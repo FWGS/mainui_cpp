@@ -225,5 +225,5 @@ CMenuYesNoMessageBox::ToggleInactiveCb
 static void ToggleInactiveInternalCb( CMenuBaseItem *pSelf, void * )
 {
 	pSelf->Parent()->ToggleInactive();
-	pSelf->Hide();
+	pSelf->ToggleVisibility();
 }
