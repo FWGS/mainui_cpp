@@ -5,7 +5,7 @@
 #include "ItemsHolder.h"
 
 CMenuItemsHolder::CMenuItemsHolder() :
-	m_iCursor( -1 ), m_iCursorPrev( -1 ), m_pItems( ), m_numItems( 0 ), m_bInit( false ), CMenuBaseItem()
+	m_iCursor( 0 ), m_iCursorPrev( 0 ), m_pItems( ), m_numItems( 0 ), m_bInit( false ), CMenuBaseItem()
 {
 	;
 }
@@ -117,7 +117,7 @@ void CMenuItemsHolder::MouseMove( int x, int y )
 		CMenuBaseItem *item = m_pItems[i];
 
 		// Invisible or inactive items will be skipped
-		if( !item->IsVisible() && item->iFlags & (QMF_GRAYED|QMF_INACTIVE) )
+		if( !item->IsVisible() || item->iFlags & (QMF_GRAYED|QMF_INACTIVE) )
 		{
 			if( item->iFlags & QMF_HASMOUSEFOCUS )
 			{
@@ -400,14 +400,14 @@ void CMenuItemsHolder::AddItem(CMenuBaseItem &item)
 void CMenuItemsHolder::Show()
 {
 	iFlags &= ~QMF_HIDDEN;
-	uiStatic.menuActive = this;
-	m_iCursor = 0;
+	// uiStatic.menuActive = this;
+	// m_iCursor = 0;
 }
 
 void CMenuItemsHolder::Hide()
 {
 	iFlags |= QMF_HIDDEN;
-	uiStatic.menuActive = uiStatic.menuStack[uiStatic.menuDepth-1];
+	// uiStatic.menuActive = uiStatic.menuStack[uiStatic.menuDepth-1];
 }
 
 bool CMenuItemsHolder::IsVisible()

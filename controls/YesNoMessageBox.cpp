@@ -24,7 +24,7 @@ static void ToggleInactiveInternalCb( CMenuBaseItem *pSelf, void *pExtra );
 
 CMenuYesNoMessageBox::CMenuYesNoMessageBox()
 {
-	iFlags = QMF_INACTIVE|QMF_DIALOG|QMF_HIDDEN;
+	iFlags = QMF_DIALOG|QMF_HIDDEN;
 	dlgMessage1.iFlags = QMF_INACTIVE|QMF_DROPSHADOW;
 	dlgMessage1.eTextAlignment = QM_CENTER;
 
@@ -225,5 +225,5 @@ CMenuYesNoMessageBox::ToggleInactiveCb
 static void ToggleInactiveInternalCb( CMenuBaseItem *pSelf, void * )
 {
 	pSelf->Parent()->ToggleInactive();
-	pSelf->ToggleInactive();
+	pSelf->Hide();
 }

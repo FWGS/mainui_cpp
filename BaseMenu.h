@@ -127,8 +127,8 @@ typedef struct
 
 typedef struct
 {
-	CMenuFramework	*menuActive;
-	CMenuFramework	*menuStack[UI_MAX_MENUDEPTH];
+	CMenuItemsHolder	*menuActive; // current active fullscreen holder(menu framework)
+	CMenuItemsHolder	*menuStack[UI_MAX_MENUDEPTH];
 	int				menuDepth;
 
 	netadr_t serverAddresses[UI_MAX_SERVERS];
