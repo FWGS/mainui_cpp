@@ -263,10 +263,10 @@ public:
 #define FREE( x )		EngFuncs::MemFree( x, __FILE__, __LINE__ )
 
 #define CL_IsActive()	(EngFuncs::ClientInGame() && !EngFuncs::GetCvarFloat( "cl_background" ))
-#define Host_Error( ... ) EngFuncs::engfuncs.pfnHostError( __VA_ARGS__ )
-#define Con_DPrintf( ... ) EngFuncs::engfuncs.Con_DPrintf( __VA_ARGS__ )
-#define Con_NPrintf( ... ) EngFuncs::engfuncs.Con_NPrintf( __VA_ARGS__ )
-#define Con_NXPrintf( ... ) EngFuncs::engfuncs.Con_NXPrintf( __VA_ARGS__ )
-#define Con_Printf( ... ) EngFuncs::engfuncs.Con_Printf( __VA_ARGS__ )
+#define Host_Error (*EngFuncs::engfuncs.pfnHostError)
+#define Con_DPrintf (*EngFuncs::engfuncs.Con_DPrintf)
+#define Con_NPrintf (*EngFuncs::engfuncs.Con_NPrintf)
+#define Con_NXPrintf (*EngFuncs::engfuncs.Con_NXPrintf)
+#define Con_Printf (*EngFuncs::engfuncs.Con_Printf)
 
 #endif//ENGINECALLBACKS_H

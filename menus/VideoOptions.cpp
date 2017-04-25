@@ -144,7 +144,7 @@ void CMenuVidOptions::_Init( void )
 	SET_EVENT( done, onActivated )
 	{
 		pSelf->Parent<CMenuVidOptions>()->SetConfig();
-		pSelf->Parent()->PopMenu();
+		pSelf->Parent()->Hide();
 	}
 	END_EVENT( done, onActivated )
 

@@ -24,11 +24,11 @@ static void ToggleInactiveInternalCb( CMenuBaseItem *pSelf, void *pExtra );
 
 CMenuYesNoMessageBox::CMenuYesNoMessageBox()
 {
-	iFlags = QMF_INACTIVE|QMF_HIDDEN|QMF_DIALOG;
-	dlgMessage1.iFlags = QMF_INACTIVE|QMF_DROPSHADOW|QMF_HIDDEN|QMF_DIALOG;
+	iFlags = QMF_INACTIVE|QMF_DIALOG|QMF_HIDDEN;
+	dlgMessage1.iFlags = QMF_INACTIVE|QMF_DROPSHADOW;
 	dlgMessage1.eTextAlignment = QM_CENTER;
 
-	yes.iFlags = no.iFlags = QMF_DROPSHADOW|QMF_HIDDEN|QMF_DIALOG;
+	yes.iFlags = no.iFlags = QMF_DROPSHADOW;
 	yes.onActivated.pExtra = no.onActivated.pExtra = this;
 	yes.bEnableTransitions = no.bEnableTransitions = false;
 
@@ -54,7 +54,7 @@ CMenuYesNoMessageBox::CMenuYesNoMessageBox()
 CMenuYesNoMessageBox::Init
 ==============
 */
-void CMenuYesNoMessageBox::Init( void )
+void CMenuYesNoMessageBox::_Init( void )
 {
 	if( !m_bSetYes )
 		SetPositiveButton( "Ok", PC_OK );
@@ -68,9 +68,9 @@ void CMenuYesNoMessageBox::Init( void )
 	if( !onPositive )
 		onPositive = ToggleInactiveInternalCb;
 
-	m_pParent->AddItem( dlgMessage1 );
-	m_pParent->AddItem( yes );
-	m_pParent->AddItem( no );
+	AddItem( dlgMessage1 );
+	AddItem( yes );
+	AddItem( no );
 }
 
 /*
@@ -78,7 +78,7 @@ void CMenuYesNoMessageBox::Init( void )
 CMenuYesNoMessageBox::VidInit
 ==============
 */
-void CMenuYesNoMessageBox::VidInit( void )
+void CMenuYesNoMessageBox::_VidInit( void )
 {
 	dlgMessage1.SetRect( DLG_X + 192, 280, 640, 256 );
 	yes.SetRect( DLG_X + 380, 460, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
@@ -87,7 +87,8 @@ void CMenuYesNoMessageBox::VidInit( void )
 
 	dlgMessage1.SetCharSize( UI_MED_CHAR_WIDTH, UI_MED_CHAR_HEIGHT );
 
-	CMenuAction::VidInit(); // setup rect properly
+	m_scPos = pos.Scale();
+	m_scSize = size.Scale();
 }
 
 /*
@@ -98,6 +99,7 @@ CMenuYesNoMessageBox::Draw
 void CMenuYesNoMessageBox::Draw( void )
 {
 	UI_FillRect( m_scPos, m_scSize, uiPromptBgColor );
+	CMenuItemsHolder::Draw();
 }
 
 /*
@@ -112,7 +114,7 @@ const char *CMenuYesNoMessageBox::Key(int key, int down)
 		onNegative( this );
 		return uiSoundNull;
 	}
-	else return CMenuAction::Key( key, down );
+	else return CMenuItemsHolder::Key( key, down );
 }
 
 /*
@@ -179,7 +181,7 @@ void CMenuYesNoMessageBox::HighlightChoice( int yesno )
 CMenuYesNoMessageBox::ToggleInactive
 ==============
 */
-void CMenuYesNoMessageBox::ToggleInactive(void)
+/*void CMenuYesNoMessageBox::ToggleInactive(void)
 {
 	yes.iFlags ^= QMF_HIDDEN;
 	no.iFlags ^= QMF_HIDDEN;
@@ -203,7 +205,7 @@ void CMenuYesNoMessageBox::SetInactive(bool enable)
 		dlgMessage1.iFlags &= ~(QMF_HIDDEN);
 		iFlags &= ~(QMF_HIDDEN);
 	}
-}
+}*/
 
 /*
 ==============
@@ -222,6 +224,6 @@ CMenuYesNoMessageBox::ToggleInactiveCb
 */
 static void ToggleInactiveInternalCb( CMenuBaseItem *pSelf, void * )
 {
-	pSelf->Parent()->ToggleItemsInactive();
+	pSelf->Parent()->ToggleInactive();
 	pSelf->ToggleInactive();
 }

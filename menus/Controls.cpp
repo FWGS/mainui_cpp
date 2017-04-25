@@ -49,7 +49,6 @@ private:
 	char		keysDescription[MAX_KEYS][256];
 	char		*keysDescriptionPtr[MAX_KEYS];
 
-	void ToggleInactive();
 	void ResetToDefaultsDialog();
 	void GetKeyBindings( const char *command, int *twoKeys );
 	void UnbindCommand( const char *command );
@@ -89,7 +88,7 @@ private:
 void CMenuControls::ResetToDefaultsDialog( void )
 {
 	// toggle main menu between active\inactive
-	ToggleItemsInactive();
+	ToggleInactive();
 
 	// show\hide reset to defaults dialog
 	msgBox2.ToggleInactive();
@@ -98,7 +97,7 @@ void CMenuControls::ResetToDefaultsDialog( void )
 void CMenuControls::PromptDialog( void )
 {
 	// toggle main menu between active\inactive
-	ToggleItemsInactive();
+	ToggleInactive();
 
 	// show\hide quit dialog
 	msgBox1.iFlags ^= QMF_HIDDEN;
@@ -185,7 +184,6 @@ void CMenuControls::ParseKeysList( void )
 
 			snprintf( str, sizeof(str), "^6%s^7", token );	// enable uiPromptTextColor
 			StringConcat( keysDescription[i], str, strlen( str ) + 1 );
-			AddSpaces( keysDescription[i], 256, 256 );	// empty
 			keysDescriptionPtr[i] = keysDescription[i];
 			strcpy( keysBind[i], "" );
 			strcpy( firstKey[i], "" );
@@ -393,7 +391,7 @@ void CMenuControls::_Init( void )
 	SET_EVENT( cancel, onActivated )
 	{
 		EngFuncs::ClientCmd( TRUE, "exec keyboard\n");
-		pSelf->Parent()->PopMenu();
+		pSelf->Parent()->Hide();
 	}
 	END_EVENT( cancel, onActivated )
 

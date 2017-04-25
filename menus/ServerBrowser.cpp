@@ -81,14 +81,9 @@ void CMenuServerBrowser::PromptDialog( CMenuBaseItem *pSelf, void *pExtra )
 
 	// toggle main menu between active\inactive
 	// show\hide quit dialog
-	parent->joinGame.iFlags ^= QMF_INACTIVE;
-	parent->createGame.iFlags ^= QMF_INACTIVE;
-	parent->gameInfo.iFlags ^= QMF_INACTIVE;
-	parent->refresh.iFlags ^= QMF_INACTIVE;
-	parent->done.iFlags ^= QMF_INACTIVE;
-	parent->gameList.iFlags ^= QMF_INACTIVE;
+	parent->ToggleInactive();
 
-	parent->msgBox.ToggleInactive();
+	parent->msgBox.ToggleVisibility();
 }
 
 /*

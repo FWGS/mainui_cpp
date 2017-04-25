@@ -33,6 +33,7 @@ set (MAINUI_CONTROLS_SOURCES
 	controls/Action.cpp
 	controls/Bitmap.cpp
 	controls/CheckBox.cpp
+	controls/ItemsHolder.cpp
 	controls/Field.cpp
 	controls/PicButton.cpp
 	controls/ScrollList.cpp

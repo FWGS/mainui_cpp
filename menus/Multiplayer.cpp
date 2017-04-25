@@ -61,14 +61,9 @@ void CMenuMultiplayer::PredictDialog( CMenuBaseItem *pSelf, void *pExtra )
 
 	// toggle main menu between active\inactive
 	// show\hide remove dialog
-	parent->internetGames.iFlags ^= QMF_INACTIVE;
-	parent->spectateGames.iFlags ^= QMF_INACTIVE;
-	parent->LANGame.iFlags ^= QMF_INACTIVE;
-	parent->Customize.iFlags ^= QMF_INACTIVE;
-	parent->Controls.iFlags ^= QMF_INACTIVE;
-	parent->done.iFlags ^= QMF_INACTIVE;
+	parent->ToggleInactive();
 
-	parent->msgBox.ToggleInactive();
+	parent->msgBox.ToggleVisibility();
 }
 
 

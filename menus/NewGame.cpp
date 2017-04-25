@@ -73,7 +73,7 @@ void CMenuNewGame::StartGameCb( CMenuBaseItem *pSelf, void *pExtra )
 
 	EngFuncs::ClientCmd( FALSE, "newgame\n" );
 
-	parent->SetItemsInactive( false );
+	parent->SetInactive( false );
 	parent->msgBox.SetInactive( true );
 }
 
@@ -81,7 +81,7 @@ void CMenuNewGame::PromptDialogCb( CMenuBaseItem *pSelf, void *pExtra )
 {
 	CMenuNewGame *parent = (CMenuNewGame *)pSelf->Parent();
 
-	parent->SetItemsInactive( true );
+	parent->SetInactive( true );
 	parent->msgBox.onPositive.pExtra = pExtra;
 	parent->msgBox.SetInactive( false );
 }

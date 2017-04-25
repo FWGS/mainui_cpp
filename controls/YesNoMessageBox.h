@@ -17,24 +17,25 @@ GNU General Public License for more details.
 #ifndef MENU_GENERICMSGBOX_H
 #define MENU_GENERICMSGBOX_H
 
+#include "ItemsHolder.h"
 #include "PicButton.h"
 #include "Action.h"
 
-class CMenuYesNoMessageBox : public CMenuAction
+class CMenuYesNoMessageBox : public CMenuItemsHolder
 {
 public:
 	CMenuYesNoMessageBox();
 
-	virtual void Init();
-	virtual void VidInit();
+	virtual void _Init();
+	virtual void _VidInit();
 	virtual void Draw();
 	virtual const char *Key( int key, int down );
 	void SetMessage( const char *msg );
 	void SetPositiveButton( const char *msg, int buttonPic, void *extra = NULL );
 	void SetNegativeButton( const char *msg, int buttonPic, void *extra = NULL );
 	void HighlightChoice( int ch ); // 0 - not hightlight, 1 - yes, 2 - no
-	void ToggleInactive();
-	void SetInactive( bool enable );
+	// void ToggleInactive();
+	// void SetInactive( bool enable );
 
 	// Pass pointer to messagebox to extra of calling object
 	static void ToggleInactiveCb( CMenuBaseItem *, void *pExtra );

@@ -80,12 +80,9 @@ void CMenuCustomGame::EndGameDialog( CMenuBaseItem *pSelf, void *pExtra )
 
 	// toggle main menu between active\inactive
 	// show\hide delete dialog
-	parent->load.iFlags ^= QMF_INACTIVE;
-	parent->go2url.iFlags ^= QMF_INACTIVE;
-	parent->done.iFlags ^= QMF_INACTIVE;
-	parent->modList.iFlags ^= QMF_INACTIVE;
+	parent->ToggleInactive();
 
-	parent->msgBox.ToggleInactive();
+	parent->msgBox.ToggleVisibility();
 }
 
 void CMenuCustomGame::ChangeGame(CMenuBaseItem *pSelf, void *pExtra)
@@ -133,9 +130,15 @@ void CMenuCustomGame::GetModList( void )
 		strncpy( modsDir[i], games[i]->gamefolder, sizeof( modsDir[i] ));
 		strncpy( modsWebSites[i], games[i]->game_url, sizeof( modsWebSites[i] ));
 
-		if( strlen( games[i]->type ))
+		if( games[i]->type[0] )
+		{
 			StringConcat( modsDescription[i], games[i]->type, TYPE_LENGTH );
-		AddSpaces( modsDescription[i], TYPE_LENGTH );
+			AddSpaces( modsDescription[i], TYPE_LENGTH );
+		}
+		else
+		{
+			AddSpaces( modsDescription[i], TYPE_LENGTH+1 );
+		}
 
 		if( ColorStrlen( games[i]->title ) > 31 ) // NAME_LENGTH
 		{
@@ -147,7 +150,7 @@ void CMenuCustomGame::GetModList( void )
 		AddSpaces( modsDescription[i], NAME_LENGTH );
 		StringConcat( modsDescription[i], games[i]->version, VER_LENGTH );
 		AddSpaces( modsDescription[i], VER_LENGTH );
-		if( strlen( games[i]->size ))
+		if( games[i]->size[0] )
 			StringConcat( modsDescription[i], games[i]->size, SIZE_LENGTH );
 		else StringConcat( modsDescription[i], "0.0 Mb", SIZE_LENGTH );
 		AddSpaces( modsDescription[i], SIZE_LENGTH );

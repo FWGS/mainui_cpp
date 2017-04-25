@@ -41,7 +41,7 @@ class CMenuMain: public CMenuFramework
 {
 public:
 	virtual const char *Key( int key, int down );
-	virtual void Activate( );
+	virtual const char *Activate( );
 
 private:
 	virtual void _Init();
@@ -184,7 +184,7 @@ void CMenuMain::QuitDialogCb(CMenuBaseItem *pSelf , void *pExtra)
 
 	// toggle main menu between active\inactive
 	// show\hide quit dialog
-	parent->ToggleItemsInactive();
+	parent->ToggleInactive();
 
 	if( CL_IsActive() )
 		parent->dialog.SetMessage( MenuStrings[HINT_QUIT_ACTIVE] );
@@ -192,7 +192,7 @@ void CMenuMain::QuitDialogCb(CMenuBaseItem *pSelf , void *pExtra)
 		parent->dialog.SetMessage( MenuStrings[HINT_QUIT] );
 
 	parent->dialog.onPositive = QuitCb;
-	parent->dialog.SetInactive( false );
+	parent->dialog.Show();
 }
 
 void CMenuMain::DisconnectDialogCb( CMenuBaseItem *pSelf , void *pExtra)
@@ -200,11 +200,11 @@ void CMenuMain::DisconnectDialogCb( CMenuBaseItem *pSelf , void *pExtra)
 	CMenuMain *parent = pSelf->Parent<CMenuMain>();
 	// toggle main menu between active\inactive
 	// show\hide quit dialog
-	parent->ToggleItemsInactive();
+	parent->ToggleInactive();
 
 	parent->dialog.onPositive = DisconnectCb;
 	parent->dialog.SetMessage( "Really disconnect?" );
-	parent->dialog.ToggleInactive();
+	parent->dialog.ToggleVisibility();
 }
 
 void CMenuMain::HazardCourseDialogCb(CMenuBaseItem *pSelf, void *pExtra)
@@ -212,11 +212,11 @@ void CMenuMain::HazardCourseDialogCb(CMenuBaseItem *pSelf, void *pExtra)
 	CMenuMain *parent = pSelf->Parent<CMenuMain>();
 	// toggle main menu between active\inactive
 	// show\hide quit dialog
-	parent->ToggleItemsInactive();
+	parent->ToggleInactive();
 
 	parent->dialog.onPositive = HazardCourseCb;
 	parent->dialog.SetMessage( MenuStrings[HINT_RESTART_HZ] );
-	parent->dialog.ToggleInactive();
+	parent->dialog.ToggleVisibility();
 
 }
 
@@ -248,7 +248,7 @@ const char *CMenuMain::Key( int key, int down )
 UI_Main_ActivateFunc
 =================
 */
-void CMenuMain::Activate( void )
+const char *CMenuMain::Activate( void )
 {
 	if ( !CL_IsActive( ))
 	{
@@ -265,6 +265,8 @@ void CMenuMain::Activate( void )
 	{
 		console.pos.y = CL_IsActive() ? 130 : 230;
 	}
+
+	return 0;
 }
 
 /*
@@ -286,7 +288,7 @@ void CMenuMain::HazardCourseCb( CMenuBaseItem *pSelf, void* )
 	EngFuncs::PlayBackgroundTrack( NULL, NULL );
 
 	EngFuncs::ClientCmd( FALSE, "hazardcourse\n" );
-	pSelf->Parent<CMenuMain>()->dialog.SetInactive( true );
+	pSelf->Parent<CMenuMain>()->dialog.Hide( );
 }
 
 void CMenuMain::DisconnectCb( CMenuBaseItem *pSelf, void* )
@@ -295,7 +297,7 @@ void CMenuMain::DisconnectCb( CMenuBaseItem *pSelf, void* )
 		EngFuncs::ClientCmd( TRUE, "endgame;wait;wait;wait;menu_options;menu_main\n");
 	else
 		EngFuncs::ClientCmd( TRUE, "cmd disconnect;wait;wait;wait;menu_options;menu_main\n");
-	pSelf->Parent<CMenuMain>()->dialog.SetInactive( true );
+	pSelf->Parent<CMenuMain>()->dialog.Hide( );
 }
 
 void CMenuMain::_Init( void )
@@ -322,7 +324,7 @@ void CMenuMain::_Init( void )
 	resumeGame.SetNameAndStatus( "Resume Game", MenuStrings[HINT_RESUME_GAME] );
 	resumeGame.SetPicture( PC_RESUME_GAME );
 	resumeGame.iFlags |= QMF_NOTIFY;
-	resumeGame.onActivated = CloseMenuCb;
+	resumeGame.onActivated = UI_CloseMenu;
 
 	disconnect.SetNameAndStatus( "Disconnect", "Disconnect from server" );
 	disconnect.SetPicture( PC_DISCONNECT );

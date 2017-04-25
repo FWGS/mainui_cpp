@@ -46,10 +46,11 @@ enum ELetterCase
 	QM_UPPERCASE
 };
 
+class CMenuItemsHolder;
 class CMenuBaseItem
 {
 public:
-	friend class CMenuFramework;
+	friend class CMenuItemsHolder;
 
 	// The main constructor
 	CMenuBaseItem();
@@ -73,6 +74,8 @@ public:
 	// Char is a special key press event for text input
 	virtual void Char( int key );
 
+	virtual void MouseMove( int x, int y ) {}
+
 	virtual const char *Activate( void );
 
 	virtual void ToggleInactive( void )
@@ -86,8 +89,26 @@ public:
 		else iFlags &= ~QMF_INACTIVE;
 	}
 
+	virtual void Show() { iFlags &= ~QMF_HIDDEN; }
+
+	virtual void Hide() { iFlags |= QMF_HIDDEN;  }
+
+	virtual bool IsVisible() { return !(iFlags & QMF_HIDDEN); }
+
+	void ToggleVisibility()
+	{
+		if( IsVisible() ) Hide();
+		else Show();
+	}
+
+	void SetVisibility( bool show )
+	{
+		if( show ) Show();
+		else Hide();
+	}
+
 	// Checks item is current selected in parent Framework
-	bool IsCurrentSelected( void ) { return this == m_pParent->ItemAtCursor(); }
+	bool IsCurrentSelected( void );
 
 
 	CEventCallback onGotFocus;
@@ -106,7 +127,7 @@ public:
 	void SetCharSize( EFontSizes fs );
 	void SetNameAndStatus( const char *name, const char *status ) { szName = name, szStatusText = status; }
 
-	CMenuFramework* Parent() const			{ return m_pParent; }
+	CMenuItemsHolder* Parent() const			{ return m_pParent; }
 	template <class T> T* Parent() const	{ return (T*) m_pParent; } // a shortcut to parent
 	bool IsPressed() const { return m_bPressed; }
 	int LastFocusTime() const { return m_iLastFocusTime; }
@@ -131,7 +152,7 @@ protected:
 	// calls specific EventCallback
 	virtual void _Event( int ev );
 
-	CMenuFramework	*m_pParent;
+	CMenuItemsHolder	*m_pParent;
 	bool	m_bPressed;
 	int		m_iLastFocusTime;
 

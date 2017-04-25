@@ -351,7 +351,7 @@ void CMenuPlayerSetup::_Init( void )
 	SET_EVENT( done, onActivated )
 	{
 		pSelf->Parent<CMenuPlayerSetup>()->SetConfig();
-		pSelf->Parent()->PopMenu();
+		pSelf->Parent()->Hide();
 	}
 	END_EVENT( done, onActivated )
 

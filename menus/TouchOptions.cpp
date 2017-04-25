@@ -225,7 +225,7 @@ void CMenuTouchOptions::_Init( void )
 	SET_EVENT( done, onActivated )
 	{
 		pSelf->Parent<CMenuTouchOptions>()->SetConfig();
-		pSelf->Parent()->PopMenu();
+		pSelf->Parent()->Hide();
 	}
 	END_EVENT( done, onActivated )
 
@@ -269,7 +269,7 @@ void CMenuTouchOptions::_Init( void )
 	{
 		CMenuTouchOptions *parent = pSelf->Parent<CMenuTouchOptions>();
 
-		parent->ToggleItemsInactive();
+		parent->ToggleInactive();
 		parent->msgBox.SetMessage( "Reset all buttons?");
 		parent->msgBox.onPositive = CMenuTouchOptions::ResetButtonsCb;
 	}
@@ -281,7 +281,7 @@ void CMenuTouchOptions::_Init( void )
 	{
 		CMenuTouchOptions *parent = pSelf->Parent<CMenuTouchOptions>();
 
-		parent->ToggleItemsInactive();
+		parent->ToggleInactive();
 		parent->msgBox.SetMessage( "Delete selected profile?");
 		parent->msgBox.onPositive = CMenuTouchOptions::DeleteProfileCb;
 	}
@@ -358,8 +358,6 @@ void CMenuTouchOptions::_Init( void )
 	END_EVENT( save, onActivated )
 
 	msgBox.SetPositiveButton( "Ok", PC_OK );
-	msgBox.SetNegativeButton( "Cancel", PC_CANCEL );
-	msgBox.onNegative = ToggleItemsInactiveCb;
 	
 	AddItem( background );
 	AddItem( banner );

@@ -1112,7 +1112,7 @@ int UI_VidInit( void )
 	// now recalc all the menus in stack
 	for( int i = 0; i < uiStatic.menuDepth; i++ )
 	{
-		CMenuFramework *item = uiStatic.menuStack[i];
+		CMenuItemsHolder *item = uiStatic.menuStack[i];
 
 		if( item )
 		{

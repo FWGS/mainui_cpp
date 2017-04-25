@@ -138,17 +138,9 @@ void CMenuCreateGame::PromptDialog( CMenuBaseItem *pSelf, void *pExtra )
 	
 	// toggle main menu between active\inactive
 	// show\hide quit dialog
-	menu->advOptions.iFlags ^= QMF_INACTIVE;
-	menu->done.iFlags ^= QMF_INACTIVE;
-	menu->cancel.iFlags ^= QMF_INACTIVE;
-	menu->maxClients.iFlags ^= QMF_INACTIVE;
-	menu->hostName.iFlags ^= QMF_INACTIVE;
-	menu->password.iFlags ^= QMF_INACTIVE;
-	menu->dedicatedServer.iFlags ^= QMF_INACTIVE;
-	menu->hltv.iFlags ^= QMF_INACTIVE;
-	menu->mapsList.iFlags ^= QMF_INACTIVE;
+	menu->ToggleInactive();
 
-	menu->msgBox.ToggleInactive();
+	menu->msgBox.ToggleVisibility();
 }
 
 /*

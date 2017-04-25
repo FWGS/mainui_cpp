@@ -241,47 +241,11 @@ void CMenuTouchButtons::UpdateFields( )
 }
 void CMenuTouchButtons::DisableButtons()
 {
-	remove.iFlags |= QMF_INACTIVE;
-	hide.iFlags |= QMF_INACTIVE;
-	buttonList.iFlags |= QMF_INACTIVE;
-	blue.iFlags |= QMF_INACTIVE;
-	alpha.iFlags |= QMF_INACTIVE;
-	red.iFlags |= QMF_INACTIVE;
-	green.iFlags |= QMF_INACTIVE;
-	reset.iFlags |= QMF_INACTIVE;
-	name.iFlags |= QMF_INACTIVE;
-	done.iFlags |= QMF_INACTIVE;
-	cancel.iFlags |= QMF_INACTIVE;
-	command.iFlags |= QMF_INACTIVE;
-	texture.iFlags |= QMF_INACTIVE;
-	sp.iFlags |= QMF_INACTIVE;
-	mp.iFlags |= QMF_INACTIVE;
-	lock.iFlags |= QMF_INACTIVE;
-	additive.iFlags |= QMF_INACTIVE;
-	precision.iFlags |= QMF_INACTIVE;
-	editor.iFlags |= QMF_INACTIVE;
+	SetInactive( true );
 }
 void CMenuTouchButtons::EnableButtons()
 {
-	remove.iFlags &= ~QMF_INACTIVE;
-	hide.iFlags &= ~QMF_INACTIVE;
-	buttonList.iFlags &= ~QMF_INACTIVE;
-	blue.iFlags &= ~QMF_INACTIVE;
-	alpha.iFlags &= ~QMF_INACTIVE;
-	red.iFlags &= ~QMF_INACTIVE;
-	green.iFlags &= ~QMF_INACTIVE;
-	reset.iFlags &= ~QMF_INACTIVE;
-	name.iFlags &= ~QMF_INACTIVE;
-	done.iFlags &= ~QMF_INACTIVE;
-	cancel.iFlags &= ~QMF_INACTIVE;
-	command.iFlags &= ~QMF_INACTIVE;
-	texture.iFlags &= ~QMF_INACTIVE;
-	sp.iFlags &= ~QMF_INACTIVE;
-	mp.iFlags &= ~QMF_INACTIVE;
-	lock.iFlags &= ~QMF_INACTIVE;
-	additive.iFlags &= ~QMF_INACTIVE;
-	precision.iFlags &= ~QMF_INACTIVE;
-	editor.iFlags &= ~QMF_INACTIVE;
+	SetInactive( false );
 }
 
 void CMenuTouchButtons::FileDialogCallback( bool success )
@@ -299,7 +263,7 @@ void CMenuTouchButtons::ExitMenuCb(CMenuBaseItem *pSelf, void *pExtra)
 	const char *cmd = (const char *)pExtra;
 
 	EngFuncs::ClientCmd( 0, cmd );
-	pSelf->Parent()->PopMenu();
+	pSelf->Parent()->Hide();
 }
 
 /*
@@ -502,7 +466,7 @@ void CMenuTouchButtons::_Init( void )
 
 		parent->msgBox.SetMessage( "Reset all buttons?" );
 		parent->msgBox.onPositive = CMenuTouchButtons::ResetButtonsCb;
-		parent->msgBox.ToggleInactive();
+		parent->msgBox.Show();
 	}
 	END_EVENT( reset, onActivated )
 
@@ -515,7 +479,7 @@ void CMenuTouchButtons::_Init( void )
 
 		parent->msgBox.SetMessage( "Delete selected button?" );
 		parent->msgBox.onPositive = CMenuTouchButtons::DeleteButtonCb;
-		parent->msgBox.ToggleInactive();
+		parent->msgBox.Show();
 	}
 	END_EVENT( remove, onActivated )
 
