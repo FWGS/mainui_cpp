@@ -100,8 +100,8 @@ void CMenuControls::PromptDialog( void )
 	ToggleInactive();
 
 	// show\hide quit dialog
-	msgBox1.iFlags ^= QMF_HIDDEN;
-	dlgMessage.iFlags ^= QMF_HIDDEN;
+	msgBox1.ToggleVisibility();
+	dlgMessage.ToggleVisibility();
 }
 
 /*
@@ -171,6 +171,12 @@ void CMenuControls::ParseKeysList( void )
 		Con_Printf( "UI_Parse_KeysList: kb_act.lst not found\n" );
 		return;
 	}
+
+	memset( keysBind, 0, sizeof( keysBind ));
+	memset( firstKey, 0, sizeof( firstKey ));
+	memset( secondKey, 0, sizeof( secondKey ));
+	memset( keysDescription, 0, sizeof( keysDescription ));
+	memset( keysDescriptionPtr, 0, sizeof( keysDescriptionPtr ));
 
 	while(( pfile = EngFuncs::COM_ParseFile( pfile, token )) != NULL )
 	{
@@ -285,7 +291,7 @@ const char *CMenuControls::Key( int key, int down )
 {
 	char	cmd[128];
 
-	if( msgBox1.iFlags & QMF_HIDDEN )
+	if( !msgBox1.IsVisible() )
 	{
 		if( down && key == K_ESCAPE && defaults.iFlags & QMF_INACTIVE )
 		{
@@ -313,6 +319,8 @@ const char *CMenuControls::Key( int key, int down )
 			bind_grab = false;
 			ParseKeysList();
 
+			PromptDialog();
+
 			return uiSoundLaunch;
 		}
 	}
@@ -339,7 +347,10 @@ void CMenuControls::EnterGrabMode()
 	const char *bindName = keysBind[keysList.iCurItem];
 
 	if( !bindName[0] )
+	{
 		UI_StartSound( uiSoundBuzz );
+		return; // not a key
+	}
 
 	int keys[2];
 
@@ -397,7 +408,7 @@ void CMenuControls::_Init( void )
 
 	keysList.SetRect( 360, 255, 640, 440 );
 	keysList.onDeleteEntry = UnbindEntryCb;
-	keysList.onActivated = EnterGrabModeCb;
+	keysList.onActivateEntry = EnterGrabModeCb;
 	keysList.szName = hintText;
 	ParseKeysList();
 

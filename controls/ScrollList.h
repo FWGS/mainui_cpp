@@ -60,6 +60,7 @@ public:
 #endif
 
 	CEventCallback onDeleteEntry;
+	CEventCallback onActivateEntry;
 
 	const char	*szBackground;
 	const char	*szUpArrow;

@@ -215,7 +215,7 @@ const char *CMenuScrollList::Key( int key, int down )
 	case K_AUX1:
 	case K_AUX31:
 	case K_AUX32:
-		_Event( QM_ACTIVATED );
+		if( onActivateEntry ) onActivateEntry( this );
 		break;
 	}
 	if( !noscroll )

@@ -3,6 +3,7 @@
 
 #include "Action.h"
 
+
 /*class CMenuActionMsgBox : public CMenuAction
 {
 public:
