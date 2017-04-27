@@ -35,7 +35,7 @@ private:
 	virtual void _Init();
 	virtual void _VidInit();
 	void GetConfig();
-	void SetConfig();
+	void SaveAndPopMenu();
 
 	CMenuBackgroundBitmap	background;
 	CMenuBannerBitmap	banner;
@@ -79,7 +79,7 @@ void CMenuAudio::GetConfig( void )
 CMenuAudio::SetConfig
 =================
 */
-void CMenuAudio::SetConfig( void )
+void CMenuAudio::SaveAndPopMenu( void )
 {
 	soundVolume.WriteCvar();
 	musicVolume.WriteCvar();
@@ -90,6 +90,8 @@ void CMenuAudio::SetConfig( void )
 	muteFocusLost.WriteCvar();
 	vibrationEnable.WriteCvar();
 	reverseChannels.WriteCvar();
+
+	CMenuFramework::SaveAndPopMenu();
 }
 
 /*
@@ -103,7 +105,7 @@ void CMenuAudio::_Init( void )
 
 	done.SetNameAndStatus( "Done", "Go back to the Configuration Menu");
 	done.SetPicture( PC_DONE );
-	done.onActivated = PopMenuCb;
+	done.onActivated = SaveAndPopMenuCb;
 
 	soundVolume.SetNameAndStatus( "Game sound volume", "Set master volume level" );
 	soundVolume.Setup( 0.0, 1.0, 0.05f );

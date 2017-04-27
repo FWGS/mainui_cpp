@@ -243,6 +243,7 @@ private:
 	void _VidInit();
 	void FindModels();
 	void SetConfig();
+	void SaveAndPopMenu();
 
 	char	models[MAX_PLAYERMODELS][CS_SIZE];
 	char	*modelsPtr[MAX_PLAYERMODELS];
@@ -327,6 +328,12 @@ void CMenuPlayerSetup::SetConfig( void )
 	clLW.WriteCvar();
 }
 
+void CMenuPlayerSetup::SaveAndPopMenu( void )
+{
+	SetConfig();
+	CMenuFramework::SaveAndPopMenu();
+}
+
 /*
 =================
 UI_PlayerSetup_Init
@@ -348,12 +355,7 @@ void CMenuPlayerSetup::_Init( void )
 
 	done.SetNameAndStatus( "Done", "Go back to the Multiplayer Menu" );
 	done.SetPicture( PC_DONE );\
-	SET_EVENT( done, onActivated )
-	{
-		pSelf->Parent<CMenuPlayerSetup>()->SetConfig();
-		pSelf->Parent()->Hide();
-	}
-	END_EVENT( done, onActivated )
+	done.onActivated = SaveAndPopMenuCb;
 
 	AdvOptions.SetNameAndStatus( "Adv. Options", "Configure handness, fov and other advanced options" );
 	AdvOptions.SetPicture( PC_ADV_OPT );

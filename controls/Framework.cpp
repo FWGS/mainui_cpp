@@ -5,7 +5,7 @@
 
 CMenuFramework::CMenuFramework() : CMenuItemsHolder()
 {
-	;
+	SetCoord( 0, 0 );
 }
 
 /*
@@ -100,7 +100,7 @@ void CMenuFramework::PopMenu( void )
 }
 
 
-void CMenuFramework::SaveAndPopMenuCb( CMenuBaseItem *pSelf, void *pExtra )
+void CMenuFramework::SaveAndPopMenu( )
 {
 	EngFuncs::ClientCmd( FALSE, "trysaveconfig\n" );
 	pSelf->Parent()->Hide();

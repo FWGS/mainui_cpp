@@ -25,9 +25,11 @@ public:
 		PushMenu();
 	}
 
+	virtual void SaveAndPopMenu();
+
 	// Events library
 	DECLARE_EVENT_TO_MENU_METHOD( CMenuFramework, PopMenu );
-	static void SaveAndPopMenuCb( CMenuBaseItem *pSelf, void *pExtra );
+	DECLARE_EVENT_TO_MENU_METHOD( CMenuFramework, SaveAndPopMenu );
 };
 
 #endif // FRAMEWORK_H

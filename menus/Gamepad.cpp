@@ -59,7 +59,7 @@ private:
 	virtual void _Init();
 	virtual void _VidInit();
 	void GetConfig();
-	void SetConfig();
+	void SaveAndPopMenu();
 
 
 	CMenuBackgroundBitmap background;
@@ -145,7 +145,7 @@ void CMenuGamePad::GetConfig( void )
 CMenuGamePad::SetConfig
 =================
 */
-void CMenuGamePad::SetConfig( void )
+void CMenuGamePad::SaveAndPopMenu( void )
 {
 	float _side, _forward, _pitch, _yaw;
 	char binding[7] = { 0 };
@@ -185,6 +185,8 @@ void CMenuGamePad::SetConfig( void )
 	EngFuncs::CvarSetValue( "joy_pitch", _pitch );
 	EngFuncs::CvarSetValue( "joy_yaw", _yaw );
 	EngFuncs::CvarSetString( "joy_axis_binding", binding );
+
+	CMenuFramework::SaveAndPopMenu();
 }
 
 /*
@@ -198,7 +200,7 @@ void CMenuGamePad::_Init( void )
 
 	done.SetNameAndStatus( "Done", "Go back to the Configuration Menu" );
 	done.SetPicture( PC_DONE );
-	done.onActivated = PopMenuCb;
+	done.onActivated = SaveAndPopMenuCb;
 
 	axisBind_label.eTextAlignment = QM_CENTER;
 	axisBind_label.iFlags = QMF_INACTIVE|QMF_DROPSHADOW;

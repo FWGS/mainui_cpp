@@ -150,10 +150,21 @@ void CMenuPicButton::Draw( )
 		{ 0, uiStatic.buttons_width, 52, 78 }
 		};
 
-		EngFuncs::PIC_Set( hPic, r, g, b, 255 );
 		EngFuncs::PIC_EnableScissor( m_scPos.x, m_scPos.y, uiStatic.buttons_draw_width, uiStatic.buttons_draw_height - 2 );
 
-		if( ( state == BUTTON_NOFOCUS && bPulse ) || (state == BUTTON_FOCUS && (eFocusAnimation == QM_PULSEIFFOCUS )))
+		a = (512 - (uiStatic.realTime - m_iLastFocusTime)) >> 1;
+
+		if( state == BUTTON_NOFOCUS && a > 0 )
+		{
+			EngFuncs::PIC_Set( hPic, r, g, b, a );
+			EngFuncs::PIC_DrawAdditive( m_scPos.x, m_scPos.y, uiStatic.buttons_draw_width, uiStatic.buttons_draw_height, &rects[BUTTON_FOCUS] );
+		}
+
+		EngFuncs::PIC_Set( hPic, r, g, b, 255 );
+
+		// pulse code.
+		if( ( state == BUTTON_NOFOCUS && bPulse ) ||
+			( state == BUTTON_FOCUS   && eFocusAnimation == QM_PULSEIFFOCUS ) )
 		{
 			EngFuncs::PIC_DrawAdditive( m_scPos.x, m_scPos.y, uiStatic.buttons_draw_width, uiStatic.buttons_draw_height, &rects[BUTTON_NOFOCUS] );
 
@@ -162,16 +173,19 @@ void CMenuPicButton::Draw( )
 		}
 		else
 		{
-			// just draw
-			EngFuncs::PIC_DrawAdditive( m_scPos.x, m_scPos.y, uiStatic.buttons_draw_width, uiStatic.buttons_draw_height, &rects[state] );
-		}
+			// special handling for focused
+			if( state == BUTTON_FOCUS )
+			{
+				EngFuncs::PIC_DrawAdditive( m_scPos.x, m_scPos.y, uiStatic.buttons_draw_width, uiStatic.buttons_draw_height, &rects[BUTTON_FOCUS] );
 
-		a = (512 - (uiStatic.realTime - m_iLastFocusTime)) >> 1;
-
-		if( state == BUTTON_NOFOCUS && a > 0 )
-		{
-			EngFuncs::PIC_Set( hPic, r, g, b, a );
-			EngFuncs::PIC_DrawAdditive( m_scPos.x, m_scPos.y, uiStatic.buttons_draw_width, uiStatic.buttons_draw_height, &rects[BUTTON_FOCUS] );
+				EngFuncs::PIC_Set( hPic, r, g, b, 255 ); // set colors again
+				EngFuncs::PIC_DrawAdditive( m_scPos.x, m_scPos.y, uiStatic.buttons_draw_width, uiStatic.buttons_draw_height, &rects[BUTTON_NOFOCUS] );
+			}
+			else
+			{
+				// just draw
+				EngFuncs::PIC_DrawAdditive( m_scPos.x, m_scPos.y, uiStatic.buttons_draw_width, uiStatic.buttons_draw_height, &rects[state] );
+			}
 		}
 
 		EngFuncs::PIC_DisableScissor();

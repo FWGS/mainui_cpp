@@ -246,7 +246,7 @@ void CMenuServerBrowser::_Init( void )
 			EngFuncs::CvarSetValue( "public", 0.0f );
 		else EngFuncs::CvarSetValue( "public", 1.0f );
 
-		// UI_CreateGame_Menu();
+		UI_CreateGame_Menu();
 	}
 	END_EVENT( createGame, onActivated )
 
@@ -311,7 +311,7 @@ void CMenuServerBrowser::_VidInit()
 	{
 		banner.SetPicture( ART_BANNER_INET );
 		createGame.szStatusText = ( "Create new Internet game" );
-		createGame.onActivated = UI_RefreshInternetServerList;
+		refresh.onActivated = UI_RefreshInternetServerList;
 	}
 
 	joinGame.SetCoord( 72, 230 );
@@ -320,7 +320,7 @@ void CMenuServerBrowser::_VidInit()
 	refresh.SetCoord( 72, 380 );
 	done.SetCoord( 72, 430 );
 
-	gameList.SetRect( 340, 255, 660, 240 );
+	gameList.SetRect( 340, 255, 660, 440 );
 
 	refreshTime = uiStatic.realTime + 500; // delay before update 0.5 sec
 }

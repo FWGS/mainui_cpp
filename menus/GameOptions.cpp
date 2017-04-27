@@ -85,6 +85,7 @@ void CMenuGameOptions::SaveCb(CMenuBaseItem *pSelf, void *pExtra)
 	parent->alwaysRun.WriteCvar();
 	parent->maxPacket.WriteCvar();
 
+	EngFuncs::ClientCmd( FALSE, "trysaveconfig\n" );
 	parent->PopMenu();
 }
 
@@ -155,7 +156,7 @@ void CMenuGameOptions::_Init( void )
 
 
 	maxPacketmessage1.iFlags = QMF_INACTIVE|QMF_DROPSHADOW;
-	maxPacketmessage1.szName = "Limit network packet size";
+	maxPacketmessage1.szName = "Limit network packet size\n";
 	maxPacketmessage1.iColor = uiColorHelp;
 	maxPacketmessage1.SetCharSize( QM_SMALLFONT );
 

@@ -108,7 +108,17 @@ void CMenuCustomGame::UpdateExtras( CMenuBaseItem *pSelf, void *pExtra )
 
 	int i = self->iCurItem;
 
+	if( !stricmp( parent->modsDir[i], gMenu.m_gameinfo.gamefolder ) )
+		parent->load.iFlags |= QMF_GRAYED;
+	else
+		parent->load.iFlags &= ~QMF_GRAYED;
+
 	parent->go2url.onActivated.pExtra = parent->modsWebSites[i];
+	if( parent->modsWebSites[i][0] )
+		parent->go2url.iFlags &= ~QMF_GRAYED;
+	else
+		parent->go2url.iFlags |= QMF_GRAYED;
+
 	parent->msgBox.onPositive.pExtra = parent->modsDir[i];
 	parent->load.onActivated.pExtra = parent->modsDir[i];
 }
@@ -168,8 +178,16 @@ void CMenuCustomGame::GetModList( void )
 	// see if the load button should be grayed
 	if( !stricmp( gMenu.m_gameinfo.gamefolder, modsDir[modList.iCurItem] ))
 		load.iFlags |= QMF_GRAYED;
+	else
+		load.iFlags &= ~QMF_GRAYED;
+
 	if( modsWebSites[modList.iCurItem][0] == '\0' )
 		go2url.iFlags |= QMF_GRAYED;
+	else
+	{
+		go2url.iFlags &= ~QMF_GRAYED;
+		go2url.onActivated.pExtra = modsWebSites[modList.iCurItem];
+	}
 }
 
 /*

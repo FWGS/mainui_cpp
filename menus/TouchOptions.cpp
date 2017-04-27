@@ -43,7 +43,7 @@ private:
 	static void ResetButtonsCb( CMenuBaseItem *pSelf, void *pExtra );
 
 	void GetProfileList();
-	void SetConfig();
+	void SaveAndPopMenu();
 	void GetConfig();
 
 	char		profileDesc[UI_MAXGAMES][95];
@@ -149,7 +149,7 @@ void CMenuTouchOptions::GetProfileList( void )
 UI_TouchOptions_SetConfig
 =================
 */
-void CMenuTouchOptions::SetConfig( void )
+void CMenuTouchOptions::SaveAndPopMenu( void )
 {
 	grid.WriteCvar();
 	gridsize.WriteCvar();
@@ -159,6 +159,8 @@ void CMenuTouchOptions::SetConfig( void )
 	moveY.WriteCvar();
 	enable.WriteCvar();
 	nomouse.WriteCvar();
+
+	CMenuFramework::SaveAndPopMenu();
 }
 
 void CMenuTouchOptions::GetConfig( void )
@@ -222,12 +224,7 @@ void CMenuTouchOptions::_Init( void )
 */
 	done.SetNameAndStatus( "Done", "Go back to the Touch Menu" );
 	done.SetPicture( PC_DONE );
-	SET_EVENT( done, onActivated )
-	{
-		pSelf->Parent<CMenuTouchOptions>()->SetConfig();
-		pSelf->Parent()->Hide();
-	}
-	END_EVENT( done, onActivated )
+	done.onActivated = SaveAndPopMenuCb;
 
 	lookX.SetNameAndStatus( "Look X", "Horizontal look sensitivity" );
 	lookX.Setup( 50, 500, 5 );

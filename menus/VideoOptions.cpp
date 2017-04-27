@@ -36,7 +36,7 @@ private:
 	void _Init();
 	void _VidInit();
 
-	void SetConfig();
+	void SaveAndPopMenu();
 	void GetConfig();
 
 	int		outlineWidth;
@@ -75,13 +75,15 @@ void CMenuVidOptions::GetConfig( void )
 	else gammaIntensity.SetCurrentValue( RemapVal( EngFuncs::GetCvarFloat( "gamma" ), 0.5f, 2.3f, 0.0f, 1.0f ) );
 }
 
-void CMenuVidOptions::SetConfig( void )
+void CMenuVidOptions::SaveAndPopMenu( void )
 {
 	screenSize.WriteCvar();
 	glareReduction.WriteCvar();
 	fastSky.WriteCvar();
 	hiTextures.WriteCvar();
 	// gamma is already written
+
+	CMenuFramework::SaveAndPopMenu();
 }
 
 /*
@@ -141,12 +143,7 @@ void CMenuVidOptions::_Init( void )
 	done.SetNameAndStatus( "Done", "Go back to the Video Menu" );
 	done.SetCoord( 72, 435 );
 	done.SetPicture( PC_DONE );
-	SET_EVENT( done, onActivated )
-	{
-		pSelf->Parent<CMenuVidOptions>()->SetConfig();
-		pSelf->Parent()->Hide();
-	}
-	END_EVENT( done, onActivated )
+	done.onActivated = SaveAndPopMenuCb;
 
 	screenSize.SetNameAndStatus( "Screen size",  "Set the screen size" );
 	screenSize.SetCoord( 72, 280 );

@@ -59,6 +59,7 @@ private:
 	CMenuField	maxClients;
 	CMenuField	hostName;
 	CMenuField	password;
+	CMenuCheckBox   nat;
 	CMenuCheckBox	hltv;
 	CMenuCheckBox	dedicatedServer;
 
@@ -95,6 +96,7 @@ void CMenuCreateGame::Begin( CMenuBaseItem *pSelf, void *pExtra )
 
 	EngFuncs::CvarSetValue( "deathmatch", 1.0f );	// start deathmatch as default
 	EngFuncs::CvarSetString( "defaultmap", mapName );
+	EngFuncs::CvarSetValue( "sv_nat", EngFuncs::GetCvarFloat( "public" ) ? menu->nat.bChecked : 0 );
 	menu->hostName.WriteCvar();
 	menu->hltv.WriteCvar();
 	menu->maxClients.WriteCvar();
@@ -206,12 +208,14 @@ void CMenuCreateGame::_Init( void )
 
 	done.SetNameAndStatus( "Ok", "Start the multiplayer game" );
 	done.SetPicture( PC_OK );
-	done.onActivated = PromptDialog;
-	done.onActivatedClActive = Begin;
+	done.onActivated = Begin;
+	done.onActivatedClActive = PromptDialog;
 
 	cancel.SetNameAndStatus( "Cancel", "Return to the previous menu" );
 	cancel.SetPicture( PC_CANCEL );
 	cancel.onActivated = PopMenuCb;
+
+	nat.SetNameAndStatus( "NAT", "Use NAT Bypass instead of direct mode" );
 
 	dedicatedServer.SetNameAndStatus( "Dedicated server", "faster, but you can't join the server from this machine" );
 
@@ -244,9 +248,6 @@ void CMenuCreateGame::_Init( void )
 	password.bHideInput = true;
 	// TODO: This field is completely ignored. Add password option to the engine!
 
-	msgBox.SetPositiveButton( "Ok", PC_OK );
-	msgBox.SetNegativeButton( "Cancel", PC_CANCEL );
-	msgBox.onNegative = PromptDialog;
 	msgBox.onPositive = Begin;
 
 	AddItem( background );
@@ -259,6 +260,7 @@ void CMenuCreateGame::_Init( void )
 	AddItem( password );
 	AddItem( dedicatedServer );
 	AddItem( hltv );
+	AddItem( nat );
 	AddItem( mapsList );
 	AddItem( msgBox );
 }
@@ -269,9 +271,15 @@ void CMenuCreateGame::_VidInit()
 	done.SetCoord( 72, 280 );
 	cancel.SetCoord( 72, 330 );
 
-	dedicatedServer.SetCoord( 72, 685 );
+	nat.SetCoord( 72, 585 );
+	if( EngFuncs::GetCvarFloat("public") )
+		nat.Hide();
+	else nat.Show();
+
 	hltv.SetCoord( 72, 635 );
-	mapsList.SetCoord( 590, 245 );
+	dedicatedServer.SetCoord( 72, 685 );
+
+	mapsList.SetRect( 590, 245, 410, 440 );
 
 	hostName.SetRect( 350, 260, 205, 32 );
 	maxClients.SetRect( 350, 360, 205, 32 );

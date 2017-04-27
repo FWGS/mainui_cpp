@@ -40,6 +40,7 @@ private:
 	virtual void _VidInit( void );
 
 	void GetConfig( void );
+	void SaveAndPopMenu( void );
 
 	CMenuBackgroundBitmap background;
 	CMenuBannerBitmap banner;
@@ -74,6 +75,8 @@ void CAdvancedControls::GetConfig( void )
 	mlook = (kbutton_s *)EngFuncs::KEY_GetState( "in_mlook" );
 	if( mlook && mlook->state & 1 )
 		mouseLook.bChecked = true;
+	else
+		mouseLook.bChecked = false;
 
 	crosshair.LinkCvar( "crosshair" );
 	lookSpring.LinkCvar( "lookspring" );
@@ -94,6 +97,23 @@ void CAdvancedControls::GetConfig( void )
 	}
 }
 
+void CAdvancedControls::SaveAndPopMenu()
+{
+	crosshair.WriteCvar();
+	lookSpring.WriteCvar();
+	lookStrafe.WriteCvar();
+	mouseFilter.WriteCvar();
+	autoaim.WriteCvar();
+	sensitivity.WriteCvar();
+
+	if( mouseLook.bChecked )
+		EngFuncs::ClientCmd( TRUE, "+mlook\n" );
+	else
+		EngFuncs::ClientCmd( TRUE, "-mlook\n" );
+
+	CMenuFramework::SaveAndPopMenu();
+}
+
 /*
 =================
 UI_AdvControls_Init
@@ -101,16 +121,17 @@ UI_AdvControls_Init
 */
 void CAdvancedControls::_Init( void )
 {
-	// memset( &uiAdvControls, 0, sizeof( uiAdvControls_t ));
-
 	banner.SetPicture( ART_BANNER );
 
 	done.SetNameAndStatus( "Done", "save changed and go back to the Customize Menu" );
-	done.onActivated = PopMenuCb;
+	done.SetPicture( PC_DONE );
+	done.onActivated = SaveAndPopMenuCb;
 
 	crosshair.SetNameAndStatus( "Crosshair", "Enable the weapon aiming crosshair" );
+	crosshair.iFlags |= QMF_NOTIFY;
 
 	invertMouse.SetNameAndStatus( "Invert mouse", "Reverse mouse up/down axis" );
+	invertMouse.iFlags |= QMF_NOTIFY;
 	SET_EVENT( invertMouse, onChanged )
 	{
 		CMenuCheckBox *self = (CMenuCheckBox*)pSelf;
@@ -122,6 +143,7 @@ void CAdvancedControls::_Init( void )
 	END_EVENT( invertMouse, onChanged )
 
 	mouseLook.SetNameAndStatus( "Mouse look", "Use the mouse to look around instead of using the mouse to move" );
+	mouseLook.iFlags |= QMF_NOTIFY;
 	SET_EVENT( mouseLook, onChanged )
 	{
 		CMenuCheckBox *self = (CMenuCheckBox*)pSelf;
@@ -130,26 +152,30 @@ void CAdvancedControls::_Init( void )
 		{
 			parent->lookSpring.iFlags |= QMF_GRAYED;
 			parent->lookStrafe.iFlags |= QMF_GRAYED;
-			EngFuncs::ClientCmd( TRUE, "+mlook" );
+			EngFuncs::ClientCmd( TRUE, "+mlook\n" );
 		}
 		else
 		{
 			parent->lookSpring.iFlags &= ~QMF_GRAYED;
-			parent->lookSpring.iFlags &= ~QMF_GRAYED;
-			EngFuncs::ClientCmd( TRUE, "-mlook" );
+			parent->lookStrafe.iFlags &= ~QMF_GRAYED;
+			EngFuncs::ClientCmd( TRUE, "-mlook\n" );
 		}
 	}
 	END_EVENT( mouseLook, onChanged )
 
 	lookSpring.SetNameAndStatus("Look spring", "Causes the screen to 'spring' back to looking straight ahead when you\nmove forward" );
+	lookSpring.iFlags |= QMF_NOTIFY;
 
 	lookStrafe.SetNameAndStatus( "Look strafe", "In combination with your mouse look modifier, causes left-right movements\nto strafe instead of turn");
+	lookStrafe.iFlags |= QMF_NOTIFY;
 
 	mouseFilter.SetNameAndStatus( "Mouse filter", "Average mouse inputs over the last two frames to smooth out movements" );
+	mouseFilter.iFlags |= QMF_NOTIFY;
 
 	autoaim.SetNameAndStatus( "Autoaim", "Let game to help you aim at enemies" );
+	autoaim.iFlags |= QMF_NOTIFY;
 
-	sensitivity.szStatusText = "Set in-game mouse sensitivity";
+	sensitivity.SetNameAndStatus( "Senitivity", "Set in-game mouse sensitivity" );
 	sensitivity.Setup( 0.0, 20.0f, 0.1 );
 
 	AddItem( background );
