@@ -64,7 +64,8 @@ typedef void (*VoidCallback)(void);
 class CEventCallback
 {
 public:
-	CEventCallback() : pExtra(NULL), callback(NULL) {}
+	CEventCallback() : pExtra( NULL ), callback( NULL ) {}
+
 	void *pExtra;
 
 	operator bool() { return (bool)callback; }
@@ -92,21 +93,21 @@ public:
 
 	void SetCommand( int execute_now, const char *sz )
 	{
-		static CmdCallback cmd;
 		cmd.execute_now = execute_now;
 		cmd.cmd = sz;
+
 		pExtra = &cmd;
 		callback = CmdCallbackWrapperCb;
 	}
 
 private:
-	EventCallback callback;
-
 	struct CmdCallback
 	{
 		int execute_now;
 		const char *cmd;
-	};
+	} cmd;
+	EventCallback callback;
+
 
 	static void VoidCallbackWrapperCb( CMenuBaseItem *pSelf, void *pExtra )
 	{
