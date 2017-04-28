@@ -239,8 +239,10 @@ public:
 	{ engfuncs.pfnProcessImage( texnum, gamma, topColor, bottomColor ); }
 	static inline int	CompareFileTime( char *filename1, char *filename2, int *iCompare )
 	{ return engfuncs.pfnCompareFileTime( filename1, filename2, iCompare ); }
+	static ui_enginefuncs_t engfuncs;
 
 	// text funcs
+#ifndef XASH_DISABLE_FWGS_EXTENSIONS
 	static inline void EnableTextInput( int enable )
 	{ if( textfuncs.pfnEnableTextInput ) textfuncs.pfnEnableTextInput( enable ); }
 	static inline int UtfProcessChar( int ch )
@@ -252,8 +254,13 @@ public:
 	static inline int UtfMoveRight( char *str, int pos, int length )
 	{ if( textfuncs.pfnUtfMoveRight ) textfuncs.pfnUtfMoveRight( str, pos, length );
 		return pos + 1; }
-	static ui_enginefuncs_t engfuncs;
 	static ui_textfuncs_t textfuncs;
+#else
+	static inline void EnableTextInput( int enable ) { }
+	static inline int UtfProcessChar( int ch ) { return ch; }
+	static inline int UtfMoveLeft( char *str, int pos ) { return pos - 1; }
+	static inline int UtfMoveRight( char *str, int pos, int length ) { return pos + 1; }
+#endif
 };
 
 
