@@ -41,7 +41,8 @@ set (MAINUI_CONTROLS_SOURCES
 	controls/SpinControl.cpp
 	controls/YesNoMessageBox.cpp
 	controls/MessageBox.cpp
-	controls/Editable.h)
+	controls/Editable.h
+	controls/Switch.cpp)
 
 set (MAINUI_MENUS_SOURCES
 	menus/AdvancedControls.cpp

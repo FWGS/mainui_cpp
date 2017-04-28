@@ -213,19 +213,19 @@ void CMenuGamePad::_Init( void )
 		axisBind[i].Setup( axisNames, JOY_AXIS_NULL + 1 );
 	}
 
-	side.Setup( 0.0f, 2.0f, 0.1f );
+	side.Setup( 0.0f, 1.0f, 0.1f );
 	side.SetNameAndStatus( "Side", "Side movement sensitity" );
 	invSide.SetNameAndStatus( "Invert", "Invert side movement axis" );
 
-	forward.Setup( 0.0f, 2.0f, 0.1f );
+	forward.Setup( 0.0f, 1.0f, 0.1f );
 	forward.SetNameAndStatus( "Forward", "Forward movement sensitivity" );
 	invFwd.SetNameAndStatus( "Invert", "Invert forward movement axis" );
 
-	pitch.Setup( 0.0f, 2.0f, 0.1f );
+	pitch.Setup( 0.0f, 200.0f, 0.1f );
 	pitch.SetNameAndStatus( "Pitch", "Pitch rotating sensitivity" );
 	invPitch.SetNameAndStatus( "Invert", "Invert pitch axis" );
 
-	yaw.Setup( 0.0f, 2.0f, 0.1f );
+	yaw.Setup( 0.0f, 200.0f, 0.1f );
 	yaw.SetNameAndStatus( "Yaw", "Yaw rotating sensitivity" );
 	invYaw.SetNameAndStatus( "Invert", "Invert yaw axis" );
 
@@ -250,12 +250,12 @@ void CMenuGamePad::_Init( void )
 void CMenuGamePad::_VidInit()
 {
 	done.SetCoord( 72, 630 );
-	axisBind_label.SetRect( 52, 180, 26, 200 );
-	axisBind_label.SetCharSize( 30, 17 );
+	axisBind_label.SetRect( 52, 180, 200, 26 );
+	axisBind_label.SetCharSize( 17, 30 );
 
 	for( int i = 0, y = 230; i < 6; i++, y += 50 )
 	{
-		axisBind[i].SetRect( 72, y, 26, 256 );
+		axisBind[i].SetRect( 72, y, 256, 26 );
 		axisBind[i].SetCharSize( 11, 22 );
 	}
 

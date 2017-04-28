@@ -78,8 +78,6 @@ const char *CMenuCheckBox::Key( int key, int down )
 		sound = uiSoundGlow;
 		break;
 	}
-	if( sound && ( iFlags & QMF_SILENT ))
-		sound = uiSoundNull;
 
 	if( iFlags & QMF_ACT_ONRELEASE )
 	{
@@ -92,9 +90,9 @@ const char *CMenuCheckBox::Key( int key, int down )
 				event = QM_PRESSED;
 				m_bPressed = true;
 			}
-			else event = QM_CHANGED;
-			if( !down )
+			else
 			{
+				event = QM_CHANGED;
 				bChecked = !bChecked;	// apply on release
 				SetCvarValue( bChecked );
 			}
@@ -110,6 +108,9 @@ const char *CMenuCheckBox::Key( int key, int down )
 			_Event( QM_CHANGED );
 		}
 	}
+
+	if( iFlags & QMF_SILENT )
+		return 0;
 	return sound;
 }
 

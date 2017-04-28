@@ -85,6 +85,7 @@ public:
 	int		iScrollBarSliding;
 // highlight // mittorn
 	int		iHighlight;
+	bool    bFramedHintText;
 };
 
 #endif // MENU_SCROLLLIST_H

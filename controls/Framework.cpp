@@ -103,7 +103,7 @@ void CMenuFramework::PopMenu( void )
 void CMenuFramework::SaveAndPopMenu( )
 {
 	EngFuncs::ClientCmd( FALSE, "trysaveconfig\n" );
-	pSelf->Parent()->Hide();
+	PopMenu();
 }
 
 void CMenuFramework::Show()

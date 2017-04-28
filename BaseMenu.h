@@ -218,7 +218,7 @@ void UI_DrawPicTrans( int x, int y, int width, int height, const int color, cons
 void UI_DrawPicHoles( int x, int y, int width, int height, const int color, const char *pic );
 void UI_FillRect( int x, int y, int w, int h, const int color );
 void UI_DrawRectangleExt( int in_x, int in_y, int in_w, int in_h, const int color, int outlineWidth );
-void UI_DrawString(int x, int y, int w, int h, const char *str, const int col, int forceCol, int charW, int charH, ETextAlignment justify, bool shadow );
+void UI_DrawString(int x, int y, int w, int h, const char *str, const int col, int forceCol, int charW, int charH, ETextAlignment justify, bool shadow, ETextAlignment vertAlign = QM_TOP);
 inline void UI_DrawRectangle( int x, int y, int w, int h, const int color )
 {
 	UI_DrawRectangleExt( x, y, w, h, color, uiStatic.outlineWidth );
@@ -256,9 +256,9 @@ inline void UI_DrawRectangleExt( Point pos, Size size, const int color, int outl
 {
 	UI_DrawRectangleExt( pos.x, pos.y, size.w, size.h, color, outlineWidth );
 }
-inline void UI_DrawString( Point pos, Size size, const char *str, const int col, int forceCol, Size chSize, ETextAlignment justify, bool shadow )
+inline void UI_DrawString( Point pos, Size size, const char *str, const int col, int forceCol, Size chSize, ETextAlignment justify, bool shadow, ETextAlignment verticalAlignment = QM_TOP  )
 {
-	UI_DrawString( pos.x, pos.y, size.w, size.h, str, col, forceCol, chSize.w, chSize.h, justify, shadow );
+	UI_DrawString( pos.x, pos.y, size.w, size.h, str, col, forceCol, chSize.w, chSize.h, justify, shadow, verticalAlignment );
 }
 
 void UI_StartSound( const char *sound );

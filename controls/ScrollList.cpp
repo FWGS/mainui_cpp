@@ -33,6 +33,7 @@ CMenuScrollList::CMenuScrollList() : CMenuBaseItem()
 
 	eFocusAnimation = QM_HIGHLIGHTIFFOCUS;
 	SetCharSize( QM_SMALLFONT );
+	bFramedHintText = false;
 }
 
 
@@ -276,7 +277,14 @@ void CMenuScrollList::Draw( )
 
 	if( szName )
 	{
-		UI_DrawString( x, y - m_scChSize.h * 1.5, w, h, szName, uiColorDkGrey, true, m_scChSize.w, m_scChSize.h, eTextAlignment, shadow );
+		if( bFramedHintText )
+		{
+			UI_FillRect( x, y - m_scChSize.h * 1.75, w, m_scChSize.h * 1.75, uiColorBlack );
+			UI_DrawRectangle( x, y - m_scChSize.h * 1.75, w, m_scChSize.h * 1.75, uiInputFgColor );
+		}
+
+		UI_DrawString( x, y - m_scChSize.h * 1.5, w, h, szName, uiColorHelp, true, m_scChSize.w, m_scChSize.h, eTextAlignment, shadow );
+
 	}
 
 

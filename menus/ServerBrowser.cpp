@@ -15,7 +15,6 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-
 */
 
 #include "extdll.h"
@@ -25,6 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "ScrollList.h"
 #include "Utils.h"
 #include "keydefs.h"
+#include "Switch.h"
 #include "BtnsBMPTable.h"
 
 #define ART_BANNER_INET		"gfx/shell/head_inetgames"
@@ -48,8 +48,13 @@ private:
 	virtual void _Init();
 	virtual void _VidInit();
 
-	static void PromptDialog( CMenuBaseItem *pSelf, void *pExtra );
 	void GetGamesList( void );
+	void ClearList( void );
+	void RefreshList( void );
+
+	DECLARE_EVENT_TO_MENU_METHOD( CMenuServerBrowser, RefreshList )
+
+	static void PromptDialog( CMenuBaseItem *pSelf, void *pExtra );
 	static void JoinGame( CMenuBaseItem *pSelf, void *pExtra );
 
 	char		gameDescription[UI_MAX_SERVERS][256];
@@ -63,12 +68,14 @@ private:
 	CMenuPicButton gameInfo;
 	CMenuPicButton refresh;
 	CMenuPicButton done;
+	CMenuSwitch natOrDirect;
 
 	CMenuYesNoMessageBox msgBox;
 	CMenuScrollList	gameList;
 
-	char		hintText[MAX_HINT_TEXT];
-	int		refreshTime;
+	char  hintText[MAX_HINT_TEXT];
+	int	  refreshTime;
+	int   refreshTime2;
 
 	bool m_bLanOnly;
 };
@@ -182,7 +189,34 @@ void CMenuServerBrowser::JoinGame( CMenuBaseItem *pSelf, void *pExtra )
 
 	EngFuncs::ClientJoin( uiStatic.serverAddresses[parent->gameList.iCurItem] );
 	// prevent refresh durning connect
-	parent->refreshTime = uiStatic.realTime + 999999999;
+	parent->refreshTime = uiStatic.realTime + 999999;
+}
+
+void CMenuServerBrowser::ClearList()
+{
+	uiStatic.numServers = 0;
+	gameList.iNumItems = 0;
+	gameList.iCurItem = 0;
+	memset( gameDescriptionPtr, 0, sizeof( gameDescriptionPtr ) );
+}
+
+void CMenuServerBrowser::RefreshList()
+{
+	if( m_bLanOnly )
+	{
+		UI_RefreshServerList();
+	}
+	else
+	{
+		if( uiStatic.realTime > refreshTime2 )
+		{
+			UI_RefreshInternetServerList();
+			refreshTime2 = uiStatic.realTime + (EngFuncs::GetCvarFloat("cl_nat") ? 4000:1000);
+			refresh.iFlags |= QMF_GRAYED;
+			if( uiStatic.realTime + 20000 < refreshTime )
+				refreshTime = uiStatic.realTime + 20000;
+		}
+	}
 }
 
 /*
@@ -196,9 +230,13 @@ void CMenuServerBrowser::Draw( void )
 
 	if( uiStatic.realTime > refreshTime )
 	{
+		RefreshList();
 		refreshTime = uiStatic.realTime + 20000; // refresh every 10 secs
-		if( m_bLanOnly ) UI_RefreshServerList();
-		else UI_RefreshInternetServerList();
+	}
+
+	if( uiStatic.realTime > refreshTime2 )
+	{
+		refresh.iFlags &= ~QMF_GRAYED;
 	}
 
 	// serverinfo has been changed update display
@@ -257,6 +295,7 @@ void CMenuServerBrowser::_Init( void )
 
 	refresh.SetNameAndStatus( "Refresh", "Refresh servers list" );
 	refresh.SetPicture( PC_REFRESH );
+	refresh.onActivated = RefreshListCb;
 
 	done.SetNameAndStatus( "Done", "Return to main menu" );
 	done.onActivated = PopMenuCb;
@@ -264,15 +303,30 @@ void CMenuServerBrowser::_Init( void )
 
 	msgBox.SetMessage( "Join a network game will exit\nany current game, OK to exit?" );
 	msgBox.SetPositiveButton( "Ok", PC_OK );
-	msgBox.SetNegativeButton( "Cancel", PC_CANCEL );
 	msgBox.HighlightChoice( 1 );
 	msgBox.onPositive = JoinGame;
-	msgBox.onNegative = PromptDialog;
 
 	gameList.SetCharSize( QM_SMALLFONT );
 	gameList.eFocusAnimation = QM_HIGHLIGHTIFFOCUS;
 	gameList.pszItemNames = (const char **)gameDescriptionPtr;
+	gameList.bFramedHintText = true;
 	gameList.szName = hintText;
+
+	natOrDirect.szLeftName = "Direct";
+	natOrDirect.szRightName = "NAT";
+	natOrDirect.eTextAlignment = QM_CENTER;
+	natOrDirect.bMouseToggle = false;
+	natOrDirect.LinkCvar( "cl_nat" );
+	SET_EVENT( natOrDirect, onChanged )
+	{
+		CMenuSwitch *self = (CMenuSwitch*)pSelf;
+		CMenuServerBrowser *parent = self->Parent<CMenuServerBrowser>();
+
+		self->WriteCvar();
+		parent->ClearList();
+		parent->RefreshList();
+	}
+	END_EVENT( natOrDirect, onChanged )
 
 	// server.dll needs for reading savefiles or startup newgame
 	if( !EngFuncs::CheckGameDll( ))
@@ -287,8 +341,8 @@ void CMenuServerBrowser::_Init( void )
 	AddItem( refresh );
 	AddItem( done );
 	AddItem( gameList );
+	AddItem( natOrDirect );
 	AddItem( msgBox );
-
 }
 
 /*
@@ -305,13 +359,13 @@ void CMenuServerBrowser::_VidInit()
 	{
 		banner.SetPicture( ART_BANNER_LAN );
 		createGame.szStatusText = ( "Create new LAN game" );
-		refresh.onActivated = UI_RefreshServerList;
+		natOrDirect.iFlags |= QMF_HIDDEN;
 	}
 	else
 	{
 		banner.SetPicture( ART_BANNER_INET );
 		createGame.szStatusText = ( "Create new Internet game" );
-		refresh.onActivated = UI_RefreshInternetServerList;
+		natOrDirect.iFlags &= ~QMF_HIDDEN;
 	}
 
 	joinGame.SetCoord( 72, 230 );
@@ -321,8 +375,10 @@ void CMenuServerBrowser::_VidInit()
 	done.SetCoord( 72, 430 );
 
 	gameList.SetRect( 340, 255, 660, 440 );
+	natOrDirect.SetCoord( 780, 180 );
 
 	refreshTime = uiStatic.realTime + 500; // delay before update 0.5 sec
+	refreshTime2 = uiStatic.realTime + 500;
 }
 
 /*
