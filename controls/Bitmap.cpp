@@ -160,6 +160,12 @@ void CMenuBackgroundBitmap::Draw()
 	if( EngFuncs::GetCvarFloat("cl_background") )
 		return;
 
+	if( EngFuncs::ClientInGame() && EngFuncs::GetCvarFloat("ui_renderworld") )
+	{
+		UI_FillRect( 0, 0, ScreenWidth, ScreenHeight, uiColorBlack );
+		return;
+	}
+
 	if (!uiStatic.m_fHaveSteamBackground)
 	{
 		UI_DrawPic( 0, 0, ScreenWidth, ScreenHeight, uiColorWhite, szPic );
