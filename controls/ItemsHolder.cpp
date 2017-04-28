@@ -95,7 +95,7 @@ const char *CMenuItemsHolder::Key( int key, int down )
 
 void CMenuItemsHolder::Char( int ch )
 {
-	if( m_numItems )
+	if( !m_numItems )
 		return;
 
 	CMenuBaseItem *item = ItemAtCursor();
