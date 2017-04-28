@@ -74,16 +74,16 @@ void CMenuNewGame::StartGameCb( CMenuBaseItem *pSelf, void *pExtra )
 	EngFuncs::ClientCmd( FALSE, "newgame\n" );
 
 	parent->SetInactive( false );
-	parent->msgBox.SetInactive( true );
+	parent->msgBox.SetVisibility( false );
 }
 
 void CMenuNewGame::PromptDialogCb( CMenuBaseItem *pSelf, void *pExtra )
 {
 	CMenuNewGame *parent = (CMenuNewGame *)pSelf->Parent();
 
-	parent->SetInactive( true );
-	parent->msgBox.onPositive.pExtra = pExtra;
-	parent->msgBox.SetInactive( false );
+	parent->ToggleInactive();
+	parent->msgBox.onPositive.pExtra = pSelf->onActivated.pExtra;
+	parent->msgBox.ToggleVisibility();
 }
 
 /*
@@ -114,7 +114,7 @@ void CMenuNewGame::_Init( void )
 	hard.onActivated.pExtra = (void*)3;
 
 	easy.onActivatedClActive = medium.onActivatedClActive = hard.onActivatedClActive = PromptDialogCb;
-	easy.onActivated = medium.onActivated = hard.onActivated = StartGameCb;
+	msgBox.onPositive = easy.onActivated = medium.onActivated = hard.onActivated = StartGameCb;
 
 	cancel.SetNameAndStatus("Cancel", "Go back to the main menu");
 	cancel.SetPicture( PC_CANCEL );
@@ -123,7 +123,7 @@ void CMenuNewGame::_Init( void )
 	cancel.onActivated = PopMenuCb;
 
 	msgBox.SetMessage( MenuStrings[HINT_RESTART_GAME] );
-	msgBox.onPositive = StartGameCb;
+	msgBox.HighlightChoice( CMenuYesNoMessageBox::HIGHLIGHT_NO );
 
 	AddItem( background );
 	AddItem( banner );

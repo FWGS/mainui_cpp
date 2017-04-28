@@ -33,6 +33,12 @@ public:
 	void SetMessage( const char *msg );
 	void SetPositiveButton( const char *msg, int buttonPic, void *extra = NULL );
 	void SetNegativeButton( const char *msg, int buttonPic, void *extra = NULL );
+	enum
+	{
+		NO_HIGHLIGHT = 0,
+		HIGHLIGHT_YES,
+		HIGHLIGHT_NO
+	};
 	void HighlightChoice( int ch ); // 0 - not hightlight, 1 - yes, 2 - no
 	// void ToggleInactive();
 	// void SetInactive( bool enable );
