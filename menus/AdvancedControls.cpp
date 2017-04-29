@@ -38,7 +38,6 @@ public:
 private:
 	virtual void _Init( void );
 	virtual void _VidInit( void );
-	friend class EventCallback;
 
 	void GetConfig( void );
 	void SaveAndPopMenu( void );
