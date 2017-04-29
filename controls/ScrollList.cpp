@@ -260,7 +260,7 @@ void CMenuScrollList::Draw( )
 	shadow = (iFlags & QMF_DROPSHADOW);
 
 	// use fixed size for arrows
-	Size arrow = { 24, 24 };
+	Size arrow( 24, 24 );
 
 	arrow = arrow.Scale();
 

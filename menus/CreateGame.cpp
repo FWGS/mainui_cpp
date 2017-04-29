@@ -128,7 +128,7 @@ void CMenuCreateGame::Begin( CMenuBaseItem *pSelf, void *pExtra )
 		EngFuncs::CvarSetValue( "maxplayers", atoi( menu->maxClients.GetBuffer() ));
 
 		// hack: wait three frames allowing server to completely shutdown, reapply maxplayers and start new map
-		sprintf( cmd, "EngFuncs::HostEndGame;wait;wait;wait;maxplayers %i;latch;map %s\n", atoi( menu->maxClients.GetBuffer() ), mapName );
+		sprintf( cmd, "endgame;wait;wait;wait;maxplayers %i;latch;map %s\n", atoi( menu->maxClients.GetBuffer() ), mapName );
 		EngFuncs::ClientCmd( FALSE, cmd );
 
 	}
@@ -272,7 +272,7 @@ void CMenuCreateGame::_VidInit()
 	cancel.SetCoord( 72, 330 );
 
 	nat.SetCoord( 72, 585 );
-	if( EngFuncs::GetCvarFloat("public") )
+	if( !EngFuncs::GetCvarFloat("public") )
 		nat.Hide();
 	else nat.Show();
 

@@ -42,6 +42,7 @@ private:
 
 	CMenuPicButton	done;
 
+public:
 	CMenuSlider	soundVolume;
 	CMenuSlider	musicVolume;
 	CMenuSlider	suitVolume;

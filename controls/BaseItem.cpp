@@ -100,7 +100,7 @@ void CMenuBaseItem::_Event( int ev )
 	case QM_GOTFOCUS:  callback = onGotFocus; break;
 	case QM_LOSTFOCUS: callback = onLostFocus; break;
 	case QM_ACTIVATED:
-		if( onActivatedClActive && CL_IsActive( ))
+		if( (bool)onActivatedClActive && CL_IsActive( ))
 			callback = onActivatedClActive;
 		else callback = onActivated;
 		break;

@@ -298,6 +298,7 @@ void CMenuSpinControl::SetCurrentValue( const char *stringValue )
 	{
 		if( !strcmp( m_stringValues[i], stringValue ) )
 		{
+			m_flCurValue = i;
 			Display();
 			return;
 		}

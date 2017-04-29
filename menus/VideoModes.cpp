@@ -65,7 +65,7 @@ class CMenuVidModes : public CMenuFramework
 {
 private:
 	void _Init();
-
+public:
 	void GetConfig();
 	void SetConfig();
 
@@ -130,7 +130,7 @@ void CMenuVidModes::_Init( void )
 	ok.SetPicture( PC_OK );
 	SET_EVENT( ok, onActivated )
 	{
-		pSelf->Parent<CMenuVidModes>()->SetConfig();
+		((CMenuVidModes*)pSelf->Parent())->SetConfig();
 		pSelf->Parent()->Hide();
 	}
 	END_EVENT( ok, onActivated )

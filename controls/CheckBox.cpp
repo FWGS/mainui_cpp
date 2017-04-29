@@ -92,9 +92,11 @@ const char *CMenuCheckBox::Key( int key, int down )
 			}
 			else
 			{
+				m_bPressed = false;
 				event = QM_CHANGED;
 				bChecked = !bChecked;	// apply on release
 				SetCvarValue( bChecked );
+
 			}
 			_Event( event );
 		}

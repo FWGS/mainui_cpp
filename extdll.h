@@ -59,6 +59,7 @@ GNU General Public License for more details.
 typedef int (*cmpfunc)( const void *a, const void *b );
 typedef int BOOL;
 typedef unsigned char byte;
+typedef unsigned int uint;
 
 #include "menu_int.h"
 

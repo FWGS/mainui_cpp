@@ -44,7 +44,7 @@ public:
 private:
 	void _Init();
 	void _VidInit();
-
+public:
 	void DeleteButton();
 	void ResetButtons();
 	void UpdateFields();
@@ -164,7 +164,7 @@ void CMenuTouchButtons::GetButtonList()
 
 void CMenuTouchButtons::CMenuColor::Draw()
 {
-	CMenuTouchButtons *parent = Parent<CMenuTouchButtons>();
+	CMenuTouchButtons *parent = (CMenuTouchButtons *)Parent();
 
 	uint color = ((uint)parent->blue.GetCurrentValue()) |
 				(((uint)parent->green.GetCurrentValue()) << 8) |
@@ -176,7 +176,7 @@ void CMenuTouchButtons::CMenuColor::Draw()
 
 void CMenuTouchButtons::CMenuButtonPreview::Draw()
 {
-	CMenuTouchButtons *parent = Parent<CMenuTouchButtons>();
+	CMenuTouchButtons *parent = (CMenuTouchButtons *)Parent();
 
 	UI_FillRect( m_scPos.x - 2, m_scPos.y - 2, m_scSize.w + 4, m_scSize.h + 4, 0xFFC0C0C0 );
 	UI_FillRect( m_scPos, m_scSize, 0xFF808080 );
@@ -317,7 +317,7 @@ void CMenuTouchButtons::_Init( void )
 	SET_EVENT( mp, onChanged )
 	{
 		CMenuCheckBox *self = (CMenuCheckBox*)pSelf;
-		CMenuTouchButtons *parent = pSelf->Parent<CMenuTouchButtons>();
+		CMenuTouchButtons *parent = (CMenuTouchButtons*)pSelf->Parent();
 		if( self->bChecked )
 		{
 			parent->curflags |= TOUCH_FL_MP;
@@ -335,7 +335,7 @@ void CMenuTouchButtons::_Init( void )
 	SET_EVENT( sp, onChanged )
 	{
 		CMenuCheckBox *self = (CMenuCheckBox*)pSelf;
-		CMenuTouchButtons *parent = pSelf->Parent<CMenuTouchButtons>();
+		CMenuTouchButtons *parent = (CMenuTouchButtons*)pSelf->Parent();
 		if( self->bChecked )
 		{
 			parent->curflags |= TOUCH_FL_SP;
@@ -364,7 +364,7 @@ void CMenuTouchButtons::_Init( void )
 	SET_EVENT( save, onActivated )
 	{
 		char command[256];
-		CMenuTouchButtons *parent = pSelf->Parent<CMenuTouchButtons>();
+		CMenuTouchButtons *parent = (CMenuTouchButtons*)pSelf->Parent();
 
 		if( parent->name.GetBuffer()[0] )
 		{
@@ -409,7 +409,7 @@ void CMenuTouchButtons::_Init( void )
 	select.SetPicture("gfx/shell/btn_touch_select");
 	SET_EVENT( select, onActivated )
 	{
-		pSelf->Parent<CMenuTouchButtons>()->DisableButtons();
+		((CMenuTouchButtons*)pSelf->Parent())->DisableButtons();
 
 		// TODO: Remove uiFileDialogGlobal
 		// TODO: Make uiFileDialog menu globally known
@@ -423,7 +423,7 @@ void CMenuTouchButtons::_Init( void )
 		strcpy( uiFileDialogGlobal.patterns[5], "*.tga");
 		uiFileDialogGlobal.preview = true;
 		uiFileDialogGlobal.valid = true;
-		uiFileDialogGlobal.callback = FileDialogCallback;
+		uiFileDialogGlobal.callback = CMenuTouchButtons::FileDialogCallback;
 		UI_FileDialog_Menu();
 	}
 	END_EVENT( select, onActivated )
@@ -442,9 +442,9 @@ void CMenuTouchButtons::_Init( void )
 
 		const char *buf = self->GetBuffer();
 		if( buf[0] && buf[0] != '#' )
-			self->Parent<CMenuTouchButtons>()->preview.textureId = EngFuncs::PIC_Load( buf );
+			((CMenuTouchButtons*)self->Parent())->preview.textureId = EngFuncs::PIC_Load( buf );
 		else
-			self->Parent<CMenuTouchButtons>()->preview.textureId = 0;
+			((CMenuTouchButtons*)self->Parent())->preview.textureId = 0;
 	}
 	END_EVENT( texture, onChanged )
 
@@ -452,7 +452,7 @@ void CMenuTouchButtons::_Init( void )
 	msgBox.SetNegativeButton( "Cancel", PC_CANCEL );
 	SET_EVENT( msgBox, onNegative )
 	{
-		pSelf->Parent<CMenuTouchButtons>()->EnableButtons();
+		((CMenuTouchButtons*)pSelf->Parent())->EnableButtons();
 		((CMenuYesNoMessageBox*)pSelf)->ToggleInactive();
 	}
 	END_EVENT( msgBox, onNegative )
@@ -461,7 +461,7 @@ void CMenuTouchButtons::_Init( void )
 	reset.SetPicture( "gfx/shell/btn_touch_reset" );
 	SET_EVENT( reset, onActivated )
 	{
-		CMenuTouchButtons *parent = pSelf->Parent<CMenuTouchButtons>();
+		CMenuTouchButtons *parent = (CMenuTouchButtons*)pSelf->Parent();
 		parent->DisableButtons();
 
 		parent->msgBox.SetMessage( "Reset all buttons?" );
@@ -474,7 +474,7 @@ void CMenuTouchButtons::_Init( void )
 	remove.SetPicture( PC_DELETE );
 	SET_EVENT( remove, onActivated )
 	{
-		CMenuTouchButtons *parent = pSelf->Parent<CMenuTouchButtons>();
+		CMenuTouchButtons *parent = (CMenuTouchButtons*)pSelf->Parent();
 		parent->DisableButtons();
 
 		parent->msgBox.SetMessage( "Delete selected button?" );
