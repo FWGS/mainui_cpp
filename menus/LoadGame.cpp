@@ -93,6 +93,8 @@ private:
 
 	void DeleteDialog();
 	DECLARE_EVENT_TO_MENU_METHOD( CMenuLoadGame, DeleteDialog )
+
+public:
 	void GetGameList();
 
 	char		saveName[UI_MAXGAMES][CS_SIZE];
@@ -102,6 +104,7 @@ private:
 
 	CMenuBackgroundBitmap background;
 	CMenuBannerBitmap banner;
+
 	CMenuPicButton	load;
 	CMenuPicButton  save;
 	CMenuPicButton	remove;
@@ -212,7 +215,7 @@ void CMenuLoadGame::_Init( void )
 	save.SetPicture( PC_SAVE_GAME );
 	SET_EVENT( save, onActivated )
 	{
-		CMenuLoadGame *parent = pSelf->Parent<CMenuLoadGame>();
+		CMenuLoadGame *parent = (CMenuLoadGame*)pSelf->Parent();
 		const char *saveName = parent->saveName[parent->savesList.iCurItem];;
 		if( saveName[0] )
 		{
@@ -234,7 +237,7 @@ void CMenuLoadGame::_Init( void )
 	load.SetPicture( PC_LOAD_GAME );
 	SET_EVENT( load, onActivated )
 	{
-		CMenuLoadGame *parent = pSelf->Parent<CMenuLoadGame>();
+		CMenuLoadGame *parent = (CMenuLoadGame*)pSelf->Parent();
 		const char *saveName = parent->saveName[parent->savesList.iCurItem];
 		if( saveName[0] )
 		{
@@ -263,7 +266,7 @@ void CMenuLoadGame::_Init( void )
 	SET_EVENT( savesList, onChanged )
 	{
 		CMenuScrollList *self = (CMenuScrollList*)pSelf;
-		CMenuLoadGame *parent = self->Parent<CMenuLoadGame>();
+		CMenuLoadGame *parent = (CMenuLoadGame*)self->Parent();
 
 		parent->levelShot.szName = parent->saveName[self->iCurItem];
 	}
@@ -274,7 +277,7 @@ void CMenuLoadGame::_Init( void )
 	msgBox.SetMessage( "Delete this save?" );
 	SET_EVENT( msgBox, onPositive )
 	{
-		CMenuLoadGame *parent = pSelf->Parent<CMenuLoadGame>();
+		CMenuLoadGame *parent = (CMenuLoadGame*)pSelf->Parent();
 		const char *delName = parent->delName[parent->savesList.iCurItem];
 
 		if( delName[0] )

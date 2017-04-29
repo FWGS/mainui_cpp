@@ -106,7 +106,7 @@ public:
 
 	// sound handlers
 	static inline void	PlayLocalSound( const char *szSound )
-	{ return engfuncs.pfnPlayLocalSound( szSound ); }
+	{ engfuncs.pfnPlayLocalSound( szSound ); }
 
 	// cinematic handlers
 	static inline void	DrawLogo( const char *filename, float x, float y, float width, float height )
@@ -142,7 +142,7 @@ public:
 	static inline void	RenderScene( const struct ref_params_s *fd )
 	{  engfuncs.pfnRenderScene( fd ); }
 	static inline int	CL_CreateVisibleEntity( int type, struct cl_entity_s *ent )
-	{  engfuncs.CL_CreateVisibleEntity( type, ent ); }
+	{  return engfuncs.CL_CreateVisibleEntity( type, ent ); }
 
 	// misc handlers
 	// static inline void	HostError( const char *szFmt, ... );
@@ -155,7 +155,7 @@ public:
 	static inline int	CreateMapsList( int iRefresh )
 	{ return engfuncs.pfnCreateMapsList( iRefresh ); }
 	static inline int	ClientInGame( void )
-	{  engfuncs.pfnClientInGame(); }
+	{  return engfuncs.pfnClientInGame(); }
 	static inline void	ClientJoin( const struct netadr_s adr )
 	{  engfuncs.pfnClientJoin( adr ); }
 
@@ -192,7 +192,7 @@ public:
 	static inline void*	MemAlloc( size_t cb, const char *filename, const int fileline )
 	{ return engfuncs.pfnMemAlloc( cb, filename, fileline ); }
 	static inline void	MemFree( void *mem, const char *filename, const int fileline )
-	{ return  engfuncs.pfnMemFree( mem, filename, fileline ); }
+	{ engfuncs.pfnMemFree( mem, filename, fileline ); }
 
 	// collect info from engine
 	static inline int	GetGameInfo( GAMEINFO *pgameinfo )
@@ -232,9 +232,9 @@ public:
 	{ return engfuncs.pfnRandomLong( lLow, lHigh ); }
 
 	static inline void	SetCursor( void *hCursor ) // change cursor
-	{ return engfuncs.pfnSetCursor( hCursor ); }
+	{ engfuncs.pfnSetCursor( hCursor ); }
 	static inline int	IsMapValid( const char *filename )
-	{ return engfuncs.pfnIsMapValid( filename ); }
+	{ return engfuncs.pfnIsMapValid( (char*)filename ); }
 	static inline void	ProcessImage( int texnum, float gamma, int topColor = 0, int bottomColor = 0 )
 	{ engfuncs.pfnProcessImage( texnum, gamma, topColor, bottomColor ); }
 	static inline int	CompareFileTime( char *filename1, char *filename2, int *iCompare )

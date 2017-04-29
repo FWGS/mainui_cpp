@@ -180,7 +180,7 @@ void CMenuMain::QuitCb(CMenuBaseItem *, void *)
 
 void CMenuMain::QuitDialogCb(CMenuBaseItem *pSelf , void *pExtra)
 {
-	CMenuMain *parent = pSelf->Parent<CMenuMain>();
+	CMenuMain *parent = (CMenuMain*)pSelf->Parent();
 
 	// toggle main menu between active\inactive
 	// show\hide quit dialog
@@ -197,7 +197,7 @@ void CMenuMain::QuitDialogCb(CMenuBaseItem *pSelf , void *pExtra)
 
 void CMenuMain::DisconnectDialogCb( CMenuBaseItem *pSelf , void *pExtra)
 {
-	CMenuMain *parent = pSelf->Parent<CMenuMain>();
+	CMenuMain *parent = (CMenuMain*)pSelf->Parent();
 	// toggle main menu between active\inactive
 	// show\hide quit dialog
 	parent->ToggleInactive();
@@ -209,7 +209,7 @@ void CMenuMain::DisconnectDialogCb( CMenuBaseItem *pSelf , void *pExtra)
 
 void CMenuMain::HazardCourseDialogCb(CMenuBaseItem *pSelf, void *pExtra)
 {
-	CMenuMain *parent = pSelf->Parent<CMenuMain>();
+	CMenuMain *parent = (CMenuMain*)pSelf->Parent();
 	// toggle main menu between active\inactive
 	// show\hide quit dialog
 	parent->ToggleInactive();
@@ -288,7 +288,7 @@ void CMenuMain::HazardCourseCb( CMenuBaseItem *pSelf, void* )
 	EngFuncs::PlayBackgroundTrack( NULL, NULL );
 
 	EngFuncs::ClientCmd( FALSE, "hazardcourse\n" );
-	pSelf->Parent<CMenuMain>()->dialog.Hide( );
+	((CMenuMain*)pSelf->Parent())->dialog.Hide( );
 }
 
 void CMenuMain::DisconnectCb( CMenuBaseItem *pSelf, void* )
@@ -297,7 +297,7 @@ void CMenuMain::DisconnectCb( CMenuBaseItem *pSelf, void* )
 		EngFuncs::ClientCmd( TRUE, "endgame;wait;wait;wait;menu_options;menu_main\n");
 	else
 		EngFuncs::ClientCmd( TRUE, "cmd disconnect;wait;wait;wait;menu_options;menu_main\n");
-	pSelf->Parent<CMenuMain>()->dialog.Hide( );
+	((CMenuMain*)pSelf->Parent())->dialog.Hide( );
 }
 
 void CMenuMain::_Init( void )

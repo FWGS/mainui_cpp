@@ -36,6 +36,7 @@ public:
 private:
 	virtual void _Init();
 	virtual void _VidInit();
+public:
 	static void PredictDialog( CMenuBaseItem *pSelf, void *pExtra );
 
 	CMenuBackgroundBitmap	background;

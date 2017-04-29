@@ -92,7 +92,7 @@ void CMenuFileDialog::GetFileList( void )
 
 void CMenuFileDialog::SaveAndPopCb(CMenuBaseItem *pSelf, void *pExtra)
 {
-	CMenuFileDialog *parent = pSelf->Parent<CMenuFileDialog>();
+	CMenuFileDialog *parent = (CMenuFileDialog*)pSelf->Parent();
 	const char *fileName = (const char *)pExtra;
 
 	strncpy( uiFileDialogGlobal.result, fileName, 256 );
@@ -105,7 +105,7 @@ void CMenuFileDialog::SaveAndPopCb(CMenuBaseItem *pSelf, void *pExtra)
 
 void CMenuFileDialog::UpdateExtra(CMenuBaseItem *pSelf, void *pExtra)
 {
-	CMenuFileDialog *parent = pSelf->Parent<CMenuFileDialog>();
+	CMenuFileDialog *parent = (CMenuFileDialog*)pSelf->Parent();
 	const char *fileName = parent->filePath[parent->fileList.iCurItem];
 
 	parent->done.onActivated.pExtra = (void*)fileName;

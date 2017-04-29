@@ -241,6 +241,7 @@ class CMenuPlayerSetup : public CMenuFramework
 private:
 	void _Init();
 	void _VidInit();
+public:
 	void FindModels();
 	void SetConfig();
 	void SaveAndPopMenu();
@@ -278,7 +279,7 @@ void CMenuPlayerSetup::FindModels( void )
 {
 	char	name[256], path[256];
 	char	**filenames;
-	int numFiles;
+	int numFiles, i;
 	
 	num_models = 0;
 
@@ -294,7 +295,7 @@ void CMenuPlayerSetup::FindModels( void )
 	num_models++;
 #endif
 	// build the model list
-	for( int i = 0; i < numFiles; i++ )
+	for( i = 0; i < numFiles; i++ )
 	{
 		COM_FileBase( filenames[i], name );
 		snprintf( path, sizeof(path), "models/player/%s/%s.mdl", name, name );
@@ -306,7 +307,7 @@ void CMenuPlayerSetup::FindModels( void )
 		num_models++;
 	}
 
-	for( int i = num_models; i < MAX_PLAYERMODELS; i++ )
+	for( i = num_models; i < MAX_PLAYERMODELS; i++ )
 		modelsPtr[i] = NULL;
 }
 
@@ -361,7 +362,7 @@ void CMenuPlayerSetup::_Init( void )
 	AdvOptions.SetPicture( PC_ADV_OPT );
 	SET_EVENT( AdvOptions, onActivated )
 	{
-		pSelf->Parent<CMenuPlayerSetup>()->SetConfig();
+		((CMenuPlayerSetup*)pSelf->Parent())->SetConfig();
 		UI_GameOptions_Menu();
 	}
 	END_EVENT( AdvOptions, onActivated )
@@ -375,7 +376,7 @@ void CMenuPlayerSetup::_Init( void )
 	model.LinkCvar( "model", CMenuEditable::CVAR_STRING );
 	SET_EVENT( model, onChanged )
 	{
-		CMenuPlayerSetup *parent = pSelf->Parent<CMenuPlayerSetup>();
+		CMenuPlayerSetup *parent = (CMenuPlayerSetup*)pSelf->Parent();
 		CMenuSpinControl *self = (CMenuSpinControl*)pSelf;
 		char image[256];
 		const char *model = self->GetCurrentString();

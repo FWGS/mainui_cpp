@@ -1,11 +1,12 @@
 
 CC ?= gcc -m32
-CXX ?= g++ -m32
+CXX ?= wine cmd /c cl
 CFLAGS ?= -O2 -fPIC -ggdb
-TOPDIR = $(PWD)/..
-INCLUDES = -I../common -I../engine -I../engine/common -I../engine/client -I../pm_shared
+TOPDIR = $(PWD)
+XASH3D ?= $(PWD)/..
+INCLUDES = -I$(XASH3D)/common -I$(XASH3D)/engine -I$(XASH3D)/engine/common -I$(XASH3D)/engine/client -I$(XASH3D)/pm_shared -I$(TOPDIR) -I$(TOPDIR)/controls
 INCLUDES += -I$(VGUI_DIR)/include/
-DEFINES =
+DEFINES = -DMY_COMPILER_SUCKS
 
 SRCS = \
 	controls/Framework.cpp                          \
@@ -62,20 +63,12 @@ $(OBJS): | obj
 
 
 obj:
-	mkdir -p $@
+	mkdir -p obj obj/menus obj/controls
 
 obj/%.o : %.cpp
 	$(CXX) $(CFLAGS) $(INCLUDES) $(DEFINES) -c $< -o $@
 
-.PHONY: depend clean
+.PHONY: clean
 
 clean : 
 	$(RM) $(OBJS) libxashmenu.so
-
-depend: Makefile.dep
-
-Makefile.dep: $(SRCS)
-	rm -f ./Makefile.dep
-	$(CC) $(CFLAGS) $(INCLUDES) $(DEFINES) -MM $^>>./Makefile.dep
-
-include Makefile.dep

@@ -196,6 +196,8 @@ CMenuGamePad::Init
 */
 void CMenuGamePad::_Init( void )
 {
+	int i, y;
+
 	banner.SetPicture( ART_BANNER );
 
 	done.SetNameAndStatus( "Done", "Go back to the Configuration Menu" );
@@ -207,7 +209,7 @@ void CMenuGamePad::_Init( void )
 	axisBind_label.iColor = uiColorHelp;
 	axisBind_label.szName = "Axis binding map";
 
-	for( int i = 0, y = 230; i < 6; i++, y += 50 )
+	for( i = 0, y = 230; i < 6; i++, y += 50 )
 	{
 		axisBind[i].szStatusText = "Set axis binding";
 		axisBind[i].Setup( axisNames, JOY_AXIS_NULL + 1 );
@@ -232,7 +234,7 @@ void CMenuGamePad::_Init( void )
 	AddItem( background );
 	AddItem( banner );
 	AddItem( done );
-	for( int i = 0; i < 6; i++ )
+	for( i = 0; i < 6; i++ )
 	{
 		AddItem( axisBind[i] );
 	}

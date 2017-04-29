@@ -37,7 +37,7 @@ private:
 
 	CMenuBackgroundBitmap	background;
 	CMenuBannerBitmap	banner;
-
+public:
 	CMenuPicButton	controls;
 	CMenuPicButton	audio;
 	CMenuPicButton	video;

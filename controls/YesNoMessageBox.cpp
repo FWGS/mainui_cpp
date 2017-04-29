@@ -62,10 +62,10 @@ void CMenuYesNoMessageBox::_Init( void )
 	if( !m_bSetNo )
 		SetNegativeButton( "Cancel", PC_CANCEL );
 
-	if( !onNegative )
+	if( !(bool)onNegative )
 		onNegative = ToggleInactiveInternalCb;
 
-	if( !onPositive )
+	if( !(bool)onPositive )
 		onPositive = ToggleInactiveInternalCb;
 
 	AddItem( dlgMessage1 );

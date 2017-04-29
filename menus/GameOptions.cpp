@@ -77,7 +77,7 @@ const char *CMenuGameOptions::Key( int key, int down )
 
 void CMenuGameOptions::SaveCb(CMenuBaseItem *pSelf, void *pExtra)
 {
-	CMenuGameOptions *parent = pSelf->Parent<CMenuGameOptions>();
+	CMenuGameOptions *parent = (CMenuGameOptions*)pSelf->Parent();
 
 	parent->maxFPS.WriteCvar();
 	parent->hand.WriteCvar();
@@ -100,7 +100,7 @@ void CMenuGameOptions::Restore()
 
 void CMenuGameOptions::RestoreCb(CMenuBaseItem *pSelf, void *pExtra)
 {
-	CMenuGameOptions *parent = pSelf->Parent<CMenuGameOptions>();
+	CMenuGameOptions *parent = (CMenuGameOptions*)pSelf->Parent();
 
 	parent->Restore();
 	parent->PopMenu();

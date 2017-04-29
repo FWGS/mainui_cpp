@@ -39,6 +39,7 @@ private:
 	void _Init();
 	void _VidInit();
 
+public:
 	static void DeleteProfileCb( CMenuBaseItem *pSelf, void *pExtra );
 	static void ResetButtonsCb( CMenuBaseItem *pSelf, void *pExtra );
 
@@ -177,7 +178,7 @@ void CMenuTouchOptions::GetConfig( void )
 
 void CMenuTouchOptions::DeleteProfileCb(CMenuBaseItem *pSelf, void *pExtra)
 {
-	CMenuTouchOptions *parent = pSelf->Parent<CMenuTouchOptions>();
+	CMenuTouchOptions *parent = (CMenuTouchOptions*)pSelf->Parent();
 	char command[256];
 
 	if( parent->profiles.iCurItem <= parent->firstProfile )
@@ -191,7 +192,7 @@ void CMenuTouchOptions::DeleteProfileCb(CMenuBaseItem *pSelf, void *pExtra)
 
 void CMenuTouchOptions::ResetButtonsCb(CMenuBaseItem *pSelf, void *pExtra)
 {
-	CMenuTouchOptions *parent = pSelf->Parent<CMenuTouchOptions>();
+	CMenuTouchOptions *parent = (CMenuTouchOptions*)pSelf->Parent();
 
 	EngFuncs::ClientCmd( 0, "touch_pitch 90\n" );
 	EngFuncs::ClientCmd( 0, "touch_yaw 120\n" );
@@ -264,7 +265,7 @@ void CMenuTouchOptions::_Init( void )
 	reset.SetPicture("gfx/shell/btn_touch_reset");
 	SET_EVENT( reset, onActivated )
 	{
-		CMenuTouchOptions *parent = pSelf->Parent<CMenuTouchOptions>();
+		CMenuTouchOptions *parent = (CMenuTouchOptions *)pSelf->Parent();
 
 		parent->ToggleInactive();
 		parent->msgBox.SetMessage( "Reset all buttons?");
@@ -276,7 +277,7 @@ void CMenuTouchOptions::_Init( void )
 	remove.SetPicture( PC_DELETE );
 	SET_EVENT( remove, onActivated )
 	{
-		CMenuTouchOptions *parent = pSelf->Parent<CMenuTouchOptions>();
+		CMenuTouchOptions *parent = (CMenuTouchOptions *)pSelf->Parent();
 
 		parent->ToggleInactive();
 		parent->msgBox.SetMessage( "Delete selected profile?");
@@ -288,7 +289,7 @@ void CMenuTouchOptions::_Init( void )
 	apply.SetPicture( PC_ACTIVATE );
 	SET_EVENT( apply, onActivated )
 	{
-		CMenuTouchOptions *parent = pSelf->Parent<CMenuTouchOptions>();
+		CMenuTouchOptions *parent = (CMenuTouchOptions *)pSelf->Parent();
 		int i = parent->profiles.iCurItem;
 
 		// preset selected
@@ -340,7 +341,7 @@ void CMenuTouchOptions::_Init( void )
 	save.SetPicture("gfx/shell/btn_touch_save");
 	SET_EVENT( save, onActivated )
 	{
-		CMenuTouchOptions *parent = pSelf->Parent<CMenuTouchOptions>();
+		CMenuTouchOptions *parent = (CMenuTouchOptions*)pSelf->Parent();
 		char name[256];
 
 		if( parent->profilename.GetBuffer()[0] )

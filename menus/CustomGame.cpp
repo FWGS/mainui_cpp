@@ -87,7 +87,7 @@ void CMenuCustomGame::EndGameDialog( CMenuBaseItem *pSelf, void *pExtra )
 
 void CMenuCustomGame::ChangeGame(CMenuBaseItem *pSelf, void *pExtra)
 {
-	CMenuCustomGame *parent = pSelf->Parent<CMenuCustomGame>();
+	CMenuCustomGame *parent = (CMenuCustomGame*)pSelf->Parent();
 
 	char cmd[128];
 	sprintf( cmd, "game %s\n", (const char*)pExtra );
@@ -103,7 +103,7 @@ void CMenuCustomGame::Go2Site(CMenuBaseItem *pSelf, void *pExtra)
 
 void CMenuCustomGame::UpdateExtras( CMenuBaseItem *pSelf, void *pExtra )
 {
-	CMenuCustomGame *parent = pSelf->Parent<CMenuCustomGame>();
+	CMenuCustomGame *parent = (CMenuCustomGame*)pSelf->Parent();
 	CMenuScrollList *self = (CMenuScrollList*)pSelf;
 
 	int i = self->iCurItem;

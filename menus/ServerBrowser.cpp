@@ -48,6 +48,7 @@ private:
 	virtual void _Init();
 	virtual void _VidInit();
 
+public:
 	void GetGamesList( void );
 	void ClearList( void );
 	void RefreshList( void );
@@ -271,8 +272,9 @@ void CMenuServerBrowser::_Init( void )
 	joinGame.SetPicture( PC_JOIN_GAME );
 	SET_EVENT( joinGame, onActivated )
 	{
-		if( CL_IsActive() ) PromptDialog( pSelf, pExtra );
-		else JoinGame( pSelf, pExtra );
+		CMenuServerBrowser *parent = (CMenuServerBrowser*) pSelf->Parent();
+		if( CL_IsActive() ) parent->PromptDialog( pSelf, pExtra );
+		else parent->JoinGame( pSelf, pExtra );
 	}
 	END_EVENT( joinGame, onActivated )
 
@@ -320,7 +322,7 @@ void CMenuServerBrowser::_Init( void )
 	SET_EVENT( natOrDirect, onChanged )
 	{
 		CMenuSwitch *self = (CMenuSwitch*)pSelf;
-		CMenuServerBrowser *parent = self->Parent<CMenuServerBrowser>();
+		CMenuServerBrowser *parent = (CMenuServerBrowser*)self->Parent();
 
 		self->WriteCvar();
 		parent->ClearList();

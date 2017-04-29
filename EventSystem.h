@@ -33,9 +33,23 @@
 // #define SET_EVENT_VOID( item, callback, func, ... )	SET_EVENT( item, callback ) { (func)(__VA_ARGS__); } END_EVENT( item, callback )
 // #define SET_EVENT_THIS_VOID( item, callback, func, ... ) SET_EVENT_VOID( (*this), callback, func, __VA_ARGS__ )
 #endif
+#if _MSC_VER < 1900
 
+#define DECLARE_EVENT_TO_MENU_METHOD( className, method ) \
+	static void method##Cb( CMenuBaseItem *pSelf, void * ) \
+	{\
+		((className *)pSelf->Parent())->method();\
+	}
+
+#define DECLARE_EVENT_TO_ITEM_METHOD( className, method ) \
+	static void method##Cb( CMenuBaseItem *pSelf, void * ) \
+	{\
+		((className *)pSelf)->method();\
+	}
+
+#else
 #define DECLARE_EVENT_TO_MENU_METHOD( className, method, ... ) \
-	static void method ## Cb( CMenuBaseItem *pSelf, void * ) \
+	static void method ## Cb( CMenuBaseItem *pSelf, void *, ... ) \
 	{\
 		pSelf->Parent<className>()->method(__VA_ARGS__);\
 	}
@@ -45,7 +59,7 @@
 	{\
 		((className *)pSelf)->method(__VA_ARGS__);\
 	}
-
+#endif
 
 class CMenuBaseItem;
 

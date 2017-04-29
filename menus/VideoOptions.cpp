@@ -36,6 +36,7 @@ private:
 	void _Init();
 	void _VidInit();
 
+public:
 	void SaveAndPopMenu();
 	void GetConfig();
 
@@ -122,7 +123,7 @@ void CMenuVidOptions::CMenuVidPreview::Draw( )
 	viewport[1] = (m_scSize.h - sb_lines - viewport[3]) / 2;
 
 	UI_DrawPic( m_scPos.x + viewport[0], m_scPos.y + viewport[1], viewport[2], viewport[3], uiColorWhite, szPic );
-	UI_DrawRectangleExt( m_scPos, m_scSize, color, Parent<CMenuVidOptions>()->outlineWidth );
+	UI_DrawRectangleExt( m_scPos, m_scSize, color, ((CMenuVidOptions*)Parent())->outlineWidth );
 }
 
 /*
