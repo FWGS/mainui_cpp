@@ -51,7 +51,6 @@ public:
 
 	HIMAGE hPlayerImage;
 
-private:
 	void CalcFov();
 
 	ref_params_t refdef;
@@ -74,7 +73,7 @@ CMenuPlayerModelView::CMenuPlayerModelView() : CMenuBaseItem()
 
 void CMenuPlayerModelView::Init()
 {
-	ent = EngFuncs::GetPlayerModel();
+
 }
 
 void CMenuPlayerModelView::VidInit()
@@ -82,8 +81,12 @@ void CMenuPlayerModelView::VidInit()
 	m_scPos = pos.Scale();
 	m_scSize = size.Scale();
 
+	ent = EngFuncs::GetPlayerModel();
+
 	if( !ent )
 		return;
+
+	EngFuncs::SetModel( ent, "models/player.mdl" );
 
 	// setup render and actor
 	refdef.fov_x = 40;
@@ -103,7 +106,7 @@ void CMenuPlayerModelView::VidInit()
 	ent->curstate.scale = 1.0f;
 	ent->curstate.frame = 0.0f;
 	ent->curstate.framerate = 1.0f;
-	ent->curstate.effects |= EF_FULLBRIGHT;
+	//ent->curstate.effects |= EF_FULLBRIGHT;
 	ent->curstate.controller[0] = 127;
 	ent->curstate.controller[1] = 127;
 	ent->curstate.controller[2] = 127;
@@ -154,7 +157,7 @@ const char *CMenuPlayerModelView::Key(int key, int down)
 	case K_KP_LEFTARROW:
 		if( down )
 		{
-			yaw -= 10.0f;
+			yaw += 10.0f;
 
 			if( yaw > 180.0f ) yaw -= 360.0f;
 			else if( yaw < -180.0f ) yaw += 360.0f;
@@ -383,6 +386,13 @@ void CMenuPlayerSetup::_Init( void )
 
 		snprintf( image, 256, "models/player/%s/%s.bmp", model, model );
 		parent->view.hPlayerImage = EngFuncs::PIC_Load( image );
+		EngFuncs::CvarSetString("model", model );
+		if( !strcmp( model, "player" ) )
+			strcpy( image, "models/player.mdl" );
+		else
+			snprintf( image, sizeof(image), "models/player/%s/%s.mdl", model, model );
+		if( parent->view.ent )
+			EngFuncs::SetModel( parent->view.ent, image );
 	}
 	END_EVENT( model, onChanged )
 
@@ -409,6 +419,9 @@ void CMenuPlayerSetup::_Init( void )
 	hiModels.iFlags |= addFlags;
 	hiModels.SetNameAndStatus( "High quality models", "Show HD models in multiplayer" );
 	hiModels.LinkCvar( "cl_himodels" );
+
+	view.iFlags |= addFlags;
+	//view.
 
 	AddItem( background );
 	AddItem( banner );
