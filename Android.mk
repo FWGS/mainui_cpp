@@ -14,8 +14,9 @@ endif
 
 
 LOCAL_MODULE := menu
+LOCAL_CFLAGS := -std=gnu++11
 
-APP_PLATFORM := android-12
+APP_PLATFORM := android-9
 
 LOCAL_C_INCLUDES := $(SDL_PATH)/include \
 		    $(LOCAL_PATH)/.			    \
@@ -24,12 +25,10 @@ LOCAL_C_INCLUDES := $(SDL_PATH)/include \
 	            $(LOCAL_PATH)/../engine \
 		    $(LOCAL_PATH)/../engine/common \
 		    $(LOCAL_PATH)/../utils/vgui/include \
-		    $(HLSDK_PATH)/cl_dll/
+		    $(LOCAL_PATH)/menus \
+		    $(LOCAL_PATH)/controls
 
-LOCAL_CPP_FLAGS := -std=c++11
-
-LOCAL_SRC_FILES := \
-	controls/Framework.cpp                          \
+LOCAL_SRC_FILES := 	controls/Framework.cpp                          \
 	controls/BaseItem.cpp                           \
 	controls/Action.cpp                             \
 	controls/Bitmap.cpp                             \
@@ -72,7 +71,6 @@ LOCAL_SRC_FILES := \
 	MenuStrings.cpp                                 \
 	Utils.cpp                                       \
 	udll_int.cpp                                    \
-
 
 ifeq ($(XASH_SDL),1)
 LOCAL_SHARED_LIBRARIES += SDL2

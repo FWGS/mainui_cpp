@@ -216,6 +216,7 @@ void CMenuCreateGame::_Init( void )
 	cancel.onActivated = PopMenuCb;
 
 	nat.SetNameAndStatus( "NAT", "Use NAT Bypass instead of direct mode" );
+	nat.bChecked = true;
 
 	dedicatedServer.SetNameAndStatus( "Dedicated server", "faster, but you can't join the server from this machine" );
 
