@@ -6,7 +6,6 @@ enum
 {
 	QMF_GRAYED             = BIT( 1 ), // Grays and disables
 	QMF_INACTIVE           = BIT( 2 ), // Disables any input
-	QMF_HIDDEN             = BIT( 3 ), // Doesn't draw
 	QMF_DROPSHADOW         = BIT( 4 ),
 	QMF_SILENT             = BIT( 5 ), // Don't play sounds
 	QMF_HASMOUSEFOCUS      = BIT( 6 ),
@@ -15,7 +14,9 @@ enum
 	QMF_NOTIFY             = BIT( 9 ), // draw notify at right screen side
 	QMF_ACT_ONRELEASE      = BIT( 10 ), // call Key_Event when button is released
 	QMF_HASKEYBOARDFOCUS   = BIT( 11 ),
-	QMF_DIALOG             = BIT( 12 ) // modal windows. Will grab key, char and mousemove events
+	QMF_DIALOG             = BIT( 12 ), // modal windows. Will grab key, char and mousemove events
+
+	QMF_HIDDEN             = BIT( 31 ), // DEPREACTED: Use Show/Hide/SetVisibility/ToggleVisibility
 };
 
 enum ETextAlignment
