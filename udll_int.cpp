@@ -43,12 +43,6 @@ static UI_FUNCTIONS gFunctionTable =
 	UI_FinalCredits
 };
 
-#ifdef _WIN32
-#define EXPORT __declspec(dllexport)
-#else
-#define EXPORT
-#endif
-
 //=======================================================================
 //			GetApi
 //=======================================================================
@@ -80,10 +74,5 @@ extern "C" EXPORT int GiveTextAPI( ui_textfuncs_t* pTextfuncsFromEngine )
 	memcpy( &EngFuncs::textfuncs, pTextfuncsFromEngine, sizeof( ui_textfuncs_t ));
 
 	return TRUE;
-}
-
-extern "C" EXPORT void AddTouchButtonToList( const char *name, const char *texture, const char *command, unsigned char *color, int flags )
-{
-	// UI_TouchButtons_AddButtonToList( name, texture, command, color, flags );
 }
 

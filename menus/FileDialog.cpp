@@ -45,16 +45,31 @@ private:
 	char		*filePathPtr[UI_MAXGAMES];
 	CMenuBackgroundBitmap background;
 	//CMenuBannerBitmap banner;
-	CMenuBitmap preview;
-	HIMAGE image;
 
 	CMenuPicButton	done;
 	CMenuPicButton	cancel;
 
 	CMenuScrollList fileList;
+
+public:
+	class CPreview : public CMenuAction
+	{
+		public:
+		virtual void Draw();
+		HIMAGE image;
+	} preview;
 };
 
 static CMenuFileDialog uiFileDialog;
+
+
+void CMenuFileDialog::CPreview::Draw()
+{
+	UI_FillRect( m_scPos.x - 2, m_scPos.y - 2,  m_scSize.w + 4, m_scSize.h + 4, 0xFFC0C0C0 );
+	UI_FillRect( m_scPos.x, m_scPos.y, m_scSize.w, m_scSize.h, 0xFF808080 );
+	EngFuncs::PIC_Set( image, 255, 255, 255, 255 );
+	EngFuncs::PIC_DrawTrans( m_scPos, m_scSize );
+}
 
 void CMenuFileDialog::GetFileList( void )
 {
@@ -86,9 +101,8 @@ void CMenuFileDialog::GetFileList( void )
 
 
 	fileList.pszItemNames = (const char **)filePathPtr;
-	image = EngFuncs::PIC_Load( filePath[ fileList.iCurItem ] );
+	preview.image = EngFuncs::PIC_Load( filePath[ fileList.iCurItem ] );
 }
-
 
 void CMenuFileDialog::SaveAndPopCb(CMenuBaseItem *pSelf, void *pExtra)
 {
@@ -111,7 +125,7 @@ void CMenuFileDialog::UpdateExtra(CMenuBaseItem *pSelf, void *pExtra)
 	parent->done.onActivated.pExtra = (void*)fileName;
 
 	if( uiFileDialogGlobal.preview )
-		parent->image = EngFuncs::PIC_Load( fileName );
+		parent->preview.image = EngFuncs::PIC_Load( fileName );
 }
 
 /*
@@ -137,7 +151,7 @@ void CMenuFileDialog::_Init( void )
 	fileList.iFlags |= QMF_DROPSHADOW;
 	fileList.onChanged = UpdateExtra;
 
-	preview.iFlags = QMF_INACTIVE;
+	//preview.iFlags |= QMF_INACTIVE;
 
 	GetFileList();
 
@@ -156,7 +170,7 @@ void CMenuFileDialog::_VidInit()
 	fileList.SetRect( 340, 150, 600, 500 );
 	preview.SetRect( 72, 300, 196, 196 );
 
-	if( uiFileDialogGlobal.preview )
+	if( !uiFileDialogGlobal.preview )
 		preview.iFlags |= QMF_HIDDEN;
 	else
 		preview.iFlags &= ~QMF_HIDDEN;

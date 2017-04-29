@@ -16,6 +16,13 @@ GNU General Public License for more details.
 #ifndef EXTDLL_H
 #define EXTDLL_H
 
+#ifdef _WIN32
+#define EXPORT __declspec(dllexport)
+#else
+#define EXPORT
+#endif
+
+
 // shut-up compiler warnings
 #ifdef MSC_VER
 #pragma warning(disable : 4305)	// int or float data truncation

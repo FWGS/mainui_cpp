@@ -39,7 +39,7 @@ class CMenuTouchButtons : public CMenuFramework
 public:
 	void AddButtonToList( const char *name, const char *texture, const char *command, unsigned char *color, int flags );
 	void GetButtonList();
-	bool        gettingList;
+	bool gettingList;
 
 private:
 	void _Init();
@@ -129,6 +129,13 @@ void CMenuTouchButtons::AddButtonToList( const char *name, const char *texture, 
 	memcpy( bColors[i], color, 4 );
 	bFlags[i] = flags;
 }
+
+// Engine callback
+extern "C" EXPORT void AddTouchButtonToList( const char *name, const char *texture, const char *command, unsigned char *color, int flags )
+{
+	uiTouchButtons.AddButtonToList( name, texture, command, color, flags );
+}
+
 
 void CMenuTouchButtons::GetButtonList()
 {
@@ -497,6 +504,7 @@ void CMenuTouchButtons::_Init( void )
 
 void CMenuTouchButtons::_VidInit()
 {
+	banner.SetCoord( 72, 0 );
 	done.SetCoord( 72, 550 );
 	cancel.SetCoord( 72, 600 );
 
@@ -551,12 +559,6 @@ void UI_TouchButtons_Menu( void )
     UI_TouchButtons_Precache();
 
 	uiTouchButtons.Show();
-}
-
-// Engine callback
-void UI_TouchButtons_AddButtonToList( const char *name, const char *texture, const char *command, unsigned char *color, int flags )
-{
-	uiTouchButtons.AddButtonToList( name, texture, command, color, flags );
 }
 
 void UI_TouchButtons_GetButtonList()
