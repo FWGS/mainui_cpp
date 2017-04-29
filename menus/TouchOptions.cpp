@@ -258,6 +258,28 @@ void CMenuTouchOptions::_Init( void )
 
 	GetProfileList();
 
+	SET_EVENT( profiles, onChanged )
+	{
+		CMenuTouchOptions *parent = (CMenuTouchOptions *)pSelf->Parent();
+		CMenuScrollList *self = (CMenuScrollList*)pSelf;
+		char curprofile[256];
+		int isCurrent;
+		COM_FileBase( EngFuncs::GetCvarString( "touch_config_file" ), curprofile );
+		isCurrent = !strcmp( curprofile, parent->profileDesc[ self->iCurItem ]);
+
+			// Scrolllist changed, update availiable options
+		parent->remove.iFlags |= QMF_GRAYED;
+		if( ( self->iCurItem > parent->firstProfile ) && !isCurrent )
+			parent->remove.iFlags &= ~QMF_GRAYED;
+
+		parent->apply.iFlags &= ~QMF_GRAYED;
+		if( self->iCurItem == 0 | self->iCurItem == parent->firstProfile - 1 )
+			self->iCurItem++;
+		if( isCurrent )
+			parent->apply.iFlags |= QMF_GRAYED;
+	}
+	END_EVENT( profiles, onChanged )
+
 	profilename.szName = "New Profile:";
 	profilename.iMaxLength = 16;
 
@@ -380,6 +402,7 @@ void CMenuTouchOptions::_Init( void )
 void CMenuTouchOptions::_VidInit()
 {
 	done.SetCoord( 72, 700 );
+	reset.SetCoord( 72, 640 );
 	lookX.SetCoord( 72, 280 );
 	lookY.SetCoord( 72, 340 );
 	moveX.SetCoord( 72, 400 );
