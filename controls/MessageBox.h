@@ -1,34 +1,17 @@
 #ifndef MESSAGEBOX_H
 #define MESSAGEBOX_H
 
-#include "Action.h"
-
-
-/*class CMenuActionMsgBox : public CMenuAction
+class CMenuMessageBox : public CMenuItemsHolder
 {
 public:
-	CMenuActionMessageBox();
-	virtual void Init();
+	CMenuMessageBox();
 
-	EventCallback onAction;
-	void *pActionExtra;
-
+	void SetMessage( const char *sz );
 private:
-	CMenuPicButton ok;
-};*/
+	void _Init();
 
-/*class CMenuProgressBarMsgBox : public CMenuMessageBox
-{
-public:
-	CMenuProgressBarMsgBox();
-	virtual void Draw();
-
-	// Accepts any values from 0.0 to 1.0
-	void SetPrimaryProgress( float progress );
-	void SetSecondaryProgress( float progress ); // optional
-private:
-	float m_flProgress;
-	float m_flSecondProgress;
-};*/
+	CMenuAction dlgMessage;
+	CMenuAction background;
+};
 
 #endif // MESSAGEBOX_H

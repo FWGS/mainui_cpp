@@ -131,6 +131,7 @@ typedef struct
 	CMenuItemsHolder *menuActive; // current active window
 	CMenuItemsHolder *menuStack[UI_MAX_MENUDEPTH];
 	int      menuDepth;
+	int      rootPosition;
 
 	netadr_t serverAddresses[UI_MAX_SERVERS];
 	char	serverNames[UI_MAX_SERVERS][256];

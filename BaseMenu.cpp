@@ -603,13 +603,15 @@ void UI_UpdateMenu( float flTime )
 
 	// find last root element
 	int i;
+#if 0
 	for( i = uiStatic.menuDepth-1; i >= 0; i-- )
 	{
 		if( uiStatic.menuStack[i]->IsRoot() )
 			break;
 	}
+#endif
 
-	for( ; i < uiStatic.menuDepth; i++ )
+	for( i = uiStatic.rootPosition ; i < uiStatic.menuDepth; i++ )
 		uiStatic.menuStack[i]->Draw();
 
 	if( uiStatic.firstDraw )
@@ -649,7 +651,7 @@ UI_KeyEvent
 */
 void UI_KeyEvent( int key, int down )
 {
-	const char	*sound;
+	const char	*sound = NULL;
 
 	if( !uiStatic.initialized )
 		return;
@@ -664,11 +666,17 @@ void UI_KeyEvent( int key, int down )
 		cursorDown = !!down;
 	}
 
-	sound = uiStatic.menuActive->Key( key, down );
+	// go down on stack to nearest root or dialog
+	for( int i = uiStatic.menuDepth-1; i >= uiStatic.rootPosition; i-- )
+	{
+		sound = uiStatic.menuStack[i]->Key( key, down );
 
-	if( !down ) return;
-	if( sound && sound != uiSoundNull )
-		UI_StartSound( sound );
+		if( !down && sound && sound != uiSoundNull )
+			UI_StartSound( sound );
+
+		if( uiStatic.menuStack[i]->iFlags & QMF_DIALOG )
+			break;
+	}
 }
 
 /*
@@ -687,7 +695,13 @@ void UI_CharEvent( int key )
 	if( !uiStatic.menuActive )
 		return;
 
-	uiStatic.menuActive->Char( key );
+	for( int i = uiStatic.menuDepth-1; i >= uiStatic.rootPosition; i-- )
+	{
+		uiStatic.menuStack[i]->Char( key );
+
+		if( uiStatic.menuStack[i]->iFlags & QMF_DIALOG )
+			break;
+	}
 }
 
 
@@ -731,6 +745,8 @@ void UI_MouseMove( int x, int y )
 	uiStatic.cursorY = y;
 
 	// hack: prevent changing focus when field active
+	// a1ba: should this ever exist? We can't find FIELD in menu anymore, until RTTI is not enabled
+	// maybe put this somewhere in draw method of field?
 #if (defined(__ANDROID__) || defined(MENU_FIELD_RESIZE_HACK)) && 0
 	CMenuField *f = uiStatic.menuActive->ItemAtCursor();
 	if( f && f->type == QMTYPE_FIELD )
@@ -752,7 +768,14 @@ void UI_MouseMove( int x, int y )
 	uiStatic.cursorX = bound( 0, uiStatic.cursorX, ScreenWidth );
 	uiStatic.cursorY = bound( 0, uiStatic.cursorY, ScreenHeight );
 
-	uiStatic.menuActive->MouseMove( x, y );
+	// go down on stack to nearest root or dialog
+	for( int i = uiStatic.menuDepth-1; i >= uiStatic.rootPosition; i-- )
+	{
+		uiStatic.menuStack[i]->MouseMove( x, y );
+
+		if( uiStatic.menuStack[i]->iFlags & QMF_DIALOG )
+			break;
+	}
 }
 
 

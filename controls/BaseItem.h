@@ -15,7 +15,7 @@ enum
 	QMF_NOTIFY             = BIT( 9 ), // draw notify at right screen side
 	QMF_ACT_ONRELEASE      = BIT( 10 ), // call Key_Event when button is released
 	QMF_HASKEYBOARDFOCUS   = BIT( 11 ),
-	QMF_DIALOG             = BIT( 12 ) // dialogs can't be switched inactive by framework
+	QMF_DIALOG             = BIT( 12 ) // modal windows. Will grab key, char and mousemove events
 };
 
 enum ETextAlignment

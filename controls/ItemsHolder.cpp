@@ -196,8 +196,7 @@ void CMenuItemsHolder::ToggleInactive()
 {
 	for( int i = 0; i < m_numItems; i++ )
 	{
-		if( !( m_pItems[i]->iFlags & QMF_DIALOG ) )
-			m_pItems[i]->ToggleInactive();
+		m_pItems[i]->ToggleInactive();
 	}
 }
 
@@ -205,8 +204,7 @@ void CMenuItemsHolder::SetInactive( bool inactive )
 {
 	for( int i = 0; i < m_numItems; i++ )
 	{
-		if( !( m_pItems[i]->iFlags & QMF_DIALOG ) )
-			m_pItems[i]->SetInactive( inactive );
+		m_pItems[i]->SetInactive( inactive );
 	}
 }
 

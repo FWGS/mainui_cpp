@@ -19,6 +19,7 @@ void CMenuFramework::Show()
 	CMenuItemsHolder::Show();
 
 	uiStatic.rootActive = this;
+	uiStatic.rootPosition = uiStatic.menuDepth-1;
 }
 
 void CMenuFramework::Hide()
@@ -31,12 +32,14 @@ void CMenuFramework::Hide()
 		if( uiStatic.menuStack[i]->IsRoot() )
 		{
 			uiStatic.rootActive = uiStatic.menuStack[i];
+			uiStatic.rootPosition = i;
 			return;
 		}
 	}
 
 	// looks like we are have a modal or some window over game
 	uiStatic.rootActive = NULL;
+	uiStatic.rootPosition = 0;
 }
 
 bool CMenuFramework::IsVisible()
