@@ -40,7 +40,8 @@ public:
 	inline int ItemCount() const { return m_numItems; }
 	inline bool WasInit() const { return m_bInit; }
 
-	DECLARE_EVENT_TO_MENU_METHOD( CMenuItemsHolder, PopMenu );
+	DECLARE_EVENT_TO_MENU_METHOD( CMenuItemsHolder, Show );
+	DECLARE_EVENT_TO_MENU_METHOD( CMenuItemsHolder, Hide );
 
 protected:
 	virtual void _Init() {}

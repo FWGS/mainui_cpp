@@ -91,7 +91,7 @@ void CMenuMultiplayer::_Init( void )
 	done.SetNameAndStatus( "Done", "Go back to the Main menu" );
 	done.SetPicture( PC_DONE );
 	done.iFlags |= QMF_NOTIFY;
-	done.onActivated = PopMenuCb;
+	done.onActivated = HideCb;
 
 	msgBox.SetMessage( "It is recomended to enable\nclient movement prediction\nPress OK to enable it now\nOr enable it later in\n^5(Multiplayer/Customize)");
 	msgBox.SetPositiveButton( "Ok", PC_OK );

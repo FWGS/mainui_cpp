@@ -377,7 +377,7 @@ void CMenuPicButton::SetTitleAnim( int anim_state )
 		return;
 
 	// skip buttons which don't call new menu
-	if( !uiStatic.menuStack[uiStatic.menuDepth-1]->IsRoot() )
+	if( uiStatic.menuDepth && !uiStatic.menuStack[uiStatic.menuDepth-1]->IsRoot() )
 		return;
 
 	if( PreClickDepth == uiStatic.menuDepth && anim_state == AS_TO_TITLE )

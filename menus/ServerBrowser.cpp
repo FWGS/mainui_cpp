@@ -263,7 +263,7 @@ void CMenuServerBrowser::_Init( void )
 	refresh.onActivated = RefreshListCb;
 
 	done.SetNameAndStatus( "Done", "Return to main menu" );
-	done.onActivated = PopMenuCb;
+	done.onActivated = HideCb;
 	done.SetPicture( PC_DONE );
 
 	msgBox.SetMessage( "Join a network game will exit\nany current game, OK to exit?" );
@@ -326,13 +326,13 @@ void CMenuServerBrowser::_VidInit()
 	{
 		banner.SetPicture( ART_BANNER_LAN );
 		createGame.szStatusText = ( "Create new LAN game" );
-		natOrDirect.iFlags |= QMF_HIDDEN;
+		natOrDirect.Show();
 	}
 	else
 	{
 		banner.SetPicture( ART_BANNER_INET );
 		createGame.szStatusText = ( "Create new Internet game" );
-		natOrDirect.iFlags &= ~QMF_HIDDEN;
+		natOrDirect.Hide();
 	}
 
 	joinGame.SetCoord( 72, 230 );

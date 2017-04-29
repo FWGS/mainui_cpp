@@ -275,7 +275,7 @@ void CMenuLoadGame::_Init( void )
 
 	cancel.SetNameAndStatus( "Cancel", "Return back to main menu" );
 	cancel.SetPicture( PC_CANCEL );
-	cancel.onActivated = PopMenuCb;
+	cancel.onActivated = HideCb;
 
 	savesList.szName = hintText;
 	SET_EVENT( savesList, onChanged )
@@ -336,14 +336,14 @@ void CMenuLoadGame::SetSaveMode(bool saveMode)
 	if( saveMode )
 	{
 		banner.SetPicture( ART_BANNER_SAVE );
-		save.iFlags &= ~QMF_HIDDEN;
-		load.iFlags |= QMF_HIDDEN;
+		save.SetVisibility( true );
+		load.SetVisibility( false );
 	}
 	else
 	{
 		banner.SetPicture( ART_BANNER_LOAD );
-		save.iFlags |= QMF_HIDDEN;
-		load.iFlags &= ~QMF_HIDDEN;
+		save.SetVisibility( false );
+		load.SetVisibility( true );
 	}
 	GetGameList();
 }

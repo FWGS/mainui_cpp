@@ -114,7 +114,7 @@ void CMenuNewGame::_Init( void )
 	cancel.SetPicture( PC_CANCEL );
 	cancel.SetCoord( 72, 380 );
 	cancel.iFlags |= QMF_NOTIFY;
-	cancel.onActivated = PopMenuCb;
+	cancel.onActivated = HideCb;
 
 	msgBox.SetMessage( MenuStrings[HINT_RESTART_GAME] );
 	msgBox.HighlightChoice( CMenuYesNoMessageBox::HIGHLIGHT_NO );

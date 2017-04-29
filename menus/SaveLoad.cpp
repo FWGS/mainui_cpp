@@ -76,7 +76,7 @@ void CMenuSaveLoad::_Init( void )
 	done.SetNameAndStatus( "Done", "Go back to the Main Menu" );
 	done.SetPicture( PC_DONE );
 	done.iFlags |= QMF_NOTIFY;
-	done.onActivated = PopMenuCb;
+	done.onActivated = HideCb;
 
 	hintMessage.iFlags = QMF_INACTIVE;
 	hintMessage.iColor = uiColorHelp;

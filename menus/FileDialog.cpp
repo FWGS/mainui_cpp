@@ -170,10 +170,7 @@ void CMenuFileDialog::_VidInit()
 	fileList.SetRect( 340, 150, 600, 500 );
 	preview.SetRect( 72, 300, 196, 196 );
 
-	if( !uiFileDialogGlobal.preview )
-		preview.iFlags |= QMF_HIDDEN;
-	else
-		preview.iFlags &= ~QMF_HIDDEN;
+	preview.SetVisibility( uiFileDialogGlobal.preview );
 }
 
 /*

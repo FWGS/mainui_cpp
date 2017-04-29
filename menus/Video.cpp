@@ -64,7 +64,7 @@ void CMenuVideo::_Init( void )
 	done.SetNameAndStatus( "Done", "Go back to the previous menu" );
 	done.SetCoord( 72, 330 );
 	done.SetPicture( PC_DONE );
-	done.onActivated = PopMenuCb;
+	done.onActivated = HideCb;
 
 	AddItem( background );
 	AddItem( banner );

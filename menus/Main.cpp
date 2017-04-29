@@ -226,15 +226,15 @@ UI_Main_ActivateFunc
 */
 const char *CMenuMain::Activate( void )
 {
-	if ( !CL_IsActive( ))
+	if ( CL_IsActive( ))
 	{
-		resumeGame.iFlags |= QMF_HIDDEN;
-		disconnect.iFlags |= QMF_HIDDEN;
+		resumeGame.Show();
+		disconnect.Show();
 	}
 	else
 	{
-		resumeGame.iFlags &= ~QMF_HIDDEN;
-		disconnect.iFlags &= ~QMF_HIDDEN;
+		resumeGame.Hide();
+		disconnect.Hide();
 	}
 
 	if( gpGlobals->developer )
@@ -431,8 +431,8 @@ void CMenuMain::_VidInit( void )
 	{
 		saveRestore.SetNameAndStatus( "Load Game", MenuStrings[HINT_LOADGAME] );
 		saveRestore.SetPicture( PC_LOAD_GAME );
-		resumeGame.iFlags |= QMF_HIDDEN;
-		disconnect.iFlags |= QMF_HIDDEN;
+		resumeGame.Show();
+		disconnect.Show();
 	}
 
 	saveRestore.SetCoord( 72, bTrainMap ? 380 : 330 );

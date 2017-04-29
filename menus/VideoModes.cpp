@@ -138,7 +138,7 @@ void CMenuVidModes::_Init( void )
 	cancel.SetCoord( 72, 280 );
 	cancel.SetNameAndStatus( "Cancel", "Return back to previous menu" );
 	cancel.SetPicture( PC_CANCEL );
-	cancel.onActivated = PopMenuCb;
+	cancel.onActivated = HideCb;
 
 	listCaption.iFlags = QMF_INACTIVE;
 	listCaption.SetCharSize( QM_SMALLFONT );

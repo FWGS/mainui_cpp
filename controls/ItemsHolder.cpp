@@ -221,7 +221,7 @@ void CMenuItemsHolder::Draw( )
 	{
 		item = m_pItems[i];
 
-		if( item->iFlags & QMF_HIDDEN )
+		if( !item->IsVisible() )
 			continue;
 
 		item->Draw();

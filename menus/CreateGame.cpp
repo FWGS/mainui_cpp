@@ -201,7 +201,7 @@ void CMenuCreateGame::_Init( void )
 
 	cancel.SetNameAndStatus( "Cancel", "Return to the previous menu" );
 	cancel.SetPicture( PC_CANCEL );
-	cancel.onActivated = PopMenuCb;
+	cancel.onActivated = HideCb;
 
 	nat.SetNameAndStatus( "NAT", "Use NAT Bypass instead of direct mode" );
 	nat.bChecked = true;

@@ -64,7 +64,7 @@ void CMenuTouch::_Init( void )
 
 	done.SetNameAndStatus( "Done",  "Go back to the previous menu" );
 	done.SetPicture( PC_DONE );
-	done.onActivated = PopMenuCb;
+	done.onActivated = HideCb;
 
 	AddItem( background );
 	AddItem( banner );

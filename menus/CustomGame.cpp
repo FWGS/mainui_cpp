@@ -207,7 +207,7 @@ void CMenuCustomGame::_Init( void )
 
 	done.SetNameAndStatus( "Done", "Return to main menu" );
 	done.SetPicture( PC_DONE );
-	done.onActivated = PopMenuCb;
+	done.onActivated = HideCb;
 
 	modList.onChanged = UpdateExtras;
 	modList.szName = hintText;

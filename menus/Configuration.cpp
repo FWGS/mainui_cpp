@@ -96,7 +96,7 @@ void CMenuOptions::_Init( void )
 	done.SetNameAndStatus( "Done", "Go back to the Main menu" );
 	done.SetPicture( PC_DONE );
 	done.iFlags |= QMF_NOTIFY;
-	done.onActivated = PopMenuCb;
+	done.onActivated = HideCb;
 
 	msgBox.SetMessage( "Check the Internet for updates?" );
 	SET_EVENT( msgBox, onPositive )
