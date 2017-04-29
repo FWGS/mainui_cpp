@@ -42,7 +42,6 @@ private:
 	virtual void _Init();
 	virtual void _VidInit();
 	static void Begin( CMenuBaseItem *pSelf, void *pExtra );
-	static void PromptDialog( CMenuBaseItem *pSelf, void *pExtra );
 	void GetMapsList();
 
 	char		mapName[UI_MAXGAMES][64];
@@ -134,17 +133,6 @@ void CMenuCreateGame::Begin( CMenuBaseItem *pSelf, void *pExtra )
 	}
 }
 
-void CMenuCreateGame::PromptDialog( CMenuBaseItem *pSelf, void *pExtra )
-{
-	CMenuCreateGame *menu = (CMenuCreateGame*)pSelf->Parent();
-	
-	// toggle main menu between active\inactive
-	// show\hide quit dialog
-	menu->ToggleInactive();
-
-	menu->msgBox.ToggleVisibility();
-}
-
 /*
 =================
 CMenuCreateGame::GetMapsList
@@ -209,7 +197,7 @@ void CMenuCreateGame::_Init( void )
 	done.SetNameAndStatus( "Ok", "Start the multiplayer game" );
 	done.SetPicture( PC_OK );
 	done.onActivated = Begin;
-	done.onActivatedClActive = PromptDialog;
+	done.onActivatedClActive = msgBox.MakeOpenEvent();
 
 	cancel.SetNameAndStatus( "Cancel", "Return to the previous menu" );
 	cancel.SetPicture( PC_CANCEL );
@@ -263,7 +251,6 @@ void CMenuCreateGame::_Init( void )
 	AddItem( hltv );
 	AddItem( nat );
 	AddItem( mapsList );
-	AddItem( msgBox );
 }
 
 void CMenuCreateGame::_VidInit()
@@ -309,5 +296,5 @@ void UI_CreateGame_Menu( void )
 
 	UI_CreateGame_Precache();
 
-	uiCreateGame.Open();
+	uiCreateGame.Show();
 }

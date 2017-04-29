@@ -36,7 +36,6 @@ private:
 	virtual void _Init();
 
 	static void StartGameCb( CMenuBaseItem *pSelf, void *pExtra );
-	static void PromptDialogCb( CMenuBaseItem *pSelf, void *pExtra );
 
 	CMenuBackgroundBitmap background;
 	CMenuBannerBitmap     banner;
@@ -72,18 +71,6 @@ void CMenuNewGame::StartGameCb( CMenuBaseItem *pSelf, void *pExtra )
 	EngFuncs::PlayBackgroundTrack( NULL, NULL );
 
 	EngFuncs::ClientCmd( FALSE, "newgame\n" );
-
-	parent->SetInactive( false );
-	parent->msgBox.SetVisibility( false );
-}
-
-void CMenuNewGame::PromptDialogCb( CMenuBaseItem *pSelf, void *pExtra )
-{
-	CMenuNewGame *parent = (CMenuNewGame *)pSelf->Parent();
-
-	parent->ToggleInactive();
-	parent->msgBox.onPositive.pExtra = pSelf->onActivated.pExtra;
-	parent->msgBox.ToggleVisibility();
 }
 
 /*
@@ -113,7 +100,7 @@ void CMenuNewGame::_Init( void )
 	hard.iFlags |= QMF_NOTIFY;
 	hard.onActivated.pExtra = (void*)3;
 
-	easy.onActivatedClActive = medium.onActivatedClActive = hard.onActivatedClActive = PromptDialogCb;
+	easy.onActivatedClActive = medium.onActivatedClActive = hard.onActivatedClActive = msgBox.MakeOpenEvent();
 	msgBox.onPositive = easy.onActivated = medium.onActivated = hard.onActivated = StartGameCb;
 
 	cancel.SetNameAndStatus("Cancel", "Go back to the main menu");
@@ -131,7 +118,6 @@ void CMenuNewGame::_Init( void )
 	AddItem( medium );
 	AddItem( hard );
 	AddItem( cancel );
-	AddItem( msgBox );
 }
 
 /*
@@ -156,5 +142,5 @@ void UI_NewGame_Menu( void )
 		return;
 
 	UI_NewGame_Precache();
-	uiNewGame.Open();
+	uiNewGame.Show();
 }

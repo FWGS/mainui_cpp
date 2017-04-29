@@ -47,7 +47,8 @@ private:
 	virtual void _Init();
 	virtual void _VidInit( );
 
-	static void QuitDialogCb( CMenuBaseItem *pSelf, void *pExtra );
+	void QuitDialog();
+	DECLARE_EVENT_TO_MENU_METHOD( CMenuMain, QuitDialog )
 	static void DisconnectDialogCb( CMenuBaseItem *pSelf, void *pExtra );
 	static void HazardCourseDialogCb( CMenuBaseItem *pSelf, void *pExtra );
 	static void HazardCourseCb( CMenuBaseItem *pSelf, void *pExtra );
@@ -63,7 +64,6 @@ private:
 	class CMenuMainBanner : public CMenuBannerBitmap
 	{
 	public:
-		virtual void VidInit();
 		virtual void Draw();
 	private:
 		HIMAGE pic;
@@ -105,18 +105,6 @@ void CMenuMain::CMenuMainBackground::Draw( )
 		return;
 
 	CMenuBackgroundBitmap::Draw();
-}
-
-void CMenuMain::CMenuMainBanner::VidInit()
-{
-	pic = EngFuncs::PIC_Load( "resource/logo_game.tga", 1<<9 | (1<<12));
-
-	if( pic )
-	{
-		size.w = EngFuncs::PIC_Width( pic );
-		size.h = EngFuncs::PIC_Height( pic );
-		m_scSize = size.Scale();
-	}
 }
 
 void CMenuMain::CMenuMainBanner::Draw()
@@ -178,45 +166,33 @@ void CMenuMain::QuitCb(CMenuBaseItem *, void *)
 	EngFuncs::ClientCmd( FALSE, "quit\n" );
 }
 
-void CMenuMain::QuitDialogCb(CMenuBaseItem *pSelf , void *pExtra)
+void CMenuMain::QuitDialog()
 {
-	CMenuMain *parent = (CMenuMain*)pSelf->Parent();
-
-	// toggle main menu between active\inactive
-	// show\hide quit dialog
-	parent->ToggleInactive();
-
 	if( CL_IsActive() )
-		parent->dialog.SetMessage( MenuStrings[HINT_QUIT_ACTIVE] );
+		dialog.SetMessage( MenuStrings[HINT_QUIT_ACTIVE] );
 	else
-		parent->dialog.SetMessage( MenuStrings[HINT_QUIT] );
+		dialog.SetMessage( MenuStrings[HINT_QUIT] );
 
-	parent->dialog.onPositive = QuitCb;
-    parent->dialog.ToggleVisibility();
+	dialog.onPositive = QuitCb;
+	dialog.Show();
 }
 
 void CMenuMain::DisconnectDialogCb( CMenuBaseItem *pSelf , void *pExtra)
 {
 	CMenuMain *parent = (CMenuMain*)pSelf->Parent();
-	// toggle main menu between active\inactive
-	// show\hide quit dialog
-	parent->ToggleInactive();
 
 	parent->dialog.onPositive = DisconnectCb;
 	parent->dialog.SetMessage( "Really disconnect?" );
-	parent->dialog.ToggleVisibility();
+	parent->dialog.Show();
 }
 
 void CMenuMain::HazardCourseDialogCb(CMenuBaseItem *pSelf, void *pExtra)
 {
 	CMenuMain *parent = (CMenuMain*)pSelf->Parent();
-	// toggle main menu between active\inactive
-	// show\hide quit dialog
-	parent->ToggleInactive();
 
 	parent->dialog.onPositive = HazardCourseCb;
 	parent->dialog.SetMessage( MenuStrings[HINT_RESTART_HZ] );
-	parent->dialog.ToggleVisibility();
+	parent->dialog.Show();
 
 }
 
@@ -231,12 +207,12 @@ const char *CMenuMain::Key( int key, int down )
 	{
 		if ( CL_IsActive( ))
 		{
-			if( dialog.iFlags & QMF_HIDDEN )
+			if( !dialog.IsVisible() )
 				UI_CloseMenu();
 		}
 		else
 		{
-			QuitDialogCb( &dialog, NULL );
+			QuitDialog();
 		}
 		return uiSoundNull;
 	}
@@ -429,7 +405,6 @@ void CMenuMain::_Init( void )
 	AddItem( quit );
 	AddItem( minimizeBtn );
 	AddItem( quitButton );
-	AddItem( dialog );
 }
 
 /*
@@ -505,5 +480,5 @@ UI_Main_Menu
 void UI_Main_Menu( void )
 {
 	UI_Main_Precache();
-	uiMain.Open();
+	uiMain.Show();
 }

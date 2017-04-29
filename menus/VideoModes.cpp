@@ -90,7 +90,7 @@ UI_VidModes_GetModesList
 */
 void CMenuVidModes::GetConfig( void )
 {
-	int i;
+	unsigned int i;
 
 	for( i = 0; i < MAX_VIDMODES-1; i++ )
 		videoModesPtr[i] = uiVideoModes[i];
@@ -185,5 +185,5 @@ UI_VidModes_Menu
 void UI_VidModes_Menu( void )
 {
 	UI_VidModes_Precache();
-	uiVidModes.Open();
+	uiVidModes.Show();
 }

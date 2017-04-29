@@ -117,8 +117,8 @@ public:
 	CEventCallback onCvarGet;
 
 protected:
-	cvarType_e  m_eType;
 	const char *m_szCvarName;
+	cvarType_e  m_eType;
 
 	char		m_szString[CS_SIZE], m_szOriginalString[CS_SIZE];
 	float		m_flValue, m_flOriginalValue;

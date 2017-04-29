@@ -86,7 +86,7 @@ void CMenuGameOptions::SaveCb(CMenuBaseItem *pSelf, void *pExtra)
 	parent->maxPacket.WriteCvar();
 
 	EngFuncs::ClientCmd( FALSE, "trysaveconfig\n" );
-	parent->PopMenu();
+	parent->Hide();
 }
 
 void CMenuGameOptions::Restore()
@@ -103,7 +103,7 @@ void CMenuGameOptions::RestoreCb(CMenuBaseItem *pSelf, void *pExtra)
 	CMenuGameOptions *parent = (CMenuGameOptions*)pSelf->Parent();
 
 	parent->Restore();
-	parent->PopMenu();
+	parent->Hide();
 }
 
 /*
@@ -212,5 +212,5 @@ void UI_GameOptions_Menu( void )
 {
 	UI_GameOptions_Precache();
 
-	uiGameOptions.Open();
+	uiGameOptions.Show();
 }

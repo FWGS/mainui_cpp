@@ -216,5 +216,5 @@ void UI_Audio_Menu( void )
 {
 	UI_Audio_Precache();
 
-	uiAudio.Open();
+	uiAudio.Show();
 }

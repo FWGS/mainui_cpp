@@ -49,7 +49,6 @@ private:
 	char		keysDescription[MAX_KEYS][256];
 	char		*keysDescriptionPtr[MAX_KEYS];
 
-	void ResetToDefaultsDialog();
 	void GetKeyBindings( const char *command, int *twoKeys );
 	void UnbindCommand( const char *command );
 	void ParseKeysList( void );
@@ -59,7 +58,6 @@ private:
 	void EnterGrabMode( void );
 	void UnbindEntry( void );
 
-	DECLARE_EVENT_TO_MENU_METHOD( CMenuControls, ResetToDefaultsDialog )
 	DECLARE_EVENT_TO_MENU_METHOD( CMenuControls, ResetKeysList )
 	DECLARE_EVENT_TO_MENU_METHOD( CMenuControls, EnterGrabMode )
 	DECLARE_EVENT_TO_MENU_METHOD( CMenuControls, UnbindEntry )
@@ -84,15 +82,6 @@ private:
 	int bind_grab;
 	char hintText[KEY2_LENGTH+1];
 } uiControls;
-
-void CMenuControls::ResetToDefaultsDialog( void )
-{
-	// toggle main menu between active\inactive
-	ToggleInactive();
-
-	// show\hide reset to defaults dialog
-	msgBox2.ToggleInactive();
-}
 
 void CMenuControls::PromptDialog( void )
 {
@@ -291,16 +280,7 @@ const char *CMenuControls::Key( int key, int down )
 {
 	char	cmd[128];
 
-	if( !msgBox1.IsVisible() )
-	{
-		if( down && key == K_ESCAPE && defaults.iFlags & QMF_INACTIVE )
-		{
-			ResetToDefaultsDialog();
-			return uiSoundNull;
-		}
-	}
-
-	if( down )
+	if( msgBox1.IsVisible() && down )
 	{
 		if( bind_grab )	// assume we are in grab-mode
 		{
@@ -384,7 +364,7 @@ void CMenuControls::_Init( void )
 	defaults.SetNameAndStatus( "Use defaults", "Reset all buttons binding to their default values" );
 	defaults.SetCoord( 72, 230 );
 	defaults.SetPicture( PC_USE_DEFAULTS );
-	defaults.onActivated = ResetToDefaultsDialogCb;
+	defaults.onActivated = msgBox2.MakeOpenEvent();
 
 	advanced.SetNameAndStatus( "Adv controls", "Change mouse sensitivity, enable autoaim, mouselook and crosshair" );
 	advanced.SetCoord( 72, 280 );
@@ -418,7 +398,6 @@ void CMenuControls::_Init( void )
 
 	msgBox2.SetMessage( "Reset buttons to default?" );
 	msgBox2.onPositive = ResetKeysListCb;
-	msgBox2.onNegative = ResetToDefaultsDialogCb;
 
 	dlgMessage.iFlags = QMF_INACTIVE|QMF_HIDDEN|QMF_DROPSHADOW|QMF_DIALOG;
 	dlgMessage.szName = "Press a key or button";
@@ -454,5 +433,5 @@ UI_Controls_Menu
 void UI_Controls_Menu( void )
 {
 	UI_Controls_Precache();
-	uiControls.Open();
+	uiControls.Show();
 }

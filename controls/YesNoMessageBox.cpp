@@ -36,6 +36,8 @@ CMenuYesNoMessageBox::CMenuYesNoMessageBox()
 	{
 		CMenuYesNoMessageBox *msgBox = (CMenuYesNoMessageBox*)pExtra;
 		msgBox->onPositive( msgBox );
+
+		msgBox->Hide();
 	}
 	END_EVENT( yes, onActivated )
 
@@ -43,6 +45,8 @@ CMenuYesNoMessageBox::CMenuYesNoMessageBox()
 	{
 		CMenuYesNoMessageBox *msgBox = (CMenuYesNoMessageBox*)pExtra;
 		msgBox->onNegative( msgBox );
+
+		msgBox->Hide();
 	}
 	END_EVENT( no, onActivated )
 
@@ -63,10 +67,10 @@ void CMenuYesNoMessageBox::_Init( void )
 		SetNegativeButton( "Cancel", PC_CANCEL );
 
 	if( !(bool)onNegative )
-		onNegative = ToggleInactiveInternalCb;
+		onNegative = CEventCallback::NoopCb;
 
 	if( !(bool)onPositive )
-		onPositive = ToggleInactiveInternalCb;
+		onPositive = CEventCallback::NoopCb;
 
 	AddItem( dlgMessage1 );
 	AddItem( yes );
@@ -176,43 +180,18 @@ void CMenuYesNoMessageBox::HighlightChoice( int yesno )
 	}
 }
 
-/*
-==============
-CMenuYesNoMessageBox::ToggleInactive
-==============
-*/
-/*void CMenuYesNoMessageBox::ToggleInactive(void)
+CEventCallback CMenuYesNoMessageBox::MakeOpenEvent()
 {
-	yes.iFlags ^= QMF_HIDDEN;
-	no.iFlags ^= QMF_HIDDEN;
-	dlgMessage1.iFlags ^= QMF_HIDDEN;
-	iFlags ^= QMF_HIDDEN;
+	return CEventCallback( OpenCb, this );
 }
 
-void CMenuYesNoMessageBox::SetInactive(bool enable)
-{
-	if( enable )
-	{
-		yes.iFlags |= QMF_HIDDEN;
-		no.iFlags |= QMF_HIDDEN;
-		dlgMessage1.iFlags |= QMF_HIDDEN;
-		iFlags |= QMF_HIDDEN;
-	}
-	else
-	{
-		yes.iFlags &= ~(QMF_HIDDEN);
-		no.iFlags &= ~(QMF_HIDDEN);
-		dlgMessage1.iFlags &= ~(QMF_HIDDEN);
-		iFlags &= ~(QMF_HIDDEN);
-	}
-}*/
 
 /*
 ==============
 CMenuYesNoMessageBox::ToggleInactiveCb
 ==============
 */
-void CMenuYesNoMessageBox::ToggleInactiveCb( CMenuBaseItem *, void *pExtra )
+void CMenuYesNoMessageBox::OpenCb( CMenuBaseItem *, void *pExtra )
 {
 	ToggleInactiveInternalCb( (CMenuBaseItem*)pExtra, NULL );
 }
@@ -224,6 +203,5 @@ CMenuYesNoMessageBox::ToggleInactiveCb
 */
 static void ToggleInactiveInternalCb( CMenuBaseItem *pSelf, void * )
 {
-	pSelf->Parent()->ToggleInactive();
 	pSelf->ToggleVisibility();
 }

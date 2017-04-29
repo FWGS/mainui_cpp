@@ -258,7 +258,7 @@ void UI_DrawRectangleExt( int in_x, int in_y, int in_w, int in_h, const int colo
 UI_DrawString
 =================
 */
-void UI_DrawString( int x, int y, int w, int h, const char *string, const int color, int forceColor, int charW, int charH, ETextAlignment justify, bool shadow, ETextAlignment vertAlignment )
+void UI_DrawString( int x, int y, int w, int h, const char *string, const int color, int forceColor, int charW, int charH, ETextAlignment justify, bool shadow, EVertAlignment vertAlignment )
 {
 	int	modulate, shadowModulate;
 	char	line[1024], *l;
@@ -601,8 +601,16 @@ void UI_UpdateMenu( float flTime )
 		uiStatic.menuActive->Activate();
 	}
 
-	// draw menu
-	uiStatic.menuActive->Draw();
+	// find last root element
+	int i;
+	for( i = uiStatic.menuDepth-1; i >= 0; i-- )
+	{
+		if( uiStatic.menuStack[i]->IsRoot() )
+			break;
+	}
+
+	for( ; i < uiStatic.menuDepth; i++ )
+		uiStatic.menuStack[i]->Draw();
 
 	if( uiStatic.firstDraw )
 	{
@@ -1145,6 +1153,7 @@ int UI_VidInit( void )
 			if( valid )
 			{
 				// don't notify menu widget about cursor changes
+				item->SetCursor( cursorPrev, false );
 				item->SetCursor( cursor, false );
 			}
 		}

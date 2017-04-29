@@ -271,8 +271,7 @@ void CMenuLoadGame::_Init( void )
 
 	remove.SetNameAndStatus( "Delete", "Delete saved game" );
 	remove.SetPicture( PC_DELETE );
-	remove.onActivated.pExtra = &msgBox;
-	remove.onActivated = CMenuYesNoMessageBox::ToggleInactiveCb;
+	remove.onActivated = msgBox.MakeOpenEvent();
 
 	cancel.SetNameAndStatus( "Cancel", "Return back to main menu" );
 	cancel.SetPicture( PC_CANCEL );
@@ -287,8 +286,7 @@ void CMenuLoadGame::_Init( void )
 		parent->levelShot.szName = parent->saveName[self->iCurItem];
 	}
 	END_EVENT( savesList, onChanged )
-	savesList.onDeleteEntry = CMenuYesNoMessageBox::ToggleInactiveCb;
-	savesList.onDeleteEntry.pExtra = &msgBox;
+	savesList.onDeleteEntry = msgBox.MakeOpenEvent();
 
 	msgBox.SetMessage( "Delete this save?" );
 	SET_EVENT( msgBox, onPositive )
@@ -308,7 +306,6 @@ void CMenuLoadGame::_Init( void )
 
 			parent->GetGameList();
 		}
-		CMenuYesNoMessageBox::ToggleInactiveCb( NULL, &parent->msgBox );
 	}
 	END_EVENT( msgBox, onPositive )
 
@@ -320,7 +317,6 @@ void CMenuLoadGame::_Init( void )
 	AddItem( cancel );
 	AddItem( levelShot );
 	AddItem( savesList );
-	AddItem( msgBox );
 }
 
 void CMenuLoadGame::_VidInit()
@@ -379,7 +375,7 @@ void UI_LoadGame_Menu( void )
 	if( !EngFuncs::CheckGameDll( )) return;
 
 	UI_LoadGame_Precache();
-	uiLoadGame.Open();
+	uiLoadGame.Show();
 	uiLoadGame.SetSaveMode(false);
 }
 
@@ -394,6 +390,6 @@ void UI_SaveGame_Menu( void )
 	if( !EngFuncs::CheckGameDll( )) return;
 
 	UI_LoadGame_Precache();
-	uiLoadGame.Open();
+	uiLoadGame.Show();
 	uiLoadGame.SetSaveMode(true);
 }

@@ -91,8 +91,7 @@ void CMenuOptions::_Init( void )
 	update.SetNameAndStatus( "Update", "Download the latest version of Xash3D engine" );
 	update.SetPicture( PC_UPDATE );
 	update.iFlags |= QMF_NOTIFY;
-	update.onActivated = CMenuYesNoMessageBox::ToggleInactiveCb;
-	update.onActivated.pExtra = &msgBox;
+	update.onActivated = msgBox.MakeOpenEvent();
 
 	done.SetNameAndStatus( "Done", "Go back to the Main menu" );
 	done.SetPicture( PC_DONE );
@@ -120,8 +119,6 @@ void CMenuOptions::_Init( void )
 	AddItem( gamepad );
 	AddItem( update );
 	AddItem( done );
-	AddItem( msgBox );
-
 }
 
 void CMenuOptions::_VidInit( void )
@@ -153,5 +150,5 @@ CMenuOptions::Menu
 void UI_Options_Menu( void )
 {
 	UI_Options_Precache();
-	uiOptions.Open();
+	uiOptions.Show();
 }

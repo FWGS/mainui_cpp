@@ -137,8 +137,8 @@ void CAdvancedControls::_Init( void )
 	{
 		CMenuCheckBox *self = (CMenuCheckBox*)pSelf;
 		float m_pitch = EngFuncs::GetCvarFloat( "m_pitch" );
-		if( self->bChecked  && m_pitch > 0 ||
-			!self->bChecked && m_pitch < 0 )
+		if( (self->bChecked  && m_pitch > 0) ||
+			(!self->bChecked && m_pitch < 0))
 			EngFuncs::CvarSetValue( "m_pitch", -m_pitch );
 	}
 	END_EVENT( invertMouse, onChanged )
@@ -226,5 +226,5 @@ UI_AdvControls_Menu
 void UI_AdvControls_Menu( void )
 {
 	UI_AdvControls_Precache();
-	uiAdvControls.Open();
+	uiAdvControls.Show();
 }

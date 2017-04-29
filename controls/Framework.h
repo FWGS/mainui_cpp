@@ -13,22 +13,11 @@ public:
 	void Show();
 	void Hide();
 	bool IsVisible();
-
-	void PushMenu( void );
-	void PopMenu( void );
-
-	inline void Open()
-	{
-		Init();
-		VidInit();
-
-		PushMenu();
-	}
+	bool IsRoot() { return true; }
 
 	virtual void SaveAndPopMenu();
 
 	// Events library
-	DECLARE_EVENT_TO_MENU_METHOD( CMenuFramework, PopMenu );
 	DECLARE_EVENT_TO_MENU_METHOD( CMenuFramework, SaveAndPopMenu );
 };
 

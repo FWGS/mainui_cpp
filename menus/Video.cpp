@@ -91,5 +91,5 @@ UI_Video_Menu
 void UI_Video_Menu( void )
 {
 	UI_Video_Precache();
-	uiVideo.Open();
+	uiVideo.Show();
 }

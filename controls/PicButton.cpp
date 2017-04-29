@@ -342,8 +342,11 @@ void CMenuPicButton::DrawTitleAnim()
 {
 	if( !TransPic ) return;
 
+#if 1
 	float frac = GetTitleTransFraction();
-	//float frac = (sin(gpGlobals->time*4)+1)/2;
+#else
+	float frac = (sin(gpGlobals->time*4)+1)/2;
+#endif
 
 #ifdef TA_ALT_MODE
 	if( frac == 1 && transition_state == AS_TO_BUTTON )
@@ -369,7 +372,14 @@ void CMenuPicButton::SetTitleAnim( int anim_state )
 	static	wrect_t r = { 0, uiStatic.buttons_width, 26, 51 };
 	CMenuPicButton *button = this;
 
+	// check this before any button changes
+	if( !bEnableTransitions )
+		return;
+
 	// skip buttons which don't call new menu
+	if( !uiStatic.menuStack[uiStatic.menuDepth-1]->IsRoot() )
+		return;
+
 	if( PreClickDepth == uiStatic.menuDepth && anim_state == AS_TO_TITLE )
 		return;
 

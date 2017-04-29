@@ -92,8 +92,8 @@ const char * CMenuSwitch::Key(int key, int down)
 		}
 		else
 		{
-			if( UI_CursorInRect( m_leftPoint, m_leftSize ) && bState ||
-				UI_CursorInRect( m_rightPoint, m_rightSize ) && !bState )
+			if( (UI_CursorInRect( m_leftPoint, m_leftSize ) && bState) ||
+				(UI_CursorInRect( m_rightPoint, m_rightSize ) && !bState) )
 			{
 				sound = uiSoundGlow;
 			}

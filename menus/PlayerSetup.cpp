@@ -430,7 +430,7 @@ void CMenuPlayerSetup::_Init( void )
 	AddItem( name );
 	AddItem( clPredict);
 	AddItem( clLW);
-	if( !gMenu.m_gameinfo.flags & GFL_NOMODELS )
+	if( !(gMenu.m_gameinfo.flags & GFL_NOMODELS) )
 	{
 		AddItem( topColor );
 		AddItem( bottomColor );
@@ -484,8 +484,5 @@ void UI_PlayerSetup_Menu( void )
 		return;
 
 	UI_PlayerSetup_Precache();
-	uiPlayerSetup.Init();
-	uiPlayerSetup.VidInit();
-
-	uiPlayerSetup.PushMenu();
+	uiPlayerSetup.Show();
 }

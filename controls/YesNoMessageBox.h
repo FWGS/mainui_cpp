@@ -40,11 +40,10 @@ public:
 		HIGHLIGHT_NO
 	};
 	void HighlightChoice( int ch ); // 0 - not hightlight, 1 - yes, 2 - no
-	// void ToggleInactive();
-	// void SetInactive( bool enable );
 
 	// Pass pointer to messagebox to extra of calling object
-	static void ToggleInactiveCb( CMenuBaseItem *, void *pExtra );
+	static void OpenCb( CMenuBaseItem *, void *pExtra );
+	CEventCallback MakeOpenEvent();
 
 	CEventCallback onPositive;
 	CEventCallback onNegative;

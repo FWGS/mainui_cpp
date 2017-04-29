@@ -42,7 +42,7 @@ enum
 #define ColorIndex( c )		((( c ) - '0' ) & 7 )
 #define IsColorString( p )		( p && *( p ) == '^' && *(( p ) + 1) && *(( p ) + 1) >= '0' && *(( p ) + 1 ) <= '9' )
 
-#define UI_MAX_MENUDEPTH		8
+#define UI_MAX_MENUDEPTH		64
 #define UI_MAX_MENUITEMS		64
 
 #define UI_PULSE_DIVISOR		75
@@ -127,9 +127,10 @@ typedef struct
 
 typedef struct
 {
-	CMenuItemsHolder	*menuActive; // current active fullscreen holder(menu framework)
-	CMenuItemsHolder	*menuStack[UI_MAX_MENUDEPTH];
-	int				menuDepth;
+	CMenuItemsHolder *rootActive; // current active fullscreen holder(menu framework)
+	CMenuItemsHolder *menuActive; // current active window
+	CMenuItemsHolder *menuStack[UI_MAX_MENUDEPTH];
+	int      menuDepth;
 
 	netadr_t serverAddresses[UI_MAX_SERVERS];
 	char	serverNames[UI_MAX_SERVERS][256];
@@ -218,7 +219,7 @@ void UI_DrawPicTrans( int x, int y, int width, int height, const int color, cons
 void UI_DrawPicHoles( int x, int y, int width, int height, const int color, const char *pic );
 void UI_FillRect( int x, int y, int w, int h, const int color );
 void UI_DrawRectangleExt( int in_x, int in_y, int in_w, int in_h, const int color, int outlineWidth );
-void UI_DrawString(int x, int y, int w, int h, const char *str, const int col, int forceCol, int charW, int charH, ETextAlignment justify, bool shadow, ETextAlignment vertAlign = QM_TOP);
+void UI_DrawString(int x, int y, int w, int h, const char *str, const int col, int forceCol, int charW, int charH, ETextAlignment justify, bool shadow, EVertAlignment vertAlign = QM_TOP);
 inline void UI_DrawRectangle( int x, int y, int w, int h, const int color )
 {
 	UI_DrawRectangleExt( x, y, w, h, color, uiStatic.outlineWidth );
@@ -256,7 +257,7 @@ inline void UI_DrawRectangleExt( Point pos, Size size, const int color, int outl
 {
 	UI_DrawRectangleExt( pos.x, pos.y, size.w, size.h, color, outlineWidth );
 }
-inline void UI_DrawString( Point pos, Size size, const char *str, const int col, int forceCol, Size chSize, ETextAlignment justify, bool shadow, ETextAlignment verticalAlignment = QM_TOP  )
+inline void UI_DrawString( Point pos, Size size, const char *str, const int col, int forceCol, Size chSize, ETextAlignment justify, bool shadow, EVertAlignment verticalAlignment = QM_TOP  )
 {
 	UI_DrawString( pos.x, pos.y, size.w, size.h, str, col, forceCol, chSize.w, chSize.h, justify, shadow, verticalAlignment );
 }

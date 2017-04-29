@@ -105,7 +105,7 @@ void CMenuGamePad::GetConfig( void )
 	invYaw.bChecked = _yaw < 0.0f ? true: false;
 
 	// I made a monster...
-	for( int i = 0; i < sizeof( binding ) - 1; i++ )
+	for( unsigned int i = 0; i < sizeof( binding ) - 1; i++ )
 	{
 		switch( binding[i] )
 		{
@@ -294,8 +294,5 @@ CMenuGamePad::Menu
 void UI_GamePad_Menu( void )
 {
 	UI_GamePad_Precache();
-	uiGamePad.Init();
-	uiGamePad.VidInit();
-
-	uiGamePad.PushMenu();
+	uiGamePad.Show();
 }

@@ -23,7 +23,11 @@ enum ETextAlignment
 	QM_LEFT = 0, // justify by left
 	QM_CENTER,   // justify by center
 	QM_RIGHT,     // justify by right
-	QM_BOTTOM,
+};
+
+enum EVertAlignment
+{
+	QM_BOTTOM = 0,
 	QM_VCENTER,
 	QM_TOP
 };

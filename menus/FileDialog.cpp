@@ -100,7 +100,7 @@ void CMenuFileDialog::SaveAndPopCb(CMenuBaseItem *pSelf, void *pExtra)
 	uiFileDialogGlobal.valid = false;
 	uiFileDialogGlobal.callback( fileName[0] != 0 );
 
-	parent->PopMenu();
+	parent->Hide();
 }
 
 void CMenuFileDialog::UpdateExtra(CMenuBaseItem *pSelf, void *pExtra)
@@ -181,8 +181,5 @@ void UI_FileDialog_Menu( void )
 {
 	UI_FileDialog_Precache();
 
-	uiFileDialog.Init();
-	uiFileDialog.VidInit();
-
-	uiFileDialog.PushMenu();
+	uiFileDialog.Show();
 }

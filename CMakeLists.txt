@@ -84,6 +84,8 @@ set (MAINUI_SOURCES
 list(APPEND MAINUI_SOURCES ${MAINUI_CONTROLS_SOURCES})
 list(APPEND MAINUI_SOURCES ${MAINUI_MENUS_SOURCES})
 
+add_compile_options( -Wall -Wextra -Wpedantic -Wno-unused-parameter -Wno-unused-variable )
+
 if( NOT XASH_SDK )
 	set( XASH_SDK "../" )
 endif( )

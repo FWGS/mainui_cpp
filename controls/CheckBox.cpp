@@ -148,7 +148,7 @@ void CMenuCheckBox::Draw( void )
 		return; // grayed
 	}
 
-	if(( iFlags & QMF_MOUSEONLY ) && !( iFlags & QMF_HASMOUSEFOCUS )
+	if((( iFlags & QMF_MOUSEONLY ) && !( iFlags & QMF_HASMOUSEFOCUS ))
 	   || ( this != m_pParent->ItemAtCursor() ) )
 	{
 		if( !bChecked )

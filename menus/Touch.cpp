@@ -98,6 +98,6 @@ UI_Touch_Menu
 void UI_Touch_Menu( void )
 {
 	UI_Touch_Precache();
-	uiTouch.Open();
+	uiTouch.Show();
 }
 

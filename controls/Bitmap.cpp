@@ -223,10 +223,10 @@ void CMenuBannerBitmap::Draw()
 {
 	// don't draw banners until transition is done
 #ifdef TA_ALT_MODE
-	if( CMenuPicButton::GetTitleTransFraction() != 10 )
-#else
-	if( CMenuPicButton::GetTitleTransFraction() < 1.0f )
+	return;
 #endif
+
+	if( CMenuPicButton::GetTitleTransFraction() < 1.0f )
 	{
 		return;
 	}
@@ -237,8 +237,9 @@ void CMenuBannerBitmap::Draw()
 void CMenuBannerBitmap::VidInit()
 {
 	CMenuBitmap::VidInit();
+	// CMenuPicButton::SetTitleAnim( CMenuPicButton::AS_TO_TITLE );
 	CMenuPicButton::SetupTitleQuad( pos.x, pos.y, size.w, size.h );
-#ifdef TA_ALT_MODE2
+#if defined(TA_ALT_MODE2) && !defined(TA_ALT_MODE)
 	HIMAGE hPic = EngFuncs::PIC_Load( szPic );
 	CMenuPicButton::SetTransPic( hPic );
 #endif

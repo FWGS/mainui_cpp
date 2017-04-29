@@ -123,5 +123,5 @@ void UI_SaveLoad_Menu( void )
 	}
 
 	UI_SaveLoad_Precache();
-	uiSaveLoad.Open();
+	uiSaveLoad.Show();
 }

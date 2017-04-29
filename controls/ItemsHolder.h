@@ -24,6 +24,8 @@ public:
 	virtual void Hide();
 	virtual bool IsVisible();
 
+	virtual bool IsRoot() { return false; }
+
 	void CursorMoved( void );
 	void SetCursor( int newCursor, bool notify = true );
 	void SetCursorToItem( CMenuBaseItem *item, bool notify = true );
@@ -38,6 +40,8 @@ public:
 	inline int ItemCount() const { return m_numItems; }
 	inline bool WasInit() const { return m_bInit; }
 
+	DECLARE_EVENT_TO_MENU_METHOD( CMenuItemsHolder, PopMenu );
+
 protected:
 	virtual void _Init() {}
 	virtual void _VidInit() {}
@@ -49,6 +53,9 @@ protected:
 	int m_numItems;
 	bool m_bInit;
 private:
+
+	void PushMenu();
+	void PopMenu();
 };
 
 #endif // EMBEDITEM_H

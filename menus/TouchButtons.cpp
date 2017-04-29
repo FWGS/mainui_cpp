@@ -48,8 +48,6 @@ public:
 	void DeleteButton();
 	void ResetButtons();
 	void UpdateFields();
-	void DisableButtons();
-	void EnableButtons();
 
 	DECLARE_EVENT_TO_MENU_METHOD( CMenuTouchButtons, ResetButtons )
 	DECLARE_EVENT_TO_MENU_METHOD( CMenuTouchButtons, DeleteButton )
@@ -239,14 +237,6 @@ void CMenuTouchButtons::UpdateFields( )
 	texture.SetBuffer( bTextures[i] );
 	command.SetBuffer( bCommands[i] );
 }
-void CMenuTouchButtons::DisableButtons()
-{
-	SetInactive( true );
-}
-void CMenuTouchButtons::EnableButtons()
-{
-	SetInactive( false );
-}
 
 void CMenuTouchButtons::FileDialogCallback( bool success )
 {
@@ -255,7 +245,6 @@ void CMenuTouchButtons::FileDialogCallback( bool success )
 		uiTouchButtons.texture.SetBuffer( uiFileDialogGlobal.result );
 		uiTouchButtons.textureid = EngFuncs::PIC_Load(uiTouchButtons.texture.GetBuffer());
 	}
-	uiTouchButtons.EnableButtons();
 }
 
 void CMenuTouchButtons::ExitMenuCb(CMenuBaseItem *pSelf, void *pExtra)
@@ -409,8 +398,6 @@ void CMenuTouchButtons::_Init( void )
 	select.SetPicture("gfx/shell/btn_touch_select");
 	SET_EVENT( select, onActivated )
 	{
-		((CMenuTouchButtons*)pSelf->Parent())->DisableButtons();
-
 		// TODO: Remove uiFileDialogGlobal
 		// TODO: Make uiFileDialog menu globally known
 		// TODO: Make FileDialogCallback as event
@@ -450,20 +437,12 @@ void CMenuTouchButtons::_Init( void )
 
 	msgBox.SetPositiveButton( "Ok", PC_OK );
 	msgBox.SetNegativeButton( "Cancel", PC_CANCEL );
-	SET_EVENT( msgBox, onNegative )
-	{
-		((CMenuTouchButtons*)pSelf->Parent())->EnableButtons();
-		((CMenuYesNoMessageBox*)pSelf)->ToggleInactive();
-	}
-	END_EVENT( msgBox, onNegative )
 
 	reset.SetNameAndStatus( "Reset", "Reset touch to default state" );
 	reset.SetPicture( "gfx/shell/btn_touch_reset" );
 	SET_EVENT( reset, onActivated )
 	{
 		CMenuTouchButtons *parent = (CMenuTouchButtons*)pSelf->Parent();
-		parent->DisableButtons();
-
 		parent->msgBox.SetMessage( "Reset all buttons?" );
 		parent->msgBox.onPositive = CMenuTouchButtons::ResetButtonsCb;
 		parent->msgBox.Show();
@@ -475,8 +454,6 @@ void CMenuTouchButtons::_Init( void )
 	SET_EVENT( remove, onActivated )
 	{
 		CMenuTouchButtons *parent = (CMenuTouchButtons*)pSelf->Parent();
-		parent->DisableButtons();
-
 		parent->msgBox.SetMessage( "Delete selected button?" );
 		parent->msgBox.onPositive = CMenuTouchButtons::DeleteButtonCb;
 		parent->msgBox.Show();
@@ -514,7 +491,6 @@ void CMenuTouchButtons::_Init( void )
 	AddItem( command );
 	AddItem( texture );
 	AddItem( name );
-	AddItem( msgBox );
 
 	GetButtonList();
 }
@@ -574,7 +550,7 @@ void UI_TouchButtons_Menu( void )
 {
     UI_TouchButtons_Precache();
 
-	uiTouchButtons.Open();
+	uiTouchButtons.Show();
 }
 
 // Engine callback

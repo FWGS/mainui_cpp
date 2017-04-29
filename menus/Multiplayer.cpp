@@ -30,15 +30,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 class CMenuMultiplayer : public CMenuFramework
 {
-public:
-	virtual const char *Key(int key, int down);
-
 private:
 	virtual void _Init();
 	virtual void _VidInit();
 public:
-	static void PredictDialog( CMenuBaseItem *pSelf, void *pExtra );
-
 	CMenuBackgroundBitmap	background;
 	CMenuBannerBitmap		banner;
 
@@ -54,34 +49,6 @@ public:
 };
 
 static CMenuMultiplayer	uiMultiPlayer;
-
-
-void CMenuMultiplayer::PredictDialog( CMenuBaseItem *pSelf, void *pExtra )
-{
-	CMenuMultiplayer *parent = (CMenuMultiplayer*)pSelf->Parent();
-
-	// toggle main menu between active\inactive
-	// show\hide remove dialog
-	parent->ToggleInactive();
-
-	parent->msgBox.ToggleVisibility();
-}
-
-
-/*
-=================
-UI_Multiplayer_KeyFunc
-=================
-*/
-const char *CMenuMultiplayer::Key( int key, int down )
-{
-	if( down && key == K_ESCAPE && !( msgBox.iFlags & QMF_HIDDEN ))
-	{
-		PredictDialog( &msgBox, NULL );
-		return uiSoundNull;
-	}
-	return CMenuFramework::Key( key, down );
-}
 
 
 /*
@@ -134,14 +101,12 @@ void CMenuMultiplayer::_Init( void )
 	{
 		EngFuncs::CvarSetValue( "cl_predict", 1.0f );
 		EngFuncs::CvarSetValue( "menu_mp_firsttime", 0.0f );
-		CMenuMultiplayer::PredictDialog( pSelf, pExtra );
 	}
 	END_EVENT( msgBox, onPositive )
 
 	SET_EVENT( msgBox, onNegative )
 	{
 		EngFuncs::CvarSetValue( "menu_mp_firsttime", 0.0f );
-		CMenuMultiplayer::PredictDialog( pSelf, pExtra );
 	}
 	END_EVENT( msgBox, onNegative )
 
@@ -153,10 +118,9 @@ void CMenuMultiplayer::_Init( void )
 	AddItem( Customize );
 	AddItem( Controls );
 	AddItem( done );
-	AddItem( msgBox );
 
 	if( EngFuncs::GetCvarFloat( "menu_mp_firsttime" ) && !EngFuncs::GetCvarFloat( "cl_predict" ) )
-		PredictDialog( &msgBox, NULL );
+		msgBox.Show();
 }
 
 void CMenuMultiplayer::_VidInit()
@@ -190,8 +154,5 @@ void UI_MultiPlayer_Menu( void )
 		return;
 
 	UI_MultiPlayer_Precache();
-	uiMultiPlayer.Init();
-	uiMultiPlayer.VidInit();
-
-	uiMultiPlayer.PushMenu();
+	uiMultiPlayer.Show();
 }

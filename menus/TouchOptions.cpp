@@ -289,9 +289,9 @@ void CMenuTouchOptions::_Init( void )
 	{
 		CMenuTouchOptions *parent = (CMenuTouchOptions *)pSelf->Parent();
 
-		parent->ToggleInactive();
 		parent->msgBox.SetMessage( "Reset all buttons?");
 		parent->msgBox.onPositive = CMenuTouchOptions::ResetButtonsCb;
+		parent->msgBox.Show();
 	}
 	END_EVENT( reset, onActivated )
 
@@ -301,9 +301,9 @@ void CMenuTouchOptions::_Init( void )
 	{
 		CMenuTouchOptions *parent = (CMenuTouchOptions *)pSelf->Parent();
 
-		parent->ToggleInactive();
 		parent->msgBox.SetMessage( "Delete selected profile?");
 		parent->msgBox.onPositive = CMenuTouchOptions::DeleteProfileCb;
+		parent->msgBox.Show();
 	}
 	END_EVENT( remove, onActivated )
 
@@ -396,7 +396,6 @@ void CMenuTouchOptions::_Init( void )
 	AddItem( apply );
 	AddItem( grid );
 	AddItem( gridsize );
-	AddItem( msgBox );
 }
 
 void CMenuTouchOptions::_VidInit()
@@ -441,5 +440,5 @@ UI_TouchOptions_Menu
 void UI_TouchOptions_Menu( void )
 {
 	UI_TouchOptions_Precache();
-	uiTouchOptions.Open();
+	uiTouchOptions.Show();
 }

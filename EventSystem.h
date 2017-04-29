@@ -79,6 +79,7 @@ class CEventCallback
 {
 public:
 	CEventCallback() : pExtra( NULL ), callback( NULL ) {}
+	CEventCallback( EventCallback cb, void *ex ) : pExtra( ex ), callback( cb ) {}
 
 	void *pExtra;
 
@@ -113,6 +114,8 @@ public:
 		pExtra = &cmd;
 		callback = CmdCallbackWrapperCb;
 	}
+
+	static void NoopCb( CMenuBaseItem *, void * ) {}
 
 private:
 	struct CmdCallback

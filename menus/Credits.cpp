@@ -115,7 +115,7 @@ void CMenuCredits::Draw( void )
 	}
 
 	if( !uiCredits.active )
-		PopMenu();
+		Hide();
 }
 
 /*
@@ -228,7 +228,7 @@ UI_Credits_Menu
 void UI_Credits_Menu( void )
 {
 	UI_Credits_Precache();
-	uiCredits.Open();
+	uiCredits.Show();
 }
 
 void UI_FinalCredits( void )

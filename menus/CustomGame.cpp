@@ -44,7 +44,6 @@ class CMenuCustomGame: public CMenuFramework
 public:
 
 private:
-	static void EndGameDialog( CMenuBaseItem *pSelf, void *pExtra );
 	static void ChangeGame( CMenuBaseItem *pSelf, void *pExtra );
 	static void Go2Site( CMenuBaseItem *pSelf, void *pExtra );
 	static void UpdateExtras(CMenuBaseItem *pSelf, void *pExtra);
@@ -73,17 +72,6 @@ private:
 };
 
 static CMenuCustomGame	uiCustomGame;
-
-void CMenuCustomGame::EndGameDialog( CMenuBaseItem *pSelf, void *pExtra )
-{
-	CMenuCustomGame *parent = (CMenuCustomGame*)pSelf->Parent();
-
-	// toggle main menu between active\inactive
-	// show\hide delete dialog
-	parent->ToggleInactive();
-
-	parent->msgBox.ToggleVisibility();
-}
 
 void CMenuCustomGame::ChangeGame(CMenuBaseItem *pSelf, void *pExtra)
 {
@@ -210,7 +198,7 @@ void CMenuCustomGame::_Init( void )
 
 	load.SetNameAndStatus("Activate", "Activate selected custom game" );
 	load.SetPicture( PC_ACTIVATE );
-	load.onActivatedClActive = EndGameDialog;
+	load.onActivatedClActive = msgBox.MakeOpenEvent();
 	load.onActivated = ChangeGame;
 
 	go2url.SetNameAndStatus( "Visit web site", "Visit the web site of game developers" );
@@ -226,11 +214,7 @@ void CMenuCustomGame::_Init( void )
 	GetModList();
 
 	msgBox.SetMessage( "Leave current game?" );
-	msgBox.SetPositiveButton( "Ok", PC_OK );
-	msgBox.SetNegativeButton( "Cancel", PC_CANCEL );
 	msgBox.onPositive = ChangeGame;
-	msgBox.onNegative = EndGameDialog;
-
 
 	AddItem( background );
 	AddItem( banner );
@@ -238,7 +222,6 @@ void CMenuCustomGame::_Init( void )
 	AddItem( go2url );
 	AddItem( done );
 	AddItem( modList );
-	AddItem( msgBox );
 }
 
 void CMenuCustomGame::_VidInit()
@@ -271,5 +254,5 @@ void UI_CustomGame_Menu( void )
 		return;
 
 	UI_CustomGame_Precache();
-	uiCustomGame.Open();
+	uiCustomGame.Show();
 }

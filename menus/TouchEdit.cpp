@@ -49,7 +49,7 @@ void CMenuTouchEdit::Draw( void )
 {
 	if( !EngFuncs::GetCvarFloat("touch_in_menu") )
 	{
-		PopMenu();
+		Hide();
 		UI_TouchButtons_GetButtonList();
 	}
 }
@@ -65,7 +65,7 @@ const char *CMenuTouchEdit::Key( int key, int down )
 	{
 		EngFuncs::CvarSetString("touch_in_menu", "0");
 		EngFuncs::ClientCmd(0, "touch_disableedit");
-		PopMenu();
+		Hide();
 		return uiSoundOut;
 	}
 	return uiSoundNull;
@@ -100,5 +100,5 @@ UI_TouchEdit_Menu
 void UI_TouchEdit_Menu( void )
 {
 	UI_TouchEdit_Precache();
-	uiTouchEdit.Open();
+	uiTouchEdit.Show();
 }

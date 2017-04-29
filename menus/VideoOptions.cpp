@@ -215,5 +215,5 @@ CMenuVidOptions::Menu
 void UI_VidOptions_Menu( void )
 {
 	UI_VidOptions_Precache();
-	uiVidOptions.Open();
+	uiVidOptions.Show();
 }

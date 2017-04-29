@@ -39,7 +39,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 class CMenuServerBrowser: public CMenuFramework
 {
 public:
-	virtual const char *Key( int key, int down );
 	virtual void Draw();
 
 	void SetLANOnly( bool lanOnly ) { m_bLanOnly = lanOnly; }
@@ -55,7 +54,6 @@ public:
 
 	DECLARE_EVENT_TO_MENU_METHOD( CMenuServerBrowser, RefreshList )
 
-	static void PromptDialog( CMenuBaseItem *pSelf, void *pExtra );
 	static void JoinGame( CMenuBaseItem *pSelf, void *pExtra );
 
 	char		gameDescription[UI_MAX_SERVERS][256];
@@ -82,32 +80,6 @@ public:
 };
 
 static CMenuServerBrowser	uiServerBrowser;
-
-void CMenuServerBrowser::PromptDialog( CMenuBaseItem *pSelf, void *pExtra )
-{
-	CMenuServerBrowser *parent = (CMenuServerBrowser *)pSelf->Parent();
-
-	// toggle main menu between active\inactive
-	// show\hide quit dialog
-	parent->ToggleInactive();
-
-	parent->msgBox.ToggleVisibility();
-}
-
-/*
-=================
-CMenuServerBrowser::KeyFunc
-=================
-*/
-const char *CMenuServerBrowser::Key( int key, int down )
-{
-	if( down && key == K_ESCAPE && !( msgBox.iFlags & QMF_HIDDEN ))
-	{
-		PromptDialog( &msgBox, NULL );
-		return uiSoundNull;
-	}
-	return CMenuFramework::Key( key, down );
-}
 
 /*
 =================
@@ -180,10 +152,6 @@ CMenuServerBrowser::JoinGame
 void CMenuServerBrowser::JoinGame( CMenuBaseItem *pSelf, void *pExtra )
 {
 	CMenuServerBrowser *parent = (CMenuServerBrowser *)pSelf->Parent();
-
-	// close dialog
-	if( !(parent->msgBox.iFlags & QMF_HIDDEN ) )
-		PromptDialog( pSelf, pExtra );
 
 	if( parent->gameDescription[parent->gameList.iCurItem][0] == 0 )
 		return;
@@ -270,13 +238,8 @@ void CMenuServerBrowser::_Init( void )
 	joinGame.iFlags |= QMF_GRAYED;
 	joinGame.SetNameAndStatus( "Join game", "Join to selected game" );
 	joinGame.SetPicture( PC_JOIN_GAME );
-	SET_EVENT( joinGame, onActivated )
-	{
-		CMenuServerBrowser *parent = (CMenuServerBrowser*) pSelf->Parent();
-		if( CL_IsActive() ) parent->PromptDialog( pSelf, pExtra );
-		else parent->JoinGame( pSelf, pExtra );
-	}
-	END_EVENT( joinGame, onActivated )
+	joinGame.onActivatedClActive = msgBox.MakeOpenEvent();
+	joinGame.onActivated = JoinGame;
 
 	createGame.SetNameAndStatus( "Create game", "Create new Internet game" );
 	createGame.SetPicture( PC_CREATE_GAME );
@@ -347,7 +310,6 @@ void CMenuServerBrowser::_Init( void )
 	AddItem( done );
 	AddItem( gameList );
 	AddItem( natOrDirect );
-	AddItem( msgBox );
 }
 
 /*
@@ -416,7 +378,7 @@ void UI_ServerBrowser_Menu( void )
 	}
 
 	UI_InternetGames_Precache();
-	uiServerBrowser.Open();
+	uiServerBrowser.Show();
 }
 
 void UI_InternetGames_Menu( void )
