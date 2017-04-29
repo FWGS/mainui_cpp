@@ -57,7 +57,6 @@ private:
 
 	HIMAGE hPic;
 	int button_id;
-	bool m_bEnableTrans;
 
 	static Quad LerpQuad( Quad a, Quad b, float frac );
 

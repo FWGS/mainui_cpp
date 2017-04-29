@@ -36,6 +36,7 @@ private:
 	virtual void _Init();
 
 	static void StartGameCb( CMenuBaseItem *pSelf, void *pExtra );
+	static void ShowDialogCb( CMenuBaseItem *pSelf, void *pExtra );
 
 	CMenuBackgroundBitmap background;
 	CMenuBannerBitmap     banner;
@@ -56,12 +57,10 @@ CMenuNewGame::StartGame
 */
 void CMenuNewGame::StartGameCb( CMenuBaseItem *pSelf, void *pExtra )
 {
-	CMenuNewGame *parent = (CMenuNewGame *)pSelf->Parent();
-
 	if( EngFuncs::GetCvarFloat( "host_serverstate" ) && EngFuncs::GetCvarFloat( "maxplayers" ) > 1 )
 		EngFuncs::HostEndGame( "end of the game" );
 
-	EngFuncs::CvarSetValue( "skill", (int)pExtra );
+	EngFuncs::CvarSetValue( "skill", int((size_t)pExtra) );
 	EngFuncs::CvarSetValue( "deathmatch", 0.0f );
 	EngFuncs::CvarSetValue( "teamplay", 0.0f );
 	EngFuncs::CvarSetValue( "pausable", 1.0f ); // singleplayer is always allowing pause
@@ -71,6 +70,14 @@ void CMenuNewGame::StartGameCb( CMenuBaseItem *pSelf, void *pExtra )
 	EngFuncs::PlayBackgroundTrack( NULL, NULL );
 
 	EngFuncs::ClientCmd( FALSE, "newgame\n" );
+}
+
+void CMenuNewGame::ShowDialogCb( CMenuBaseItem *pSelf, void *pExtra )
+{
+	CMenuNewGame *parent = (CMenuNewGame *)pSelf->Parent();
+
+	parent->msgBox.onPositive.pExtra = pExtra;
+	parent->msgBox.Show();
 }
 
 /*
@@ -86,21 +93,21 @@ void CMenuNewGame::_Init( void )
 	easy.SetPicture( PC_EASY );
 	easy.SetCoord( 72, 230 );
 	easy.iFlags |= QMF_NOTIFY;
-	easy.onActivated.pExtra = (void*)1;
+	easy.onActivatedClActive.pExtra = easy.onActivated.pExtra = (void*)1;
 
 	medium.SetNameAndStatus( "Medium", MenuStrings[HINT_SKILL_NORMAL] );
 	medium.SetPicture( PC_MEDIUM );
 	medium.SetCoord( 72, 280 );
 	medium.iFlags |= QMF_NOTIFY;
-	medium.onActivated.pExtra = (void*)2;
+	medium.onActivatedClActive.pExtra = medium.onActivated.pExtra = (void*)2;
 
 	hard.SetNameAndStatus( "Difficult", MenuStrings[HINT_SKILL_HARD] );
 	hard.SetPicture( PC_DIFFICULT );
 	hard.SetCoord( 72, 330 );
 	hard.iFlags |= QMF_NOTIFY;
-	hard.onActivated.pExtra = (void*)3;
+	hard.onActivatedClActive.pExtra = hard.onActivated.pExtra = (void*)3;
 
-	easy.onActivatedClActive = medium.onActivatedClActive = hard.onActivatedClActive = msgBox.MakeOpenEvent();
+	easy.onActivatedClActive = medium.onActivatedClActive = hard.onActivatedClActive = ShowDialogCb;
 	msgBox.onPositive = easy.onActivated = medium.onActivated = hard.onActivated = StartGameCb;
 
 	cancel.SetNameAndStatus("Cancel", "Go back to the main menu");

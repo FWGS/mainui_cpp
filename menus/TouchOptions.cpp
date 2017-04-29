@@ -273,7 +273,7 @@ void CMenuTouchOptions::_Init( void )
 			parent->remove.iFlags &= ~QMF_GRAYED;
 
 		parent->apply.iFlags &= ~QMF_GRAYED;
-		if( self->iCurItem == 0 | self->iCurItem == parent->firstProfile - 1 )
+		if( self->iCurItem == 0 || self->iCurItem == parent->firstProfile - 1 )
 			self->iCurItem++;
 		if( isCurrent )
 			parent->apply.iFlags |= QMF_GRAYED;
