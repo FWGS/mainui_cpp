@@ -27,6 +27,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "PicButton.h"
 #include "Action.h"
 #include "YesNoMessageBox.h"
+#include "MessageBox.h"
 #include "ScrollList.h"
 
 #define ART_BANNER		"gfx/shell/head_controls"
@@ -73,9 +74,7 @@ private:
 	CMenuScrollList keysList;
 
 	// redefine key wait dialog
-	// TODO: Replace with universal CMenuMessageBox
-	CMenuAction msgBox1; // small msgbox
-	CMenuAction dlgMessage;
+	CMenuMessageBox msgBox1; // small msgbox
 
 	CMenuYesNoMessageBox msgBox2; // large msgbox
 
@@ -85,12 +84,8 @@ private:
 
 void CMenuControls::PromptDialog( void )
 {
-	// toggle main menu between active\inactive
-	ToggleInactive();
-
 	// show\hide quit dialog
 	msgBox1.ToggleVisibility();
-	dlgMessage.ToggleVisibility();
 }
 
 /*
@@ -393,15 +388,10 @@ void CMenuControls::_Init( void )
 	ParseKeysList();
 
 	msgBox1.SetRect( DLG_X + 192, 256, 640, 128 );
-	msgBox1.SetBackground( uiColorHelp );
-	msgBox1.iFlags = QMF_INACTIVE|QMF_HIDDEN|QMF_DIALOG;
+	msgBox1.SetMessage( "Press a key or button" );
 
 	msgBox2.SetMessage( "Reset buttons to default?" );
 	msgBox2.onPositive = ResetKeysListCb;
-
-	dlgMessage.iFlags = QMF_INACTIVE|QMF_HIDDEN|QMF_DROPSHADOW|QMF_DIALOG;
-	dlgMessage.szName = "Press a key or button";
-	dlgMessage.SetCoord( DLG_X + 320, 280 );
 
 	AddItem( background );
 	AddItem( banner );
@@ -410,9 +400,6 @@ void CMenuControls::_Init( void )
 	AddItem( done );
 	AddItem( cancel );
 	AddItem( keysList );
-	AddItem( msgBox1 );
-	AddItem( msgBox2 );
-	AddItem( dlgMessage );
 }
 
 /*
