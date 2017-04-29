@@ -192,7 +192,7 @@ void CMenuMain::QuitDialogCb(CMenuBaseItem *pSelf , void *pExtra)
 		parent->dialog.SetMessage( MenuStrings[HINT_QUIT] );
 
 	parent->dialog.onPositive = QuitCb;
-	parent->dialog.Show();
+    parent->dialog.ToggleVisibility();
 }
 
 void CMenuMain::DisconnectDialogCb( CMenuBaseItem *pSelf , void *pExtra)

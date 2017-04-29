@@ -47,7 +47,7 @@ private:
 
 	CMenuPicButton done;
 
-public:
+//public:
 	CMenuCheckBox	crosshair;
 	CMenuCheckBox	invertMouse;
 	CMenuCheckBox	mouseLook;
