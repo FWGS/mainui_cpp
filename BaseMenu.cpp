@@ -667,7 +667,8 @@ void UI_KeyEvent( int key, int down )
 	}
 
 	// go down on stack to nearest root or dialog
-	for( int i = uiStatic.menuDepth-1; i >= uiStatic.rootPosition; i-- )
+	int rootPos = uiStatic.rootPosition;
+	for( int i = uiStatic.menuDepth-1; i >= rootPos; i-- )
 	{
 		sound = uiStatic.menuStack[i]->Key( key, down );
 
@@ -695,7 +696,8 @@ void UI_CharEvent( int key )
 	if( !uiStatic.menuActive )
 		return;
 
-	for( int i = uiStatic.menuDepth-1; i >= uiStatic.rootPosition; i-- )
+	int rootPos = uiStatic.rootPosition;
+	for( int i = uiStatic.menuDepth-1; i >= rootPos; i-- )
 	{
 		uiStatic.menuStack[i]->Char( key );
 
@@ -769,7 +771,8 @@ void UI_MouseMove( int x, int y )
 	uiStatic.cursorY = bound( 0, uiStatic.cursorY, ScreenHeight );
 
 	// go down on stack to nearest root or dialog
-	for( int i = uiStatic.menuDepth-1; i >= uiStatic.rootPosition; i-- )
+	int rootPos = uiStatic.rootPosition;
+	for( int i = uiStatic.menuDepth-1; i >= rootPos; i-- )
 	{
 		uiStatic.menuStack[i]->MouseMove( x, y );
 
