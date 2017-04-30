@@ -527,7 +527,7 @@ void CMenuTouchButtons::_VidInit()
 
 	save.SetCoord( 384 - 72 + 320, 550 );
 	editor.SetCoord( 384 - 42 + 320, 600 );
-	select.SetCoord( 500, 300 );
+	select.SetRect( 500, 300, 150,50 );
 
 	name.SetRect( 400, 550, 205, 32 );
 	command.SetRect( 400, 150, 205, 32 );
