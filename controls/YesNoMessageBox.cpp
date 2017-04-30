@@ -116,6 +116,7 @@ const char *CMenuYesNoMessageBox::Key(int key, int down)
 	if( key == K_ESCAPE && down )
 	{
 		onNegative( this );
+		Hide();
 		return uiSoundNull;
 	}
 	else return CMenuItemsHolder::Key( key, down );
