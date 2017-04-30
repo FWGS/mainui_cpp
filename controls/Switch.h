@@ -25,6 +25,11 @@ public:
 
 	int iSelectColor;
 	int iBackgroundColor;
+	int iFgTextColor;
+	int iBgTextColor;
+
+	float fTextOffsetX;
+	float fTextOffsetY;
 private:
 	Point m_rightPoint, m_leftPoint;
 	Size m_rightSize, m_leftSize;
