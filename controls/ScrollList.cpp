@@ -363,7 +363,7 @@ void CMenuScrollList::Draw( )
 
 	float step = (iNumItems <= 1 ) ? 1 : (down.y - up.y - arrow.h) / (float)(iNumItems - 1);
 
-	if( cursorDown && !iScrollBarSliding )
+	if( cursorDown && !iScrollBarSliding && ( iFlags & QMF_HASMOUSEFOCUS ) )
 	{
 		if( UI_CursorInRect( m_scPos.x, m_scPos.y, m_scSize.w - arrow.w, m_scSize.h ))
 		{
