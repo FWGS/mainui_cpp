@@ -327,13 +327,13 @@ void CMenuServerBrowser::_VidInit()
 	{
 		banner.SetPicture( ART_BANNER_LAN );
 		createGame.szStatusText = ( "Create new LAN game" );
-		natOrDirect.Show();
+		natOrDirect.Hide();
 	}
 	else
 	{
 		banner.SetPicture( ART_BANNER_INET );
 		createGame.szStatusText = ( "Create new Internet game" );
-		natOrDirect.Hide();
+		natOrDirect.Show();
 	}
 
 	joinGame.SetCoord( 72, 230 );
