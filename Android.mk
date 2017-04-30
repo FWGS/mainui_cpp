@@ -14,7 +14,7 @@ endif
 
 
 LOCAL_MODULE := menu
-LOCAL_CFLAGS := -std=gnu++11
+LOCAL_CPPFLAGS := -std=gnu++11
 
 APP_PLATFORM := android-9
 
