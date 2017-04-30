@@ -93,6 +93,7 @@ private:
 
 	void DeleteDialog();
 	DECLARE_EVENT_TO_MENU_METHOD( CMenuLoadGame, DeleteDialog )
+	bool m_fSaveMode;
 
 public:
 	void GetGameList();
@@ -130,7 +131,7 @@ void CMenuLoadGame::GetGameList( void )
 {
 	char	comment[256];
 	char	**filenames;
-	int	i, numFiles;
+	int	i = 0, j, numFiles;
 
 	filenames = EngFuncs::GetFilesList( "save/*.sav", &numFiles, TRUE );
 
@@ -138,11 +139,25 @@ void CMenuLoadGame::GetGameList( void )
 	qsort( filenames, numFiles, sizeof( char* ), (cmpfunc)COM_CompareSaves );
 	memset( saveDescription, 0, sizeof( saveDescription ) );
 
-	for ( i = 0; i < numFiles; i++ )
+	if ( m_fSaveMode && CL_IsActive() )
+	{
+		// create new entry for current save game
+		strncpy( saveName[i], "new", CS_SIZE );
+		StringConcat( saveDescription[i], "Current", TIME_LENGTH );
+		AddSpaces( saveDescription[i], TIME_LENGTH ); // fill remaining entries
+		StringConcat( saveDescription[i], "New Saved Game", NAME_LENGTH );
+		AddSpaces( saveDescription[i], NAME_LENGTH );
+		StringConcat( saveDescription[i], "New", GAMETIME_LENGTH );
+		AddSpaces( saveDescription[i], GAMETIME_LENGTH );
+		saveDescriptionPtr[i] = saveDescription[i];
+		i++;
+	}
+
+	for ( j = 0; j < numFiles; i++, j++ )
 	{
 		if( i >= UI_MAXGAMES ) break;
 		
-		if( !EngFuncs::GetSaveComment( filenames[i], comment ))
+		if( !EngFuncs::GetSaveComment( filenames[j], comment ))
 		{
 			if( comment[0] )
 			{
@@ -152,15 +167,16 @@ void CMenuLoadGame::GetGameList( void )
 				StringConcat( saveDescription[i], comment, NAME_LENGTH );
 				AddSpaces( saveDescription[i], NAME_LENGTH );
 				saveDescriptionPtr[i] = saveDescription[i];
-				COM_FileBase( filenames[i], delName[i] );
+				COM_FileBase( filenames[j], saveName[i] );
+				COM_FileBase( filenames[j], delName[i] );
 			}
-			else saveDescriptionPtr[i] = NULL;
+			else saveDescriptionPtr[j] = NULL;
 			continue;
 		}
 
 		// strip path, leave only filename (empty slots doesn't have savename)
-		COM_FileBase( filenames[i], saveName[i] );
-		COM_FileBase( filenames[i], delName[i] );
+		COM_FileBase( filenames[j], saveName[i] );
+		COM_FileBase( filenames[j], delName[i] );
 
 		// fill save desc
 		StringConcat( saveDescription[i], comment + CS_SIZE, TIME_LENGTH );
@@ -299,6 +315,7 @@ void CMenuLoadGame::_Init( void )
 	AddItem( background );
 	AddItem( banner );
 	AddItem( load );
+	AddItem( save );
 	AddItem( remove );
 	AddItem( cancel );
 	AddItem( levelShot );
@@ -319,6 +336,7 @@ void CMenuLoadGame::_VidInit()
 
 void CMenuLoadGame::SetSaveMode(bool saveMode)
 {
+	m_fSaveMode = saveMode;
 	if( saveMode )
 	{
 		banner.SetPicture( ART_BANNER_SAVE );
@@ -331,6 +349,7 @@ void CMenuLoadGame::SetSaveMode(bool saveMode)
 		save.iFlags |= QMF_HIDDEN;
 		load.iFlags &= ~QMF_HIDDEN;
 	}
+	GetGameList();
 }
 
 /*
