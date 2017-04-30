@@ -170,6 +170,7 @@ const char *CMenuPlayerModelView::Key(int key, int down)
 		break;
 	case K_ENTER:
 	case K_AUX1:
+	case K_MOUSE2:
 		if( down ) ent->curstate.sequence++;
 		break;
 	default:

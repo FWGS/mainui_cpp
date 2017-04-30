@@ -23,7 +23,7 @@ const char *CMenuItemsHolder::Key( int key, int down )
 		{
 			sound = item->Key( key, down );
 
-			if( sound ) return sound;
+			if( sound && sound != uiSoundNull ) return sound;
 		}
 
 		// system keys are always wait for keys down and never keys up
