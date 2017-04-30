@@ -12,7 +12,7 @@ CMenuMessageBox::CMenuMessageBox() : CMenuItemsHolder()
 
 void CMenuMessageBox::_Init()
 {
-	background.SetBackground( uiColorHelp );
+	background.SetBackground( uiPromptBgColor );
 	background.SetRect( DLG_X + 192, 256, 640, 128 );
 	background.iFlags = QMF_INACTIVE;
 

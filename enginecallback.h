@@ -99,8 +99,8 @@ public:
 	{ engfuncs.pfnDelCommand( cmd_name ); }
 	static inline int   CmdArgc( void )
 	{ return engfuncs.pfnCmdArgc(); }
-	static inline char*	CmdArgv( int argc )
-	{ return engfuncs.pfnCmdArgv( argc ); }
+	static inline char*	CmdArgv( int argi )
+	{ return engfuncs.pfnCmdArgv( argi ); }
 	static inline char*	CmdArgs( void )
 	{ return engfuncs.pfnCmd_Args(); }
 

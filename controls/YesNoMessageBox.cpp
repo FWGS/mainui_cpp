@@ -22,7 +22,7 @@ GNU General Public License for more details.
 
 static void ToggleInactiveInternalCb( CMenuBaseItem *pSelf, void *pExtra );
 
-CMenuYesNoMessageBox::CMenuYesNoMessageBox()
+CMenuYesNoMessageBox::CMenuYesNoMessageBox( bool alert )
 {
 	iFlags = QMF_DIALOG;
 	dlgMessage1.iFlags = QMF_INACTIVE|QMF_DROPSHADOW;
@@ -35,22 +35,24 @@ CMenuYesNoMessageBox::CMenuYesNoMessageBox()
 	SET_EVENT( yes, onActivated )
 	{
 		CMenuYesNoMessageBox *msgBox = (CMenuYesNoMessageBox*)pExtra;
-		msgBox->onPositive( msgBox );
 
 		msgBox->Hide();
+		msgBox->onPositive( msgBox );
+
 	}
 	END_EVENT( yes, onActivated )
 
 	SET_EVENT( no, onActivated )
 	{
 		CMenuYesNoMessageBox *msgBox = (CMenuYesNoMessageBox*)pExtra;
+		msgBox->Hide();
 		msgBox->onNegative( msgBox );
 
-		msgBox->Hide();
 	}
 	END_EVENT( no, onActivated )
 
 	m_bSetYes = m_bSetNo = false;
+	m_bIsAlert = alert;
 }
 
 /*
@@ -74,7 +76,10 @@ void CMenuYesNoMessageBox::_Init( void )
 
 	AddItem( dlgMessage1 );
 	AddItem( yes );
-	AddItem( no );
+
+	// alert dialog has single OK button
+	if( !m_bIsAlert )
+		AddItem( no );
 }
 
 /*
@@ -85,7 +90,10 @@ CMenuYesNoMessageBox::VidInit
 void CMenuYesNoMessageBox::_VidInit( void )
 {
 	dlgMessage1.SetRect( DLG_X + 192, 280, 640, 256 );
-	yes.SetRect( DLG_X + 380, 460, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
+	if( m_bIsAlert )
+		yes.SetRect( DLG_X + 490, 460, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
+	else
+		yes.SetRect( DLG_X + 380, 460, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
 	no.SetRect( DLG_X + 530, 460, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
 	SetRect( DLG_X + 192, 256, 640, 256 );
 
@@ -102,6 +110,7 @@ CMenuYesNoMessageBox::Draw
 */
 void CMenuYesNoMessageBox::Draw( void )
 {
+	UI_FillRect( 0,0, gpGlobals->scrWidth, gpGlobals->scrHeight, 0x40000000 );
 	UI_FillRect( m_scPos, m_scSize, uiPromptBgColor );
 	CMenuItemsHolder::Draw();
 }
@@ -115,8 +124,9 @@ const char *CMenuYesNoMessageBox::Key(int key, int down)
 {
 	if( key == K_ESCAPE && down )
 	{
-		onNegative( this );
 		Hide();
+		onNegative( this );
+
 		return uiSoundNull;
 	}
 	else return CMenuItemsHolder::Key( key, down );

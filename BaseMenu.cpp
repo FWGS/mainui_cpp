@@ -31,6 +31,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "menufont.h"	// built-in menu font
 #include "Utils.h"
 #include "BtnsBMPTable.h"
+#include "YesNoMessageBox.h"
 
 cvar_t		*ui_precache;
 cvar_t		*ui_showmodels;
@@ -1101,6 +1102,23 @@ static void UI_LoadBackgroundMapList( void )
 	EngFuncs::COM_FreeFile( afile );
 }
 
+static void UI_ShowMessageBox( void )
+{
+	static char msg[1024];
+	static CMenuYesNoMessageBox msgBox( true );
+
+	strncpy( msg, EngFuncs::CmdArgv(1), 1023 );
+	msg[1023] = 0;
+
+	if( !UI_IsVisible() )
+	{
+		UI_Main_Menu();
+		UI_SetActiveMenu( TRUE );
+	}
+	msgBox.SetMessage( msg );
+	msgBox.Show();
+}
+
 /*
 =================
 UI_VidInit
@@ -1230,6 +1248,7 @@ void UI_Init( void )
 	EngFuncs::Cmd_AddCommand( "menu_filedialog", UI_FileDialog_Menu );
 	EngFuncs::Cmd_AddCommand( "menu_gamepad", UI_GamePad_Menu );
 	EngFuncs::Cmd_AddCommand( "menu_resetping", UI_MenuResetPing_f );
+	EngFuncs::Cmd_AddCommand( "menu_showmessagebox", UI_ShowMessageBox );
 
 	EngFuncs::CreateMapsList( TRUE );
 

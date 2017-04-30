@@ -24,7 +24,7 @@ GNU General Public License for more details.
 class CMenuYesNoMessageBox : public CMenuItemsHolder
 {
 public:
-	CMenuYesNoMessageBox();
+	CMenuYesNoMessageBox( bool alert = false );
 
 	virtual void _Init();
 	virtual void _VidInit();
@@ -53,6 +53,7 @@ private:
 	CMenuPicButton	yes;
 	CMenuPicButton	no;
 	bool m_bSetYes, m_bSetNo;
+	bool m_bIsAlert;
 };
 
 #endif // MENU_GENERICMSGBOX_H
