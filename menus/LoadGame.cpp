@@ -308,6 +308,7 @@ void CMenuLoadGame::_Init( void )
 		}
 	}
 	END_EVENT( msgBox, onPositive )
+	msgBox.Link( this );
 
 	AddItem( background );
 	AddItem( banner );

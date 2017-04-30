@@ -392,6 +392,7 @@ void CMenuControls::_Init( void )
 
 	msgBox2.SetMessage( "Reset buttons to default?" );
 	msgBox2.onPositive = ResetKeysListCb;
+	msgBox2.Link( this );
 
 	AddItem( background );
 	AddItem( banner );

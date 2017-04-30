@@ -469,6 +469,7 @@ void CMenuTouchButtons::_Init( void )
 
 	buttonList.pszItemNames = (const char **)bNamesPtr;
 	buttonList.onChanged = UpdateFieldsCb;
+	msgBox.Link( this );
 
 	AddItem( background );
 	AddItem( remove );

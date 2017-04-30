@@ -270,6 +270,7 @@ void CMenuServerBrowser::_Init( void )
 	msgBox.SetPositiveButton( "Ok", PC_OK );
 	msgBox.HighlightChoice( 1 );
 	msgBox.onPositive = JoinGame;
+	msgBox.Link( this );
 
 	gameList.SetCharSize( QM_SMALLFONT );
 	gameList.eFocusAnimation = QM_HIGHLIGHTIFFOCUS;

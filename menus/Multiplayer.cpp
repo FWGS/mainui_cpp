@@ -109,6 +109,7 @@ void CMenuMultiplayer::_Init( void )
 		EngFuncs::CvarSetValue( "menu_mp_firsttime", 0.0f );
 	}
 	END_EVENT( msgBox, onNegative )
+	msgBox.Link( this );
 
 	AddItem( background );
 	AddItem( banner );

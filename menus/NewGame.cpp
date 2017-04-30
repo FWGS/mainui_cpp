@@ -118,6 +118,7 @@ void CMenuNewGame::_Init( void )
 
 	msgBox.SetMessage( MenuStrings[HINT_RESTART_GAME] );
 	msgBox.HighlightChoice( CMenuYesNoMessageBox::HIGHLIGHT_NO );
+	msgBox.Link( this );
 
 	AddItem( background );
 	AddItem( banner );

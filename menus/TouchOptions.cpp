@@ -378,6 +378,7 @@ void CMenuTouchOptions::_Init( void )
 	END_EVENT( save, onActivated )
 
 	msgBox.SetPositiveButton( "Ok", PC_OK );
+	msgBox.Link( this );
 	
 	AddItem( background );
 	AddItem( banner );

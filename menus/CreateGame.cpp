@@ -79,6 +79,9 @@ CMenuCreateGame::Begin
 void CMenuCreateGame::Begin( CMenuBaseItem *pSelf, void *pExtra )
 {
 	CMenuCreateGame *menu = (CMenuCreateGame*)pSelf->Parent();
+	int item = menu->mapsList.iCurItem;
+	if( item < 0 || item > UI_MAXGAMES )
+		return;
 
 	const char *mapName = menu->mapName[menu->mapsList.iCurItem];
 
@@ -238,6 +241,8 @@ void CMenuCreateGame::_Init( void )
 	// TODO: This field is completely ignored. Add password option to the engine!
 
 	msgBox.onPositive = Begin;
+	msgBox.SetMessage( "Starting a new game will exit\nany current game, OK to exit?" );
+	msgBox.Link( this );
 
 	AddItem( background );
 	AddItem( banner );

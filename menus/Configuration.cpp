@@ -104,6 +104,7 @@ void CMenuOptions::_Init( void )
 		EngFuncs::ShellExecute( ((CMenuOptions*)pSelf->Parent())->m_szUpdateUrl, NULL, TRUE );
 	}
 	END_EVENT( msgBox, onPositive )
+	msgBox.Link( this );
 
 	if( gMenu.m_gameinfo.update_url[0] != 0 )
 		m_szUpdateUrl = gMenu.m_gameinfo.update_url;

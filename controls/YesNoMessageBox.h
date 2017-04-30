@@ -33,6 +33,7 @@ public:
 	void SetMessage( const char *msg );
 	void SetPositiveButton( const char *msg, int buttonPic, void *extra = NULL );
 	void SetNegativeButton( const char *msg, int buttonPic, void *extra = NULL );
+	void Link( CMenuItemsHolder *h );
 	enum
 	{
 		NO_HIGHLIGHT = 0,

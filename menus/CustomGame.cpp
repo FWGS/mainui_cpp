@@ -215,6 +215,7 @@ void CMenuCustomGame::_Init( void )
 
 	msgBox.SetMessage( "Leave current game?" );
 	msgBox.onPositive = ChangeGame;
+	msgBox.Link( this );
 
 	AddItem( background );
 	AddItem( banner );

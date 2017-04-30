@@ -205,3 +205,9 @@ static void ToggleInactiveInternalCb( CMenuBaseItem *pSelf, void * )
 {
 	pSelf->ToggleVisibility();
 }
+
+
+void CMenuYesNoMessageBox::Link( CMenuItemsHolder *holder )
+{
+	m_pParent = holder;
+}
