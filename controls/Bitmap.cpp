@@ -237,6 +237,8 @@ void CMenuBannerBitmap::Draw()
 void CMenuBannerBitmap::VidInit()
 {
 	CMenuBitmap::VidInit();
+	if( !szPic )
+		return;
 	// CMenuPicButton::SetTitleAnim( CMenuPicButton::AS_TO_TITLE );
 	CMenuPicButton::SetupTitleQuad( pos.x, pos.y, size.w, size.h );
 #if defined(TA_ALT_MODE2) && !defined(TA_ALT_MODE)
