@@ -106,7 +106,7 @@ void CMenuPlayerModelView::VidInit()
 	ent->curstate.scale = 1.0f;
 	ent->curstate.frame = 0.0f;
 	ent->curstate.framerate = 1.0f;
-	//ent->curstate.effects |= EF_FULLBRIGHT;
+	ent->curstate.effects |= EF_FULLBRIGHT;
 	ent->curstate.controller[0] = 127;
 	ent->curstate.controller[1] = 127;
 	ent->curstate.controller[2] = 127;
@@ -118,7 +118,6 @@ void CMenuPlayerModelView::VidInit()
 	ent->origin[0] = ent->curstate.origin[0] = 45.0f / tan( DEG2RAD( refdef.fov_y / 2.0f ));
 	ent->origin[2] = ent->curstate.origin[2] = 2.0f;
 	ent->angles[1] = ent->curstate.angles[1] = 180.0f;
-	ent->angles[0] = ent->curstate.angles[0] = 180.0f;
 	
 	ent->player = true; // yes, draw me as playermodel
 }
@@ -225,7 +224,7 @@ void CMenuPlayerModelView::Draw()
 			float diffY = uiStatic.cursorY - prevCursorY;
 			if( diffY )
 			{
-				float pitch = ent->angles[0];
+				float pitch = refdef.viewangles[2];
 
 				pitch += diffY / uiStatic.scaleY;
 
@@ -233,7 +232,8 @@ void CMenuPlayerModelView::Draw()
 					pitch -= 360.0f;
 				else if( pitch < -180.0f )
 					pitch += 360.0f;
-				ent->angles[0] = ent->curstate.angles[0] = pitch;
+				refdef.viewangles[2] = pitch;
+				ent->angles[2] = ent->curstate.angles[2] = -pitch;
 			}
 
 			prevCursorY = uiStatic.cursorY;
