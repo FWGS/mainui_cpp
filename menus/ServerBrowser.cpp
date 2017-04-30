@@ -319,6 +319,9 @@ void CMenuServerBrowser::_Init( void )
 	natOrDirect.eTextAlignment = QM_CENTER;
 	natOrDirect.bMouseToggle = false;
 	natOrDirect.LinkCvar( "cl_nat" );
+	natOrDirect.iSelectColor = uiInputFgColor;
+	// bit darker
+	natOrDirect.iFgTextColor = uiInputFgColor - 0x00151515;
 	SET_EVENT( natOrDirect, onChanged )
 	{
 		CMenuSwitch *self = (CMenuSwitch*)pSelf;

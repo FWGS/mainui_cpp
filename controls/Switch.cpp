@@ -31,6 +31,11 @@ CMenuSwitch::CMenuSwitch( ) : CMenuEditable( )
 
 	iSelectColor = uiPromptTextColor;
 	iBackgroundColor = uiColorBlack;
+	iFgTextColor = uiInputFgColor;
+	iBgTextColor = uiPromptTextColor;
+
+	fTextOffsetX = -10.0f;
+	fTextOffsetY = 5.0f;
 
 	eTextAlignment = QM_CENTER;
 	iFlags |= QMF_DROPSHADOW;
@@ -141,8 +146,8 @@ void CMenuSwitch::Draw( void )
 {
 	bool shadow = (iFlags & QMF_DROPSHADOW);
 
-	int leftSelect = iSelectColor, rightSelect = iSelectColor;
-
+	int selectColor = iSelectColor;
+	int bgColor = iBackgroundColor;
 	UI_DrawString( m_scTextPos, m_scTextSize, szName, uiColorHelp, true, m_scChSize, eTextAlignment, shadow );
 
 	if( szStatusText && iFlags & QMF_NOTIFY )
@@ -162,33 +167,42 @@ void CMenuSwitch::Draw( void )
 
 	if( iFlags & QMF_GRAYED )
 	{
-		leftSelect = rightSelect = uiColorDkGrey;
+		selectColor = uiColorDkGrey;
 	}
 	else if( bMouseToggle )
 	{
 		if( UI_CursorInRect( m_scPos, m_scSize ) )
 		{
-			leftSelect = rightSelect = iFocusColor;
+			selectColor = iFocusColor;
 		}
 	}
 	else
 	{
-		if( UI_CursorInRect( m_leftPoint, m_leftSize ) )
+		if( bState && UI_CursorInRect( m_leftPoint, m_leftSize ) )
 		{
-			leftSelect = iFocusColor;
+			bgColor = iFocusColor;
 		}
-		else if( UI_CursorInRect( m_rightPoint, m_rightSize ))
+		else if(!bState && UI_CursorInRect( m_rightPoint, m_rightSize ))
 		{
-			rightSelect = iFocusColor;
+			bgColor = iFocusColor;
 		}
 	}
 
 	// draw toggle rectangles
-	UI_FillRect( m_leftPoint, m_leftSize, bState? iBackgroundColor: leftSelect );
-	UI_FillRect( m_rightPoint, m_rightSize, bState? rightSelect: iBackgroundColor );
+	UI_FillRect( m_leftPoint, m_leftSize, bState? bgColor: selectColor );
+	UI_FillRect( m_rightPoint, m_rightSize, bState? selectColor: bgColor );
 
-	UI_DrawString( m_leftPoint, m_leftSize, szLeftName, bState?leftSelect: uiColorHelp, iColor, m_scChSize, eTextAlignment, shadow, QM_VCENTER );
-	UI_DrawString( m_rightPoint, m_rightSize, szRightName, bState?uiColorHelp:rightSelect, iColor, m_scChSize, eTextAlignment, shadow, QM_VCENTER );
+	// strings with same coordinates looks a bit ugly
+	Point stringLeftPoint = m_leftPoint;
+	stringLeftPoint.x += fTextOffsetX * uiStatic.scaleX;
+	stringLeftPoint.y += fTextOffsetY * uiStatic.scaleY;
+
+	Point stringRightPoint = m_rightPoint;
+	stringRightPoint.x += fTextOffsetX * uiStatic.scaleX;
+	stringRightPoint.y += fTextOffsetY * uiStatic.scaleY;
+
+	UI_DrawString( stringLeftPoint, m_leftSize, szLeftName, bState?iBgTextColor: iFgTextColor, iColor, m_scChSize, eTextAlignment, shadow, QM_VCENTER );
+	UI_DrawString( stringRightPoint, m_rightSize, szRightName, bState?iFgTextColor:iBgTextColor, iColor, m_scChSize, eTextAlignment, shadow, QM_VCENTER );
 
 	// draw rectangle
 	UI_DrawRectangle( m_scPos, m_scSize, uiInputFgColor );
