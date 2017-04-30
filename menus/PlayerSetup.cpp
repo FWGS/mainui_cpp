@@ -57,7 +57,7 @@ public:
 	cl_entity_t *ent;
 
 	bool mouseYawControl;
-	int prevCursorX;
+	int prevCursorX, prevCursorY;
 };
 
 CMenuPlayerModelView::CMenuPlayerModelView() : CMenuBaseItem()
@@ -118,6 +118,8 @@ void CMenuPlayerModelView::VidInit()
 	ent->origin[0] = ent->curstate.origin[0] = 45.0f / tan( DEG2RAD( refdef.fov_y / 2.0f ));
 	ent->origin[2] = ent->curstate.origin[2] = 2.0f;
 	ent->angles[1] = ent->curstate.angles[1] = 180.0f;
+	ent->angles[0] = ent->curstate.angles[0] = 180.0f;
+	
 	ent->player = true; // yes, draw me as playermodel
 }
 
@@ -131,6 +133,8 @@ const char *CMenuPlayerModelView::Key(int key, int down)
 	{
 		mouseYawControl = true;
 		prevCursorX =  uiStatic.cursorX;
+		prevCursorY =  uiStatic.cursorY;
+		
 	}
 	else if( key == K_MOUSE1 && !down && mouseYawControl )
 	{
@@ -187,7 +191,7 @@ void CMenuPlayerModelView::Draw()
 	else
 		UI_DrawRectangle( m_scPos, m_scSize, uiInputFgColor );
 
-	if( !ui_showmodels->value && hPlayerImage != 0 )
+	if( !ui_showmodels->value )
 	{
 		EngFuncs::PIC_Set( hPlayerImage, 255, 255, 255, 255 );
 		EngFuncs::PIC_Draw( m_scPos, m_scSize );
@@ -203,20 +207,36 @@ void CMenuPlayerModelView::Draw()
 
 		if( mouseYawControl )
 		{
-			int diffX = uiStatic.cursorX - prevCursorX;
+			float diffX = uiStatic.cursorX - prevCursorX;
 			if( diffX )
 			{
 				float yaw = ent->angles[1];
 
-				yaw += (float)diffX / uiStatic.scaleX;
+				yaw += diffX / uiStatic.scaleX;
 
 				if( yaw > 180.0f )
 					yaw -= 360.0f;
 				else if( yaw < -180.0f )
 					yaw += 360.0f;
+				ent->angles[1] = ent->curstate.angles[1] = yaw;
 			}
 
 			prevCursorX = uiStatic.cursorX;
+			float diffY = uiStatic.cursorY - prevCursorY;
+			if( diffY )
+			{
+				float pitch = ent->angles[0];
+
+				pitch += diffY / uiStatic.scaleY;
+
+				if( pitch > 180.0f )
+					pitch -= 360.0f;
+				else if( pitch < -180.0f )
+					pitch += 360.0f;
+				ent->angles[0] = ent->curstate.angles[0] = pitch;
+			}
+
+			prevCursorY = uiStatic.cursorY;
 		}
 
 		// draw the player model
@@ -415,6 +435,11 @@ void CMenuPlayerSetup::_Init( void )
 	showModels.iFlags |= addFlags;
 	showModels.SetNameAndStatus( "Show 3D preview", "Show 3D player models instead of preview thumbnails" );
 	showModels.LinkCvar( "ui_showmodels" );
+	SET_EVENT( showModels, onChanged )
+	{
+		((CMenuCheckBox*) pSelf )->WriteCvar();
+	}
+	END_EVENT( showModels, onChanged )
 
 	hiModels.iFlags |= addFlags;
 	hiModels.SetNameAndStatus( "High quality models", "Show HD models in multiplayer" );
