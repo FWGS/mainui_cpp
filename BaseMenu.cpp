@@ -664,7 +664,7 @@ void UI_KeyEvent( int key, int down )
 		return;
 	if( key == K_MOUSE1 )
 	{
-		cursorDown = !!down;
+		g_bCursorDown = !!down;
 	}
 
 	// go down on stack to nearest root or dialog
@@ -709,7 +709,7 @@ void UI_CharEvent( int key )
 
 
 
-bool cursorDown;
+bool g_bCursorDown;
 float cursorDY;
 
 /*
@@ -728,7 +728,7 @@ void UI_MouseMove( int x, int y )
 	if( !uiStatic.visible )
 		return;
 
-	if( cursorDown )
+	if( g_bCursorDown )
 	{
 		static bool prevDown = false;
 		if(!prevDown)

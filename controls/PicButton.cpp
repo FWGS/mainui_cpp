@@ -118,7 +118,7 @@ void CMenuPicButton::Draw( )
 	}
 
 	// make sure what cursor in rect
-	if( m_bPressed && cursorDown )
+	if( m_bPressed && g_bCursorDown )
 		state = BUTTON_PRESSED;
 	else m_bPressed = false;
 

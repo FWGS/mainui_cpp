@@ -182,7 +182,7 @@ typedef struct
 } uiStatic_t;
 
 extern float	cursorDY;			// use for touch scroll
-extern bool cursorDown;
+extern bool g_bCursorDown;
 extern uiStatic_t		uiStatic;
 
 #define DLG_X ((uiStatic.width - 640) / 2 - 192) // Dialogs are 640px in width
