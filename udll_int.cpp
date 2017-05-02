@@ -19,7 +19,9 @@ GNU General Public License for more details.
 #include "Utils.h"
 
 ui_enginefuncs_t EngFuncs::engfuncs;
+#ifndef XASH_DISABLE_FWGS_EXTENSIONS
 ui_textfuncs_t	EngFuncs::textfuncs;
+#endif
 ui_globalvars_t	*gpGlobals;
 CMenu gMenu;
 
@@ -56,13 +58,15 @@ extern "C" EXPORT int GetMenuAPI(UI_FUNCTIONS *pFunctionTable, ui_enginefuncs_t*
 	// copy HUD_FUNCTIONS table to engine, copy engfuncs table from engine
 	memcpy( pFunctionTable, &gFunctionTable, sizeof( UI_FUNCTIONS ));
 	memcpy( &EngFuncs::engfuncs, pEngfuncsFromEngine, sizeof( ui_enginefuncs_t ));
+#ifndef XASH_DISABLE_FWGS_EXTENSIONS
 	memset( &EngFuncs::textfuncs, 0, sizeof( ui_textfuncs_t ));
-
+#endif
 	gpGlobals = pGlobals;
 
 	return TRUE;
 }
 
+#ifndef XASH_DISABLE_FWGS_EXTENSIONS
 extern "C" EXPORT int GiveTextAPI( ui_textfuncs_t* pTextfuncsFromEngine )
 {
 	if( !pTextfuncsFromEngine )
@@ -75,4 +79,4 @@ extern "C" EXPORT int GiveTextAPI( ui_textfuncs_t* pTextfuncsFromEngine )
 
 	return TRUE;
 }
-
+#endif

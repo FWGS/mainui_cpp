@@ -54,6 +54,7 @@ protected:
 	int m_numItems;
 	bool m_bInit;
 private:
+	friend void UI_DrawMouseCursor( void ); // HACKHACK: Cursor should be set by menu item
 
 	void PushMenu();
 	void PopMenu();

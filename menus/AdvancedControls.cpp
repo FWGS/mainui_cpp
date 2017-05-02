@@ -42,6 +42,7 @@ private:
 	void GetConfig( void );
 	void SaveAndPopMenu( void );
 
+public:
 	CMenuBackgroundBitmap background;
 	CMenuBannerBitmap banner;
 
