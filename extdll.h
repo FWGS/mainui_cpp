@@ -41,7 +41,8 @@ GNU General Public License for more details.
 
 // C++11 stuff
 #ifndef MY_COMPILER_SUCKS
-#include <functional>
+// Not needed anymore
+// #include <functional>
 #endif
 
 #define bound( min, num, max )	((num) >= (min) ? ((num) < (max) ? (num) : (max)) : (min))
