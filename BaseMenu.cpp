@@ -363,6 +363,10 @@ void UI_DrawString( int x, int y, int w, int h, const char *string, const int co
 	}
 }
 
+#ifdef XASH_DISABLE_FWGS_EXTENSIONS
+#include <windows.h> // DrawMouseCursor
+#endif
+
 /*
 =================
 UI_DrawMouseCursor
@@ -370,39 +374,40 @@ UI_DrawMouseCursor
 */
 void UI_DrawMouseCursor( void )
 {
-/* TODO: SDL2
+#ifdef XASH_DISABLE_FWGS_EXTENSIONS
 	CMenuBaseItem	*item;
 	HICON		hCursor = NULL;
 	int		i;
 
 	if( uiStatic.hideCursor ) return;
 
-	for( i = 0; i < uiStatic.menuActive->numItems; i++ )
+	for( i = 0; i < uiStatic.menuActive->m_numItems; i++ )
 	{
-		item = (CMenuBaseItem *)uiStatic.menuActive->items[i];
+		item = (CMenuBaseItem *)uiStatic.menuActive->m_pItems[i];
 
-		if ( item->flags & (QMF_INACTIVE|QMF_HIDDEN))
+		if ( !item->IsVisible() )
 			continue;
 
-		if ( !UI_CursorInRect( item->x, item->y, item->width, item->height ))
+		if( !(item->iFlags & QMF_HASMOUSEFOCUS) )
 			continue;
 
-		if ( item->flags & QMF_GRAYED )
+		if ( item->iFlags & QMF_GRAYED )
 		{
 			hCursor = (HICON)LoadCursor( NULL, (LPCTSTR)OCR_NO );
 		}
 		else
 		{
-			if( item->type == QMTYPE_FIELD )
-				hCursor = (HICON)LoadCursor( NULL, (LPCTSTR)OCR_IBEAM );
+			//if( item->type == QMTYPE_FIELD )
+			//	hCursor = (HICON)LoadCursor( NULL, (LPCTSTR)OCR_IBEAM );
 		}
 		break;
 	}
 
 	if( !hCursor ) hCursor = (HICON)LoadCursor( NULL, (LPCTSTR)OCR_NORMAL );
 
-	SET_CURSOR( hCursor );
-*/
+	EngFuncs::SetCursor( hCursor );
+#endif
+	//TODO: Unified LoadCursor interface extension
 }
 
 
@@ -634,7 +639,7 @@ void UI_UpdateMenu( float flTime )
 	//
 
 	// draw cursor
-	// UI_DrawMouseCursor();
+	UI_DrawMouseCursor();
 
 	// delay playing the enter sound until after the menu has been
 	// drawn, to avoid delay while caching images
@@ -773,7 +778,7 @@ void UI_MouseMove( int x, int y )
 
 	// go down on stack to nearest root or dialog
 	int rootPos = uiStatic.rootPosition;
-	for( int i = uiStatic.menuDepth-1; i >= rootPos; i-- )
+	for( i = uiStatic.menuDepth-1; i >= rootPos; i-- )
 	{
 		uiStatic.menuStack[i]->MouseMove( x, y );
 

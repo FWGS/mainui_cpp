@@ -77,6 +77,7 @@ set (MAINUI_SOURCES
 	BaseMenu.cpp
 	Btns.cpp
 	MenuStrings.cpp
+	CFGScript.cpp
 	Utils.cpp
 	udll_int.cpp
 	)
