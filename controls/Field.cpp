@@ -70,10 +70,17 @@ void CMenuField::_Event( int ev )
 	switch( ev )
 	{
 	case QM_LOSTFOCUS:
-		EngFuncs::EnableTextInput( false );
+		UI_EnableTextInput( false );
+		VidInit();
 		break;
 	case QM_GOTFOCUS:
-		EngFuncs::EnableTextInput( true );
+		UI_EnableTextInput( true );
+		break;
+	case QM_IMRESIZED:
+		if( pos.Scale().y > gpGlobals->scrHeight - 100 * uiStatic.scaleY )
+			m_scPos.y = gpGlobals->scrHeight - 100 * uiStatic.scaleY;
+		else
+			VidInit();
 		break;
 	}
 
@@ -315,7 +322,7 @@ void CMenuField::Draw( void )
 
 	if( newPos.y > ScreenHeight - m_scSize.h - 40 )
 	{
-		if(this == m_pParent->ItemAtCursor())
+		if(iFlags & QMF_HASKEYBOARDFOCUS)
 			newPos.y = ScreenHeight - m_scSize.h - 15;
 		else
 			return;
