@@ -7,6 +7,7 @@ XASH3D ?= $(PWD)/..
 INCLUDES = -I$(XASH3D)/common -I$(XASH3D)/engine -I$(XASH3D)/engine/common -I$(XASH3D)/engine/client -I$(XASH3D)/pm_shared -I$(TOPDIR) -I$(TOPDIR)/controls
 INCLUDES += -I$(VGUI_DIR)/include/
 DEFINES = -DMY_COMPILER_SUCKS
+LDFLAGS = -Wl,--no-undefined
 
 SRCS = \
 	controls/Framework.cpp                          \
@@ -17,12 +18,14 @@ SRCS = \
 	controls/ItemsHolder.cpp                        \
 	controls/Field.cpp                              \
 	controls/PicButton.cpp                          \
+	controls/ProgressBar.cpp                        \
 	controls/ScrollList.cpp                         \
 	controls/Slider.cpp                             \
 	controls/SpinControl.cpp                        \
 	controls/YesNoMessageBox.cpp                    \
 	controls/MessageBox.cpp                         \
 	controls/Switch.cpp                             \
+	controls/ConnectionProgress.cpp                 \
 	menus/AdvancedControls.cpp                      \
 	menus/Audio.cpp                                 \
 	menus/Configuration.cpp                         \

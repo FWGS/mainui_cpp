@@ -32,6 +32,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Utils.h"
 #include "BtnsBMPTable.h"
 #include "YesNoMessageBox.h"
+#include "ConnectionProgress.h"
 
 cvar_t		*ui_precache;
 cvar_t		*ui_showmodels;
@@ -553,6 +554,7 @@ void UI_CloseMenu( void )
 {
 	uiStatic.menuActive = NULL;
 	uiStatic.menuDepth = 0;
+	uiStatic.rootPosition = 0;
 	uiStatic.visible = false;
 
 	// clearing serverlist
@@ -1249,6 +1251,7 @@ void UI_Init( void )
 	EngFuncs::Cmd_AddCommand( "menu_gamepad", UI_GamePad_Menu );
 	EngFuncs::Cmd_AddCommand( "menu_resetping", UI_MenuResetPing_f );
 	EngFuncs::Cmd_AddCommand( "menu_showmessagebox", UI_ShowMessageBox );
+	EngFuncs::Cmd_AddCommand( "menu_connectionprogress", UI_ConnectionProgress_f );
 
 	EngFuncs::CreateMapsList( TRUE );
 
