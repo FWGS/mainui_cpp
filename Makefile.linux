@@ -25,7 +25,7 @@ SRCS = \
 	controls/YesNoMessageBox.cpp                    \
 	controls/MessageBox.cpp                         \
 	controls/Switch.cpp                             \
-	controls/ConnectionProgress.cpp                 \
+	menus/ConnectionProgress.cpp                 \
 	menus/AdvancedControls.cpp                      \
 	menus/Audio.cpp                                 \
 	menus/Configuration.cpp                         \
