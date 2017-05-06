@@ -10,7 +10,27 @@ CMenuConnectionProgress::CMenuConnectionProgress() : CMenuItemsHolder()
 
 const char *CMenuConnectionProgress::Key( int key, int down )
 {
+	if( down )
+	{
+		switch( key )
+		{
+		case K_ESCAPE:
+			dialog.Show();
+			return uiSoundOut;
+		case '`':
+			consoleButton.Activate();
+			return uiSoundLaunch;
+		default:
+			break;
+		}
+	}
+
 	return CMenuItemsHolder::Key( key, down );
+}
+
+void CMenuConnectionProgress::DisconnectCb( CMenuBaseItem *pSelf , void *pExtra )
+{
+	EngFuncs::ClientCmd( FALSE, "cmd disconnect;endgame disconnect;wait;wait;wait;menu_options;menu_main\n");
 }
 
 void CMenuConnectionProgress::_Init( void )
@@ -27,14 +47,10 @@ void CMenuConnectionProgress::_Init( void )
 
 	disconnectButton.SetPicture( PC_DISCONNECT );
 
-	SET_EVENT( disconnectButton, onActivated )
-	{
-		pSelf->Parent()->Hide();
-		UI_CloseMenu();
-		UI_SetActiveMenu( true );
-		EngFuncs::ClientCmd( TRUE, "cmd disconnect;endgame disconnect;wait;wait;wait;menu_options;menu_main\n");
-	}
-	END_EVENT( disconnectButton, onActivated );
+	disconnectButton.onActivated = DisconnectCb;
+	dialog.SetMessage( "Really disconnect?" );
+	dialog.onPositive = DisconnectCb;
+
 
 	downloadProgress.LinkCvar( "scr_download", 0.0f, 100.0f );
 
@@ -52,8 +68,8 @@ void CMenuConnectionProgress::_VidInit( void )
 
 	consoleButton.SetRect( DLG_X + 380, 460, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
 	disconnectButton.SetRect( DLG_X + 530, 460, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
-	downloadProgress.SetRect( DLG_X + 212, 276, 500, 20 );
-	precacheProgress.SetRect( DLG_X + 212, 316, 500, 20 );
+	downloadProgress.SetRect( DLG_X + 212, 276, 600, 20 );
+	precacheProgress.SetRect( DLG_X + 212, 316, 600, 20 );
 
 	m_scPos = pos.Scale();
 	m_scSize = size.Scale();
