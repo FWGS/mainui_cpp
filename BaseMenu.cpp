@@ -730,6 +730,9 @@ void UI_MouseMove( int x, int y )
 	if( !uiStatic.visible )
 		return;
 
+	if( uiStatic.cursorX == x && uiStatic.cursorY == y )
+		return;
+
 	if( g_bCursorDown )
 	{
 		static bool prevDown = false;
