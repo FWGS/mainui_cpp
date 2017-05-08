@@ -1132,7 +1132,22 @@ UI_VidInit
 int UI_VidInit( void )
 {
 	static bool calledOnce = true;
+	if( uiStatic.textInput )
+	{
+	/*
+		int rootPos = uiStatic.rootPosition;
+		for( int i = uiStatic.menuDepth-1; i >= rootPos; i-- )
+		{
+			uiStatic.menuStack[i]->_Event( QM_IMRESIZED );
 
+			if( uiStatic.menuStack[i]->iFlags & QMF_DIALOG )
+				break;
+		}*/
+		if( uiStatic.menuActive && uiStatic.menuActive->ItemAtCursor() )
+			uiStatic.menuActive->ItemAtCursor()->_Event( QM_IMRESIZED );
+		
+		return 0;
+	}
 	UI_Precache ();
 	// Sizes are based on screen height
 	uiStatic.scaleX = uiStatic.scaleY = ScreenHeight / 768.0f;

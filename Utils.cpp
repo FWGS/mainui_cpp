@@ -321,8 +321,11 @@ int UI_FadeAlpha( int starttime, int endtime )
 	return PackRGBA( 255, 255, 255, alpha );
 }
 
-
-
+void UI_EnableTextInput( bool enable )
+{
+	uiStatic.textInput = enable;
+	EngFuncs::EnableTextInput( enable );
+}
 
 
 

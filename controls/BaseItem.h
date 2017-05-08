@@ -160,6 +160,8 @@ protected:
 	// calls specific EventCallback
 	virtual void _Event( int ev );
 
+	friend int UI_VidInit( void );
+
 	CMenuItemsHolder	*m_pParent;
 	bool	m_bPressed;
 	int		m_iLastFocusTime;

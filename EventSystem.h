@@ -69,7 +69,8 @@ enum menuEvent_e
 	QM_LOSTFOCUS,
 	QM_ACTIVATED,
 	QM_CHANGED,
-	QM_PRESSED
+	QM_PRESSED,
+	QM_IMRESIZED
 };
 
 typedef void (*EventCallback)(CMenuBaseItem *, void *);
