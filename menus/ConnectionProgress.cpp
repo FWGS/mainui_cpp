@@ -140,12 +140,20 @@ void CMenuConnectionProgress::HandleDisconnect( void )
 	SetCommonText( "Disconnected." );
 
 	m_iState = STATE_NONE;
+	VidInit();
 }
 
 void CMenuConnectionProgress::DisconnectCb( CMenuBaseItem *pSelf , void *pExtra )
 {
-	if( ((CMenuConnectionProgress*)(pSelf->Parent()))->m_iState == STATE_DOWNLOAD )
+	CMenuConnectionProgress *parent = (CMenuConnectionProgress*)pSelf->Parent();
+
+	if( parent->m_iState == STATE_DOWNLOAD )
+	{
 		EngFuncs::ClientCmd( true, "http_clear\n" );
+		parent->m_iState = STATE_CONNECTING;
+		parent->HandleDisconnect();
+	}
+
 	EngFuncs::ClientCmd( FALSE, "cmd disconnect;endgame disconnect\n");
 }
 
