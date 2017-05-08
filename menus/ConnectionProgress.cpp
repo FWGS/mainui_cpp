@@ -251,7 +251,7 @@ void CMenuConnectionProgress::Draw( void )
 		Hide();
 		return;
 	}
-	UI_FillRect( 0,0, gpGlobals->scrWidth, gpGlobals->scrHeight, 0x40000000 );
+	UI_FillRect( 0,0, gpGlobals->scrWidth, gpGlobals->scrHeight, m_iState == STATE_NONE ? 0XFF000000 : 0x40000000 );
 	UI_FillRect( m_scPos, m_scSize, uiPromptBgColor );
 	CMenuItemsHolder::Draw();
 }
