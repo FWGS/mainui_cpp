@@ -17,20 +17,10 @@ GNU General Public License for more details.
 #include "extdll.h"
 #include "BaseMenu.h"
 #include "enginecallback.h"
+#include "CFGScript.h"
 
-#define MAX_STRING 256
-#define MAX_SCR_VARS 128
 #define CVAR_USERINFO BIT(1)
 
-typedef enum
-{
-	T_NONE = 0,
-	T_BOOL,
-	T_NUMBER,
-	T_LIST,
-	T_STRING,
-	T_COUNT
-} cvartype_t;
 
 const char *cvartypes[] = { NULL, "BOOL" , "NUMBER", "LIST", "STRING" };
 
@@ -40,18 +30,6 @@ typedef struct parserstate_s
 	char token[MAX_STRING];
 	const char *filename;
 } parserstate_t;
-
-typedef struct scrvardef_s
-{
-	int flags;
-	char name[MAX_STRING];
-	char value[MAX_STRING];
-	char desc[MAX_STRING];
-	float fMin, fMax;
-	cvartype_t type;
-	bool fHandled;
-	scrvardef_s *next;
-} scrvardef_t;
 
 /*
 ===================
@@ -301,7 +279,7 @@ finish:
 
 void CSCR_FreeList( scrvardef_t *list )
 {
-	scrvardef_t *i;
+	scrvardef_t *i = list;
 	while( i )
 	{
 		scrvardef_t *next = i->next;
