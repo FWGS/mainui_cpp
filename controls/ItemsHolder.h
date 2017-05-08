@@ -20,18 +20,13 @@ public:
 
 	virtual void MouseMove( int x, int y );
 
-	virtual void Show();
-	virtual void Hide();
-	virtual bool IsVisible();
-
-	virtual bool IsRoot() { return false; }
-
 	void CursorMoved( void );
 	void SetCursor( int newCursor, bool notify = true );
 	void SetCursorToItem( CMenuBaseItem *item, bool notify = true );
 	void AdjustCursor( int dir );
 
 	void AddItem( CMenuBaseItem &item );
+	void AddItem( CMenuBaseItem *item ) { AddItem( *item ); }
 	CMenuBaseItem *ItemAtCursor( void );
 	CMenuBaseItem *ItemAtCursorPrev( void );
 
@@ -53,11 +48,6 @@ protected:
 	CMenuBaseItem *m_pItems[UI_MAX_MENUITEMS];
 	int m_numItems;
 	bool m_bInit;
-private:
-	friend void UI_DrawMouseCursor( void ); // HACKHACK: Cursor should be set by menu item
-
-	void PushMenu();
-	void PopMenu();
 };
 
 #endif // EMBEDITEM_H

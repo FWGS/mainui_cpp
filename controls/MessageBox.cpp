@@ -5,7 +5,7 @@
 #include "ItemsHolder.h"
 #include "MessageBox.h"
 
-CMenuMessageBox::CMenuMessageBox() : CMenuItemsHolder()
+CMenuMessageBox::CMenuMessageBox() : CMenuBaseWindow()
 {
 	iFlags |= QMF_INACTIVE;
 }

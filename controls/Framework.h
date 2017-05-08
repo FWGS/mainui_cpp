@@ -2,10 +2,10 @@
 #ifndef FRAMEWORK_H
 #define FRAMEWORK_H
 
-#include "ItemsHolder.h"
+#include "BaseWindow.h"
 class CMenuBaseItem;
 
-class CMenuFramework : public CMenuItemsHolder
+class CMenuFramework : public CMenuBaseWindow
 {
 public:
 	CMenuFramework();
@@ -14,11 +14,6 @@ public:
 	void Hide();
 	bool IsVisible();
 	bool IsRoot() { return true; }
-
-	virtual void SaveAndPopMenu();
-
-	// Events library
-	DECLARE_EVENT_TO_MENU_METHOD( CMenuFramework, SaveAndPopMenu );
 };
 
 #endif // FRAMEWORK_H

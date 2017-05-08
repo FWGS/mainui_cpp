@@ -17,11 +17,12 @@ GNU General Public License for more details.
 #ifndef MENU_GENERICMSGBOX_H
 #define MENU_GENERICMSGBOX_H
 
-#include "ItemsHolder.h"
 #include "PicButton.h"
 #include "Action.h"
+#include "ItemsHolder.h"
+#include "BaseWindow.h"
 
-class CMenuYesNoMessageBox : public CMenuItemsHolder
+class CMenuYesNoMessageBox : public CMenuBaseWindow
 {
 public:
 	CMenuYesNoMessageBox( bool alert = false );

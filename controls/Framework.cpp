@@ -3,20 +3,14 @@
 #include "Utils.h"
 #include "PicButton.h"
 
-CMenuFramework::CMenuFramework() : CMenuItemsHolder()
+CMenuFramework::CMenuFramework() : CMenuBaseWindow()
 {
 	SetCoord( 0, 0 );
 }
 
-void CMenuFramework::SaveAndPopMenu( )
-{
-	EngFuncs::ClientCmd( FALSE, "trysaveconfig\n" );
-	Hide();
-}
-
 void CMenuFramework::Show()
 {
-	CMenuItemsHolder::Show();
+	CMenuBaseWindow::Show();
 
 	uiStatic.rootActive = this;
 	uiStatic.rootPosition = uiStatic.menuDepth-1;
@@ -25,7 +19,7 @@ void CMenuFramework::Show()
 void CMenuFramework::Hide()
 {
 	int i;
-	CMenuItemsHolder::Hide();
+	CMenuBaseWindow::Hide();
 
 	for( i = uiStatic.menuDepth-1; i >= 0; i-- )
 	{

@@ -1,7 +1,7 @@
 #ifndef MESSAGEBOX_H
 #define MESSAGEBOX_H
 
-class CMenuMessageBox : public CMenuItemsHolder
+class CMenuMessageBox : public CMenuBaseWindow
 {
 public:
 	CMenuMessageBox();
