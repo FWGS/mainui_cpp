@@ -108,6 +108,7 @@ struct Size
 #include "EventSystem.h"
 #include "Framework.h"
 #include "BaseItem.h"
+#include "BaseWindow.h"
 
 // =====================================================================
 // Main menu interface
@@ -127,9 +128,9 @@ typedef struct
 
 typedef struct
 {
-	CMenuItemsHolder *rootActive; // current active fullscreen holder(menu framework)
-	CMenuItemsHolder *menuActive; // current active window
-	CMenuItemsHolder *menuStack[UI_MAX_MENUDEPTH];
+	CMenuBaseWindow *rootActive; // current active fullscreen holder(menu framework)
+	CMenuBaseWindow *menuActive; // current active window
+	CMenuBaseWindow *menuStack[UI_MAX_MENUDEPTH];
 	int      menuDepth;
 	int      rootPosition;
 
@@ -157,7 +158,6 @@ typedef struct
 	float	scaleX;
 	float	scaleY;
 	int		outlineWidth;
-	int		sliderWidth;
 
 	int		cursorX;
 	int		cursorY;
@@ -302,6 +302,7 @@ void UI_TouchButtons_Precache( void );
 void UI_TouchEdit_Precache( void );
 void UI_FileDialog_Precache( void );
 void UI_GamePad_Precache( void );
+void UI_DynamicMenu_Precache( void );
 
 // Menus
 void UI_Main_Menu( void );
@@ -332,6 +333,8 @@ void UI_FileDialog_Menu( void );
 void UI_TouchButtons_AddButtonToList( const char *name, const char *texture, const char *command, unsigned char *color, int flags );
 void UI_TouchButtons_GetButtonList();
 void UI_GamePad_Menu( void );
+void UI_AdvUserOptions_Menu( void );
+void UI_AdvServerOptions_Menu( void );
 
 //
 //-----------------------------------------------------

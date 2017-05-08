@@ -1156,14 +1156,12 @@ int UI_VidInit( void )
 	uiStatic.cursorX = ScreenWidth >> 1;
 	uiStatic.cursorY = ScreenHeight >> 1;
 	uiStatic.outlineWidth = 4;
-	uiStatic.sliderWidth = 6;
 
 	// all menu buttons have the same view sizes
 	uiStatic.buttons_draw_width = UI_BUTTONS_WIDTH;
 	uiStatic.buttons_draw_height = UI_BUTTONS_HEIGHT;
 
 	UI_ScaleCoords( NULL, NULL, &uiStatic.outlineWidth, NULL );
-	UI_ScaleCoords( NULL, NULL, &uiStatic.sliderWidth, NULL );
 	UI_ScaleCoords( NULL, NULL, &uiStatic.buttons_draw_width, &uiStatic.buttons_draw_height );
 
 	// trying to load colors.lst
@@ -1191,7 +1189,7 @@ int UI_VidInit( void )
 	// now recalc all the menus in stack
 	for( int i = 0; i < uiStatic.menuDepth; i++ )
 	{
-		CMenuItemsHolder *item = uiStatic.menuStack[i];
+		CMenuBaseWindow *item = uiStatic.menuStack[i];
 
 		if( item )
 		{

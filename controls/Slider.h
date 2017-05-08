@@ -59,6 +59,7 @@ private:
 	float	m_flRange;
 	int		m_iKeepSlider;	// when mouse button is holds
 
+	int m_iSliderOutlineWidth;
 	Size m_scCenterBox;
 };
 

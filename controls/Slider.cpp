@@ -23,9 +23,10 @@ CMenuSlider::CMenuSlider() : CMenuEditable()
 {
 	iColor = uiColorWhite;
 	iFocusColor = uiColorWhite;
+	m_iSliderOutlineWidth = 6;
 
 	size.w = 200;
-	size.h = 4;
+	size.h = 2 + m_iSliderOutlineWidth * 2;
 
 	m_flRange = 1.0f;
 
@@ -49,9 +50,6 @@ void CMenuSlider::VidInit(  )
 	m_scChSize = charSize.Scale();
 	m_scPos = pos.Scale();
 	m_scSize = size.Scale();
-
-	m_scSize.h += uiStatic.sliderWidth * 2;
-	m_scPos.y -= uiStatic.sliderWidth;
 
 	// scale the center box
 	m_scCenterBox.w = m_scSize.w / 5.0f;
@@ -154,6 +152,19 @@ void CMenuSlider::Draw( void )
 
 	shadow = (iFlags & QMF_DROPSHADOW);
 
+	if( szStatusText && iFlags & QMF_NOTIFY )
+	{
+		int	x;
+
+		x = m_scPos.x + m_scSize.w + 16 * uiStatic.scaleX;
+
+		int	r, g, b;
+
+		UnpackRGB( r, g, b, uiColorHelp );
+		EngFuncs::DrawSetTextColor( r, g, b );
+		EngFuncs::DrawConsoleString( x, m_scPos.y, szStatusText );
+	}
+
 	if( m_iKeepSlider )
 	{
 		if( !UI_CursorInRect( m_scPos.x, m_scPos.y - 40, m_scSize.w, m_scSize.h + 80 ) )
@@ -177,16 +188,12 @@ void CMenuSlider::Draw( void )
 	m_flCurValue = bound( m_flMinValue, m_flCurValue, m_flMaxValue );
 
 	// calc slider position
-	//sliderX = m_scPos.x + (m_flDrawStep * (m_flCurValue / m_flRange)); // TODO: fix behaviour when values goes negative
-	//sliderX = bound( m_scPos.x, sliderX, m_scPos.x + m_scSize.w - uiStatic.sliderWidth);
 	sliderX = m_scPos.x + ( ( m_flCurValue - m_flMinValue ) / ( m_flMaxValue - m_flMinValue ) ) * ( m_scSize.w - (m_scCenterBox.w) + (m_scCenterBox.w>>2) );
 
 
-	UI_DrawRectangleExt( m_scPos.x, m_scPos.y + uiStatic.sliderWidth, m_scSize.w, m_scCenterBox.h, uiInputBgColor, uiStatic.sliderWidth );
+	UI_DrawRectangleExt( m_scPos.x + m_iSliderOutlineWidth / 2, m_scPos.y + m_iSliderOutlineWidth, m_scSize.w - m_iSliderOutlineWidth, m_scCenterBox.h, uiInputBgColor, m_iSliderOutlineWidth );
 	if( eFocusAnimation == QM_HIGHLIGHTIFFOCUS && this == m_pParent->ItemAtCursor())
-	{
 		UI_DrawPic( sliderX, m_scPos.y, m_scCenterBox.w, m_scSize.h, uiColorHelp, UI_SLIDER_MAIN );
-	}
 	else
 		UI_DrawPic( sliderX, m_scPos.y, m_scCenterBox.w, m_scSize.h, uiColorWhite, UI_SLIDER_MAIN );
 
