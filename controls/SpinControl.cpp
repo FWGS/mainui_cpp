@@ -51,13 +51,16 @@ void CMenuSpinControl::VidInit( void )
 
 	// scale the center box
 	m_scCenterBox = size.Scale();
+	m_scCenterBox.w -= m_scSize.h * 3;
+
 	m_scCenterPos = pos.Scale();
+	m_scCenterPos.x += m_scSize.h * 1.5;
 
 	// extend the width so it has room for the arrows
-	m_scSize.w += (m_scSize.h * 3);
+	// m_scSize.w += (m_scSize.h * 3);
 
 	// calculate new X for the control
-	m_scPos.x -= (m_scSize.h + (m_scSize.h/2));
+	// m_scPos.x -= (m_scSize.h + (m_scSize.h/2));
 }
 
 /*
@@ -81,13 +84,13 @@ const char *CMenuSpinControl::Key( int key, int down )
 			break;
 
 		// calculate size and position for the arrows
-		arrow.w = size.h + (UI_OUTLINE_WIDTH * 2);
-		arrow.h = size.h + (UI_OUTLINE_WIDTH * 2);
+		arrow.w = m_scCenterBox.h + UI_OUTLINE_WIDTH * 2 * uiStatic.scaleX;
+		arrow.h = m_scCenterBox.h + UI_OUTLINE_WIDTH * 2 * uiStatic.scaleY;
 
-		left.x = m_scPos.x + UI_OUTLINE_WIDTH;
-		left.y = m_scPos.y - UI_OUTLINE_WIDTH;
-		right.x = m_scPos.x + (m_scSize.w - arrow.w) - UI_OUTLINE_WIDTH;
-		right.y = m_scPos.y - UI_OUTLINE_WIDTH;
+		left.x = m_scPos.x + UI_OUTLINE_WIDTH * uiStatic.scaleX;
+		left.y = m_scPos.y - UI_OUTLINE_WIDTH * uiStatic.scaleY;
+		right.x = m_scPos.x + (m_scSize.w - arrow.w) - UI_OUTLINE_WIDTH * uiStatic.scaleX;
+		right.y = m_scPos.y - UI_OUTLINE_WIDTH * uiStatic.scaleY;
 
 		// now see if either left or right arrow has focus
 		if( UI_CursorInRect( left, arrow ))
@@ -143,14 +146,27 @@ void CMenuSpinControl::Draw( void )
 
 	shadow = (iFlags & QMF_DROPSHADOW);
 
-	// calculate size and position for the arrows
-	arrow.w = size.h + (UI_OUTLINE_WIDTH * 2);
-	arrow.h = size.h + (UI_OUTLINE_WIDTH * 2);
+	if( szStatusText && iFlags & QMF_NOTIFY )
+	{
+		int	x;
 
-	left.x = m_scPos.x + UI_OUTLINE_WIDTH;
-	left.y = m_scPos.y - UI_OUTLINE_WIDTH;
-	right.x = m_scPos.x + (m_scSize.w - arrow.w) - UI_OUTLINE_WIDTH;
-	right.y = m_scPos.y - UI_OUTLINE_WIDTH;
+		x = m_scPos.x + m_scSize.w + 16 * uiStatic.scaleX;
+
+		int	r, g, b;
+
+		UnpackRGB( r, g, b, uiColorHelp );
+		EngFuncs::DrawSetTextColor( r, g, b );
+		EngFuncs::DrawConsoleString( x, m_scPos.y, szStatusText );
+	}
+
+	// calculate size and position for the arrows
+	arrow.w = m_scCenterBox.h + UI_OUTLINE_WIDTH * 2 * uiStatic.scaleX;
+	arrow.h = m_scCenterBox.h + UI_OUTLINE_WIDTH * 2 * uiStatic.scaleY;
+
+	left.x = m_scPos.x + UI_OUTLINE_WIDTH * uiStatic.scaleX;
+	left.y = m_scPos.y - UI_OUTLINE_WIDTH * uiStatic.scaleY;
+	right.x = m_scPos.x + (m_scSize.w - arrow.w) - UI_OUTLINE_WIDTH * uiStatic.scaleX;
+	right.y = m_scPos.y - UI_OUTLINE_WIDTH * uiStatic.scaleY;
 
 	if( m_szBackground )
 	{

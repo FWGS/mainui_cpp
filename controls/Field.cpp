@@ -29,6 +29,8 @@ CMenuField::CMenuField() : CMenuEditable(), szBuffer()
 	iFlags |= QMF_DROPSHADOW;
 	eTextAlignment = QM_CENTER;
 
+	SetSize( 200, 32 );
+
 	iMaxLength = 0;
 	iCursor = 0;
 	iScroll = 0;
@@ -319,6 +321,19 @@ void CMenuField::Draw( void )
 	float y = m_scPos.y;
 
 	Point newPos = m_scPos;
+
+	if( szStatusText && iFlags & QMF_NOTIFY )
+	{
+		int	x;
+
+		x = m_scPos.x + m_scSize.w + 16 * uiStatic.scaleX;
+
+		int	r, g, b;
+
+		UnpackRGB( r, g, b, uiColorHelp );
+		EngFuncs::DrawSetTextColor( r, g, b );
+		EngFuncs::DrawConsoleString( x, m_scPos.y, szStatusText );
+	}
 
 	if( newPos.y > ScreenHeight - m_scSize.h - 40 )
 	{

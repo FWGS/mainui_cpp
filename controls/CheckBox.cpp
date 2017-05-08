@@ -131,8 +131,10 @@ void CMenuCheckBox::Draw( void )
 	{
 		int	x;
 
-		x = 250;
-		UI_ScaleCoords( &x, NULL, NULL, NULL );
+		if( szName[0] )
+			x = 250 * uiStatic.scaleX;
+		else
+			x = m_scSize.w + 16 * uiStatic.scaleX;
 		x += m_scPos.x;
 
 		int	r, g, b;
