@@ -129,7 +129,10 @@ void CMenuConnectionProgress::HandleDisconnect( void )
 			UI_MultiPlayer_Menu();
 			UI_ServerBrowser_Menu();
 			if( m_iState == STATE_DOWNLOAD )
+			{
+				Show();
 				return;
+			}
 			m_iSource = SOURCE_CONSOLE;
 		}
 	}
