@@ -20,7 +20,8 @@ STATE_CONSOLE // do not show until state reset
 enum ESource
 {
 SOURCE_CONSOLE,
-SOURCE_MENU
+SOURCE_SERVERBROWSER,
+SOURCE_CREATEGAME
 };
 
 
@@ -61,7 +62,8 @@ public:
 	enum ESource m_iSource;
 	void SetServer( const char *pszName )
 	{
-		snprintf( sTitleString, sizeof( sTitleString ) - 1, "Connecting to %s...", pszName );
+		snprintf( sTitleString, sizeof( sTitleString ) - 1, m_iSource == SOURCE_CREATEGAME ? "Starting game..." : "Connecting to %s...", pszName );
+		commonProgress.SetValue( 0 );
 	}
 private:
 	CMenuProgressBar commonProgress;
@@ -121,13 +123,15 @@ void CMenuConnectionProgress::HandleDisconnect( void )
 	if( UI_IsVisible() && uiStatic.menuActive == this )
 	{
 		Hide();
-		if( m_iSource == SOURCE_MENU && m_iState != STATE_MENU )
+		if( m_iSource != SOURCE_CONSOLE && m_iState != STATE_MENU )
 		{
 			UI_CloseMenu();
 			UI_SetActiveMenu( true );
 			UI_Main_Menu();
 			UI_MultiPlayer_Menu();
 			UI_ServerBrowser_Menu();
+			if( m_iSource == SOURCE_CREATEGAME )
+				UI_CreateGame_Menu();
 			if( m_iState == STATE_DOWNLOAD )
 			{
 				Show();
@@ -301,7 +305,7 @@ void UI_ConnectionProgress_f( void )
 	else if( !strcmp( EngFuncs::CmdArgv(1), "menu" ) )
 	{
 		uiConnectionProgress.m_iState = STATE_MENU;
-		uiConnectionProgress.m_iSource = SOURCE_MENU;
+		uiConnectionProgress.m_iSource = SOURCE_SERVERBROWSER;
 		if( EngFuncs::CmdArgc() > 2 )
 			uiConnectionProgress.SetServer( EngFuncs::CmdArgv(2) );
 		uiConnectionProgress.SetCommonText( "Establishing network connection to server...");
@@ -311,9 +315,8 @@ void UI_ConnectionProgress_f( void )
 	else if( !strcmp( EngFuncs::CmdArgv(1), "localserver" ) )
 	{
 		uiConnectionProgress.m_iState = STATE_MENU;
-		uiConnectionProgress.m_iSource = SOURCE_MENU;
-		if( EngFuncs::CmdArgc() > 2 )
-			uiConnectionProgress.SetServer( EngFuncs::CmdArgv(2) );
+		uiConnectionProgress.m_iSource = SOURCE_CREATEGAME;
+		uiConnectionProgress.SetServer( "" );
 		uiConnectionProgress.SetCommonText( "Starting local server...");
 		uiConnectionProgress.Show();
 	}
