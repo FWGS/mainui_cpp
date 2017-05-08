@@ -279,7 +279,8 @@ public:
 	CMenuBannerBitmap banner;
 
 	CMenuPicButton	done;
-	CMenuPicButton	AdvOptions;
+	CMenuPicButton	gameOptions;
+	CMenuPicButton	advOptions;
 	CMenuPlayerModelView	view;
 
 	CMenuCheckBox	showModels;
@@ -382,14 +383,18 @@ void CMenuPlayerSetup::_Init( void )
 	done.SetPicture( PC_DONE );\
 	done.onActivated = SaveAndPopMenuCb;
 
-	AdvOptions.SetNameAndStatus( "Adv. Options", "Configure handness, fov and other advanced options" );
-	AdvOptions.SetPicture( PC_ADV_OPT );
-	SET_EVENT( AdvOptions, onActivated )
+	gameOptions.SetNameAndStatus( "Game options", "Configure handness, fov and other advanced options" );
+	gameOptions.SetPicture( PC_GAME_OPTIONS );
+	SET_EVENT( gameOptions, onActivated )
 	{
 		((CMenuPlayerSetup*)pSelf->Parent())->SetConfig();
 		UI_GameOptions_Menu();
 	}
-	END_EVENT( AdvOptions, onActivated )
+	END_EVENT( gameOptions, onActivated )
+
+	advOptions.SetNameAndStatus( "Adv options", "" );
+	advOptions.SetPicture( PC_ADV_OPT );
+	advOptions.onActivated = UI_AdvUserOptions_Menu;
 
 	name.szStatusText = "Enter your multiplayer display name";
 	name.iMaxLength = 32;
@@ -452,7 +457,8 @@ void CMenuPlayerSetup::_Init( void )
 	AddItem( background );
 	AddItem( banner );
 	AddItem( done );
-	AddItem( AdvOptions );
+	AddItem( gameOptions );
+	AddItem( advOptions );
 	AddItem( name );
 	AddItem( clPredict);
 	AddItem( clLW);
@@ -472,7 +478,8 @@ void CMenuPlayerSetup::_Init( void )
 void CMenuPlayerSetup::_VidInit()
 {
 	done.SetCoord( 72, 230 );
-	AdvOptions.SetCoord( 72, 280 );
+	gameOptions.SetCoord( 72, 280 );
+	advOptions.SetCoord( 72, 330 );
 
 	view.SetRect( 660, 260, 260, 320 );
 	name.SetRect( 320, 260, 256, 36 );

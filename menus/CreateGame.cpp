@@ -195,7 +195,7 @@ void CMenuCreateGame::_Init( void )
 
 	advOptions.SetNameAndStatus( "Adv. Options", "Open the game advanced options menu" );
 	advOptions.SetPicture( PC_ADV_OPT );
-	// SET_EVENT_VOID( advOptions, onActivated, UI_ServerAdvOptions );
+	advOptions.onActivated = UI_AdvServerOptions_Menu;
 
 	done.SetNameAndStatus( "Ok", "Start the multiplayer game" );
 	done.SetPicture( PC_OK );
