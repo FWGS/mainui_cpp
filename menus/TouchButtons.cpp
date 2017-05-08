@@ -505,14 +505,18 @@ void CMenuTouchButtons::_Init( void )
 
 void CMenuTouchButtons::_VidInit()
 {
+	int sliders_x = uiStatic.width - 344;
+	int fields_w = 205 + uiStatic.width - 1024;
+	if( fields_w < 205 ) fields_w = 205;
+
 	banner.SetCoord( 72, 0 );
 	done.SetCoord( 72, 550 );
 	cancel.SetCoord( 72, 600 );
 
-	red.SetCoord( 680, 150 );
-	green.SetCoord( 680, 210 );
-	blue.SetCoord( 680, 270 );
-	alpha.SetCoord( 680, 330 );
+	red.SetCoord( sliders_x, 150 );
+	green.SetCoord( sliders_x, 210 );
+	blue.SetCoord( sliders_x, 270 );
+	alpha.SetCoord( sliders_x, 330 );
 
 
 	additive.SetCoord( 650, 470 );
@@ -527,12 +531,12 @@ void CMenuTouchButtons::_VidInit()
 
 	save.SetCoord( 384 - 72 + 320, 550 );
 	editor.SetCoord( 384 - 42 + 320, 600 );
-	select.SetRect( 500, 300, 150,50 );
+	select.SetRect( 400 + fields_w - 95, 300, 150,50 );
 
 	name.SetRect( 400, 550, 205, 32 );
-	command.SetRect( 400, 150, 205, 32 );
-	texture.SetRect( 400, 250, 205, 32 );
-	color.SetRect( 800, 360, 70, 50 );
+	command.SetRect( 400, 150, fields_w, 32 );
+	texture.SetRect( 400, 250, fields_w, 32 );
+	color.SetRect( sliders_x + 120, 360, 70, 50 );
 	preview.SetRect( 400, 300, 70, 70 );
 
 	reset.SetCoord( 384 - 72 + 480, 600 );

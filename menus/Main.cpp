@@ -269,10 +269,7 @@ void CMenuMain::HazardCourseCb( CMenuBaseItem *pSelf, void* )
 
 void CMenuMain::DisconnectCb( CMenuBaseItem *pSelf, void* )
 {
-	if( EngFuncs::GetCvarFloat( "host_serverstate" ) )
-		EngFuncs::ClientCmd( TRUE, "endgame;wait;wait;wait;menu_options;menu_main\n");
-	else
-		EngFuncs::ClientCmd( TRUE, "cmd disconnect;wait;wait;wait;menu_options;menu_main\n");
+	EngFuncs::ClientCmd( TRUE, "cmd disconnect;endgame disconnect;wait;wait;wait;menu_options;menu_main\n");
 	((CMenuMain*)pSelf->Parent())->dialog.Hide( );
 }
 
