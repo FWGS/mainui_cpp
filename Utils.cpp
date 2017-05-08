@@ -327,8 +327,25 @@ void UI_EnableTextInput( bool enable )
 	EngFuncs::EnableTextInput( enable );
 }
 
+void *operator new( size_t a )
+{
+	return MALLOC( a );
+}
 
+void *operator new[]( size_t a )
+{
+	return MALLOC( a );
+}
 
+void operator delete( void *ptr )
+{
+	if( ptr ) FREE( ptr );
+}
+
+void operator delete[]( void *ptr )
+{
+	if( ptr ) FREE( ptr );
+}
 
 
 
