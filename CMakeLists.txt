@@ -42,7 +42,9 @@ set (MAINUI_CONTROLS_SOURCES
 	controls/YesNoMessageBox.cpp
 	controls/MessageBox.cpp
 	controls/Editable.h
-	controls/Switch.cpp)
+	controls/Switch.cpp
+	controls/BaseWindow.cpp
+	)
 
 set (MAINUI_MENUS_SOURCES
 	menus/AdvancedControls.cpp
@@ -70,6 +72,7 @@ set (MAINUI_MENUS_SOURCES
 	menus/VideoModes.cpp
 	menus/VideoOptions.cpp
 	menus/Zoo.cpp
+	menus/dynamic/ScriptMenu.cpp
 	)
 
 set (MAINUI_SOURCES
