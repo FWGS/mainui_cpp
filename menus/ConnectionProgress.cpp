@@ -50,9 +50,9 @@ public:
 	void HandleDownload( const char *pszFileName, const char *pszServerName, int iCurrent, int iTotal, const char *comment )
 	{
 		snprintf( sDownloadString, sizeof( sDownloadString ) - 1, "Downloading %s \nfrom %s", pszFileName, pszServerName );
-		snprintf( sCommonString, sizeof( sCommonString ) - 1, "%d of %d %s", iCurrent, iTotal, comment );
+		snprintf( sCommonString, sizeof( sCommonString ) - 1, "%d of %d %s", iCurrent + 1, iTotal, comment );
 		m_iState = STATE_DOWNLOAD;
-		commonProgress.SetValue( (float)iCurrent/iTotal );
+		commonProgress.SetValue( (float)iCurrent/iTotal +  0.01f / iTotal * EngFuncs::GetCvarFloat("scr_download") );
 	}
 	void SetCommonText( const char *pszText )
 	{
@@ -282,7 +282,7 @@ void UI_ConnectionProgress_f( void )
 
 	else if( !strcmp( EngFuncs::CmdArgv(1), "dl" ) )
 	{
-		uiConnectionProgress.HandleDownload(  EngFuncs::CmdArgv( 2 ), EngFuncs::CmdArgv( 3 ), atoi(EngFuncs::CmdArgv( 4 ))+1, atoi(EngFuncs::CmdArgv( 5 )), EngFuncs::CmdArgv( 6 ) );
+		uiConnectionProgress.HandleDownload(  EngFuncs::CmdArgv( 2 ), EngFuncs::CmdArgv( 3 ), atoi(EngFuncs::CmdArgv( 4 )), atoi(EngFuncs::CmdArgv( 5 )), EngFuncs::CmdArgv( 6 ) );
 	}
 
 	else if( !strcmp( EngFuncs::CmdArgv(1), "dlend" ) )
