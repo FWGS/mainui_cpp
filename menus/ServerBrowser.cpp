@@ -156,9 +156,12 @@ void CMenuServerBrowser::JoinGame( CMenuBaseItem *pSelf, void *pExtra )
 	if( parent->gameDescription[parent->gameList.iCurItem][0] == 0 )
 		return;
 
-	EngFuncs::ClientJoin( uiStatic.serverAddresses[parent->gameList.iCurItem] );
-	// prevent refresh durning connect
+	// prevent refresh during connect
 	parent->refreshTime = uiStatic.realTime + 999999;
+	//BUGBUG: ClientJoin not guaranted to return, need use ClientCmd instead!!!
+	//BUGBUG: But server addres is known only as netadr_t here!!!
+	EngFuncs::ClientCmd( false, "menu_connectionprogress menu server\n" );
+	EngFuncs::ClientJoin( uiStatic.serverAddresses[parent->gameList.iCurItem] );
 }
 
 void CMenuServerBrowser::ClearList()

@@ -8,27 +8,63 @@
 #include "PicButton.h"
 #include "YesNoMessageBox.h"
 
-enum EMenuConnectionProgressState
+enum EState
 {
 STATE_NONE,
 STATE_MENU, // do not hide when disconnected or in game
 STATE_DOWNLOAD, // enlarge your connectionprogress window
-STATE_STUFFTEXT, // stufftext progress from engine
-STATE_PRECACHE, // precache stufftext from engine
+STATE_CONNECTING, // showing single progress
 STATE_CONSOLE // do not show until state reset
 };
+
+enum ESource
+{
+SOURCE_CONSOLE,
+SOURCE_MENU
+};
+
 
 class CMenuConnectionProgress : public CMenuItemsHolder
 {
 public:
-    CMenuConnectionProgress();
+	CMenuConnectionProgress();
 	virtual void _Init();
 	virtual void _VidInit();
 	virtual void Draw();
 	virtual const char *Key( int key, int down );
 	static void DisconnectCb( CMenuBaseItem *pSelf , void *pExtra );
+	void HandleDisconnect( void );
+	void HandlePrecache( void )
+	{
+		SetCommonText( "Precaching resources" );
+		commonProgress.LinkCvar( "scr_loading", 0, 100 );
+		m_iState = STATE_CONNECTING;
+	}
+	void HandleStufftext( float flProgress, char *pszText )
+	{
+		commonProgress.SetValue( flProgress );
+		SetCommonText( pszText );
+		m_iState = STATE_CONNECTING;
+	}
+	void HandleDownload( const char *pszFileName, const char *pszServerName, int iCurrent, int iTotal )
+	{
+		snprintf( sDownloadString, sizeof( sDownloadString ) - 1, "Downloading %s \nfrom %s", pszFileName, pszServerName );
+		snprintf( sCommonString, sizeof( sCommonString ) - 1, "%d of %d", iCurrent, iTotal );
+		m_iState = STATE_DOWNLOAD;
+		commonProgress.SetValue( (float)iCurrent/iTotal );
+	}
+	void SetCommonText( const char *pszText )
+	{
+		snprintf( sCommonString, sizeof( sCommonString ) - 1, "%s", pszText );
+	}
+	enum EState m_iState;
+	enum ESource m_iSource;
+	void SetServer( const char *pszName )
+	{
+		snprintf( sTitleString, sizeof( sTitleString ) - 1, "Connecting to %s...", pszName );
+	}
 private:
-	CMenuProgressBar precacheProgress;
+	CMenuProgressBar commonProgress;
 	CMenuProgressBar downloadProgress;
 	CMenuPicButton consoleButton;
 	CMenuPicButton disconnectButton;
@@ -37,7 +73,6 @@ private:
 	CMenuAction title;
 	CMenuAction downloadText;
 	CMenuAction commonText;
-	enum EMenuConnectionProgressState m_iState;
 	char sTitleString[256];
 	char sDownloadString[512];
 	char sCommonString[512];
@@ -59,9 +94,11 @@ const char *CMenuConnectionProgress::Key( int key, int down )
 		case K_ESCAPE:
 			dialog.Show();
 			return uiSoundOut;
-		case '`':
+		case '~':
 			consoleButton.Activate();
 			return uiSoundLaunch;
+		case 'A':
+			HandleDisconnect();
 		default:
 			break;
 		}
@@ -70,9 +107,43 @@ const char *CMenuConnectionProgress::Key( int key, int down )
 	return CMenuItemsHolder::Key( key, down );
 }
 
+void CMenuConnectionProgress::HandleDisconnect( void )
+{
+	if( m_iState == STATE_NONE )
+		return;
+
+	if( m_iState == STATE_CONSOLE )
+	{
+		m_iState = STATE_NONE;
+		return;
+	}
+
+	if( UI_IsVisible() && uiStatic.menuActive == this )
+	{
+		Hide();
+		if( m_iSource == SOURCE_MENU && m_iState != STATE_MENU )
+		{
+			UI_CloseMenu();
+			UI_SetActiveMenu( true );
+			UI_Main_Menu();
+			UI_MultiPlayer_Menu();
+			UI_ServerBrowser_Menu();
+			if( m_iState == STATE_DOWNLOAD )
+				return;
+			m_iSource = SOURCE_CONSOLE;
+		}
+	}
+	
+	SetCommonText( "Disconnected." );
+
+	m_iState = STATE_NONE;
+}
+
 void CMenuConnectionProgress::DisconnectCb( CMenuBaseItem *pSelf , void *pExtra )
 {
-	EngFuncs::ClientCmd( FALSE, "cmd disconnect;endgame disconnect;wait;wait;wait;menu_options;menu_main\n");
+	if( ((CMenuConnectionProgress*)(pSelf->Parent()))->m_iState == STATE_DOWNLOAD )
+		EngFuncs::ClientCmd( true, "http_clear\n" );
+	EngFuncs::ClientCmd( FALSE, "cmd disconnect;endgame disconnect\n");
 }
 
 void CMenuConnectionProgress::_Init( void )
@@ -83,7 +154,10 @@ void CMenuConnectionProgress::_Init( void )
 
 	SET_EVENT( consoleButton, onActivated )
 	{
+		CMenuConnectionProgress *parent = (CMenuConnectionProgress *)pSelf->Parent();
 		EngFuncs::KEY_SetDest( KEY_CONSOLE );
+		parent->m_iState = STATE_CONSOLE;
+		parent->m_iSource = SOURCE_CONSOLE;
 		UI_CloseMenu();
 		UI_SetActiveMenu( false );
 	}
@@ -98,21 +172,20 @@ void CMenuConnectionProgress::_Init( void )
 
 	title.iFlags = QMF_INACTIVE|QMF_DROPSHADOW;
 	title.eTextAlignment = QM_CENTER;
-	title.szName = "Connecting...";
+	title.szName = sTitleString;
 
 	skipButton.szName = "Skip";
+	skipButton.onActivated.SetCommand( TRUE, "http_skip\n" );
 	
-	downloadText.szName = "DOWNLOAD TEXT\nDOWNLOAD TEXT";
-	commonText.szName = "COMMON TEXT\nCOMMON_TEXT";
+	downloadText.szName = sDownloadString;
+	commonText.szName = sCommonString;
 
 	downloadProgress.LinkCvar( "scr_download", 0.0f, 100.0f );
-
-	precacheProgress.LinkCvar( "scr_loading", 0.0f, 100.0f );
 
 	AddItem( consoleButton );
 	AddItem( disconnectButton );
 	AddItem( downloadProgress );
-	AddItem( precacheProgress );
+	AddItem( commonProgress );
 	AddItem( title );
 	AddItem( skipButton );
 	AddItem( downloadText );
@@ -133,8 +206,11 @@ void CMenuConnectionProgress::_VidInit( void )
 	consoleButton.SetRect( DLG_X + 380, cursor, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
 	disconnectButton.SetRect( DLG_X + 530, cursor, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
 
+	if( gpGlobals->developer < 2 )
+		consoleButton.iFlags |= QMF_HIDDEN;
+
 	cursor -= 30;
-	precacheProgress.SetRect( DLG_X + 212, cursor, 600, 20 );
+	commonProgress.SetRect( DLG_X + 212, cursor, 600, 20 );
 
 	cursor -= 50;
 	commonText.SetCharSize( UI_SMALL_CHAR_WIDTH, UI_SMALL_CHAR_HEIGHT );
@@ -166,7 +242,7 @@ void CMenuConnectionProgress::_VidInit( void )
 
 void CMenuConnectionProgress::Draw( void )
 {
-	if( m_iState != STATE_MENU && CL_IsActive() )
+	if( m_iState != STATE_MENU && CL_IsActive() || ( m_iState == STATE_NONE && uiStatic.menuActive == this ) )
 	{
 		m_iState = STATE_NONE;
 		Hide();
@@ -180,5 +256,42 @@ void CMenuConnectionProgress::Draw( void )
 
 void UI_ConnectionProgress_f( void )
 {
-	uiConnectionProgress.Show();
+	if( !strcmp( EngFuncs::CmdArgv(1), "disconnect" ) )
+	{
+		uiConnectionProgress.HandleDisconnect();
+		return;
+	}
+
+	if( uiConnectionProgress.m_iState == STATE_CONSOLE )
+		return;
+
+	if( !strcmp( EngFuncs::CmdArgv(1), "dl" ) )
+		uiConnectionProgress.HandleDownload(  EngFuncs::CmdArgv( 2 ), EngFuncs::CmdArgv( 3 ), atoi(EngFuncs::CmdArgv( 4 ))+1, atoi(EngFuncs::CmdArgv( 5 )) );
+
+	if( !strcmp( EngFuncs::CmdArgv(1), "stufftext" ) )
+		uiConnectionProgress.HandleStufftext( atof( EngFuncs::CmdArgv( 2 ) ), EngFuncs::CmdArgv( 3 ) );
+
+	if( !strcmp( EngFuncs::CmdArgv(1), "precache" ) )
+		uiConnectionProgress.HandlePrecache();
+
+	if( !strcmp( EngFuncs::CmdArgv(1), "menu" ) )
+	{
+		uiConnectionProgress.m_iState = STATE_MENU;
+		uiConnectionProgress.m_iSource = SOURCE_MENU;
+		if( EngFuncs::CmdArgc() > 2 )
+			uiConnectionProgress.SetServer( EngFuncs::CmdArgv(2) );
+		uiConnectionProgress.SetCommonText( "Establishing network connection to server...");
+		uiConnectionProgress.Show();
+	}
+
+	if( !strcmp( EngFuncs::CmdArgv(1), "serverinfo" ) )
+	{
+		if( EngFuncs::CmdArgc() > 2 )
+			uiConnectionProgress.SetServer( EngFuncs::CmdArgv(2) );
+		uiConnectionProgress.m_iState = STATE_CONNECTING;
+		uiConnectionProgress.SetCommonText( "Parsing server info..." );
+		uiConnectionProgress.Show();
+	}
+	uiConnectionProgress.VidInit();
 }
+ 

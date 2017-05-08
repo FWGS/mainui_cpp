@@ -312,6 +312,7 @@ void UI_MultiPlayer_Menu( void );
 void UI_Options_Menu( void );
 void UI_InternetGames_Menu( void );
 void UI_LanGame_Menu( void );
+void UI_ServerBrowser_Menu( void );
 void UI_PlayerSetup_Menu( void );
 void UI_Controls_Menu( void );
 void UI_AdvControls_Menu( void );

@@ -25,6 +25,8 @@ void CMenuProgressBar::LinkCvar( const char *cvName, float flMin, float flMax )
 
 void CMenuProgressBar::SetValue( float flValue )
 {
+	if( flValue > 1.0f ) flValue = 1;
+	if( flValue < 0.0f ) flValue = 0;
 	m_flValue = flValue;
 	m_pCvar = NULL;
 }
