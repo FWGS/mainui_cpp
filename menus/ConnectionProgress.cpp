@@ -277,13 +277,22 @@ void UI_ConnectionProgress_f( void )
 		return;
 
 	if( !strcmp( EngFuncs::CmdArgv(1), "dl" ) )
+	{
 		uiConnectionProgress.HandleDownload(  EngFuncs::CmdArgv( 2 ), EngFuncs::CmdArgv( 3 ), atoi(EngFuncs::CmdArgv( 4 ))+1, atoi(EngFuncs::CmdArgv( 5 )) );
+		return;
+	}
 
 	if( !strcmp( EngFuncs::CmdArgv(1), "stufftext" ) )
-		uiConnectionProgress.HandleStufftext( atof( EngFuncs::CmdArgv( 2 ) ), EngFuncs::CmdArgv( 3 ) );
+	{
+		uiConnectionProgress.HandleStufftext( atof( EngFuncs::CmdArgv( 2 ) ), EngFuncs::CmdArgv( 3 ) );\
+		return;
+	}
 
 	if( !strcmp( EngFuncs::CmdArgv(1), "precache" ) )
+	{
 		uiConnectionProgress.HandlePrecache();
+		return;
+	}
 
 	if( !strcmp( EngFuncs::CmdArgv(1), "menu" ) )
 	{
@@ -293,6 +302,18 @@ void UI_ConnectionProgress_f( void )
 			uiConnectionProgress.SetServer( EngFuncs::CmdArgv(2) );
 		uiConnectionProgress.SetCommonText( "Establishing network connection to server...");
 		uiConnectionProgress.Show();
+		return;
+	}
+
+	if( !strcmp( EngFuncs::CmdArgv(1), "localserver" ) )
+	{
+		uiConnectionProgress.m_iState = STATE_MENU;
+		uiConnectionProgress.m_iSource = SOURCE_MENU;
+		if( EngFuncs::CmdArgc() > 2 )
+			uiConnectionProgress.SetServer( EngFuncs::CmdArgv(2) );
+		uiConnectionProgress.SetCommonText( "Starting local server...");
+		uiConnectionProgress.Show();
+		return;
 	}
 
 	if( !strcmp( EngFuncs::CmdArgv(1), "serverinfo" ) )
@@ -302,7 +323,9 @@ void UI_ConnectionProgress_f( void )
 		uiConnectionProgress.m_iState = STATE_CONNECTING;
 		uiConnectionProgress.SetCommonText( "Parsing server info..." );
 		uiConnectionProgress.Show();
+		return;
 	}
+
 	uiConnectionProgress.VidInit();
 }
  

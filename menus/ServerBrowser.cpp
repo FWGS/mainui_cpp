@@ -160,8 +160,8 @@ void CMenuServerBrowser::JoinGame( CMenuBaseItem *pSelf, void *pExtra )
 	parent->refreshTime = uiStatic.realTime + 999999;
 	//BUGBUG: ClientJoin not guaranted to return, need use ClientCmd instead!!!
 	//BUGBUG: But server addres is known only as netadr_t here!!!
-	EngFuncs::ClientCmd( false, "menu_connectionprogress menu server\n" );
 	EngFuncs::ClientJoin( uiStatic.serverAddresses[parent->gameList.iCurItem] );
+	EngFuncs::ClientCmd( false, "menu_connectionprogress menu server\n" );
 }
 
 void CMenuServerBrowser::ClearList()
