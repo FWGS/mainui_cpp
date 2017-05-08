@@ -46,10 +46,10 @@ public:
 		SetCommonText( pszText );
 		m_iState = STATE_CONNECTING;
 	}
-	void HandleDownload( const char *pszFileName, const char *pszServerName, int iCurrent, int iTotal )
+	void HandleDownload( const char *pszFileName, const char *pszServerName, int iCurrent, int iTotal, const char *comment )
 	{
 		snprintf( sDownloadString, sizeof( sDownloadString ) - 1, "Downloading %s \nfrom %s", pszFileName, pszServerName );
-		snprintf( sCommonString, sizeof( sCommonString ) - 1, "%d of %d", iCurrent, iTotal );
+		snprintf( sCommonString, sizeof( sCommonString ) - 1, "%d of %d %s", iCurrent, iTotal, comment );
 		m_iState = STATE_DOWNLOAD;
 		commonProgress.SetValue( (float)iCurrent/iTotal );
 	}
@@ -276,25 +276,29 @@ void UI_ConnectionProgress_f( void )
 	if( uiConnectionProgress.m_iState == STATE_CONSOLE )
 		return;
 
-	if( !strcmp( EngFuncs::CmdArgv(1), "dl" ) )
+	else if( !strcmp( EngFuncs::CmdArgv(1), "dl" ) )
 	{
-		uiConnectionProgress.HandleDownload(  EngFuncs::CmdArgv( 2 ), EngFuncs::CmdArgv( 3 ), atoi(EngFuncs::CmdArgv( 4 ))+1, atoi(EngFuncs::CmdArgv( 5 )) );
+		uiConnectionProgress.HandleDownload(  EngFuncs::CmdArgv( 2 ), EngFuncs::CmdArgv( 3 ), atoi(EngFuncs::CmdArgv( 4 ))+1, atoi(EngFuncs::CmdArgv( 5 )), EngFuncs::CmdArgv( 6 ) );
+	}
+
+	else if( !strcmp( EngFuncs::CmdArgv(1), "dlend" ) )
+	{
+		uiConnectionProgress.m_iState = STATE_CONNECTING;
+		uiConnectionProgress.HandleDisconnect();
 		return;
 	}
 
-	if( !strcmp( EngFuncs::CmdArgv(1), "stufftext" ) )
+	else if( !strcmp( EngFuncs::CmdArgv(1), "stufftext" ) )
 	{
-		uiConnectionProgress.HandleStufftext( atof( EngFuncs::CmdArgv( 2 ) ), EngFuncs::CmdArgv( 3 ) );\
-		return;
+		uiConnectionProgress.HandleStufftext( atof( EngFuncs::CmdArgv( 2 ) ), EngFuncs::CmdArgv( 3 ) );
 	}
 
-	if( !strcmp( EngFuncs::CmdArgv(1), "precache" ) )
+	else if( !strcmp( EngFuncs::CmdArgv(1), "precache" ) )
 	{
 		uiConnectionProgress.HandlePrecache();
-		return;
 	}
 
-	if( !strcmp( EngFuncs::CmdArgv(1), "menu" ) )
+	else if( !strcmp( EngFuncs::CmdArgv(1), "menu" ) )
 	{
 		uiConnectionProgress.m_iState = STATE_MENU;
 		uiConnectionProgress.m_iSource = SOURCE_MENU;
@@ -302,10 +306,9 @@ void UI_ConnectionProgress_f( void )
 			uiConnectionProgress.SetServer( EngFuncs::CmdArgv(2) );
 		uiConnectionProgress.SetCommonText( "Establishing network connection to server...");
 		uiConnectionProgress.Show();
-		return;
 	}
 
-	if( !strcmp( EngFuncs::CmdArgv(1), "localserver" ) )
+	else if( !strcmp( EngFuncs::CmdArgv(1), "localserver" ) )
 	{
 		uiConnectionProgress.m_iState = STATE_MENU;
 		uiConnectionProgress.m_iSource = SOURCE_MENU;
@@ -313,17 +316,15 @@ void UI_ConnectionProgress_f( void )
 			uiConnectionProgress.SetServer( EngFuncs::CmdArgv(2) );
 		uiConnectionProgress.SetCommonText( "Starting local server...");
 		uiConnectionProgress.Show();
-		return;
 	}
 
-	if( !strcmp( EngFuncs::CmdArgv(1), "serverinfo" ) )
+	else if( !strcmp( EngFuncs::CmdArgv(1), "serverinfo" ) )
 	{
 		if( EngFuncs::CmdArgc() > 2 )
 			uiConnectionProgress.SetServer( EngFuncs::CmdArgv(2) );
 		uiConnectionProgress.m_iState = STATE_CONNECTING;
 		uiConnectionProgress.SetCommonText( "Parsing server info..." );
 		uiConnectionProgress.Show();
-		return;
 	}
 
 	uiConnectionProgress.VidInit();
