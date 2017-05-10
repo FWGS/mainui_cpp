@@ -14,7 +14,7 @@ endif
 
 
 LOCAL_MODULE := menu
-LOCAL_CPPFLAGS := -std=gnu++11
+LOCAL_CPPFLAGS := -std=gnu++11 -DMY_COMPILER_SUCKS
 
 APP_PLATFORM := android-9
 
@@ -42,9 +42,11 @@ LOCAL_SRC_FILES := 	controls/Framework.cpp                          \
 	controls/YesNoMessageBox.cpp                    \
 	controls/MessageBox.cpp                         \
 	controls/Switch.cpp                             \
+	controls/ProgressBar.cpp                        \
 	menus/AdvancedControls.cpp                      \
 	menus/Audio.cpp                                 \
 	menus/Configuration.cpp                         \
+	menus/ConnectionProgress.cpp			\
 	menus/Controls.cpp                              \
 	menus/CreateGame.cpp                            \
 	menus/Credits.cpp                               \

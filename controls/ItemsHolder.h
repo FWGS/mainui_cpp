@@ -48,6 +48,7 @@ protected:
 	CMenuBaseItem *m_pItems[UI_MAX_MENUITEMS];
 	int m_numItems;
 	bool m_bInit;
+	bool m_bAllowEnterActivate;
 };
 
 #endif // EMBEDITEM_H

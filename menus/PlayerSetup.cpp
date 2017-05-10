@@ -424,13 +424,15 @@ void CMenuPlayerSetup::_Init( void )
 
 	topColor.iFlags |= addFlags;
 	topColor.SetNameAndStatus( "Top color", "Set a player model top color" );
-	topColor.Setup( 0.0, 1.0, 0.05 );
+	topColor.Setup( 0.0, 255, 1 );
 	topColor.LinkCvar( "topcolor" );
+	topColor.onCvarChange = CMenuEditable::WriteCvarCb;
 
 	bottomColor.iFlags |= addFlags;
 	bottomColor.SetNameAndStatus( "Bottom color", "Set a player model bottom color" );
-	bottomColor.Setup( 0.0, 1.0, 0.05 );
+	bottomColor.Setup( 0.0, 255.0, 1 );
 	bottomColor.LinkCvar( "bottomcolor" );
+	bottomColor.onCvarChange = CMenuEditable::WriteCvarCb;
 
 	clPredict.SetNameAndStatus( "Predict movement", "Enable player movement prediction" );
 	clPredict.LinkCvar( "cl_predict" );
@@ -441,15 +443,12 @@ void CMenuPlayerSetup::_Init( void )
 	showModels.iFlags |= addFlags;
 	showModels.SetNameAndStatus( "Show 3D preview", "Show 3D player models instead of preview thumbnails" );
 	showModels.LinkCvar( "ui_showmodels" );
-	SET_EVENT( showModels, onChanged )
-	{
-		((CMenuCheckBox*) pSelf )->WriteCvar();
-	}
-	END_EVENT( showModels, onChanged )
+	showModels.onCvarChange = CMenuEditable::WriteCvarCb;
 
 	hiModels.iFlags |= addFlags;
 	hiModels.SetNameAndStatus( "High quality models", "Show HD models in multiplayer" );
 	hiModels.LinkCvar( "cl_himodels" );
+	hiModels.onCvarChange = CMenuEditable::WriteCvarCb;
 
 	view.iFlags |= addFlags;
 	//view.

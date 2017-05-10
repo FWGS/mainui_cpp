@@ -232,7 +232,7 @@ void CMenuLoadGame::_Init( void )
 	SET_EVENT( save, onActivated )
 	{
 		CMenuLoadGame *parent = (CMenuLoadGame*)pSelf->Parent();
-		const char *saveName = parent->saveName[parent->savesList.iCurItem];;
+		const char *saveName = parent->saveName[parent->savesList.iCurItem];
 		if( saveName[0] )
 		{
 			char	cmd[128];

@@ -5,7 +5,7 @@
 #include "ItemsHolder.h"
 
 CMenuItemsHolder::CMenuItemsHolder() :
-	CMenuBaseItem(), m_iCursor( 0 ), m_iCursorPrev( 0 ), m_pItems( ), m_numItems( 0 ), m_bInit( false )
+	CMenuBaseItem(), m_iCursor( 0 ), m_iCursorPrev( 0 ), m_pItems( ), m_numItems( 0 ), m_bInit( false ), m_bAllowEnterActivate( false )
 {
 	;
 }
@@ -21,9 +21,18 @@ const char *CMenuItemsHolder::Key( int key, int down )
 
 		if( item && item->IsVisible() && !(item->iFlags & (QMF_GRAYED|QMF_INACTIVE) ) )
 		{
-			sound = item->Key( key, down );
+			if( key == K_ENTER && !m_bAllowEnterActivate )
+			{
+				if( !down )
+					m_bAllowEnterActivate = true;
+				return uiSoundNull;
+			}
+			else
+			{
+				sound = item->Key( key, down );
 
-			if( sound && sound != uiSoundNull ) return sound;
+				if( sound && sound != uiSoundNull ) return sound;
+			}
 		}
 
 		// system keys are always wait for keys down and never keys up
@@ -50,6 +59,7 @@ const char *CMenuItemsHolder::Key( int key, int down )
 				m_pItems[m_iCursorPrev]->iFlags &= ~QMF_HASKEYBOARDFOCUS;
 				m_pItems[m_iCursor]->iFlags |= QMF_HASKEYBOARDFOCUS;
 			}
+			m_bAllowEnterActivate = true;
 			break;
 		case K_DOWNARROW:
 		case K_KP_DOWNARROW:
@@ -69,6 +79,7 @@ const char *CMenuItemsHolder::Key( int key, int down )
 				m_pItems[m_iCursorPrev]->iFlags &= ~QMF_HASKEYBOARDFOCUS;
 				m_pItems[m_iCursor]->iFlags |= QMF_HASKEYBOARDFOCUS;
 			}
+			m_bAllowEnterActivate = true;
 			break;
 		case K_MOUSE1:
 			if( item && (item->iFlags & QMF_HASMOUSEFOCUS) && item->IsVisible() && !(item->iFlags & (QMF_GRAYED|QMF_INACTIVE)))
@@ -78,7 +89,7 @@ const char *CMenuItemsHolder::Key( int key, int down )
 		case K_KP_ENTER:
 		case K_AUX1:
 		case K_AUX13:
-			if( item && item->IsVisible() && !(item->iFlags & (QMF_GRAYED|QMF_INACTIVE|QMF_MOUSEONLY)) )
+			if( m_bAllowEnterActivate && item && item->IsVisible() && !(item->iFlags & (QMF_GRAYED|QMF_INACTIVE|QMF_MOUSEONLY)) )
 				return item->Activate();
 			break;
 		}
