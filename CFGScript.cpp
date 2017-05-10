@@ -87,17 +87,22 @@ CSCR_ParseSingleCvar
 */
 bool CSCR_ParseSingleCvar( parserstate_t *ps, scrvardef_t *result )
 {
+	// clean linked list for list
+	result->list.iCount = 0;
+	result->list.pEntries = result->list.pLast = NULL;
+	result->list.pArray = NULL;
+
 	// read the name
 	ps->buf = EngFuncs::COM_ParseFile( ps->buf, result->name );
 
 	if( !CSCR_ExpectString( ps, "{", false, true ) )
-		return false;
+		goto error;
 
 	// read description
 	ps->buf = EngFuncs::COM_ParseFile( ps->buf, result->desc );
 
 	if( !CSCR_ExpectString( ps, "{", false, true ) )
-		return false;
+		goto error;
 
 	result->type = CSCR_ParseType( ps );
 
@@ -106,50 +111,105 @@ bool CSCR_ParseSingleCvar( parserstate_t *ps, scrvardef_t *result )
 	case T_BOOL:
 		// bool only has description
 		if( !CSCR_ExpectString( ps, "}", false, true ) )
-			return false;
+			goto error;
 		break;
 	case T_NUMBER:
 		// min
 		ps->buf = EngFuncs::COM_ParseFile( ps->buf, ps->token );
-		result->fMin = atof( ps->token );
+		result->number.fMin = atof( ps->token );
 
 		// max
 		ps->buf = EngFuncs::COM_ParseFile( ps->buf, ps->token );
-		result->fMax = atof( ps->token );
+		result->number.fMax = atof( ps->token );
 
 		if( !CSCR_ExpectString( ps, "}", false, true ) )
-			return false;
+			goto error;
 		break;
 	case T_STRING:
 		if( !CSCR_ExpectString( ps, "}", false, true ) )
-			return false;
+			goto error;
 		break;
 	case T_LIST:
 		while( !CSCR_ExpectString( ps, "}", true, false ) )
 		{
+			// char szName[128];
+			char *szName = ps->token;
+			char szValue[64];
+			scrvarlistentry_t *entry = 0;
+
 			// Read token for each item here
+
+			// ExpectString already moves buffer pointer, so just read from ps->token
+			// ps->buf = EngFuncs::COM_ParseFile( ps->buf, szName );
+			if( !szName[0] )
+				goto error;
+
+			ps->buf = EngFuncs::COM_ParseFile( ps->buf, szValue );
+			if( !szValue[0] )
+				goto error;
+
+			entry = (scrvarlistentry_t*)MALLOC( sizeof( scrvarlistentry_t ) );
+			entry->next = NULL;
+			entry->szName = (char*)MALLOC( strlen( szName ) + 1 );
+			strcpy( entry->szName, szName );
+			entry->flValue = atof( szValue );
+
+			if( !result->list.pEntries )
+				result->list.pEntries = entry;
+			else
+				result->list.pLast->next = entry;
+
+			result->list.pLast = entry;
+			result->list.iCount++;
 		}
 		break;
 	default:
-		return false;
+		goto error;
 	}
 
 	if( !CSCR_ExpectString( ps, "{", false, true ) )
-		return false;
+		goto error;
 
 	// default value
 	ps->buf = EngFuncs::COM_ParseFile( ps->buf, result->value );
 
 	if( !CSCR_ExpectString( ps, "}", false, true ) )
-		return false;
+		goto error;
 
 	if( CSCR_ExpectString( ps, "SetInfo", false, false ) )
 		result->flags |= CVAR_USERINFO;
 
 	if( !CSCR_ExpectString( ps, "}", false, true ) )
-		return false;
+		goto error;
+
+	if( result->type == T_LIST )
+	{
+		scrvarlistentry_t *entry = result->list.pEntries;
+
+		result->list.pArray = ( const char ** )MALLOC( result->list.iCount * sizeof( char * ) );
+
+		for( int i = 0; entry; entry = entry->next, i++ )
+		{
+			result->list.pArray[i] = entry->szName;
+		}
+	}
 
 	return true;
+error:
+	if( result->type == T_LIST )
+	{
+		while( result->list.pEntries )
+		{
+			scrvarlistentry_s *next = result->list.pEntries->next;
+			if( result->list.pArray )
+				FREE( result->list.pArray );
+			FREE( result->list.pEntries->szName );
+			FREE( result->list.pEntries );
+
+			result->list.pEntries = next;
+		}
+	}
+	return false;
 }
 
 /*
@@ -283,6 +343,19 @@ void CSCR_FreeList( scrvardef_t *list )
 	while( i )
 	{
 		scrvardef_t *next = i->next;
+
+		if( i->type == T_LIST )
+		{
+			while( i->list.pEntries )
+			{
+				scrvarlistentry_s *next = i->list.pEntries->next;
+				FREE( i->list.pEntries->szName );
+				FREE( i->list.pEntries );
+
+				i->list.pEntries = next;
+			}
+		}
+
 		FREE( i );
 		i = next;
 	}
