@@ -25,7 +25,7 @@ SOURCE_CREATEGAME
 };
 
 
-class CMenuConnectionProgress : public CMenuItemsHolder
+class CMenuConnectionProgress : public CMenuBaseWindow
 {
 public:
 	CMenuConnectionProgress();
@@ -82,7 +82,7 @@ private:
 
 static CMenuConnectionProgress uiConnectionProgress;
 
-CMenuConnectionProgress::CMenuConnectionProgress() : CMenuItemsHolder()
+CMenuConnectionProgress::CMenuConnectionProgress() : CMenuBaseWindow()
 {
 
 }

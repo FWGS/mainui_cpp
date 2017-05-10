@@ -44,6 +44,7 @@ set (MAINUI_CONTROLS_SOURCES
 	controls/Editable.h
 	controls/Switch.cpp
 	controls/BaseWindow.cpp
+	controls/ProgressBar.cpp
 	)
 
 set (MAINUI_MENUS_SOURCES
@@ -72,6 +73,7 @@ set (MAINUI_MENUS_SOURCES
 	menus/VideoModes.cpp
 	menus/VideoOptions.cpp
 	menus/Zoo.cpp
+	menus/ConnectionProgress.cpp
 	menus/dynamic/ScriptMenu.cpp
 	)
 
@@ -94,7 +96,7 @@ if( NOT XASH_SDK )
 	set( XASH_SDK "../" )
 endif( )
 
-include_directories (${XASH_SDK}/common ${XASH_SDK}/engine ${XASH_SDK}/pm_shared . controls/)
+include_directories (${XASH_SDK}/common ${XASH_SDK}/engine ${XASH_SDK}/pm_shared . controls/ menus/)
 add_library (${MAINUI_LIBRARY} SHARED ${MAINUI_SOURCES})
 
 if( MSVC )

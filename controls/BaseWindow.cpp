@@ -10,6 +10,7 @@ void CMenuBaseWindow::Show()
 	Init();
 	VidInit();
 	PushMenu();
+	m_bAllowEnterActivate = false;
 }
 
 void CMenuBaseWindow::Hide()
