@@ -3,7 +3,6 @@
 #define FRAMEWORK_H
 
 #include "BaseWindow.h"
-class CMenuBaseItem;
 
 class CMenuFramework : public CMenuBaseWindow
 {

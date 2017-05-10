@@ -2,7 +2,6 @@
 #ifndef BASEWINDOW_H
 #define BASEWINDOW_H
 
-#include "BaseItem.h"
 #include "ItemsHolder.h"
 
 class CMenuBaseWindow : public CMenuItemsHolder

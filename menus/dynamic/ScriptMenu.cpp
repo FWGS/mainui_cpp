@@ -34,6 +34,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define ART_BANNER_SERVER "gfx/shell/head_advoptions"
 #define ART_BANNER_USER "gfx/shell/head_advoptions"
+#define IGNORE_ALREADY_USED_CVARS 1
 
 class CMenuScriptConfigPage : public CMenuItemsHolder
 {
@@ -70,6 +71,8 @@ public:
 	}
 
 	void FlipMenu();
+	static void ListItemCvarWriteCb( CMenuBaseItem *pSelf, void *pExtra );
+	static void ListItemCvarGetCb( CMenuBaseItem *pSelf, void *pExtra );
 
 	DECLARE_EVENT_TO_MENU_METHOD( CMenuScriptConfig, FlipMenu )
 
@@ -95,7 +98,7 @@ private:
 CMenuScriptConfigPage::CMenuScriptConfigPage()
 {
 	m_iCurrentHeight = 0;
-	m_iPadding = 32;
+	m_iPadding = 16;
 	SetRect( 360, 230, 660, 440 );
 }
 
@@ -143,6 +146,38 @@ CMenuScriptConfig::~CMenuScriptConfig()
 	}
 }
 
+void CMenuScriptConfig::ListItemCvarWriteCb(CMenuBaseItem *pSelf, void *pExtra)
+{
+	CMenuSpinControl *self = (CMenuSpinControl*)pSelf;
+	scrvarlist_t *list = (scrvarlist_t*)pExtra;
+	scrvarlistentry_t *entry = list->pEntries;
+
+	int entryNum = (int)self->GetCurrentValue();
+	for( int i = 0; i < entryNum; i++, entry = entry->next );
+
+	EngFuncs::CvarSetValue( self->CvarName(), entry->flValue );
+}
+
+void CMenuScriptConfig::ListItemCvarGetCb(CMenuBaseItem *pSelf, void *pExtra)
+{
+	CMenuSpinControl *self = (CMenuSpinControl*)pSelf;
+	scrvarlist_t *list = (scrvarlist_t*)pExtra;
+	scrvarlistentry_t *entry = list->pEntries;
+
+	float value = EngFuncs::GetCvarFloat( self->CvarName() );
+	int i;
+	for( i = 0; entry; entry = entry->next, i++ )
+	{
+		if( entry->flValue == value )
+			break;
+	}
+
+	if( entry )
+	{
+		self->SetCvarValue( i );
+	}
+}
+
 void CMenuScriptConfig::_Init( void )
 {
 	done.SetNameAndStatus( "Done", "Save and Go back to previous menu" );
@@ -171,6 +206,7 @@ void CMenuScriptConfig::_Init( void )
 
 	CMenuScriptConfigPage *page = new CMenuScriptConfigPage;
 	page->SetRect( 340, 255, 660, 500 );
+	page->iFlags &= ~(QMF_GRAYED|QMF_INACTIVE);
 	page->Show();
 	m_iCurrentPage = 0;
 	m_iPagesCount = 1;
@@ -183,6 +219,12 @@ void CMenuScriptConfig::_Init( void )
 		CMenuEditable::cvarType_e cvarType;
 
 		// TODO: Maybe ignore here "hostname", "sv_password", "maxplayers" stuff?
+#if IGNORE_ALREADY_USED_CVARS
+		if( !stricmp( var->name, "hostname") ||
+			!stricmp( var->name, "sv_password" ) ||
+			!stricmp( var->name, "maxplayers") )
+			continue;
+#endif
 
 		switch( var->type )
 		{
@@ -199,15 +241,14 @@ void CMenuScriptConfig::_Init( void )
 			CMenuSpinControl *spinControl = new CMenuSpinControl;
 			float fMin, fMax;
 
-			if( var->fMin == -1 ) fMin = -9999;
-			else fMin = var->fMin;
+			if( var->number.fMin == -1 ) fMin = -9999;
+			else fMin = var->number.fMin;
 
-
-			if( var->fMax == -1 ) fMax = 9999;
-			else fMax = var->fMax;
+			if( var->number.fMax == -1 ) fMax = 9999;
+			else fMax = var->number.fMax;
 
 			spinControl->Setup( fMin, fMax, 1 );
-			spinControl->SetSize( 200, 32 );
+			spinControl->SetSize( 250, 32 );
 			editable = spinControl;
 
 			cvarType = CMenuEditable::CVAR_VALUE;
@@ -217,28 +258,32 @@ void CMenuScriptConfig::_Init( void )
 		{
 			CMenuField *field = new CMenuField;
 			field->iMaxLength = CS_SIZE;
+			field->SetSize( 250, 32 );
 			editable = field;
 			cvarType = CMenuEditable::CVAR_STRING;
 			break;
 		}
-#if 0 // Parser not done yet!
 		case T_LIST:
 		{
 			CMenuSpinControl *spinControl = new CMenuSpinControl;
 
-			spinControl->Setup( var->szStringValues, var->iStringValuesCount );
+			spinControl->Setup( var->list.pArray, var->list.iCount );
+			spinControl->SetSize( 250, 32 );
+			spinControl->onCvarGet = ListItemCvarGetCb;
+			spinControl->onCvarGet.pExtra = (void*)&var->list;
+			spinControl->onCvarWrite = ListItemCvarWriteCb;
+			spinControl->onCvarWrite.pExtra = (void*)&var->list;
+			cvarType = CMenuEditable::CVAR_VALUE;
 			editable = spinControl;
-			cvarType = CMenuEditable::CVAR_STRING;
 			break;
 		}
-#endif
 		default: continue;
 		}
 
 		editable->iFlags |= QMF_NOTIFY;
 		// editable->szName = var->name;
 		editable->szStatusText = var->desc;
-		editable->SetCharSize( QM_DEFAULTFONT );
+		editable->SetCharSize( 15, 25 );
 		editable->LinkCvar( var->name, cvarType );
 		editable->iFlags &= ~(QMF_GRAYED|QMF_INACTIVE);
 		editable->Show();
@@ -248,6 +293,7 @@ void CMenuScriptConfig::_Init( void )
 		{
 			page = new CMenuScriptConfigPage;
 			page->Hide();
+			page->iFlags &= ~(QMF_GRAYED|QMF_INACTIVE);
 			page->SetRect( 340, 255, 660, 440 );
 
 			AddItem( page );
