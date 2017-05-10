@@ -19,9 +19,6 @@
 #define SET_EVENT_THIS( callback ) SET_EVENT( this, callback )
 #define END_EVENT_THIS( callback ) } EVNAME(callback);; this->callback = EVNAME(callback)::callback;
 
-// Variadic does not works with MSVC6(which is sucks)
-// #define SET_EVENT_VOID( item, callback, func, ... ) SET_EVENT( item, callback ) { (func)(__VA_ARGS__); } END_EVENT( item, callback )
-// #define SET_EVENT_THIS_VOID( callback, func, ... ) SET_EVENT_THIS( callback ) { (func)(__VA_ARGS__); } END_EVENT_THIS( callback )
 #else
 #define SET_EVENT( item, callback ) (item).callback = [](CMenuBaseItem *pSelf, void *pExtra)
 #define END_EVENT( item, callback ) ;
@@ -29,37 +26,24 @@
 #define SET_EVENT_THIS( callback ) SET_EVENT( (*this), callback )
 #define END_EVENT_THIS( callback ) END_EVENT( (*this), callback )
 
-// Variadic does not works with MSVC6(which is sucks)
-// #define SET_EVENT_VOID( item, callback, func, ... )	SET_EVENT( item, callback ) { (func)(__VA_ARGS__); } END_EVENT( item, callback )
-// #define SET_EVENT_THIS_VOID( item, callback, func, ... ) SET_EVENT_VOID( (*this), callback, func, __VA_ARGS__ )
 #endif
-#if _MSC_VER < 1900
 
-#define DECLARE_EVENT_TO_MENU_METHOD( className, method ) \
-	static void method##Cb( CMenuBaseItem *pSelf, void * ) \
+#define DECLARE_NAMED_EVENT_TO_ITEM_METHOD( className, method, eventName ) \
+	static void eventName##Cb( CMenuBaseItem *pSelf, void * ) \
+	{\
+		((className *)pSelf)->method();\
+	}
+#define DECLARE_NAMED_EVENT_TO_MENU_METHOD( className, method, eventName ) \
+	static void eventName##Cb( CMenuBaseItem *pSelf, void * ) \
 	{\
 		((className *)pSelf->Parent())->method();\
 	}
 
+#define DECLARE_EVENT_TO_MENU_METHOD( className, method ) \
+	DECLARE_NAMED_EVENT_TO_MENU_METHOD( className, method, method )
+
 #define DECLARE_EVENT_TO_ITEM_METHOD( className, method ) \
-	static void method##Cb( CMenuBaseItem *pSelf, void * ) \
-	{\
-		((className *)pSelf)->method();\
-	}
-
-#else
-#define DECLARE_EVENT_TO_MENU_METHOD( className, method, ... ) \
-	static void method ## Cb( CMenuBaseItem *pSelf, void *, ... ) \
-	{\
-		pSelf->Parent<className>()->method(__VA_ARGS__);\
-	}
-
-#define DECLARE_EVENT_TO_ITEM_METHOD( className, method, ... ) \
-	static void method ## Cb( CMenuBaseItem *pSelf, void * ) \
-	{\
-		((className *)pSelf)->method(__VA_ARGS__);\
-	}
-#endif
+	DECLARE_NAMED_EVENT_TO_ITEM_METHOD( className, method, method )
 
 class CMenuBaseItem;
 
