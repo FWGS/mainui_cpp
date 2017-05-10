@@ -271,12 +271,12 @@ void CMenuSpinControl::UpdateEditable()
 	{
 	case CVAR_STRING:
 	{
-		SetCurrentValue( EngFuncs::GetCvarString( m_szCvarName ));
+		SetCurrentValue( CvarString() );
 		break;
 	}
 	case CVAR_VALUE:
 	{
-		SetCurrentValue( EngFuncs::GetCvarFloat( m_szCvarName ) );
+		SetCurrentValue( CvarValue() );
 		break;
 	}
 	}
@@ -342,10 +342,14 @@ void CMenuSpinControl::Display()
 	}
 	else
 	{
-		ASSERT( curValue >= m_flMinValue && curValue <= m_flMaxValue );
+		ASSERT( m_flCurValue >= m_flMinValue && m_flCurValue <= m_flMaxValue );
 		const char *stringValue = m_stringValues[(int)m_flCurValue];
 
-		SetCvarString( stringValue );
+		switch( m_eType )
+		{
+		case CVAR_STRING: SetCvarString( stringValue ); break;
+		case CVAR_VALUE: SetCvarValue( m_flCurValue ); break;
+		}
 
 		strncpy( m_szDisplay, stringValue, CS_SIZE );
 		m_szDisplay[CS_SIZE-1] = 0;
