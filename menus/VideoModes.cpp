@@ -143,7 +143,7 @@ void CMenuVidModes::_Init( void )
 	listCaption.iFlags = QMF_INACTIVE;
 	listCaption.SetCharSize( QM_SMALLFONT );
 	listCaption.iColor = uiColorHelp;
-	listCaption.szName = MenuStrings[HINT_DISPLAYMODE];
+	listCaption.szName = MenuStrings[IDS_VIDEO_MODECOL];
 	listCaption.SetCoord( 400, 270 );
 
 	vidList.SetRect( 400, 300, 560, 300 );

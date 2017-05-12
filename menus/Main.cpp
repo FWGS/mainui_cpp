@@ -169,9 +169,9 @@ void CMenuMain::QuitCb(CMenuBaseItem *, void *)
 void CMenuMain::QuitDialog()
 {
 	if( CL_IsActive() )
-		dialog.SetMessage( MenuStrings[HINT_QUIT_ACTIVE] );
+		dialog.SetMessage( MenuStrings[IDS_MAIN_QUITPROMPTINGAME] );
 	else
-		dialog.SetMessage( MenuStrings[HINT_QUIT] );
+		dialog.SetMessage( MenuStrings[IDS_MAIN_QUITPROMPT] );
 
 	dialog.onPositive = QuitCb;
 	dialog.Show();
@@ -191,7 +191,7 @@ void CMenuMain::HazardCourseDialogCb(CMenuBaseItem *pSelf, void *pExtra)
 	CMenuMain *parent = (CMenuMain*)pSelf->Parent();
 
 	parent->dialog.onPositive = HazardCourseCb;
-	parent->dialog.SetMessage( MenuStrings[HINT_RESTART_HZ] );
+	parent->dialog.SetMessage( MenuStrings[IDS_TRAINING_EXITCURRENT] );
 	parent->dialog.Show();
 
 }
@@ -294,7 +294,7 @@ void CMenuMain::_Init( void )
 	}
 	END_EVENT( console, onActivated )
 
-	resumeGame.SetNameAndStatus( "Resume Game", MenuStrings[HINT_RESUME_GAME] );
+	resumeGame.SetNameAndStatus( "Resume Game", MenuStrings[IDS_MAIN_RETURNHELP] );
 	resumeGame.SetPicture( PC_RESUME_GAME );
 	resumeGame.iFlags |= QMF_NOTIFY;
 	resumeGame.onActivated = UI_CloseMenu;
@@ -304,23 +304,23 @@ void CMenuMain::_Init( void )
 	disconnect.iFlags |= QMF_NOTIFY;
 	disconnect.onActivated = DisconnectDialogCb;
 
-	newGame.SetNameAndStatus( "New Game", MenuStrings[HINT_NEWGAME] );
+	newGame.SetNameAndStatus( "New Game", MenuStrings[IDS_MAIN_NEWGAMEHELP] );
 	newGame.SetPicture( PC_NEW_GAME );
 	newGame.iFlags |= QMF_NOTIFY;
 	newGame.onActivated = UI_NewGame_Menu;
 
-	hazardCourse.SetNameAndStatus( "Hazard Course", MenuStrings[HINT_HAZARD_COURSE] );
+	hazardCourse.SetNameAndStatus( "Hazard Course", MenuStrings[IDS_MAIN_TRAININGHELP] );
 	hazardCourse.SetPicture( PC_HAZARD_COURSE );
 	hazardCourse.iFlags |= QMF_NOTIFY;
 	hazardCourse.onActivatedClActive = HazardCourseDialogCb;
 	hazardCourse.onActivated = HazardCourseCb;
 
-	multiPlayer.SetNameAndStatus( "Multiplayer", MenuStrings[HINT_MULTIPLAYER] );
+	multiPlayer.SetNameAndStatus( "Multiplayer", MenuStrings[IDS_MAIN_MULTIPLAYERHELP] );
 	multiPlayer.SetPicture( PC_MULTIPLAYER );
 	multiPlayer.iFlags |= QMF_NOTIFY;
 	multiPlayer.onActivated = UI_MultiPlayer_Menu;
 
-	configuration.SetNameAndStatus( "Configuration", MenuStrings[HINT_CONFIGURATION] );
+	configuration.SetNameAndStatus( "Configuration", MenuStrings[IDS_MAIN_CONFIGUREHELP] );
 	configuration.SetPicture( PC_CONFIG );
 	configuration.iFlags |= QMF_NOTIFY;
 	configuration.onActivated = UI_Options_Menu;
@@ -329,21 +329,21 @@ void CMenuMain::_Init( void )
 	saveRestore.onActivatedClActive = UI_SaveLoad_Menu;
 	saveRestore.onActivated = UI_LoadGame_Menu;
 
-	customGame.SetNameAndStatus( "Custom Game", MenuStrings[HINT_CUSTOM_GAME] );
+	customGame.SetNameAndStatus( "Custom Game", MenuStrings[IDS_MAIN_CUSTOMHELP] );
 	customGame.SetPicture( PC_CUSTOM_GAME );
 	customGame.iFlags |= QMF_NOTIFY;
 	customGame.onActivated = UI_CustomGame_Menu;
 
-	previews.SetNameAndStatus( "Previews", MenuStrings[ HINT_PREVIEWS_TEXT ] );
+	previews.SetNameAndStatus( "Previews", MenuStrings[ IDS_MAIN_PREVIEWSHELP ] );
 	previews.SetPicture( PC_PREVIEWS );
 	previews.iFlags |= QMF_NOTIFY;
 	SET_EVENT( previews, onActivated )
 	{
-		EngFuncs::ShellExecute( MenuStrings[HINT_PREVIEWS_CMD], NULL, false );
+		EngFuncs::ShellExecute( MenuStrings[IDS_MEDIA_PREVIEWURL], NULL, false );
 	}
 	END_EVENT( previews, onActivated )
 
-	quit.SetNameAndStatus( "Quit", MenuStrings[HINT_QUIT] );
+	quit.SetNameAndStatus( "Quit", MenuStrings[IDS_MAIN_QUITPROMPT] );
 	quit.SetPicture( PC_QUIT );
 	quit.iFlags |= QMF_NOTIFY;
 	quit.onActivated = QuitDialogCb;
@@ -421,12 +421,12 @@ void CMenuMain::_VidInit( void )
 
 	if( CL_IsActive( ))
 	{
-		saveRestore.SetNameAndStatus( "Save\\Load Game", MenuStrings[HINT_SAVELOADGAME] );
+		saveRestore.SetNameAndStatus( "Save\\Load Game", MenuStrings[IDS_MAIN_LOADSAVEHELP] );
 		saveRestore.SetPicture( PC_SAVE_LOAD_GAME);
 	}
 	else
 	{
-		saveRestore.SetNameAndStatus( "Load Game", MenuStrings[HINT_LOADGAME] );
+		saveRestore.SetNameAndStatus( "Load Game", MenuStrings[IDS_MAIN_LOADHELP] );
 		saveRestore.SetPicture( PC_LOAD_GAME );
 		resumeGame.Show();
 		disconnect.Show();
@@ -441,7 +441,7 @@ void CMenuMain::_VidInit( void )
 	previews.SetCoord( 72, (bCustomGame) ? (bTrainMap ? 580 : 530) : (bTrainMap ? 530 : 480) );
 
 	// too short execute string - not a real command
-	if( strlen( MenuStrings[HINT_PREVIEWS_CMD] ) <= 3 )
+	if( strlen( MenuStrings[IDS_MEDIA_PREVIEWURL] ) <= 3 )
 		previews.iFlags |= QMF_GRAYED;
 
 	quit.SetCoord( 72, (bCustomGame) ? (bTrainMap ? 630 : 580) : (bTrainMap ? 580 : 530));

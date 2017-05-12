@@ -19,7 +19,7 @@ GNU General Public License for more details.
 #include "Utils.h"
 #include "MenuStrings.h"
 
-const char *MenuStrings[HINT_MAXSTRINGS] =
+const char *MenuStrings[IDS_LAST] =
 {
 "",
 "",
@@ -572,6 +572,55 @@ const char *MenuStrings[HINT_MAXSTRINGS] =
 "",
 "",
 "",	// 550
+"",
+"",
+"",
+"",
+"",
+"",
+"",
+"",
+"",
+"",	// 560
+"",
+"",
+"",
+"",
+"",
+"",
+"",
+"",
+"",
+"",	// 570
+"",
+"",
+"",
+"",
+"",
+"",
+"",
+"",
+"",
+"",	// 580
+"",
+"",
+"",
+"",
+"",
+"",
+"",
+"",
+"",
+"",	// 590
+"",
+"",
+"",
+"",
+"",
+"",
+"",
+"",
+"", // 599
 };
 
 void UI_InitAliasStrings( void )
@@ -580,25 +629,25 @@ void UI_InitAliasStrings( void )
 
 	// some strings needs to be initialized here
 	sprintf( token, "Quit %s without\nsaving current game?", gMenu.m_gameinfo.title );
-	MenuStrings[HINT_QUIT_ACTIVE] = StringCopy( token );
+	MenuStrings[IDS_MAIN_QUITPROMPTINGAME] = StringCopy( token );
 
 	sprintf( token, "Learn how to play %s", gMenu.m_gameinfo.title );
-	MenuStrings[HINT_HAZARD_COURSE] = StringCopy( token );
+	MenuStrings[IDS_MAIN_TRAININGHELP] = StringCopy( token );
 
 	sprintf( token, "Play %s on the 'easy' skill setting", gMenu.m_gameinfo.title );
-	MenuStrings[HINT_SKILL_EASY] = StringCopy( token );
+	MenuStrings[IDS_NEWGAME_EASYHELP] = StringCopy( token );
 
 	sprintf( token, "Play %s on the 'medium' skill setting", gMenu.m_gameinfo.title );
-	MenuStrings[HINT_SKILL_NORMAL] = StringCopy( token );
+	MenuStrings[IDS_NEWGAME_MEDIUMHELP] = StringCopy( token );
 
 	sprintf( token, "Play %s on the 'difficult' skill setting", gMenu.m_gameinfo.title );
-	MenuStrings[HINT_SKILL_HARD] = StringCopy( token );
+	MenuStrings[IDS_NEWGAME_DIFFICULTHELP] = StringCopy( token );
 
 	sprintf( token, "Quit playing %s", gMenu.m_gameinfo.title );
-	MenuStrings[HINT_QUIT_BUTTON] = StringCopy( token );
+	MenuStrings[IDS_MAIN_QUITHELP] = StringCopy( token );
 
 	sprintf( token, "Search for %s servers, configure character", gMenu.m_gameinfo.title );
-	MenuStrings[HINT_MULTIPLAYER] = StringCopy( token );
+	MenuStrings[IDS_MAIN_MULTIPLAYERHELP] = StringCopy( token );
 }
 
 void UI_LoadCustomStrings( void )
@@ -621,7 +670,7 @@ void UI_LoadCustomStrings( void )
 
 			// check for bad stiringnum
 			if( string_num < 0 ) continue;
-			if( string_num > ( HINT_MAXSTRINGS - 1 ))
+			if( string_num > ( IDS_LAST - 1 ))
 				continue;
 		}
 		else continue; // invalid declaration ?

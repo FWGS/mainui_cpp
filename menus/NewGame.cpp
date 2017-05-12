@@ -89,19 +89,19 @@ void CMenuNewGame::_Init( void )
 {
 	banner.SetPicture( ART_BANNER );
 	
-	easy.SetNameAndStatus( "Easy", MenuStrings[HINT_SKILL_EASY] );
+	easy.SetNameAndStatus( "Easy", MenuStrings[IDS_NEWGAME_EASYHELP] );
 	easy.SetPicture( PC_EASY );
 	easy.SetCoord( 72, 230 );
 	easy.iFlags |= QMF_NOTIFY;
 	easy.onActivatedClActive.pExtra = easy.onActivated.pExtra = (void*)1;
 
-	medium.SetNameAndStatus( "Medium", MenuStrings[HINT_SKILL_NORMAL] );
+	medium.SetNameAndStatus( "Medium", MenuStrings[IDS_NEWGAME_MEDIUMHELP] );
 	medium.SetPicture( PC_MEDIUM );
 	medium.SetCoord( 72, 280 );
 	medium.iFlags |= QMF_NOTIFY;
 	medium.onActivatedClActive.pExtra = medium.onActivated.pExtra = (void*)2;
 
-	hard.SetNameAndStatus( "Difficult", MenuStrings[HINT_SKILL_HARD] );
+	hard.SetNameAndStatus( "Difficult", MenuStrings[IDS_NEWGAME_DIFFICULTHELP] );
 	hard.SetPicture( PC_DIFFICULT );
 	hard.SetCoord( 72, 330 );
 	hard.iFlags |= QMF_NOTIFY;
@@ -116,7 +116,7 @@ void CMenuNewGame::_Init( void )
 	cancel.iFlags |= QMF_NOTIFY;
 	cancel.onActivated = HideCb;
 
-	msgBox.SetMessage( MenuStrings[HINT_RESTART_GAME] );
+	msgBox.SetMessage( MenuStrings[IDS_NEWGAME_NEWPROMPT] );
 	msgBox.HighlightChoice( CMenuYesNoMessageBox::HIGHLIGHT_NO );
 	msgBox.Link( this );
 
