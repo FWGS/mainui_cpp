@@ -274,6 +274,9 @@ void UI_DrawFinalCredits( void );
 
 void UI_CloseMenu( void );
 
+// SCR support
+void UI_LoadScriptConfig( void );
+
 // Precache
 void UI_Main_Precache( void );
 void UI_NewGame_Precache( void );

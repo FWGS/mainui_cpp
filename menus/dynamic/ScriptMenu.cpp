@@ -57,10 +57,7 @@ public:
 	CMenuScriptConfig();
 	~CMenuScriptConfig();
 
-	void SetScriptConfig( const char *path )
-	{
-		m_szConfig = path;
-	}
+	void SetScriptConfig( const char *path, bool earlyInit = false );
 
 	virtual void SaveAndPopMenu()
 	{
@@ -198,8 +195,6 @@ void CMenuScriptConfig::_Init( void )
 	AddItem( cancel );
 	AddItem( pageSelector );
 
-	m_pVars = CSCR_LoadDefaultCVars( m_szConfig, &m_iVarsCount );
-
 	if( !m_pVars )
 		return; // Show "Unavailable" label?
 
@@ -248,7 +243,7 @@ void CMenuScriptConfig::_Init( void )
 			else fMax = var->number.fMax;
 
 			spinControl->Setup( fMin, fMax, 1 );
-			spinControl->SetSize( 250, 32 );
+			spinControl->SetSize( 300, 32 );
 			editable = spinControl;
 
 			cvarType = CMenuEditable::CVAR_VALUE;
@@ -258,7 +253,7 @@ void CMenuScriptConfig::_Init( void )
 		{
 			CMenuField *field = new CMenuField;
 			field->iMaxLength = CS_SIZE;
-			field->SetSize( 250, 32 );
+			field->SetSize( 300, 32 );
 			editable = field;
 			cvarType = CMenuEditable::CVAR_STRING;
 			break;
@@ -268,7 +263,7 @@ void CMenuScriptConfig::_Init( void )
 			CMenuSpinControl *spinControl = new CMenuSpinControl;
 
 			spinControl->Setup( var->list.pArray, var->list.iCount );
-			spinControl->SetSize( 250, 32 );
+			spinControl->SetSize( 300, 32 );
 			spinControl->onCvarGet = ListItemCvarGetCb;
 			spinControl->onCvarGet.pExtra = (void*)&var->list;
 			spinControl->onCvarWrite = ListItemCvarWriteCb;
@@ -283,7 +278,7 @@ void CMenuScriptConfig::_Init( void )
 		editable->iFlags |= QMF_NOTIFY;
 		// editable->szName = var->name;
 		editable->szStatusText = var->desc;
-		editable->SetCharSize( 15, 25 );
+		editable->SetCharSize( 12, 25 );
 		editable->LinkCvar( var->name, cvarType );
 		editable->iFlags &= ~(QMF_GRAYED|QMF_INACTIVE);
 		editable->Show();
@@ -311,6 +306,33 @@ void CMenuScriptConfig::_Init( void )
 	pageSelector.onChanged = FlipMenuCb;
 }
 
+void CMenuScriptConfig::SetScriptConfig(const char *path, bool earlyInit)
+{
+	if( m_szConfig && m_pVars && !stricmp( m_szConfig, path ) )
+		return; // do nothing
+
+	m_szConfig = path;
+
+	if( m_pVars )
+		CSCR_FreeList( m_pVars );
+
+	m_pVars = CSCR_LoadDefaultCVars( m_szConfig, &m_iVarsCount );
+
+	if( earlyInit ) // create variables if engine does not support SCR
+	{
+		// Xash3D FWGS have internal SCR parser
+		// Unkle Mike's does not(as of 3598 build)
+		if( !EngFuncs::GetCvarFloat("host_build") && EngFuncs::GetCvarFloat("build"))
+		{
+			for( scrvardef_t *var = m_pVars; var; var = var->next )
+			{
+				EngFuncs::CvarRegister( var->name, var->value, var->flags );
+			}
+		}
+	}
+
+}
+
 void CMenuScriptConfig::FlipMenu()
 {
 	int newIndex = (int)pageSelector.GetCurrentValue() - 1;
@@ -324,19 +346,24 @@ void CMenuScriptConfig::FlipMenu()
 	m_iCurrentPage = newIndex;
 }
 
+static CMenuScriptConfig staticServerOptions;
+static CMenuScriptConfig staticUserOptions;
 
 void UI_AdvServerOptions_Menu()
 {
-	static CMenuScriptConfig staticServerOptions;
-	staticServerOptions.SetScriptConfig( "settings.scr" );
 	staticServerOptions.banner.SetPicture( ART_BANNER_SERVER );
 	staticServerOptions.Show();
 }
 
 void UI_AdvUserOptions_Menu()
 {
-	static CMenuScriptConfig staticUserOptions;
-	staticUserOptions.SetScriptConfig( "user.scr" );
 	staticUserOptions.banner.SetPicture( ART_BANNER_USER );
 	staticUserOptions.Show();
+}
+
+void UI_LoadScriptConfig()
+{
+	// yes, create cvars if needed
+	staticServerOptions.SetScriptConfig( "settings.scr", true );
+	staticUserOptions.SetScriptConfig( "user.scr", true );
 }

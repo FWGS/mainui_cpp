@@ -257,6 +257,22 @@ void UI_DrawRectangleExt( int in_x, int in_y, int in_w, int in_h, const int colo
 
 /*
 =================
+UI_DrawCharacter
+=================
+*/
+void UI_DrawCharacter( int x, int y, int width, int height, int ch, int ulRGBA, HIMAGE hFont )
+{
+#if 1
+	EngFuncs::DrawCharacter( x, y, width, height, ch, ulRGBA, hFont );
+#else
+	// TODO: Custom font rendering!
+#endif
+}
+
+
+
+/*
+=================
 UI_DrawString
 =================
 */
@@ -355,8 +371,8 @@ void UI_DrawString( int x, int y, int w, int h, const char *string, const int co
 				continue;
 			if( ch != ' ' )
 			{
-				if( shadow ) EngFuncs::DrawCharacter( xx + ofsX, yy + ofsY, charW, charH, ch, shadowModulate, uiStatic.hFont );
-				EngFuncs::DrawCharacter( xx, yy, charW, charH, ch, modulate, uiStatic.hFont );
+				if( shadow ) UI_DrawCharacter( xx + ofsX, yy + ofsY, charW, charH, ch, shadowModulate, uiStatic.hFont );
+				UI_DrawCharacter( xx, yy, charW, charH, ch, modulate, uiStatic.hFont );
 			}
 			xx += charW;
 		}
@@ -1283,6 +1299,9 @@ void UI_Init( void )
 
 	// load custom strings
 	UI_LoadCustomStrings();
+
+	// load scr
+	UI_LoadScriptConfig();
 
 	//CR
 	CMenuPicButton::InitTitleAnim();
