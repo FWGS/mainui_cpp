@@ -150,9 +150,6 @@ void CMenuAction::Draw( )
 		return; // no focus
 	}
 
-	if(!( iFlags & QMF_FOCUSBEHIND ))
-		UI_DrawString( m_scPos, m_scSize, szName, iColor, false, m_scChSize, eTextAlignment, shadow );
-
 	if( eFocusAnimation == QM_HIGHLIGHTIFFOCUS )
 	{
 		UI_DrawString( m_scPos, m_scSize, szName, iFocusColor, false, m_scChSize, eTextAlignment, shadow );
@@ -165,9 +162,6 @@ void CMenuAction::Draw( )
 
 		UI_DrawString( m_scPos, m_scSize, szName, color, false, m_scChSize, eTextAlignment, shadow );
 	}
-
-	if( iFlags & QMF_FOCUSBEHIND )
-		UI_DrawString( m_scPos, m_scSize, szName, iColor, false, m_scChSize, eTextAlignment, shadow );
 }
 
 void CMenuAction::SetBackground(const char *path, unsigned int color)

@@ -10,7 +10,6 @@ enum
 	QMF_SILENT             = BIT( 5 ), // Don't play sounds
 	QMF_HASMOUSEFOCUS      = BIT( 6 ),
 	QMF_MOUSEONLY          = BIT( 7 ), // Only mouse input allowed
-	QMF_FOCUSBEHIND        = BIT( 8 ), // Focus draws behind normal item
 	QMF_NOTIFY             = BIT( 9 ), // draw notify at right screen side
 	QMF_ACT_ONRELEASE      = BIT( 10 ), // call Key_Event when button is released
 	QMF_HASKEYBOARDFOCUS   = BIT( 11 ),

@@ -202,13 +202,6 @@ void CMenuSpinControl::Draw( void )
 	leftFocus = UI_CursorInRect( left, arrow );
 	rightFocus = UI_CursorInRect( right, arrow );
 
-	if( !( iFlags & QMF_FOCUSBEHIND ))
-	{
-		UI_DrawString( m_scCenterPos, m_scCenterBox, m_szDisplay, iColor, false, m_scChSize, eTextAlignment, shadow );
-		UI_DrawPic( left, arrow, iColor, m_szLeftArrow );
-		UI_DrawPic( right, arrow, iColor, m_szRightArrow );
-	}
-
 	if( eFocusAnimation == QM_HIGHLIGHTIFFOCUS )
 	{
 		UI_DrawString( m_scCenterPos, m_scCenterBox, m_szDisplay, iFocusColor, false, m_scChSize, eTextAlignment, shadow );
@@ -224,13 +217,6 @@ void CMenuSpinControl::Draw( void )
 		UI_DrawString( m_scCenterPos, m_scCenterBox, m_szDisplay, color, false, m_scChSize, eTextAlignment, shadow );
 		UI_DrawPic( left, arrow, (leftFocus) ? color : iColor, (leftFocus) ? m_szLeftArrowFocus : m_szLeftArrow );
 		UI_DrawPic( right, arrow, (rightFocus) ? color : iColor, (rightFocus) ? m_szRightArrowFocus : m_szRightArrow );
-	}
-
-	if( iFlags & QMF_FOCUSBEHIND )
-	{
-		UI_DrawString( m_scCenterPos, m_scCenterBox, m_szDisplay, iColor, false, m_scChSize, eTextAlignment, shadow );
-		UI_DrawPic( left, arrow, iColor, m_szLeftArrow );
-		UI_DrawPic( right, arrow, iColor, m_szRightArrow );
 	}
 }
 

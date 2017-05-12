@@ -56,7 +56,7 @@ void CMenuSlider::VidInit(  )
 	m_scCenterBox.h = 4;
 
 	m_iNumSteps = (m_flMaxValue - m_flMinValue) / m_flRange + 1;
-	m_flDrawStep = (float)(m_scSize.w) / (float)m_iNumSteps;
+	m_flDrawStep = (float)(m_scSize.w - m_iSliderOutlineWidth - m_scCenterBox.w) / (float)m_iNumSteps;
 }
 
 /*
@@ -83,7 +83,7 @@ const char *CMenuSlider::Key( int key, int down )
 	switch( key )
 	{
 	case K_MOUSE1:
-		if( !UI_CursorInRect( m_scPos.x, m_scPos.y - 20, m_scSize.w, m_scSize.h + 40 ) )
+		if( !UI_CursorInRect( m_scPos.x, m_scPos.y, m_scSize.w, m_scSize.h ) )
 		{
 			m_iKeepSlider = false;
 			return uiSoundNull;
@@ -94,8 +94,8 @@ const char *CMenuSlider::Key( int key, int down )
 		// immediately move slider into specified place
 		int	dist, numSteps;
 
-		dist = uiStatic.cursorX - m_scPos.x - (m_scCenterBox.w>>2);
-		numSteps = floor(dist / m_flDrawStep);
+		dist = uiStatic.cursorX - (m_scPos.x + m_iSliderOutlineWidth + m_scCenterBox.w);
+		numSteps = round(dist / m_flDrawStep);
 		m_flCurValue = bound( m_flMinValue, numSteps * m_flRange, m_flMaxValue );
 
 		// tell menu about changes
@@ -190,7 +190,9 @@ void CMenuSlider::Draw( void )
 	m_flCurValue = bound( m_flMinValue, m_flCurValue, m_flMaxValue );
 
 	// calc slider position
-	sliderX = m_scPos.x + ( ( m_flCurValue - m_flMinValue ) / ( m_flMaxValue - m_flMinValue ) ) * ( m_scSize.w - (m_scCenterBox.w) + (m_scCenterBox.w>>2) );
+	sliderX = m_scPos.x + (m_iSliderOutlineWidth/2) // start
+		+ ( ( m_flCurValue - m_flMinValue ) / ( m_flMaxValue - m_flMinValue ) )  // calc fractional part
+		* ( m_scSize.w - m_iSliderOutlineWidth - (m_scCenterBox.w) );
 
 
 	UI_DrawRectangleExt( m_scPos.x + m_iSliderOutlineWidth / 2, m_scPos.y + m_iSliderOutlineWidth, m_scSize.w - m_iSliderOutlineWidth, m_scCenterBox.h, uiInputBgColor, m_iSliderOutlineWidth );

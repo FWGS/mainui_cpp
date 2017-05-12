@@ -127,10 +127,6 @@ void CMenuBitmap::Draw( void )
 	{
 		UI_DrawPic( m_scPos, m_scSize, iColor, szPressPic );
 	}
-	else if(!( iFlags & QMF_FOCUSBEHIND ))
-	{
-		UI_DrawPic( m_scPos, m_scSize, iColor, szPic );
-	}
 
 	if( eFocusAnimation == QM_HIGHLIGHTIFFOCUS )
 	{
@@ -142,11 +138,6 @@ void CMenuBitmap::Draw( void )
 
 		color = PackAlpha( iColor, 255 * (0.5 + 0.5 * sin( (float)uiStatic.realTime / UI_PULSE_DIVISOR )));
 		UI_DrawPic( m_scPos, m_scSize, color, szFocusPic );
-	}
-
-	if( iFlags & QMF_FOCUSBEHIND )
-	{
-		UI_DrawPic( m_scPos, m_scSize, iColor, szPic );
 	}
 }
 

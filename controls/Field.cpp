@@ -431,22 +431,21 @@ void CMenuField::Draw( void )
 		return; // no focus
 	}
 
-	if( !( iFlags & QMF_FOCUSBEHIND ))
-	{
-		UI_DrawString( newPos, m_scSize, text, iColor, false, m_scChSize, eTextAlignment, shadow );
+	UI_DrawString( newPos, m_scSize, text, iColor, false, m_scChSize, eTextAlignment, shadow );
 
-		if(( uiStatic.realTime & 499 ) < 250 )
-			UI_DrawString( x + (cursor * m_scChSize.w), y, m_scChSize.w, size.h, cursor_char, iColor, true, m_scChSize.w, m_scChSize.h, QM_LEFT, shadow );
-	}
+	if(( uiStatic.realTime & 499 ) < 250 )
+		UI_DrawString( x + (cursor * m_scChSize.w), y, m_scChSize.w, m_scSize.h, cursor_char, iColor, true, m_scChSize.w, m_scChSize.h, QM_LEFT, shadow );
 
-	if( eFocusAnimation == QM_HIGHLIGHTIFFOCUS )
+
+	switch( eFocusAnimation )
 	{
+	case QM_HIGHLIGHTIFFOCUS:
 		UI_DrawString( newPos, m_scSize, text, iFocusColor, false, m_scChSize, eTextAlignment, shadow );
 
 		if(( uiStatic.realTime & 499 ) < 250 )
-			UI_DrawString( x + (cursor * m_scChSize.w), y, m_scChSize.w, size.h, cursor_char, iFocusColor, true, m_scChSize.w, m_scChSize.h, QM_LEFT, shadow );
-	}
-	else if( eFocusAnimation == QM_PULSEIFFOCUS )
+			UI_DrawString( x + (cursor * m_scChSize.w), y, m_scChSize.w, m_scSize.h, cursor_char, iFocusColor, true, m_scChSize.w, m_scChSize.h, QM_LEFT, shadow );
+		break;
+	case QM_PULSEIFFOCUS:
 	{
 		int	color;
 
@@ -454,14 +453,11 @@ void CMenuField::Draw( void )
 		UI_DrawString( newPos, m_scSize, text, color, false, m_scChSize, eTextAlignment, shadow );
 
 		if(( uiStatic.realTime & 499 ) < 250 )
-			UI_DrawString( x + (cursor * m_scChSize.w), y, m_scChSize.w, size.h, cursor_char, color, true, m_scChSize.w, m_scChSize.h, QM_LEFT, shadow );
-	}
-	if( iFlags & QMF_FOCUSBEHIND )
-	{
-		UI_DrawString( newPos, m_scSize, text, iColor, false, m_scChSize, eTextAlignment, shadow );
+			UI_DrawString( x + (cursor * m_scChSize.w), y, m_scChSize.w, m_scSize.h, cursor_char, color, true, m_scChSize.w, m_scChSize.h, QM_LEFT, shadow );
 
-		if(( uiStatic.realTime & 499 ) < 250 )
-			UI_DrawString( x + (cursor * m_scChSize.w), y, m_scChSize.w, size.h, cursor_char, iColor, true, m_scChSize.w, m_scChSize.h, QM_LEFT, shadow );
+		break;
+	}
+	default: break;
 	}
 }
 

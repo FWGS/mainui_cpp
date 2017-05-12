@@ -486,12 +486,6 @@ void CMenuScrollList::Draw( )
 			upFocus = UI_CursorInRect( up.x, up.y, arrow.w, arrow.h );
 			downFocus = UI_CursorInRect( down.x, down.y, arrow.w, arrow.h );
 
-			if(!( iFlags & QMF_FOCUSBEHIND ))
-			{
-				UI_DrawPic( up.x, up.y, arrow.w, arrow.h, uiColorWhite, szUpArrow );
-				UI_DrawPic( down.x, down.y, arrow.w, arrow.h, uiColorWhite, szDownArrow );
-			}
-
 			if( eFocusAnimation == QM_HIGHLIGHTIFFOCUS )
 			{
 				UI_DrawPic( up.x, up.y, arrow.w, arrow.h, uiColorWhite, (upFocus) ? szUpArrowFocus : szUpArrow );
@@ -505,12 +499,6 @@ void CMenuScrollList::Draw( )
 
 				UI_DrawPic( up.x, up.y, arrow.w, arrow.h, (upFocus) ? color : iColor, (upFocus) ? szUpArrowFocus : szUpArrow );
 				UI_DrawPic( down.x, down.y, arrow.w, arrow.h, (downFocus) ? color : iColor, (downFocus) ? szDownArrowFocus : szDownArrow );
-			}
-
-			if( iFlags & QMF_FOCUSBEHIND )
-			{
-				UI_DrawPic( up.x, up.y, arrow.w, arrow.h, iColor, szUpArrow );
-				UI_DrawPic( down.x, down.y, arrow.w, arrow.h, iColor, szDownArrow );
 			}
 		}
 	}
@@ -541,9 +529,6 @@ void CMenuScrollList::Draw( )
 			continue;	// no focus
 		}
 
-		if(!( iFlags & QMF_FOCUSBEHIND ))
-			UI_DrawString( x, y, w, h, pszItemNames[i], iColor, false, m_scChSize.w, m_scChSize.h, eTextAlignment, shadow );
-
 		if( eFocusAnimation == QM_HIGHLIGHTIFFOCUS )
 			UI_DrawString( x, y, w, h, pszItemNames[i], iFocusColor, false, m_scChSize.w, m_scChSize.h, eTextAlignment, shadow );
 		else if( eFocusAnimation == QM_PULSEIFFOCUS )
@@ -554,9 +539,6 @@ void CMenuScrollList::Draw( )
 
 			UI_DrawString( x, y, w, h, pszItemNames[i], color, false, m_scChSize.w, m_scChSize.h, eTextAlignment, shadow );
 		}
-
-		if( iFlags & QMF_FOCUSBEHIND )
-			UI_DrawString( x, y, w, h, pszItemNames[i], iColor, false, m_scChSize.w, m_scChSize.h, eTextAlignment, shadow );
 	}
 
 	EngFuncs::PIC_DisableScissor();
