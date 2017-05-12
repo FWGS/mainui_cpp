@@ -82,7 +82,7 @@ public:
 	// Char is a special key press event for text input
 	virtual void Char( int key );
 
-	virtual void MouseMove( int x, int y ) {}
+	virtual bool MouseMove( int x, int y ) { return true; }
 
 	virtual const char *Activate( void );
 

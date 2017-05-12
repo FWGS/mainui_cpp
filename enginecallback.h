@@ -125,10 +125,20 @@ public:
 	{ engfuncs.pfnDrawCharacter( x, y, width, height, ch, ulRGBA, hFont ); }
 	static inline int	DrawConsoleString( int x, int y, const char *string )
 	{ return  engfuncs.pfnDrawConsoleString( x, y, string ); }
+	static inline int   DrawConsoleString( Point coord, const char *string )
+	{ return DrawConsoleString( coord.x, coord.y, string ); }
 	static inline void	DrawSetTextColor( int r, int g, int b, int alpha = 255 )
 	{ engfuncs.pfnDrawSetTextColor( r, g, b, alpha ); }
 	static inline void	ConsoleStringLen(  const char *string, int *length, int *height )
 	{ engfuncs.pfnDrawConsoleStringLen( string, length, height ); }
+
+	// TODO: Move into UI class
+	static inline int   ConsoleCharacterHeight()
+	{
+		int height;
+		engfuncs.pfnDrawConsoleStringLen( "", 0, &height );
+		return height;
+	}
 	static inline void	SetConsoleDefaultColor( int r, int g, int b ) // color must came from colors.lst
 	{ engfuncs.pfnSetConsoleDefaultColor( r, g, b ); }
 

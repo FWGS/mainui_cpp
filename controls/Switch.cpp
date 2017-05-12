@@ -152,17 +152,16 @@ void CMenuSwitch::Draw( void )
 
 	if( szStatusText && iFlags & QMF_NOTIFY )
 	{
-		int	x;
+		Point coord;
 
-		x = 250;
-		UI_ScaleCoords( &x, NULL, NULL, NULL );
-		x += m_scPos.x;
+		coord.x = m_scPos.x + 250 * uiStatic.scaleX;
+		coord.y = m_scPos.y + m_scSize.h / 2 - EngFuncs::ConsoleCharacterHeight() / 2;
 
 		int	r, g, b;
 
 		UnpackRGB( r, g, b, uiColorHelp );
 		EngFuncs::DrawSetTextColor( r, g, b );
-		EngFuncs::DrawConsoleString( x, m_scPos.y, szStatusText );
+		EngFuncs::DrawConsoleString( coord, szStatusText );
 	}
 
 	if( iFlags & QMF_GRAYED )

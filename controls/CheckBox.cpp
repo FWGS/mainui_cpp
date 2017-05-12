@@ -129,19 +129,20 @@ void CMenuCheckBox::Draw( void )
 
 	if( szStatusText && iFlags & QMF_NOTIFY )
 	{
-		int	x;
+		Point coord;
 
 		if( szName[0] )
-			x = 250 * uiStatic.scaleX;
+			coord.x = 250 * uiStatic.scaleX;
 		else
-			x = m_scSize.w + 16 * uiStatic.scaleX;
-		x += m_scPos.x;
+			coord.x = m_scSize.w + 16 * uiStatic.scaleX;
+		coord.x += m_scPos.x;
+		coord.y = m_scPos.y + m_scSize.h / 2 - EngFuncs::ConsoleCharacterHeight() / 2;
 
 		int	r, g, b;
 
 		UnpackRGB( r, g, b, uiColorHelp );
 		EngFuncs::DrawSetTextColor( r, g, b );
-		EngFuncs::DrawConsoleString( x, m_scPos.y, szStatusText );
+		EngFuncs::DrawConsoleString( coord, szStatusText );
 	}
 
 	if( iFlags & QMF_GRAYED )

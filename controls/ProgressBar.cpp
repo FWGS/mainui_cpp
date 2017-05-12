@@ -36,7 +36,10 @@ void CMenuProgressBar::Draw( void )
 	float flProgress;
 
 	if( m_pCvar )
-		flProgress = ( m_pCvar->value - m_flMin ) / ( m_flMax - m_flMin );
+	{
+		flProgress = bound( m_flMin, m_pCvar->value, m_flMax );
+		flProgress = ( flProgress - m_flMin ) / ( m_flMax - m_flMin );
+	}
 	else
 		flProgress = m_flValue;
 

@@ -120,7 +120,7 @@ const char *CMenuItemsHolder::Activate()
 	return 0;
 }
 
-void CMenuItemsHolder::MouseMove( int x, int y )
+bool CMenuItemsHolder::MouseMove( int x, int y )
 {
 	// region test the active menu items
 	for( int i = 0; i < m_numItems; i++ )
@@ -146,9 +146,11 @@ void CMenuItemsHolder::MouseMove( int x, int y )
 			item->iFlags &= ~QMF_HASMOUSEFOCUS;
 			continue;
 		}
-		else
+		else if( !item->MouseMove( x, y ) )
 		{
-			item->MouseMove( x, y );
+			item->m_bPressed = false;
+			item->iFlags &= ~QMF_HASMOUSEFOCUS;
+			continue;
 		}
 
 		if( m_iCursor != i )
@@ -165,7 +167,7 @@ void CMenuItemsHolder::MouseMove( int x, int y )
 		m_pItems[m_iCursor]->iFlags |= QMF_HASMOUSEFOCUS;
 		m_pItems[m_iCursor]->m_iLastFocusTime = uiStatic.realTime;
 		// Should we stop at first matched item?
-		return;
+		return true;
 	}
 
 	// out of any region
@@ -179,6 +181,8 @@ void CMenuItemsHolder::MouseMove( int x, int y )
 			if( m_iCursorPrev != -1 )
 				m_iCursor = m_iCursorPrev;
 	}
+
+	return false;
 }
 
 void CMenuItemsHolder::Init()

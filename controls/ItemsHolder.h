@@ -18,7 +18,7 @@ public:
 	virtual void SetInactive( bool visible );
 	virtual void Draw( void );
 
-	virtual void MouseMove( int x, int y );
+	virtual bool MouseMove( int x, int y );
 
 	void CursorMoved( void );
 	void SetCursor( int newCursor, bool notify = true );

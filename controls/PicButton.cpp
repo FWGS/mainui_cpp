@@ -26,8 +26,13 @@ CMenuPicButton::CMenuPicButton() : CMenuBaseItem()
 	eFocusAnimation = QM_HIGHLIGHTIFFOCUS;
 	iFlags = QMF_DROPSHADOW;
 
+	iFocusStartTime = 0;
+
 	hPic = 0;
 	button_id = 0;
+	iOldState = BUTTON_NOFOCUS;
+	flFill = 0.0f;
+	m_iLastFocusTime = -512;
 }
 
 /*
@@ -103,6 +108,26 @@ const char *CMenuPicButton::Key( int key, int down )
 	return sound;
 }
 
+//#define ALT_PICBUTTON_FOCUS_ANIM
+
+/*
+=================
+CMenuPicButton::DrawButton
+=================
+*/
+void CMenuPicButton::DrawButton(int r, int g, int b, int a, wrect_t *rects, int state)
+{
+	EngFuncs::PIC_Set( hPic, r, g, b, a );
+#ifdef ALT_PICBUTTON_FOCUS_ANIM
+	EngFuncs::PIC_EnableScissor( m_scPos.x, m_scPos.y, uiStatic.buttons_draw_width * flFill, uiStatic.buttons_draw_height );
+#endif
+	EngFuncs::PIC_DrawAdditive( m_scPos.x, m_scPos.y, uiStatic.buttons_draw_width, uiStatic.buttons_draw_height, &rects[state] );
+
+#ifdef ALT_PICBUTTON_FOCUS_ANIM
+	EngFuncs::PIC_DisableScissor();
+#endif
+}
+
 /*
 =================
 CMenuPicButton::Draw
@@ -122,19 +147,31 @@ void CMenuPicButton::Draw( )
 		state = BUTTON_PRESSED;
 	else m_bPressed = false;
 
+	if( iOldState == BUTTON_NOFOCUS && state != BUTTON_NOFOCUS )
+		iFocusStartTime = uiStatic.realTime;
+
+	if( state != BUTTON_NOFOCUS )
+	{
+		flFill = (uiStatic.realTime - iFocusStartTime) / 600.0f;
+	}
+	else
+	{
+		flFill = 1 - (uiStatic.realTime - m_iLastFocusTime ) / 600.0f;
+	}
+	flFill = bound( 0, flFill, 1 );
+
 	if( szStatusText && iFlags & QMF_NOTIFY )
 	{
-		int	x;
+		Point coord;
 
-		x = 290;
-		UI_ScaleCoords( &x, NULL, NULL, NULL );
-		x += m_scPos.x;
+		coord.x = m_scPos.x + 290 * uiStatic.scaleX;
+		coord.y = m_scPos.y + m_scSize.h / 2 - EngFuncs::ConsoleCharacterHeight() / 2;
 
 		int	r, g, b;
 
 		UnpackRGB( r, g, b, uiColorHelp );
 		EngFuncs::DrawSetTextColor( r, g, b );
-		EngFuncs::DrawConsoleString( x, m_scPos.y, szStatusText );
+		EngFuncs::DrawConsoleString( coord, szStatusText );
 	}
 
 	if( hPic )
@@ -143,24 +180,20 @@ void CMenuPicButton::Draw( )
 
 		UnpackRGB( r, g, b, iFlags & QMF_GRAYED ? uiColorDkGrey : uiColorWhite );
 
-		wrect_t rects[]=
-		{
-		{ 0, uiStatic.buttons_width, 0, 26 },
-		{ 0, uiStatic.buttons_width, 26, 52 },
-		{ 0, uiStatic.buttons_width, 52, 78 }
-		};
-
-		EngFuncs::PIC_EnableScissor( m_scPos.x, m_scPos.y, uiStatic.buttons_draw_width, uiStatic.buttons_draw_height - 2 );
+		//EngFuncs::PIC_EnableScissor( m_scPos.x, m_scPos.y, uiStatic.buttons_draw_width, uiStatic.buttons_draw_height - 2 );
 
 		a = (512 - (uiStatic.realTime - m_iLastFocusTime)) >> 1;
 
+		wrect_t rects[] =
+		{
+		{ 0, uiStatic.buttons_width, 0,  26 },
+		{ 0, uiStatic.buttons_width, 26, 52 },
+		{ 0, uiStatic.buttons_width, 52, 78 },
+		};
 		if( state == BUTTON_NOFOCUS && a > 0 )
 		{
-			EngFuncs::PIC_Set( hPic, r, g, b, a );
-			EngFuncs::PIC_DrawAdditive( m_scPos.x, m_scPos.y, uiStatic.buttons_draw_width, uiStatic.buttons_draw_height, &rects[BUTTON_FOCUS] );
+			DrawButton( r, g, b, a, rects, BUTTON_FOCUS );
 		}
-
-		EngFuncs::PIC_Set( hPic, r, g, b, 255 );
 
 		// pulse code.
 		if( ( state == BUTTON_NOFOCUS && bPulse ) ||
@@ -176,7 +209,7 @@ void CMenuPicButton::Draw( )
 			// special handling for focused
 			if( state == BUTTON_FOCUS )
 			{
-				EngFuncs::PIC_DrawAdditive( m_scPos.x, m_scPos.y, uiStatic.buttons_draw_width, uiStatic.buttons_draw_height, &rects[BUTTON_FOCUS] );
+				DrawButton( r, g, b, 255, rects, BUTTON_FOCUS );
 
 				EngFuncs::PIC_Set( hPic, r, g, b, 255 ); // set colors again
 				EngFuncs::PIC_DrawAdditive( m_scPos.x, m_scPos.y, uiStatic.buttons_draw_width, uiStatic.buttons_draw_height, &rects[BUTTON_NOFOCUS] );
@@ -184,11 +217,12 @@ void CMenuPicButton::Draw( )
 			else
 			{
 				// just draw
+				EngFuncs::PIC_Set( hPic, r, g, b, 255 );
 				EngFuncs::PIC_DrawAdditive( m_scPos.x, m_scPos.y, uiStatic.buttons_draw_width, uiStatic.buttons_draw_height, &rects[state] );
 			}
 		}
 
-		EngFuncs::PIC_DisableScissor();
+		//EngFuncs::PIC_DisableScissor();
 	}
 	else
 	{
@@ -225,6 +259,8 @@ void CMenuPicButton::Draw( )
 		if( iFlags & QMF_FOCUSBEHIND )
 			UI_DrawString( m_scPos, m_scSize, szName, iColor, false, m_scChSize, eTextAlignment, shadow );
 	}
+
+	iOldState = state;
 }
 
 void CMenuPicButton::SetPicture( int ID )

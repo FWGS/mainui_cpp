@@ -55,8 +55,13 @@ private:
 	void TACheckMenuDepth( void );
 	void PushPButtonStack( void );
 
+	void DrawButton( int r, int g, int b, int a, wrect_t *rects, int state );
+
 	HIMAGE hPic;
 	int button_id;
+	int iFocusStartTime;
+	int iOldState;
+	float flFill;
 
 	static Quad LerpQuad( Quad a, Quad b, float frac );
 
