@@ -234,5 +234,5 @@ void UI_Credits_Menu( void )
 void UI_FinalCredits( void )
 {
 	uiCredits.finalCredits = true;
-	uiCredits.Init();
+	uiCredits.Show();
 }

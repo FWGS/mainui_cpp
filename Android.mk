@@ -72,6 +72,7 @@ LOCAL_SRC_FILES := 	controls/Framework.cpp                          \
 	Btns.cpp                                        \
 	MenuStrings.cpp                                 \
 	Utils.cpp                                       \
+	Scissor.cpp                                     \
 	udll_int.cpp                                    \
 
 ifeq ($(XASH_SDL),1)

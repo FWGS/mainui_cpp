@@ -19,6 +19,7 @@ GNU General Public License for more details.
 #include "Bitmap.h"
 #include "PicButton.h"
 #include "Utils.h"
+#include "Scissor.h"
 
 CMenuPicButton::CMenuPicButton() : CMenuBaseItem()
 {
@@ -119,12 +120,12 @@ void CMenuPicButton::DrawButton(int r, int g, int b, int a, wrect_t *rects, int 
 {
 	EngFuncs::PIC_Set( hPic, r, g, b, a );
 #ifdef ALT_PICBUTTON_FOCUS_ANIM
-	EngFuncs::PIC_EnableScissor( m_scPos.x, m_scPos.y, uiStatic.buttons_draw_width * flFill, uiStatic.buttons_draw_height );
+	UI::PushScissor( m_scPos.x, m_scPos.y, uiStatic.buttons_draw_width * flFill, uiStatic.buttons_draw_height );
 #endif
 	EngFuncs::PIC_DrawAdditive( m_scPos.x, m_scPos.y, uiStatic.buttons_draw_width, uiStatic.buttons_draw_height, &rects[state] );
 
 #ifdef ALT_PICBUTTON_FOCUS_ANIM
-	EngFuncs::PIC_DisableScissor();
+	UI::PopScissor();
 #endif
 }
 
@@ -180,8 +181,6 @@ void CMenuPicButton::Draw( )
 
 		UnpackRGB( r, g, b, iFlags & QMF_GRAYED ? uiColorDkGrey : uiColorWhite );
 
-		//EngFuncs::PIC_EnableScissor( m_scPos.x, m_scPos.y, uiStatic.buttons_draw_width, uiStatic.buttons_draw_height - 2 );
-
 		a = (512 - (uiStatic.realTime - m_iLastFocusTime)) >> 1;
 
 		wrect_t rects[] =
@@ -221,8 +220,6 @@ void CMenuPicButton::Draw( )
 				EngFuncs::PIC_DrawAdditive( m_scPos.x, m_scPos.y, uiStatic.buttons_draw_width, uiStatic.buttons_draw_height, &rects[state] );
 			}
 		}
-
-		//EngFuncs::PIC_DisableScissor();
 	}
 	else
 	{

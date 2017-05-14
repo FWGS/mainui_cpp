@@ -84,6 +84,7 @@ set (MAINUI_SOURCES
 	MenuStrings.cpp
 	CFGScript.cpp
 	Utils.cpp
+	Scissor.cpp
 	udll_int.cpp
 	)
 

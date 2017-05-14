@@ -111,7 +111,6 @@ Size Size::Scale()
 	return Size( w * uiStatic.scaleX, h * uiStatic.scaleY );
 }
 
-
 /*
 =================
 UI_CursorInRect
@@ -482,16 +481,6 @@ void UI_LoadBackgroundImage( void )
 	}
 }
 
-/*
-=================
-UI_StartSound
-=================
-*/
-void UI_StartSound( const char *sound )
-{
-	EngFuncs::PlayLocalSound( sound );
-}
-
 // =====================================================================
 
 
@@ -663,7 +652,7 @@ void UI_UpdateMenu( float flTime )
 	// drawn, to avoid delay while caching images
 	if( uiStatic.enterSound > 0.0f && uiStatic.enterSound <= gpGlobals->time )
 	{
-		UI_StartSound( uiSoundIn );
+		EngFuncs::PlayLocalSound( uiSoundIn );
 		uiStatic.enterSound = -1;
 	}
 }
@@ -697,7 +686,7 @@ void UI_KeyEvent( int key, int down )
 		sound = uiStatic.menuStack[i]->Key( key, down );
 
 		if( !down && sound && sound != uiSoundNull )
-			UI_StartSound( sound );
+			EngFuncs::PlayLocalSound( sound );
 
 		if( uiStatic.menuStack[i]->iFlags & QMF_DIALOG )
 			break;

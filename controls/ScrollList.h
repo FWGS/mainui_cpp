@@ -86,6 +86,8 @@ public:
 // highlight // mittorn
 	int		iHighlight;
 	bool    bFramedHintText;
+// a1batross // smooth scrolling
+	//float flFracScroll;
 };
 
 #endif // MENU_SCROLLLIST_H

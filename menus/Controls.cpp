@@ -307,10 +307,10 @@ void CMenuControls::UnbindEntry()
 	const char *bindName = keysBind[keysList.iCurItem];
 
 	if( !bindName[0] )
-		UI_StartSound( uiSoundBuzz );
+		EngFuncs::PlayLocalSound( uiSoundBuzz );
 
 	UnbindCommand( bindName );
-	UI_StartSound( uiSoundRemoveKey );
+	EngFuncs::PlayLocalSound( uiSoundRemoveKey );
 	ParseKeysList();
 
 	PromptDialog();
@@ -323,7 +323,7 @@ void CMenuControls::EnterGrabMode()
 
 	if( !bindName[0] )
 	{
-		UI_StartSound( uiSoundBuzz );
+		EngFuncs::PlayLocalSound( uiSoundBuzz );
 		return; // not a key
 	}
 
@@ -337,7 +337,7 @@ void CMenuControls::EnterGrabMode()
 
 	PromptDialog();
 
-	UI_StartSound( uiSoundKey );
+	EngFuncs::PlayLocalSound( uiSoundKey );
 }
 
 /*

@@ -3,6 +3,7 @@
 #include "Utils.h"
 #include "PicButton.h"
 #include "ItemsHolder.h"
+#include "Scissor.h"
 
 CMenuItemsHolder::CMenuItemsHolder() :
 	CMenuBaseItem(), m_iCursor( 0 ), m_iCursorPrev( 0 ), m_pItems( ), m_numItems( 0 ), m_bInit( false ), m_bAllowEnterActivate( false )
@@ -123,7 +124,9 @@ const char *CMenuItemsHolder::Activate()
 bool CMenuItemsHolder::MouseMove( int x, int y )
 {
 	// region test the active menu items
-	for( int i = 0; i < m_numItems; i++ )
+
+	// go in reverse direction, so last items will be first
+	for( int i = m_numItems - 1; i >= 0; i-- )
 	{
 		CMenuBaseItem *item = m_pItems[i];
 
@@ -140,13 +143,7 @@ bool CMenuItemsHolder::MouseMove( int x, int y )
 		}
 
 		// simple region test
-		if( !UI_CursorInRect( item->m_scPos, item->m_scSize ) )
-		{
-			item->m_bPressed = false;
-			item->iFlags &= ~QMF_HASMOUSEFOCUS;
-			continue;
-		}
-		else if( !item->MouseMove( x, y ) )
+		if( !UI_CursorInRect( item->m_scPos, item->m_scSize ) || !item->MouseMove( x, y ) )
 		{
 			item->m_bPressed = false;
 			item->iFlags &= ~QMF_HASMOUSEFOCUS;
@@ -161,7 +158,7 @@ bool CMenuItemsHolder::MouseMove( int x, int y )
 				m_pItems[m_iCursorPrev]->iFlags &= ~(QMF_HASMOUSEFOCUS|QMF_HASKEYBOARDFOCUS);
 
 			if( !( m_pItems[m_iCursor]->iFlags & QMF_SILENT ) )
-				UI_StartSound( uiSoundMove );
+				EngFuncs::PlayLocalSound( uiSoundMove );
 		}
 
 		m_pItems[m_iCursor]->iFlags |= QMF_HASMOUSEFOCUS;
@@ -235,6 +232,8 @@ void CMenuItemsHolder::Draw( )
 
 	const char *statusText;
 
+	UI::PushScissor( m_scPos, m_scSize );
+
 	// draw contents
 	for( int i = 0; i < m_numItems; i++ )
 	{
@@ -271,6 +270,8 @@ void CMenuItemsHolder::Draw( )
 		EngFuncs::DrawConsoleString( x, 720 * uiStatic.scaleY, statusText );
 	}
 	else statusFadeTime = uiStatic.realTime;
+
+	UI::PopScissor();
 }
 
 /*

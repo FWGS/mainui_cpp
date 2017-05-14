@@ -18,6 +18,7 @@ GNU General Public License for more details.
 #include "BaseMenu.h"
 #include "ScrollList.h"
 #include "Utils.h"
+#include "Scissor.h"
 
 CMenuScrollList::CMenuScrollList() : CMenuBaseItem()
 {
@@ -510,7 +511,7 @@ void CMenuScrollList::Draw( )
 	y = m_scPos.y + m_scChSize.h;
 
 	// prevent the columns out of rectangle bounds
-	EngFuncs::PIC_EnableScissor( x, y, m_scSize.w - arrow.w - uiStatic.outlineWidth, m_scSize.h );
+	UI::PushScissor( x, y, m_scSize.w - arrow.w - uiStatic.outlineWidth, m_scSize.h );
 
 	for( i = iTopItem; i < iTopItem + iNumRows; i++, y += m_scChSize.h )
 	{
@@ -541,5 +542,5 @@ void CMenuScrollList::Draw( )
 		}
 	}
 
-	EngFuncs::PIC_DisableScissor();
+	UI::PopScissor();
 }

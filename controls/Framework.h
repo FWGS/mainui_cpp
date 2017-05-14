@@ -10,6 +10,8 @@ public:
 	CMenuFramework();
 
 	void Show();
+	void Init();
+	void VidInit();
 	void Hide();
 	bool IsVisible();
 	bool IsRoot() { return true; }

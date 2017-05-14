@@ -81,7 +81,7 @@ void CMenuBaseWindow::PushMenu()
 
 void CMenuBaseWindow::PopMenu()
 {
-	UI_StartSound( uiSoundOut );
+	EngFuncs::PlayLocalSound( uiSoundOut );
 
 	uiStatic.menuDepth--;
 

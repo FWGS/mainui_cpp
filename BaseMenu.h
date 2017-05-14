@@ -174,7 +174,7 @@ typedef struct
 	HIMAGE	buttonsPics[71];	// Fpos.xME: replace with PC_BUTTONCOUNT
 
 	int		buttons_width;	// btns_main.bmp global width
-	int		buttons_height;	// per one button with all states (inactive, focus, pressed) 
+	int		buttons_height;	// per one button with all states (inactive, focus, pressed)
 
 	int		buttons_draw_width;	// scaled image what we drawing
 	int		buttons_draw_height;
@@ -209,6 +209,8 @@ extern int	uiInputFgColor;
 extern int	uiColorWhite;
 extern int	uiColorDkGrey;
 extern int	uiColorBlack;
+
+// TODO: Move it under namespace?
 
 void UI_ScaleCoords( int *x, int *y, int *w, int *h );
 void UI_ScaleCoords( int &x, int &y, int &w, int &h );
