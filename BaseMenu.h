@@ -116,14 +116,13 @@ struct Size
 extern cvar_t	*ui_precache;
 extern cvar_t	*ui_showmodels;
 
-#define BACKGROUND_ROWS	3
-#define BACKGROUND_COLUMNS	4
+#define MAX_BACKGROUNDS 48 // SC 5.0 have 35 tiled backgrounds!
 
 typedef struct
 {
 	HIMAGE	hImage;
-	int	width;
-	int	height;
+	Point coord;
+	Size size;
 } bimage_t;
 
 typedef struct
@@ -147,10 +146,10 @@ typedef struct
 	HIMAGE	hFont;		// mainfont
 
 	// handle steam background images
-	bimage_t m_SteamBackground[BACKGROUND_ROWS][BACKGROUND_COLUMNS];
-	float	m_flTotalWidth;
-	float	m_flTotalHeight;
-	bool	m_fHaveSteamBackground;
+	bimage_t m_SteamBackground[MAX_BACKGROUNDS];
+	Size    m_SteamBackgroundSize;
+	int     m_iSteamBackgroundCount;
+
 	bool	m_fDisableLogo;
 	bool	m_fDemosPlayed;
 	int		m_iOldMenuDepth;

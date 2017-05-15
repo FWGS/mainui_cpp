@@ -160,18 +160,12 @@ void CMenuBackgroundBitmap::Draw()
 		}
 	}
 
-	if (!uiStatic.m_fHaveSteamBackground)
-	{
-		UI_DrawPic( 0, 0, ScreenWidth, ScreenHeight, uiColorWhite, szPic );
-		return;
-	}
-
 	float xScale, yScale;
 	int xpos, ypos;
 	int xoffset, yoffset;
 	float flParallaxScale;
 
-#if 0
+#if 1
 	flParallaxScale = 0.02;
 #else
 	// Disable parallax effect. It's just funny, but not really needed
@@ -182,31 +176,28 @@ void CMenuBackgroundBitmap::Draw()
 	yoffset = (uiStatic.cursorY - ScreenHeight) * flParallaxScale;
 
 	// work out scaling factors
-	xScale = ScreenWidth / uiStatic.m_flTotalWidth * (1 + flParallaxScale);
+	xScale = ScreenWidth / uiStatic.m_SteamBackgroundSize.w * (1 + flParallaxScale);
 	yScale = xScale;
 
-	// iterate and draw all the background pieces
-	ypos = 0;
-	for (int y = 0; y < BACKGROUND_ROWS; y++)
+	if (!uiStatic.m_iSteamBackgroundCount || bForceBackground)
 	{
-		xpos = 0;
-		for (int x = 0; x < BACKGROUND_COLUMNS; x++)
-		{
-			bimage_t &bimage = uiStatic.m_SteamBackground[y][x];
+		UI_DrawPic( xoffset * xScale, yoffset * yScale,
+			ScreenWidth * xScale, ScreenWidth * 3.0f / 4.0f * yScale, uiColorWhite, szPic );
+		return;
+	}
 
-			int dx = (int)ceil(xpos * xScale);
-			int dy = (int)ceil(ypos * yScale);
-			int dw = (int)ceil(bimage.width * xScale);
-			int dt = (int)ceil(bimage.height * yScale);
 
-			if (x == 0) dx = 0;
-			if (y == 0) dy = 0;
+	// iterate and draw all the background pieces
+	for (int i = 0; i < uiStatic.m_iSteamBackgroundCount; i++)
+	{
+		bimage_t &bimage = uiStatic.m_SteamBackground[i];
+		int dx = (int)ceil(bimage.coord.x * xScale);
+		int dy = (int)ceil(bimage.coord.y * yScale);
+		int dw = (int)ceil(bimage.size.w * xScale);
+		int dt = (int)ceil(bimage.size.h * yScale);
 
-			EngFuncs::PIC_Set( bimage.hImage, 255, 255, 255, 255 );
-			EngFuncs::PIC_Draw( xoffset + dx, yoffset + dy, dw, dt );
-			xpos += bimage.width;
-		}
-		ypos += uiStatic.m_SteamBackground[y][0].height;
+		EngFuncs::PIC_Set( bimage.hImage, 255, 255, 255, 255 );
+		EngFuncs::PIC_Draw( xoffset + dx, yoffset + dy, dw, dt );
 	}
 }
 

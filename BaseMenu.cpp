@@ -426,6 +426,15 @@ void UI_DrawMouseCursor( void )
 	//TODO: Unified LoadCursor interface extension
 }
 
+const char *COM_ExtractExtension( const char *s )
+{
+	int len = strlen( s );
+
+	for( int i = len; i >= 0; i-- )
+		if( s[i] == '.' )
+			return s + i + 1;
+	return s;
+}
 
 /*
 =================
@@ -434,50 +443,73 @@ UI_LoadBackgroundImage
 */
 void UI_LoadBackgroundImage( void )
 {
-	int num_background_images = 0;
 	char filename[512];
+	char *afile, *pfile;
+	char token[4096];
 
-	for( int y = 0; y < BACKGROUND_ROWS; y++ )
+	uiStatic.m_iSteamBackgroundCount = 0;
+
+	if( !EngFuncs::FileExists("resource/BackgroundLayout.txt", TRUE) )
+		goto fallback;
+
+	afile = (char*)EngFuncs::COM_LoadFile( "resource/BackgroundLayout.txt" );
+
+	pfile = afile;
+
+	pfile = EngFuncs::COM_ParseFile( pfile, token );
+	if( !pfile || strcmp( token, "resolution" )) // resolution at first!
+		goto fallback;
+
+	pfile = EngFuncs::COM_ParseFile( pfile, token );
+	if( !pfile ) goto fallback;
+
+	uiStatic.m_SteamBackgroundSize.w = atoi( token );
+
+	pfile = EngFuncs::COM_ParseFile( pfile, token );
+	if( !pfile ) goto fallback;
+
+	uiStatic.m_SteamBackgroundSize.h = atoi( token );
+
+	// Now read all tiled background list
+	while(( pfile = EngFuncs::COM_ParseFile( pfile, token )))
 	{
-		for( int x = 0; x < BACKGROUND_COLUMNS; x++ )
-		{
-			sprintf( filename, "resource/background/800_%d_%c_loading.tga", y + 1, 'a' + x );
-			if (EngFuncs::FileExists( filename, TRUE ))
-				num_background_images++;
-		}
+		bimage_t img;
+
+		img.hImage = EngFuncs::PIC_Load( token, PIC_NOFLIP_TGA );
+
+		if( !img.hImage ) goto fallback;
+
+		// ignore "scaled" attribute. What does it mean?
+		pfile = EngFuncs::COM_ParseFile( pfile, token );
+		if( !pfile ) goto fallback;
+
+		pfile = EngFuncs::COM_ParseFile( pfile, token );
+		if( !pfile ) goto fallback;
+		img.coord.x = atoi( token );
+
+		pfile = EngFuncs::COM_ParseFile( pfile, token );
+		if( !pfile ) goto fallback;
+		img.coord.y = atoi( token );
+
+		img.size.w = EngFuncs::PIC_Width( img.hImage );
+		img.size.h = EngFuncs::PIC_Height( img.hImage );
+
+		uiStatic.m_SteamBackground[uiStatic.m_iSteamBackgroundCount] = img;
+		uiStatic.m_iSteamBackgroundCount++;
 	}
 
-	if (num_background_images == (BACKGROUND_COLUMNS * BACKGROUND_ROWS))
-		uiStatic.m_fHaveSteamBackground = TRUE;
-	else uiStatic.m_fHaveSteamBackground = FALSE;
+	EngFuncs::COM_FreeFile( afile );
+	return;
 
-	if (uiStatic.m_fHaveSteamBackground)
+fallback:
+	EngFuncs::COM_FreeFile( afile );
+	uiStatic.m_iSteamBackgroundCount = 0;
+
+	if( EngFuncs::FileExists( "gfx/shell/splash.bmp", TRUE ))
 	{
-		uiStatic.m_flTotalWidth = uiStatic.m_flTotalHeight = 0.0f;
-
-		for( int y = 0; y < BACKGROUND_ROWS; y++ )
-		{
-			for( int x = 0; x < BACKGROUND_COLUMNS; x++ )
-			{
-				bimage_t &bimage = uiStatic.m_SteamBackground[y][x];
-				sprintf(filename, "resource/background/800_%d_%c_loading.tga", y + 1, 'a' + x);
-				bimage.hImage = EngFuncs::PIC_Load( filename, PIC_NOFLIP_TGA );
-				bimage.width = EngFuncs::PIC_Width( bimage.hImage );
-				bimage.height = EngFuncs::PIC_Height( bimage.hImage );
-
-				if (y==0) uiStatic.m_flTotalWidth += bimage.width;
-				if (x==0) uiStatic.m_flTotalHeight += bimage.height;
-			}
-		}
-	}
-	else
-	{
-		if( EngFuncs::FileExists( "gfx/shell/splash.bmp", TRUE ))
-		{
-			// if we doesn't have logo.avi in gamedir we don't want to draw it
-			if( !EngFuncs::FileExists( "media/logo.avi", TRUE ))
-				uiStatic.m_fDisableLogo = TRUE;
-		}
+		// if we doesn't have logo.avi in gamedir we don't want to draw it
+		if( !EngFuncs::FileExists( "media/logo.avi", TRUE ))
+			uiStatic.m_fDisableLogo = TRUE;
 	}
 }
 
@@ -1163,8 +1195,8 @@ int UI_VidInit( void )
 	uiStatic.scaleX = uiStatic.scaleY = ScreenHeight / 768.0f;
 	uiStatic.width = ScreenWidth / uiStatic.scaleX;
 	// move cursor to screen center
-	uiStatic.cursorX = ScreenWidth >> 1;
-	uiStatic.cursorY = ScreenHeight >> 1;
+	uiStatic.cursorX = ScreenWidth / 2;
+	uiStatic.cursorY = ScreenHeight / 2;
 	uiStatic.outlineWidth = 4;
 
 	// all menu buttons have the same view sizes

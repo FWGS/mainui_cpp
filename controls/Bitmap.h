@@ -72,10 +72,12 @@ public:
 	{
 		szPic = ART_BACKGROUND;
 		iFlags = QMF_INACTIVE;
+		bForceBackground = false;
 	}
 	void Draw( void );
 	void SetInactive(bool) { }
 	void ToggleInactive() { }
+	bool bForceBackground; // if true, szPic will be drawn, instead of Steam-background
 };
 
 #endif // MENU_BITMAP_H

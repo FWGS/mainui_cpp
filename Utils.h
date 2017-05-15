@@ -65,9 +65,9 @@ extern void UI_FinalCredits( void );
 #include "cvardef.h"
 
 // ScreenHeight returns the height of the screen, in ppos.xels
-#define ScreenHeight	(gpGlobals->scrHeight)
+#define ScreenHeight	((float)(gpGlobals->scrHeight))
 // ScreenWidth returns the width of the screen, in ppos.xels
-#define ScreenWidth		(gpGlobals->scrWidth)
+#define ScreenWidth		((float)(gpGlobals->scrWidth))
 
 inline unsigned int PackRGB( int r, int g, int b )
 {
