@@ -59,9 +59,6 @@ public:
 	char		gameDescription[UI_MAX_SERVERS][256];
 	char		*gameDescriptionPtr[UI_MAX_SERVERS];
 
-	CMenuBackgroundBitmap background;
-	CMenuBannerBitmap banner;
-
 	CMenuPicButton joinGame;
 	CMenuPicButton createGame;
 	CMenuPicButton gameInfo;

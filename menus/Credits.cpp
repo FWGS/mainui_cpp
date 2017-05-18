@@ -46,7 +46,7 @@ public:
 private:
 	virtual void _Init();
 
-	CMenuBackgroundBitmap background;
+	
 
 	const char	**credits;
 	int		startTime;

@@ -69,9 +69,7 @@ public:
 	int curflags;
 
     char		*bNamesPtr[UI_MAXGAMES];
-	CMenuBackgroundBitmap background;
-	CMenuBannerBitmap banner;
-
+	
 	CMenuPicButton	done;
 	CMenuPicButton	cancel;
 

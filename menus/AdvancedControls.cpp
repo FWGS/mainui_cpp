@@ -43,9 +43,6 @@ private:
 	void SaveAndPopMenu( void );
 
 public:
-	CMenuBackgroundBitmap background;
-	CMenuBannerBitmap banner;
-
 	CMenuPicButton done;
 
 //public:

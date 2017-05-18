@@ -17,6 +17,8 @@ public:
 	bool IsRoot() { return true; }
 
 	bool DrawAnimation(EAnimation anim);
+
+	CMenuBannerBitmap banner;
 };
 
 #endif // FRAMEWORK_H

@@ -38,8 +38,6 @@ private:
 	static void StartGameCb( CMenuBaseItem *pSelf, void *pExtra );
 	static void ShowDialogCb( CMenuBaseItem *pSelf, void *pExtra );
 
-	CMenuBackgroundBitmap background;
-	CMenuBannerBitmap     banner;
 	CMenuPicButton        easy;
 	CMenuPicButton        medium;
 	CMenuPicButton        hard;

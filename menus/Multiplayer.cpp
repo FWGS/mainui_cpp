@@ -34,9 +34,6 @@ private:
 	virtual void _Init();
 	virtual void _VidInit();
 public:
-	CMenuBackgroundBitmap	background;
-	CMenuBannerBitmap		banner;
-
 	CMenuPicButton	internetGames;
 	CMenuPicButton	spectateGames;
 	CMenuPicButton	LANGame;

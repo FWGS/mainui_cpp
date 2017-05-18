@@ -42,8 +42,6 @@ public:
 
 	int		outlineWidth;
 
-	CMenuBackgroundBitmap background;
-	CMenuBannerBitmap banner;
 	class CMenuVidPreview : public CMenuBitmap
 	{
 		virtual void Draw();

@@ -32,9 +32,6 @@ class CMenuVideo : public CMenuFramework
 private:
 	void _Init();
 
-	CMenuBackgroundBitmap background;
-	CMenuBannerBitmap banner;
-
 	CMenuPicButton	vidOptions;
 	CMenuPicButton	vidModes;
 	CMenuPicButton	done;

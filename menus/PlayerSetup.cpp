@@ -275,9 +275,6 @@ public:
 	int		num_models;
 	char	currentModel[CS_SIZE];
 
-	CMenuBackgroundBitmap background;
-	CMenuBannerBitmap banner;
-
 	CMenuPicButton	done;
 	CMenuPicButton	gameOptions;
 	CMenuPicButton	advOptions;

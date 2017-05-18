@@ -61,10 +61,6 @@ private:
 	void GetConfig();
 	void SaveAndPopMenu();
 
-
-	CMenuBackgroundBitmap background;
-	CMenuBannerBitmap banner;
-
 	CMenuPicButton	done;
 	CMenuSlider side, forward, pitch, yaw;
 	CMenuCheckBox invSide, invFwd, invPitch, invYaw;

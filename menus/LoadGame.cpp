@@ -103,9 +103,6 @@ public:
 	char		saveDescription[UI_MAXGAMES][95];
 	char		*saveDescriptionPtr[UI_MAXGAMES];
 
-	CMenuBackgroundBitmap background;
-	CMenuBannerBitmap banner;
-
 	CMenuPicButton	load;
 	CMenuPicButton  save;
 	CMenuPicButton	remove;

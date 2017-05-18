@@ -63,7 +63,7 @@ private:
 	DECLARE_EVENT_TO_MENU_METHOD( CMenuControls, EnterGrabMode )
 	DECLARE_EVENT_TO_MENU_METHOD( CMenuControls, UnbindEntry )
 
-	CMenuBackgroundBitmap background;
+	
 	CMenuBannerBitmap banner;
 
 	// state toggle by

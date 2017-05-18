@@ -57,9 +57,6 @@ private:
 	char		modsDescription[MAX_MODS][256];
 	char		*modsDescriptionPtr[MAX_MODS];
 
-
-	CMenuBackgroundBitmap background;
-	CMenuBannerBitmap banner;
 	CMenuPicButton	load;
 	CMenuPicButton	go2url;
 	CMenuPicButton	done;

@@ -34,9 +34,6 @@ private:
 	void _Init();
 	void _VidInit();
 
-	CMenuBackgroundBitmap background;
-	CMenuBannerBitmap banner;
-
 	CMenuPicButton	save;
 	CMenuPicButton	load;
 	CMenuPicButton	done;

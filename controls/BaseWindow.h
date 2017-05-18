@@ -3,17 +3,23 @@
 #define BASEWINDOW_H
 
 #include "ItemsHolder.h"
+#include "Bitmap.h"
 
 // Base class for windows.
 // Should be used for message boxes, dialogs, root menus(e.g. frameworks)
 class CMenuBaseWindow : public CMenuItemsHolder
 {
 public:
+	CMenuBaseWindow();
+
 	// Overloaded functions
 	// Window visibility is switched through window stack
 	virtual void Hide();
 	virtual void Show();
 	virtual bool IsVisible();
+
+	virtual const char *Key( int key, int down );
+	virtual void Draw();
 
 	enum EAnimation
 	{
@@ -36,11 +42,19 @@ public:
 
 	// Events library
 	DECLARE_EVENT_TO_MENU_METHOD( CMenuBaseWindow, SaveAndPopMenu );
+
+	bool bAllowDrag;
+	CMenuBackgroundBitmap background;
+protected:
+
 private:
 	friend void UI_DrawMouseCursor( void ); // HACKHACK: Cursor should be set by menu item
 	friend void UI_UpdateMenu( float flTime );
 
 	bool bInTransition;
+	bool m_bHolding;
+	Point m_bHoldOffset;
+
 
 	void PushMenu();
 	void PopMenu();

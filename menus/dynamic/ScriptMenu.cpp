@@ -73,7 +73,7 @@ public:
 
 	DECLARE_EVENT_TO_MENU_METHOD( CMenuScriptConfig, FlipMenu )
 
-	CMenuBackgroundBitmap background;
+
 	CMenuBannerBitmap banner;
 private:
 	CMenuPicButton done;

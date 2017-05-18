@@ -50,9 +50,7 @@ public:
 	char		profileDesc[UI_MAXGAMES][95];
 	char		*profileDescPtr[UI_MAXGAMES];
 	int			firstProfile;
-	CMenuBackgroundBitmap background;
-	CMenuBannerBitmap banner;
-
+	
 	CMenuPicButton	done;
 
 	CMenuSlider	lookX;

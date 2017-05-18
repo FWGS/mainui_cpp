@@ -48,9 +48,6 @@ private:
 	char		mapsDescription[UI_MAXGAMES][256];
 	char		*mapsDescriptionPtr[UI_MAXGAMES];
 
-
-	CMenuBackgroundBitmap background;
-	CMenuBannerBitmap banner;
 	CMenuPicButton	advOptions;
 	CMenuPicButton	done;
 	CMenuPicButton	cancel;

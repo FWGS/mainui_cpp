@@ -71,8 +71,6 @@ public:
 
 	const char	*videoModesPtr[MAX_VIDMODES];
 
-	CMenuBackgroundBitmap background;
-	CMenuBannerBitmap banner;
 	CMenuPicButton	ok;
 	CMenuPicButton	cancel;
 	CMenuCheckBox	windowed;

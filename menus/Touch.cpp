@@ -33,9 +33,6 @@ private:
 	void _Init();
 	void _VidInit();
 
-	CMenuBackgroundBitmap background;
-	CMenuBannerBitmap banner;
-
 	CMenuPicButton	touchOptions;
 	CMenuPicButton	touchButtons;
 	CMenuPicButton	done;

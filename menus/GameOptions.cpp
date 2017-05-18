@@ -43,9 +43,6 @@ private:
 	void Restore();
 	void GetConfig();
 
-	CMenuBackgroundBitmap background;
-	CMenuBannerBitmap banner;
-
 	CMenuPicButton	done;
 	CMenuPicButton	cancel;
 

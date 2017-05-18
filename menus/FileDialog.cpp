@@ -43,9 +43,7 @@ private:
 	void GetFileList( void );
 	char		filePath[UI_MAXGAMES][95];
 	char		*filePathPtr[UI_MAXGAMES];
-	CMenuBackgroundBitmap background;
-	//CMenuBannerBitmap banner;
-
+	
 	CMenuPicButton	done;
 	CMenuPicButton	cancel;
 
