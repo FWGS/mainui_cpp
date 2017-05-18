@@ -230,8 +230,6 @@ void CMenuItemsHolder::Draw( )
 
 	const char *statusText;
 
-	UI::PushScissor( m_scPos, m_scSize );
-
 	// draw contents
 	for( int i = 0; i < m_numItems; i++ )
 	{
@@ -268,8 +266,6 @@ void CMenuItemsHolder::Draw( )
 		EngFuncs::DrawConsoleString( x, 720 * uiStatic.scaleY, statusText );
 	}
 	else statusFadeTime = uiStatic.realTime;
-
-	UI::PopScissor();
 }
 
 /*
