@@ -12,12 +12,11 @@ CMenuMessageBox::CMenuMessageBox() : CMenuBaseWindow()
 
 void CMenuMessageBox::_Init()
 {
-	background.SetBackground( uiPromptBgColor );
-	background.SetRect( DLG_X + 192, 256, 640, 128 );
-	background.iFlags = QMF_INACTIVE;
+	background.bFillColor = true;
+	background.iColor = uiPromptBgColor;
 
 	dlgMessage.iFlags = QMF_INACTIVE|QMF_DROPSHADOW;
-	dlgMessage.SetCoord( DLG_X + 320, 300 );
+	dlgMessage.SetCoord( 128, 44 );
 
 	AddItem( background );
 	AddItem( dlgMessage );

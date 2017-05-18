@@ -11,7 +11,6 @@ private:
 	void _Init();
 
 	CMenuAction dlgMessage;
-	CMenuAction background;
 };
 
 #endif // MESSAGEBOX_H
