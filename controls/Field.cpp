@@ -52,10 +52,8 @@ CMenuField::Init
 */
 void CMenuField::VidInit( void )
 {
-	m_scPos = pos.Scale();
-	m_scSize = size.Scale();
-	m_scChSize = charSize.Scale();
-
+	CalcPosition();
+	CalcSizes();
 	// calculate number of visible characters
 	iWidthInChars = (size.w / charSize.w);
 

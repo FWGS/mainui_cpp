@@ -194,10 +194,8 @@ void CMenuItemsHolder::Init()
 
 void CMenuItemsHolder::VidInit()
 {
-	m_scPos = pos.Scale();
-	m_scSize = size.Scale();
-	m_scChSize = charSize.Scale();
-
+	CalcPosition();
+	CalcSizes();
 	_VidInit();
 
 	for( CMenuBaseItem **i = m_pItems; i < m_pItems + m_numItems; i++ )

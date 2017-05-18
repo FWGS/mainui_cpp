@@ -43,9 +43,8 @@ CMenuSwitch::CMenuSwitch( ) : CMenuEditable( )
 
 void CMenuSwitch::VidInit()
 {
-	m_scPos = pos.Scale();
-	m_scSize = size.Scale();
-	m_scChSize = charSize.Scale();
+	CalcPosition();
+	CalcSizes();
 
 	int leftSize, rightSize;
 

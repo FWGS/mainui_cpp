@@ -656,8 +656,30 @@ void UI_UpdateMenu( float flTime )
 	}
 #endif
 
+
 	for( i = uiStatic.rootPosition ; i < uiStatic.menuDepth; i++ )
-		uiStatic.menuStack[i]->Draw();
+	{
+		CMenuBaseWindow *window = uiStatic.menuStack[i];
+
+		if( window->bInTransition )
+		{
+			if( window->DrawAnimation( CMenuBaseWindow::ANIM_IN ) )
+				window->bInTransition = false;
+		}
+
+		// transition is ended, so just draw
+		if( !window->bInTransition )
+		{
+			window->Draw();
+		}
+	}
+
+	if( uiStatic.prevMenu && uiStatic.prevMenu->bInTransition )
+		if( uiStatic.prevMenu->DrawAnimation( CMenuBaseWindow::ANIM_OUT ) )
+		{
+			uiStatic.prevMenu->bInTransition = false;
+		}
+
 
 	if( uiStatic.firstDraw )
 	{
@@ -673,8 +695,9 @@ void UI_UpdateMenu( float flTime )
 		}
 	}
 
+	// a1batross: moved to CMenuBaseWindow::DrawAnimation()
 	//CR
-	CMenuPicButton::DrawTitleAnim();
+	// CMenuPicButton::DrawTitleAnim();
 	//
 
 	// draw cursor

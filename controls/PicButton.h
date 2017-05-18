@@ -19,6 +19,7 @@ GNU General Public License for more details.
 #define MENU_PICBUTTON_H
 
 #include "BtnsBMPTable.h"
+#include "BaseWindow.h"
 
 // Use hover bitmap from btns_main.bmp instead of head_%s.bmp
 // #define TA_ALT_MODE 1
@@ -41,14 +42,14 @@ public:
 	bool bPulse;
 
 	static void InitTitleAnim( void );
-	static void DrawTitleAnim( void );
+	static bool DrawTitleAnim( CMenuBaseWindow::EAnimation anim );
 	static void PopPButtonStack( void );
 	static void ClearButtonStack( void );
 	static float GetTitleTransFraction( void );
 	static void SetupTitleQuad( int x, int y, int w, int h );
 	static void SetTransPic( HIMAGE pic, wrect_t *r = NULL );
 private:
-	enum animState_e { AS_TO_TITLE, AS_TO_BUTTON };
+	enum animState_e { AS_TO_TITLE = 0, AS_TO_BUTTON };
 	struct Quad { float x, y, lx, ly; };
 
 	void SetTitleAnim( int state );

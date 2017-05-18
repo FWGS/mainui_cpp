@@ -52,7 +52,7 @@ public:
 
 	virtual void VidInit()
 	{
-		m_scPos = pos.Scale();
+		CalcPosition();
 		m_scSize = size.Scale();
 	}
 

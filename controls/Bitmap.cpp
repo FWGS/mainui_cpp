@@ -39,8 +39,8 @@ void CMenuBitmap::VidInit( )
 	if( !szFocusPic )
 		szFocusPic = szPic;
 
-	m_scPos = pos.Scale();
-	m_scSize = size.Scale();
+	CalcPosition();
+	CalcSizes();
 }
 
 /*
@@ -165,7 +165,7 @@ void CMenuBackgroundBitmap::Draw()
 	int xoffset, yoffset;
 	float flParallaxScale;
 
-#if 1
+#if 0
 	flParallaxScale = 0.02;
 #else
 	// Disable parallax effect. It's just funny, but not really needed

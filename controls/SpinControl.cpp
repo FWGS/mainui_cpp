@@ -44,10 +44,8 @@ CMenuSpinControl::Init
 */
 void CMenuSpinControl::VidInit( void )
 {
-	m_scChSize = charSize.Scale();
-	m_scPos = pos.Scale();
-	m_scSize = size.Scale();
-
+	CalcPosition();
+	CalcSizes();
 
 	// scale the center box
 	m_scCenterBox = size.Scale();

@@ -78,7 +78,7 @@ void CMenuPlayerModelView::Init()
 
 void CMenuPlayerModelView::VidInit()
 {
-	m_scPos = pos.Scale();
+	CalcPosition();
 	m_scSize = size.Scale();
 
 	ent = EngFuncs::GetPlayerModel();

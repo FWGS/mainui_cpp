@@ -92,6 +92,25 @@ struct Point
 
 	int x, y;
 	Point Scale();
+	friend Point operator +( Point &a, Point &b ) { return Point( a.x + b.x, a.y + b.y ); }
+	friend Point operator -( Point &a, Point &b ) { return Point( a.x - b.x, a.y - b.y ); }
+
+	Point& operator+=( Point &a )
+	{
+		x += a.x;
+		y += a.y;
+		return *this;
+	}
+
+	Point& operator-=( Point &a )
+	{
+		x -= a.x;
+		y -= a.y;
+		return *this;
+	}
+
+	Point operator *( float scale ) { return Point( x * scale, y * scale );	}
+	Point operator /( float scale ) { return Point( x / scale, y / scale );	}
 };
 
 struct Size
@@ -129,6 +148,7 @@ typedef struct
 {
 	CMenuBaseWindow *rootActive; // current active fullscreen holder(menu framework)
 	CMenuBaseWindow *menuActive; // current active window
+	CMenuBaseWindow *prevMenu;   // previous active window
 	CMenuBaseWindow *menuStack[UI_MAX_MENUDEPTH];
 	int      menuDepth;
 	int      rootPosition;

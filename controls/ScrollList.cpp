@@ -45,9 +45,8 @@ menuScrollList_t::Init
 */
 void CMenuScrollList::VidInit( )
 {
-	m_scPos = pos.Scale();
-	m_scSize = size.Scale();
-	m_scChSize = charSize.Scale();
+	CalcPosition();
+	CalcSizes();
 
 	for( iNumItems = 0; pszItemNames && pszItemNames[iNumItems]; iNumItems++ );
 

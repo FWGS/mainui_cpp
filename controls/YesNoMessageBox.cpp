@@ -89,18 +89,19 @@ CMenuYesNoMessageBox::VidInit
 */
 void CMenuYesNoMessageBox::_VidInit( void )
 {
-	dlgMessage1.SetRect( DLG_X + 192, 280, 640, 256 );
-	if( m_bIsAlert )
-		yes.SetRect( DLG_X + 490, 460, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
-	else
-		yes.SetRect( DLG_X + 380, 460, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
-	no.SetRect( DLG_X + 530, 460, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
 	SetRect( DLG_X + 192, 256, 640, 256 );
+	CalcPosition();
+	CalcSizes();
+
+	dlgMessage1.SetRect( 0, 24, 640, 256 );
+	if( m_bIsAlert )
+		yes.SetRect( 298, 204, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
+	else
+		yes.SetRect( 188, 204, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
+	no.SetRect( 338, 204, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
 
 	dlgMessage1.SetCharSize( UI_MED_CHAR_WIDTH, UI_MED_CHAR_HEIGHT );
 
-	m_scPos = pos.Scale();
-	m_scSize = size.Scale();
 }
 
 /*

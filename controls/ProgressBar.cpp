@@ -11,8 +11,8 @@ CMenuProgressBar::CMenuProgressBar() : CMenuBaseItem()
 
 void CMenuProgressBar::VidInit( void )
 {
-	m_scPos = pos.Scale();
-	m_scSize = size.Scale();
+	CalcPosition();
+	CalcSizes();
 }
 
 void CMenuProgressBar::LinkCvar( const char *cvName, float flMin, float flMax )

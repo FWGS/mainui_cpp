@@ -81,33 +81,47 @@ public:
 	// Char is a special key press event for text input
 	virtual void Char( int key );
 
+	// Called every mouse movement got from engine.
+	// Should return true, if
 	virtual bool MouseMove( int x, int y ) { return true; }
 
+	// Called when UI is shown, for example, in pause during play
 	virtual const char *Activate( void );
 
+	// Toggle inactivity of item
 	virtual void ToggleInactive( void )
 	{
 		iFlags ^= QMF_INACTIVE;
 	}
 
+	// Direct inacivity set
 	virtual void SetInactive( bool visible )
 	{
 		if( visible ) iFlags |= QMF_INACTIVE;
 		else iFlags &= ~QMF_INACTIVE;
 	}
 
+	// Cause item to be shown.
+	// Simple items will be drawn
+	// Window will be added to current window stack
 	virtual void Show() { iFlags &= ~QMF_HIDDEN; }
 
+	// Cause item to be hidden
+	// Simple item will be hidden
+	// Window will be removed from current window stack
 	virtual void Hide() { iFlags |= QMF_HIDDEN;  }
 
+	// Determine, is this item is visible
 	virtual bool IsVisible() { return !(iFlags & QMF_HIDDEN); }
 
+	// Toggle visibiltiy.
 	void ToggleVisibility()
 	{
 		if( IsVisible() ) Hide();
 		else Show();
 	}
 
+	// Direct visibility set
 	void SetVisibility( bool show )
 	{
 		if( show ) Show();
@@ -116,6 +130,12 @@ public:
 
 	// Checks item is current selected in parent Framework
 	bool IsCurrentSelected( void );
+
+	// Calculate render positions based on relative positions.
+	void CalcPosition( void );
+
+	// Calculate scale size(item size, char size)
+	void CalcSizes( void );
 
 
 	CEventCallback onGotFocus;

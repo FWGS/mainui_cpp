@@ -116,7 +116,7 @@ bool CMenuScriptConfigPage::IsItemFits(CMenuEditable &item)
 
 void CMenuScriptConfigPage::PrepareItem(CMenuEditable &item)
 {
-	item.SetCoord( pos.x, pos.y + m_iCurrentHeight );
+	item.SetCoord( 0, m_iCurrentHeight );
 	m_iCurrentHeight += item.size.h + m_iPadding;
 }
 

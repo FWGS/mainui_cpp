@@ -52,9 +52,8 @@ void CMenuPicButton::VidInit( void )
 			size.h = charSize.h * 1.5;
 	}
 
-	m_scPos = pos.Scale();
-	m_scSize = size.Scale();
-	m_scChSize = charSize.Scale();
+	CalcPosition();
+	CalcSizes();
 }
 
 /*
@@ -365,9 +364,13 @@ void CMenuPicButton::SetTransPic(HIMAGE pic, wrect_t *r )
 	TransRect = r;
 }
 
-void CMenuPicButton::DrawTitleAnim()
+bool CMenuPicButton::DrawTitleAnim( CMenuBaseWindow::EAnimation state )
 {
-	if( !TransPic ) return;
+	if( !TransPic )
+		return true;
+
+	if( ((state == CMenuBaseWindow::ANIM_IN) ^ (transition_state == AS_TO_TITLE)) )
+		return true;
 
 #if 1
 	float frac = GetTitleTransFraction();
@@ -377,21 +380,25 @@ void CMenuPicButton::DrawTitleAnim()
 
 #ifdef TA_ALT_MODE
 	if( frac == 1 && transition_state == AS_TO_BUTTON )
-		return;
+		return true;
 #else
 	if( frac == 1 )
-		return;
+		return true;
 #endif
 
 	Quad c;
 
-	int f_idx = (transition_state == AS_TO_TITLE) ? 0 : 1;
-	int s_idx = (transition_state == AS_TO_TITLE) ? 1 : 0;
+	if( state == CMenuBaseWindow::ANIM_IN )
+		c = LerpQuad( TitleLerpQuads[0], TitleLerpQuads[1], frac );
+	else if( state == CMenuBaseWindow::ANIM_OUT )
+		c = LerpQuad( TitleLerpQuads[1], TitleLerpQuads[0], frac );
 
-	c = LerpQuad( TitleLerpQuads[f_idx], TitleLerpQuads[s_idx], frac );
+	//UI_FillRect( c.x, c.y, c.lx, c.ly, 0xFF0F00FF );
 
 	EngFuncs::PIC_Set( TransPic, 255, 255, 255 );
 	EngFuncs::PIC_DrawAdditive( c.x, c.y, c.lx, c.ly, TransRect );
+
+	return false;
 }
 
 void CMenuPicButton::SetTitleAnim( int anim_state )

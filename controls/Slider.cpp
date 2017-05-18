@@ -47,9 +47,8 @@ void CMenuSlider::VidInit(  )
 	if( m_flRange < 0.05f )
 		m_flRange = 0.05f;
 
-	m_scChSize = charSize.Scale();
-	m_scPos = pos.Scale();
-	m_scSize = size.Scale();
+	CalcPosition();
+	CalcSizes();
 
 	// scale the center box
 	m_scCenterBox.w = m_scSize.w / 5.0f;

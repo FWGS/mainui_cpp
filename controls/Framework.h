@@ -15,6 +15,8 @@ public:
 	void Hide();
 	bool IsVisible();
 	bool IsRoot() { return true; }
+
+	bool DrawAnimation(EAnimation anim);
 };
 
 #endif // FRAMEWORK_H

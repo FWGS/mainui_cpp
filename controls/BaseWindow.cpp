@@ -55,7 +55,14 @@ void CMenuBaseWindow::PushMenu()
 		uiStatic.menuStack[uiStatic.menuDepth++] = this;
 	}
 
+	if(( uiStatic.prevMenu = uiStatic.menuActive ))
+	{
+		uiStatic.prevMenu->bInTransition = true;
+	}
+
 	uiStatic.menuActive = this;
+	bInTransition = true; // enable transitions
+
 	uiStatic.firstDraw = true;
 	uiStatic.enterSound = gpGlobals->time + 0.15;	// make some delay
 	uiStatic.visible = true;
@@ -90,7 +97,11 @@ void CMenuBaseWindow::PopMenu()
 
 	if( uiStatic.menuDepth )
 	{
+		if(( uiStatic.prevMenu = uiStatic.menuActive ))
+			uiStatic.prevMenu->bInTransition = true;
+
 		uiStatic.menuActive = uiStatic.menuStack[uiStatic.menuDepth-1];
+
 		uiStatic.firstDraw = true;
 	}
 	else if ( CL_IsActive( ))
@@ -119,4 +130,9 @@ void CMenuBaseWindow::SaveAndPopMenu( )
 {
 	EngFuncs::ClientCmd( FALSE, "trysaveconfig\n" );
 	Hide();
+}
+
+bool CMenuBaseWindow::DrawAnimation(EAnimation anim)
+{
+	return true;
 }

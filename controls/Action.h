@@ -17,6 +17,8 @@ GNU General Public License for more details.
 #ifndef MENU_ACTION_H
 #define MENU_ACTION_H
 
+#include "BaseItem.h"
+
 class CMenuAction : public CMenuBaseItem
 {
 public:

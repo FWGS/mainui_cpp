@@ -55,6 +55,13 @@ void CMenuFramework::VidInit()
 	m_scPos.x = m_scPos.y = 0;
 	m_scSize.w = ScreenWidth;
 	m_scSize.h = ScreenHeight;
+}
 
+bool CMenuFramework::DrawAnimation(EAnimation anim)
+{
+	if( anim == ANIM_IN )
+		Draw();
+
+	return CMenuPicButton::DrawTitleAnim( anim );
 }
 

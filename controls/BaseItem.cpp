@@ -113,3 +113,16 @@ bool CMenuBaseItem::IsCurrentSelected()
 {
 	return this == m_pParent->ItemAtCursor();
 }
+
+void CMenuBaseItem::CalcPosition()
+{
+	m_scPos = pos.Scale();
+
+	if( m_pParent ) m_scPos += m_pParent->m_scPos;
+}
+
+void CMenuBaseItem::CalcSizes()
+{
+	m_scSize = size.Scale();
+	m_scChSize = charSize.Scale();
+}

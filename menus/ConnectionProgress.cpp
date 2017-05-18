@@ -212,37 +212,37 @@ void CMenuConnectionProgress::_VidInit( void )
 	int dlg_h = ( m_iState == STATE_DOWNLOAD )?256:192;
 	int dlg_y = 768 / 2 - dlg_h / 2;
 	SetRect( DLG_X + 192, dlg_y, 640, dlg_h );
-	int cursor = dlg_y + dlg_h;
+	int cursor = dlg_h;
 
-	title.SetCharSize( UI_MED_CHAR_WIDTH, UI_MED_CHAR_HEIGHT );
-	title.SetRect( DLG_X + 192, dlg_y + 16, 640, 20 );
+	title.SetCharSize( QM_DEFAULTFONT );
+	title.SetRect( 0, 16, 640, 20 );
 
 	cursor -= 44;
-	consoleButton.SetRect( DLG_X + 380, cursor, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
-	disconnectButton.SetRect( DLG_X + 530, cursor, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
+	consoleButton.SetRect( 188, cursor, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
+	disconnectButton.SetRect( 338, cursor, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
 
 	if( gpGlobals->developer < 2 )
 		consoleButton.iFlags |= QMF_HIDDEN;
 
 	cursor -= 30;
-	commonProgress.SetRect( DLG_X + 212, cursor, 600, 20 );
+	commonProgress.SetRect( 20, cursor, 600, 20 );
 
 	cursor -= 50;
-	commonText.SetCharSize( UI_SMALL_CHAR_WIDTH, UI_SMALL_CHAR_HEIGHT );
-	commonText.SetRect( DLG_X + 212, cursor, 500, 40 );
+	commonText.SetCharSize( QM_SMALLFONT );
+	commonText.SetRect( 20, cursor, 500, 40 );
 
 	if( m_iState == STATE_DOWNLOAD )
 	{
 		cursor -= 30;
 		downloadProgress.iFlags &= ~QMF_HIDDEN;
-		downloadProgress.SetRect( DLG_X + 212, cursor, 500, 20 );
-		skipButton.SetRect( DLG_X + 732, cursor, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
+		downloadProgress.SetRect( 20, cursor, 500, 20 );
+		skipButton.SetRect( 540, cursor, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
 		skipButton.iFlags &= ~QMF_HIDDEN;
 
 		cursor -= 50;
 		downloadText.iFlags &= ~QMF_HIDDEN;
-		downloadText.SetCharSize( UI_SMALL_CHAR_WIDTH, UI_SMALL_CHAR_HEIGHT );
-		downloadText.SetRect( DLG_X + 212, cursor, 500, 40 );
+		downloadText.SetCharSize( QM_SMALLFONT );
+		downloadText.SetRect( 20, cursor, 500, 40 );
 	}
 	else
 	{
@@ -251,8 +251,8 @@ void CMenuConnectionProgress::_VidInit( void )
 		downloadText.iFlags |= QMF_HIDDEN;
 	}
 
-	m_scPos = pos.Scale();
-	m_scSize = size.Scale();
+	CalcPosition();
+	CalcSizes();
 }
 
 void CMenuConnectionProgress::Draw( void )

@@ -42,10 +42,8 @@ CMenuCheckBox::Init
 */
 void CMenuCheckBox::VidInit( void )
 {
-	m_scPos = pos.Scale();
-	m_scSize = size.Scale();
-	m_scChSize = charSize.Scale();
-
+	CalcPosition();
+	CalcSizes();
 	m_scTextPos.x = m_scPos.x + (m_scSize.w * 1.7f );
 	m_scTextPos.y = m_scPos.y + (m_scSize.h >> 2);
 
