@@ -32,8 +32,8 @@ public:
 	virtual void Draw();
 	virtual const char *Key( int key, int down );
 	void SetMessage( const char *msg );
-	void SetPositiveButton( const char *msg, int buttonPic, void *extra = NULL );
-	void SetNegativeButton( const char *msg, int buttonPic, void *extra = NULL );
+	void SetPositiveButton( const char *msg, int buttonPic );
+	void SetNegativeButton( const char *msg, int buttonPic );
 	void Link( CMenuItemsHolder *h );
 	enum
 	{

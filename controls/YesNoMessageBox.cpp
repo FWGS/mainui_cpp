@@ -154,12 +154,11 @@ void CMenuYesNoMessageBox::SetMessage( const char *msg )
 CMenuYesNoMessageBox::SetPositiveButton
 ==============
 */
-void CMenuYesNoMessageBox::SetPositiveButton( const char *msg, int buttonPic, void *extra )
+void CMenuYesNoMessageBox::SetPositiveButton( const char *msg, int buttonPic )
 {
 	m_bSetYes = true;
 	yes.szName = msg;
 	yes.SetPicture( buttonPic );
-	onPositive.pExtra = extra;
 }
 
 /*
@@ -167,12 +166,11 @@ void CMenuYesNoMessageBox::SetPositiveButton( const char *msg, int buttonPic, vo
 CMenuYesNoMessageBox::SetNegativeButton
 ==============
 */
-void CMenuYesNoMessageBox::SetNegativeButton( const char *msg, int buttonPic, void *extra )
+void CMenuYesNoMessageBox::SetNegativeButton( const char *msg, int buttonPic )
 {
 	m_bSetNo = true;
 	no.szName = msg;
 	no.SetPicture( buttonPic );
-	onNegative.pExtra = extra;
 }
 
 /*
