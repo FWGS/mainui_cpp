@@ -39,7 +39,6 @@ public:
 	const char *szPic;
 	const char *szFocusPic;
 	const char *szPressPic;
-
 };
 
 // menu banners used fiexed rectangle (virtual screenspace at 640x480)
@@ -73,11 +72,15 @@ public:
 		szPic = ART_BACKGROUND;
 		iFlags = QMF_INACTIVE;
 		bForceBackground = false;
+		bFillColor = false;
 	}
+	void VidInit( void );
 	void Draw( void );
 	void SetInactive(bool) { }
 	void ToggleInactive() { }
+
 	bool bForceBackground; // if true, szPic will be drawn, instead of Steam-background
+	bool bFillColor; // dialogs should set this
 };
 
 #endif // MENU_BITMAP_H

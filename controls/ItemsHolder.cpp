@@ -358,6 +358,22 @@ void CMenuItemsHolder::SetCursorToItem( CMenuBaseItem *item, bool notify )
 	}
 }
 
+void CMenuItemsHolder::CalcItemsPositions()
+{
+	for( int i = 0; i < m_numItems; i++ )
+	{
+		m_pItems[i]->CalcPosition();
+	}
+}
+
+void CMenuItemsHolder::CalcItemsSizes()
+{
+	for( int i = 0; i < m_numItems; i++ )
+	{
+		m_pItems[i]->CalcSizes();
+	}
+}
+
 void CMenuItemsHolder::SetCursor( int newCursor, bool notify )
 {
 	if( newCursor < 0 || newCursor >= m_numItems )

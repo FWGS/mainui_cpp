@@ -30,6 +30,9 @@ public:
 	CMenuBaseItem *ItemAtCursor( void );
 	CMenuBaseItem *ItemAtCursorPrev( void );
 
+	void CalcItemsPositions();
+	void CalcItemsSizes();
+
 	inline int GetCursor() const { return m_iCursor; }
 	inline int GetCursorPrev() const { return m_iCursorPrev; }
 	inline int ItemCount() const { return m_numItems; }

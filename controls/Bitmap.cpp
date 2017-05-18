@@ -102,6 +102,12 @@ CMenuBitmap::Draw
 */
 void CMenuBitmap::Draw( void )
 {
+	if( !szPic )
+	{
+		UI_FillRect( m_scPos, m_scSize, iColor );
+		return;
+	}
+
 	if( iFlags & QMF_GRAYED )
 	{
 		UI_DrawPic( m_scPos, m_scSize, uiColorDkGrey, szPic );
@@ -141,6 +147,17 @@ void CMenuBitmap::Draw( void )
 	}
 }
 
+void CMenuBackgroundBitmap::VidInit()
+{
+	if( m_pParent )
+	{
+		pos.x = pos.y = 0;
+		size = m_pParent->size;
+		CalcPosition();
+		CalcSizes();
+	}
+}
+
 /*
 =================
 CMenuBackgroundBitmap::Draw
@@ -148,6 +165,12 @@ CMenuBackgroundBitmap::Draw
 */
 void CMenuBackgroundBitmap::Draw()
 {
+	if( bFillColor )
+	{
+		UI_FillRect( m_scPos, m_scSize, iColor );
+		return;
+	}
+
 	if( EngFuncs::ClientInGame() )
 	{
 		if( EngFuncs::GetCvarFloat( "cl_background" ) )
@@ -161,7 +184,6 @@ void CMenuBackgroundBitmap::Draw()
 	}
 
 	float xScale, yScale;
-	int xpos, ypos;
 	int xoffset, yoffset;
 	float flParallaxScale;
 

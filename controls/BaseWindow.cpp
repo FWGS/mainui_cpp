@@ -5,6 +5,11 @@
 #include "ItemsHolder.h"
 #include "BaseWindow.h"
 
+CMenuBaseWindow::CMenuBaseWindow() : CMenuItemsHolder()
+{
+	bAllowDrag = false; // UNDONE
+}
+
 void CMenuBaseWindow::Show()
 {
 	Init();
@@ -131,6 +136,34 @@ void CMenuBaseWindow::SaveAndPopMenu( )
 	EngFuncs::ClientCmd( FALSE, "trysaveconfig\n" );
 	Hide();
 }
+
+const char *CMenuBaseWindow::Key(int key, int down)
+{
+	if( key == K_MOUSE1 && bAllowDrag )
+	{
+		m_bHolding = down;
+		m_bHoldOffset.x = uiStatic.cursorX / uiStatic.scaleX;
+		m_bHoldOffset.y = uiStatic.cursorY / uiStatic.scaleX;
+	}
+
+	return CMenuItemsHolder::Key( key, down );
+}
+
+void CMenuBaseWindow::Draw()
+{
+	if( m_bHolding && bAllowDrag )
+	{
+		pos.x += uiStatic.cursorX / uiStatic.scaleX - m_bHoldOffset.x;
+		pos.y += uiStatic.cursorY / uiStatic.scaleX- m_bHoldOffset.y;
+
+		m_bHoldOffset.x = uiStatic.cursorX / uiStatic.scaleX;
+		m_bHoldOffset.y = uiStatic.cursorY / uiStatic.scaleX;
+		CalcPosition();
+		CalcItemsPositions();
+	}
+	CMenuItemsHolder::Draw();
+}
+
 
 bool CMenuBaseWindow::DrawAnimation(EAnimation anim)
 {
