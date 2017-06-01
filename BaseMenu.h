@@ -15,8 +15,20 @@ GNU General Public License for more details.
 
 #ifndef BASEMENU_H
 #define BASEMENU_H
+
 #include "netadr.h"
 #include "keydefs.h"
+#include "wrect.h"
+#include "Coord.h"
+#include "extdll.h"
+#include "enginecallback.h"
+
+
+#ifdef DEBUG
+#define Assert(x) if( !(x) ) Host_Error("Assert failed at: %s:%s", __FILE__, __LINE__ );
+#else
+#define Assert(x)
+#endif
 
 #define BIT( x ) ( 1U << x )
 
@@ -34,6 +46,8 @@ enum
 	KEY_GAME,
 	KEY_MENU
 };
+
+typedef int HFont;
 
 #define CS_SIZE			64	// size of one config string
 #define CS_TIME			16	// size of time string
@@ -85,49 +99,12 @@ enum
 #define UI_DOWNARROWFOCUS		"gfx/shell/dnarrowf"
 #define UI_DOWNARROWPRESSED		"gfx/shell/dnarrowp"
 
-struct Point
-{
-	Point() {}
-	Point( int x, int y ) : x(x), y(y) {}
-
-	int x, y;
-	Point Scale();
-	friend Point operator +( Point &a, Point &b ) { return Point( a.x + b.x, a.y + b.y ); }
-	friend Point operator -( Point &a, Point &b ) { return Point( a.x - b.x, a.y - b.y ); }
-
-	Point& operator+=( Point &a )
-	{
-		x += a.x;
-		y += a.y;
-		return *this;
-	}
-
-	Point& operator-=( Point &a )
-	{
-		x -= a.x;
-		y -= a.y;
-		return *this;
-	}
-
-	Point operator *( float scale ) { return Point( x * scale, y * scale );	}
-	Point operator /( float scale ) { return Point( x / scale, y / scale );	}
-};
-
-struct Size
-{
-	Size() {}
-	Size( int w, int h ) : w(w), h(h) {}
-
-	int w, h;
-	Size Scale();
-};
-
-#include "extdll.h"
-#include "enginecallback.h"
 #include "EventSystem.h"
 #include "Framework.h"
 #include "BaseItem.h"
 #include "BaseWindow.h"
+#include "FontManager.h"
+
 
 // =====================================================================
 // Main menu interface
@@ -164,6 +141,11 @@ typedef struct
 	int		bgmapcount;
 
 	HIMAGE	hFont;		// mainfont
+
+	HFont hDefaultFont;
+	HFont hSmallFont;
+	HFont hBigFont;
+	HFont hConsoleFont;
 
 	// handle steam background images
 	bimage_t m_SteamBackground[MAX_BACKGROUNDS];
@@ -242,7 +224,7 @@ void UI_DrawPicTrans( int x, int y, int width, int height, const int color, cons
 void UI_DrawPicHoles( int x, int y, int width, int height, const int color, const char *pic );
 void UI_FillRect( int x, int y, int w, int h, const int color );
 void UI_DrawRectangleExt( int in_x, int in_y, int in_w, int in_h, const int color, int outlineWidth );
-void UI_DrawString(int x, int y, int w, int h, const char *str, const int col, int forceCol, int charW, int charH, ETextAlignment justify, bool shadow, EVertAlignment vertAlign = QM_TOP);
+void UI_DrawString( HFont font, int x, int y, int w, int h, const char *str, const int col, int forceCol, int charW, int charH, ETextAlignment justify, bool shadow, EVertAlignment vertAlign = QM_TOP);
 inline void UI_DrawRectangle( int x, int y, int w, int h, const int color )
 {
 	UI_DrawRectangleExt( x, y, w, h, color, uiStatic.outlineWidth );
@@ -280,9 +262,9 @@ inline void UI_DrawRectangleExt( Point pos, Size size, const int color, int outl
 {
 	UI_DrawRectangleExt( pos.x, pos.y, size.w, size.h, color, outlineWidth );
 }
-inline void UI_DrawString( Point pos, Size size, const char *str, const int col, int forceCol, Size chSize, ETextAlignment justify, bool shadow, EVertAlignment verticalAlignment = QM_TOP  )
+inline void UI_DrawString( HFont font, Point pos, Size size, const char *str, const int col, int forceCol, Size chSize, ETextAlignment justify, bool shadow, EVertAlignment verticalAlignment = QM_TOP  )
 {
-	UI_DrawString( pos.x, pos.y, size.w, size.h, str, col, forceCol, chSize.w, chSize.h, justify, shadow, verticalAlignment );
+	UI_DrawString( font, pos.x, pos.y, size.w, size.h, str, col, forceCol, chSize.w, chSize.h, justify, shadow, verticalAlignment );
 }
 
 void UI_StartSound( const char *sound );

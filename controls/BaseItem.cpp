@@ -11,7 +11,7 @@ CMenuBaseItem::CMenuBaseItem
 CMenuBaseItem::CMenuBaseItem()
 {
 	SetNameAndStatus( "", NULL );
-	SetCharSize( UI_MED_CHAR_WIDTH, UI_MED_CHAR_HEIGHT );
+	SetCharSize( QM_DEFAULTFONT );
 	SetCoord( 0, 0 );
 	SetSize( 0, 0 );
 
@@ -63,13 +63,19 @@ void CMenuBaseItem::SetCharSize(EFontSizes fs)
 	switch( fs )
 	{
 	case QM_DEFAULTFONT:
-		SetCharSize( UI_MED_CHAR_WIDTH, UI_MED_CHAR_HEIGHT );
+		font = uiStatic.hDefaultFont;
+		charSize.w = UI_MED_CHAR_WIDTH;
+		charSize.h = UI_MED_CHAR_HEIGHT;
 		break;
 	case QM_SMALLFONT:
-		SetCharSize( UI_SMALL_CHAR_WIDTH, UI_SMALL_CHAR_HEIGHT );
+		font = uiStatic.hSmallFont;
+		charSize.w = UI_SMALL_CHAR_WIDTH;
+		charSize.h = UI_SMALL_CHAR_HEIGHT;
 		break;
 	case QM_BIGFONT:
-		SetCharSize( UI_BIG_CHAR_WIDTH, UI_BIG_CHAR_HEIGHT );
+		font = uiStatic.hBigFont;
+		charSize.w = UI_BIG_CHAR_WIDTH;
+		charSize.h = UI_BIG_CHAR_HEIGHT;
 		break;
 	}
 }

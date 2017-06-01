@@ -18,7 +18,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-#щ
+#
 
 cmake_minimum_required(VERSION 2.6.0)
 project (MAINUI)
@@ -78,6 +78,10 @@ set (MAINUI_MENUS_SOURCES
 	)
 
 set (MAINUI_SOURCES
+	font/FontManager.cpp
+	font/WinAPIFont.cpp
+	font/FreeTypeFont.cpp
+	font/BaseFontBackend.cpp
 	EventSystem.h
 	BaseMenu.cpp
 	Btns.cpp
@@ -90,6 +94,7 @@ set (MAINUI_SOURCES
 
 list(APPEND MAINUI_SOURCES ${MAINUI_CONTROLS_SOURCES})
 list(APPEND MAINUI_SOURCES ${MAINUI_MENUS_SOURCES})
+add_library (${MAINUI_LIBRARY} SHARED ${MAINUI_SOURCES})
 
 add_compile_options( -Wall -Wextra -Wpedantic -Wno-unused-parameter -Wno-unused-variable )
 
@@ -97,11 +102,23 @@ if( NOT XASH_SDK )
 	set( XASH_SDK "../" )
 endif( )
 
-include_directories (${XASH_SDK}/common ${XASH_SDK}/engine ${XASH_SDK}/pm_shared . controls/ menus/)
-add_library (${MAINUI_LIBRARY} SHARED ${MAINUI_SOURCES})
+include_directories (${XASH_SDK}/common ${XASH_SDK}/engine ${XASH_SDK}/pm_shared . controls/ menus/ utl/ font/)
+
 
 if( MSVC )
 	add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+endif( )
+
+# Font Rendering(FreeType or WinAPI)
+if( MAINUI_CPP_ENABLE_FONT_RENDER )
+	if( NOT WIN32 )
+		find_package(PkgConfig)
+		pkg_check_modules(FC REQUIRED fontconfig)
+		include_directories( ${FC_INCLUDE_DIRS} )
+		target_link_libraries( ${MAINUI_LIBRARY} ${FC_LIBRARIES} )
+		add_definitions( -DMAINUI_USE_FREETYPE )
+	endif( )
+	add_definitions( -DMAINUI_USE_CUSTOM_FONT_RENDER )
 endif( )
 
 set_target_properties (${MAINUI_LIBRARY} PROPERTIES

@@ -1,5 +1,6 @@
 /*
 Copyright (C) 1997-2001 Id Software, Inc.
+Copyright (C) 2017 a1batross
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -33,6 +34,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "BtnsBMPTable.h"
 #include "YesNoMessageBox.h"
 #include "ConnectionProgress.h"
+#include "FontManager.h"
 
 cvar_t		*ui_precache;
 cvar_t		*ui_showmodels;
@@ -256,26 +258,10 @@ void UI_DrawRectangleExt( int in_x, int in_y, int in_w, int in_h, const int colo
 
 /*
 =================
-UI_DrawCharacter
-=================
-*/
-void UI_DrawCharacter( int x, int y, int width, int height, int ch, int ulRGBA, HIMAGE hFont )
-{
-#if 1
-	EngFuncs::DrawCharacter( x, y, width, height, ch, ulRGBA, hFont );
-#else
-	// TODO: Custom font rendering!
-#endif
-}
-
-
-
-/*
-=================
 UI_DrawString
 =================
 */
-void UI_DrawString( int x, int y, int w, int h, const char *string, const int color, int forceColor, int charW, int charH, ETextAlignment justify, bool shadow, EVertAlignment vertAlignment )
+void UI_DrawString( HFont font, int x, int y, int w, int h, const char *string, const int color, int forceColor, int charW, int charH, ETextAlignment justify, bool shadow, EVertAlignment vertAlignment )
 {
 	int	modulate, shadowModulate;
 	char	line[1024], *l;
@@ -330,9 +316,15 @@ void UI_DrawString( int x, int y, int w, int h, const char *string, const int co
 		// align the text as appropriate
 		switch( justify )
 		{
-		case QM_LEFT: xx = x; break;
-		case QM_CENTER: xx = x + ((w - (ColorStrlen( line ) * charW )) / 2); break;
-		case QM_RIGHT: xx = x + (w - (ColorStrlen( line ) * charW )); break;
+		case QM_LEFT:
+			xx = x;
+			break;
+		case QM_CENTER:
+			xx = x + (w - g_FontMgr.GetTextWideScaled( font, line, charH )) / 2;
+			break;
+		case QM_RIGHT:
+			xx = x + (w - g_FontMgr.GetTextWideScaled( font, line, charH ));
+			break;
 		}
 
 		// draw it
@@ -368,14 +360,13 @@ void UI_DrawString( int x, int y, int w, int h, const char *string, const int co
 			ch = EngFuncs::UtfProcessChar( (unsigned char) ch );
 			if( !ch )
 				continue;
-			if( ch != ' ' )
+			if( shadow )
 			{
-				if( shadow ) UI_DrawCharacter( xx + ofsX, yy + ofsY, charW, charH, ch, shadowModulate, uiStatic.hFont );
-				UI_DrawCharacter( xx, yy, charW, charH, ch, modulate, uiStatic.hFont );
+				g_FontMgr.DrawCharacter( font, ch, Point( xx + ofsX, yy + ofsX ), Size( charW, charH ), shadowModulate );
 			}
-			xx += charW;
+			xx += g_FontMgr.DrawCharacter( font, ch, Point( xx, yy ), Size( charW, charH ), modulate );
 		}
-          	yy += charH;
+		yy += charH;
 	}
 }
 
@@ -710,6 +701,8 @@ void UI_UpdateMenu( float flTime )
 		EngFuncs::PlayLocalSound( uiSoundIn );
 		uiStatic.enterSound = -1;
 	}
+
+	g_FontMgr.DebugDraw( uiStatic.hDefaultFont );
 }
 
 /*
@@ -1250,6 +1243,9 @@ int UI_VidInit( void )
 
 	// reload all menu buttons
 	UI_LoadBmpButtons ();
+
+	// VidInit FontManager
+	g_FontMgr.VidInit();
 
 	// now recalc all the menus in stack
 	for( int i = 0; i < uiStatic.menuDepth; i++ )

@@ -124,4 +124,33 @@ extern int COM_CompareSaves( const void **a, const void **b );
 extern void UI_LoadCustomStrings( void );
 extern void UI_EnableTextInput( bool enable );
 
+namespace UI
+{
+namespace Graphics
+{
+/*
+ * Creates 32-bit RGBA BMP
+ *  w -- width
+ *  h -- height
+ * **ptr -- BMP header pointer. Should be freed by delete[]
+ * *size -- BMP size
+ * *texOffset -- rgbdata offset
+ * Return value is rgbdata
+ **/
+byte *MakeBMP( unsigned int w, unsigned int h, byte **ptr, int *size, int *texOffset );
+}
+
+namespace String
+{
+// void ConvertToWCharBuffered( wchar_t *dst, int dstlen, const char *src, int srclen );
+
+/*
+ * Returns converted to wide character buffer. Should be freed by delete[]
+ * length is optional. Pass a pointer to get a string length
+ **/
+wchar_t *ConvertToWChar( const char *text, int *length = NULL );
+}
+}
+
+
 #endif//UTILS_H

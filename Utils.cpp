@@ -347,7 +347,81 @@ void operator delete[]( void *ptr )
 	if( ptr ) FREE( ptr );
 }
 
+#define BI_SIZE	40 //size of bitmap info header.
+
+typedef unsigned short       word;
+
+typedef struct
+{
+	//char	id[2];		// bmfh.bfType
+	uint	fileSize;		// bmfh.bfSize
+	uint	reserved0;	// bmfh.bfReserved1 + bmfh.bfReserved2
+	uint	bitmapDataOffset;	// bmfh.bfOffBits
+	uint	bitmapHeaderSize;	// bmih.biSize
+	uint	width;		// bmih.biWidth
+	int	height;		// bmih.biHeight
+	word	planes;		// bmih.biPlanes
+	word	bitsPerPixel;	// bmih.biBitCount
+	uint	compression;	// bmih.biCompression
+	uint	bitmapDataSize;	// bmih.biSizeImage
+	uint	hRes;		// bmih.biXPelsPerMeter
+	uint	vRes;		// bmih.biYPelsPerMeter
+	uint	colors;		// bmih.biClrUsed
+	uint	importantColors;	// bmih.biClrImportant
+} bmp_t;
+
+byte *UI::Graphics::MakeBMP( unsigned int w, unsigned int h, byte **ptr, int *size, int *texOffset )
+{
+	bmp_t bhdr;
+
+	if( !ptr || !size )
+		return NULL;
+
+	int biTrueWidth = (w + 3) & ~3;
+	const char magic[2] = { 'B', 'M' };
+	const int pixel_size = 4; // create 32 bit image everytime
+	const size_t cbPalBytes = 0; // TODO: calculate it, when it would be needed to create BMP with palette
+	size_t cbBmpBits = biTrueWidth * h * pixel_size;
+
+	bhdr.fileSize = sizeof( magic ) + sizeof( bmp_t ) + cbBmpBits + cbPalBytes;
+	bhdr.reserved0 = 0;
+	bhdr.bitmapDataOffset = sizeof( magic ) + sizeof( bmp_t ) + cbPalBytes;
+	bhdr.bitmapHeaderSize = BI_SIZE;
+	bhdr.width = biTrueWidth;
+	bhdr.height = h;
+	bhdr.planes = 1;
+	bhdr.bitsPerPixel = pixel_size * 8;
+	bhdr.compression = 0;
+	bhdr.bitmapDataSize = cbBmpBits;
+	bhdr.hRes = bhdr.vRes = 0;
+	bhdr.colors = ( pixel_size == 1 ) ? 256 : 0;
+	bhdr.importantColors = 0;
+
+	*ptr = new byte[bhdr.fileSize];
+	*size = bhdr.fileSize;
+
+	if( texOffset )
+		*texOffset = bhdr.bitmapDataOffset;
+
+	memcpy( *ptr, magic, sizeof( magic ) );
+	memcpy( *ptr + sizeof( magic ), &bhdr, sizeof( bhdr ) );
+
+	byte *rgbdata = *ptr + bhdr.bitmapDataOffset;
+
+	memset( rgbdata, 0, cbBmpBits );
+
+	return rgbdata;
+}
 
 
+wchar_t *UI::String::ConvertToWChar( const char *text, int *length )
+{
+	int len = strlen( text );
+	wchar_t *wText = new wchar_t[len+1];
+	mbstowcs( wText, text, len );
+	wText[len] = 0;
 
+	if( length ) *length = len;
 
+	return wText;
+}

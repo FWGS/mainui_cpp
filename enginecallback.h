@@ -123,14 +123,21 @@ public:
 	// text message system
 	static inline void	DrawCharacter( int x, int y, int width, int height, int ch, int ulRGBA, HIMAGE hFont )
 	{ engfuncs.pfnDrawCharacter( x, y, width, height, ch, ulRGBA, hFont ); }
+#ifndef MAINUI_USE_CUSTOM_FONT_RENDER
 	static inline int	DrawConsoleString( int x, int y, const char *string )
 	{ return  engfuncs.pfnDrawConsoleString( x, y, string ); }
-	static inline int   DrawConsoleString( Point coord, const char *string )
-	{ return DrawConsoleString( coord.x, coord.y, string ); }
 	static inline void	DrawSetTextColor( int r, int g, int b, int alpha = 255 )
 	{ engfuncs.pfnDrawSetTextColor( r, g, b, alpha ); }
 	static inline void	ConsoleStringLen(  const char *string, int *length, int *height )
 	{ engfuncs.pfnDrawConsoleStringLen( string, length, height ); }
+#else
+	static int DrawConsoleString( int x, int y, const char *string );
+	static void	DrawSetTextColor( int r, int g, int b, int alpha = 255 );
+	static void	ConsoleStringLen(  const char *string, int *length, int *height );
+#endif
+
+	static inline int   DrawConsoleString( Point coord, const char *string )
+	{ return DrawConsoleString( coord.x, coord.y, string ); }
 
 	// TODO: Move into UI class
 	static inline int   ConsoleCharacterHeight()

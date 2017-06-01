@@ -103,7 +103,7 @@ void CMenuYesNoMessageBox::_VidInit( void )
 		yes.SetRect( 188, 204, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
 	no.SetRect( 338, 204, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
 
-	dlgMessage1.SetCharSize( UI_MED_CHAR_WIDTH, UI_MED_CHAR_HEIGHT );
+	dlgMessage1.SetCharSize( QM_DEFAULTFONT );
 
 }
 

@@ -43,14 +43,11 @@ CMenuPicButton::Init
 */
 void CMenuPicButton::VidInit( void )
 {
-	if( size.w < 1 || size.h < 1 )
-	{
-		if( size.w < 1 )
-			size.w = charSize.w * strlen( szName );
+	if( size.w < 1 )
+		size.w = g_FontMgr.GetTextWideScaled( font, szName, charSize.h );
 
-		if( size.h < 1 )
-			size.h = charSize.h * 1.5;
-	}
+	if( size.h < 1 )
+		size.h = charSize.h * 1.5;
 
 	CalcPosition();
 	CalcSizes();
@@ -108,7 +105,7 @@ const char *CMenuPicButton::Key( int key, int down )
 	return sound;
 }
 
-//#define ALT_PICBUTTON_FOCUS_ANIM
+#define ALT_PICBUTTON_FOCUS_ANIM
 
 /*
 =================
@@ -207,7 +204,8 @@ void CMenuPicButton::Draw( )
 			// special handling for focused
 			if( state == BUTTON_FOCUS )
 			{
-				DrawButton( r, g, b, 255, rects, BUTTON_FOCUS );
+				EngFuncs::PIC_Set( hPic, r, g, b, 255 );
+				EngFuncs::PIC_DrawAdditive( m_scPos.x, m_scPos.y, uiStatic.buttons_draw_width, uiStatic.buttons_draw_height, &rects[BUTTON_FOCUS] );
 
 				EngFuncs::PIC_Set( hPic, r, g, b, 255 ); // set colors again
 				EngFuncs::PIC_DrawAdditive( m_scPos.x, m_scPos.y, uiStatic.buttons_draw_width, uiStatic.buttons_draw_height, &rects[BUTTON_NOFOCUS] );
@@ -228,25 +226,25 @@ void CMenuPicButton::Draw( )
 
 		if( iFlags & QMF_GRAYED )
 		{
-			UI_DrawString( m_scPos, m_scSize, szName, uiColorDkGrey, true, m_scChSize, eTextAlignment, shadow );
+			UI_DrawString( font, m_scPos, m_scSize, szName, uiColorDkGrey, true, m_scChSize, eTextAlignment, shadow );
 			return; // grayed
 		}
 
 		if(this != m_pParent->ItemAtCursor())
 		{
-			UI_DrawString( m_scPos, m_scSize, szName, iColor, false, m_scChSize, eTextAlignment, shadow );
+			UI_DrawString( font, m_scPos, m_scSize, szName, iColor, false, m_scChSize, eTextAlignment, shadow );
 			return; // no focus
 		}
 
 		if( eFocusAnimation == QM_HIGHLIGHTIFFOCUS )
-			UI_DrawString( m_scPos, m_scSize, szName, iFocusColor, false, m_scChSize, eTextAlignment, shadow );
+			UI_DrawString( font, m_scPos, m_scSize, szName, iFocusColor, false, m_scChSize, eTextAlignment, shadow );
 		else if( eFocusAnimation == QM_PULSEIFFOCUS )
 		{
 			int	color;
 
 			color = PackAlpha( iColor, 255 * (0.5 + 0.5 * sin( (float)uiStatic.realTime / UI_PULSE_DIVISOR )));
 
-			UI_DrawString( m_scPos, m_scSize, szName, color, false, m_scChSize, eTextAlignment, shadow );
+			UI_DrawString( font, m_scPos, m_scSize, szName, color, false, m_scChSize, eTextAlignment, shadow );
 		}
 	}
 
@@ -255,6 +253,8 @@ void CMenuPicButton::Draw( )
 
 void CMenuPicButton::SetPicture( int ID )
 {
+	return;
+
 	if( ID < 0 || ID > PC_BUTTONCOUNT )
 		return; // bad id
 

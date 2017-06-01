@@ -49,12 +49,12 @@ void CMenuSwitch::VidInit()
 	int leftSize, rightSize;
 
 	if( szLeftName )
-		leftSize = strlen( szLeftName ) * m_scChSize.w;
+		leftSize = g_FontMgr.GetTextWideScaled( font, szLeftName, m_scChSize.h );
 	else
 		leftSize = m_scSize.w / 2;
 
 	if( szRightName )
-		rightSize = strlen( szRightName ) * m_scChSize.w;
+		rightSize = g_FontMgr.GetTextWideScaled( font, szLeftName, m_scChSize.h );
 	else
 		rightSize = m_scSize.w / 2;
 
@@ -72,7 +72,7 @@ void CMenuSwitch::VidInit()
 	m_scTextPos.x = m_scPos.x + (m_scSize.w * 1.7f );
 	m_scTextPos.y = m_scPos.y + (m_scSize.h >> 2);
 
-	m_scTextSize.w = strlen( szName ) * m_scChSize.w;
+	m_scTextSize.w = g_FontMgr.GetTextWideScaled( font, szName, m_scChSize.h );
 	m_scTextSize.h = m_scChSize.h;
 }
 
@@ -147,7 +147,7 @@ void CMenuSwitch::Draw( void )
 
 	int selectColor = iSelectColor;
 	int bgColor = iBackgroundColor;
-	UI_DrawString( m_scTextPos, m_scTextSize, szName, uiColorHelp, true, m_scChSize, eTextAlignment, shadow );
+	UI_DrawString( font, m_scTextPos, m_scTextSize, szName, uiColorHelp, true, m_scChSize, eTextAlignment, shadow );
 
 	if( szStatusText && iFlags & QMF_NOTIFY )
 	{
@@ -199,8 +199,8 @@ void CMenuSwitch::Draw( void )
 	stringRightPoint.x += fTextOffsetX * uiStatic.scaleX;
 	stringRightPoint.y += fTextOffsetY * uiStatic.scaleY;
 
-	UI_DrawString( stringLeftPoint, m_leftSize, szLeftName, bState?iBgTextColor: iFgTextColor, iColor, m_scChSize, eTextAlignment, shadow, QM_VCENTER );
-	UI_DrawString( stringRightPoint, m_rightSize, szRightName, bState?iFgTextColor:iBgTextColor, iColor, m_scChSize, eTextAlignment, shadow, QM_VCENTER );
+	UI_DrawString( font, stringLeftPoint, m_leftSize, szLeftName, bState?iBgTextColor: iFgTextColor, iColor, m_scChSize, eTextAlignment, shadow, QM_VCENTER );
+	UI_DrawString( font, stringRightPoint, m_rightSize, szRightName, bState?iFgTextColor:iBgTextColor, iColor, m_scChSize, eTextAlignment, shadow, QM_VCENTER );
 
 	// draw rectangle
 	UI_DrawRectangle( m_scPos, m_scSize, uiInputFgColor );

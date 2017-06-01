@@ -102,9 +102,9 @@ void CMenuCredits::Draw( void )
 			if( !uiCredits.fadeTime ) uiCredits.fadeTime = (gpGlobals->time * 1000);
 			color = UI_FadeAlpha( uiCredits.fadeTime, uiCredits.showTime );
 			if( UnpackAlpha( color ))
-				UI_DrawString( 0, ( ScreenHeight - h ) / 2, ScreenWidth, h, uiCredits.credits[i], color, true, w, h, QM_CENTER, true );
+				UI_DrawString( font, 0, ( ScreenHeight - h ) / 2, ScreenWidth, h, uiCredits.credits[i], color, true, w, h, QM_CENTER, true );
 		}
-		else UI_DrawString( 0, y, ScreenWidth, h, uiCredits.credits[i], uiColorWhite, false, w, h, QM_CENTER, true );
+		else UI_DrawString( font, 0, y, ScreenWidth, h, uiCredits.credits[i], uiColorWhite, false, w, h, QM_CENTER, true );
 	}
 
 	if( y < 0 && UnpackAlpha( color ) == 0 )

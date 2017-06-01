@@ -21,7 +21,7 @@ GNU General Public License for more details.
 
 CMenuCheckBox::CMenuCheckBox() : CMenuEditable()
 {
-	SetCharSize( 12, 24 );
+	SetCharSize( QM_DEFAULTFONT );
 	SetSize( 32, 32 );
 	SetPicture( UI_CHECKBOX_EMPTY,
 		UI_CHECKBOX_FOCUS,
@@ -47,7 +47,7 @@ void CMenuCheckBox::VidInit( void )
 	m_scTextPos.x = m_scPos.x + (m_scSize.w * 1.7f );
 	m_scTextPos.y = m_scPos.y + (m_scSize.h >> 2);
 
-	m_scTextSize.w = strlen( szName ) * m_scChSize.w;
+	m_scTextSize.w = g_FontMgr.GetTextWideScaled( font, szName, m_scChSize.w );
 	m_scTextSize.h = m_scChSize.h;
 }
 
@@ -123,7 +123,7 @@ void CMenuCheckBox::Draw( void )
 {
 	bool shadow = (iFlags & QMF_DROPSHADOW);
 
-	UI_DrawString( m_scTextPos, m_scTextSize, szName, uiColorHelp, true, m_scChSize, eTextAlignment, shadow );
+	UI_DrawString( font, m_scTextPos, m_scTextSize, szName, uiColorHelp, true, m_scChSize, eTextAlignment, shadow );
 
 	if( szStatusText && iFlags & QMF_NOTIFY )
 	{

@@ -32,7 +32,7 @@ CMenuSlider::CMenuSlider() : CMenuEditable()
 
 	eFocusAnimation = QM_HIGHLIGHTIFFOCUS;
 
-	SetCharSize( 12, 24 );
+	SetCharSize( QM_DEFAULTFONT );
 
 	iFlags |= QMF_DROPSHADOW;
 }
@@ -202,7 +202,7 @@ void CMenuSlider::Draw( void )
 
 
 	textHeight = m_scPos.y - (m_scChSize.h * 1.5f);
-	UI_DrawString( m_scPos.x, textHeight, m_scSize.w, m_scChSize.h, szName, uiColorHelp, true, m_scChSize.w, m_scChSize.h, eTextAlignment, shadow );
+	UI_DrawString( font, m_scPos.x, textHeight, m_scSize.w, m_scChSize.h, szName, uiColorHelp, true, m_scChSize.w, m_scChSize.h, eTextAlignment, shadow );
 }
 
 void CMenuSlider::UpdateEditable()
