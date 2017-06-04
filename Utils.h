@@ -34,7 +34,7 @@ GNU General Public License for more details.
 // How did I ever live without ASSERT?
 //
 #ifdef _DEBUG
-void DBG_AssertFunction( BOOL fExpr, const char* szExpr, const char* szFile, int szLine, const char* szMessage );
+void DBG_AssertFunction( bool fExpr, const char* szExpr, const char* szFile, int szLine, const char* szMessage );
 #define ASSERT( f )		DBG_AssertFunction( f, #f, __FILE__, __LINE__, NULL )
 #define ASSERTSZ( f, sz )	DBG_AssertFunction( f, #f, __FILE__, __LINE__, sz )
 #else

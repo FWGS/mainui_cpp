@@ -91,7 +91,9 @@ set (MAINUI_SOURCES
 list(APPEND MAINUI_SOURCES ${MAINUI_CONTROLS_SOURCES})
 list(APPEND MAINUI_SOURCES ${MAINUI_MENUS_SOURCES})
 
-add_compile_options( -Wall -Wextra -Wpedantic -Wno-unused-parameter -Wno-unused-variable )
+if( NOT WIN32 AND NOT MINGW )
+	add_compile_options( -Wall -Wextra -Wpedantic -Wno-unused-parameter -Wno-unused-variable )
+endif()
 
 if( NOT XASH_SDK )
 	set( XASH_SDK "../" )
@@ -107,11 +109,25 @@ endif( )
 set_target_properties (${MAINUI_LIBRARY} PROPERTIES
 	POSITION_INDEPENDENT_CODE 1 )
 
+# Name library as it named in Unkle Mike's Xash3D
 if( WIN32 )
 	set_target_properties(${MAINUI_LIBRARY} PROPERTIES
 		OUTPUT_NAME menu )
 endif()
 
-install( TARGETS ${MAINUI_LIBRARY} DESTINATION ${LIB_INSTALL_DIR}/xash3d 
+if( NOT WIN32 )
+	install( TARGETS ${MAINUI_LIBRARY} DESTINATION ${LIB_INSTALL_DIR}/xash3d 
         PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ)
-
+else()
+	install( TARGETS ${MAINUI_LIBRARY}
+		CONFIGURATIONS Debug 
+		RUNTIME DESTINATION ${LIB_INSTALL_DIR}/Debug/
+		LIBRARY DESTINATION ${LIB_INSTALL_DIR}/Debug/ )
+	install( FILES $<TARGET_FILE_DIR:${MAINUI_LIBRARY}>/$<TARGET_PROPERTY:${MAINUI_LIBRARY},OUTPUT_NAME>.pdb
+		CONFIGURATIONS Debug 
+		DESTINATION ${LIB_INSTALL_DIR}/Debug/ )
+	install( TARGETS ${MAINUI_LIBRARY}
+		CONFIGURATIONS Release 
+		RUNTIME DESTINATION ${LIB_INSTALL_DIR}/Release/
+		LIBRARY DESTINATION ${LIB_INSTALL_DIR}/Release/ )
+endif()
