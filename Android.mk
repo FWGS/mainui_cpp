@@ -43,10 +43,11 @@ LOCAL_SRC_FILES := 	controls/Framework.cpp                          \
 	controls/MessageBox.cpp                         \
 	controls/Switch.cpp                             \
 	controls/ProgressBar.cpp                        \
+	controls/BaseWindow.cpp                         \
 	menus/AdvancedControls.cpp                      \
 	menus/Audio.cpp                                 \
 	menus/Configuration.cpp                         \
-	menus/ConnectionProgress.cpp			\
+	menus/ConnectionProgress.cpp                    \
 	menus/Controls.cpp                              \
 	menus/CreateGame.cpp                            \
 	menus/Credits.cpp                               \
@@ -68,14 +69,13 @@ LOCAL_SRC_FILES := 	controls/Framework.cpp                          \
 	menus/Video.cpp                                 \
 	menus/VideoModes.cpp                            \
 	menus/VideoOptions.cpp                          \
+	menus/dynamic/ScriptMenu.cpp                    \
 	BaseMenu.cpp                                    \
 	Btns.cpp                                        \
 	MenuStrings.cpp                                 \
 	Utils.cpp                                       \
 	Scissor.cpp                                     \
 	udll_int.cpp                                    \
+	CFGScript.cpp
 
-ifeq ($(XASH_SDL),1)
-LOCAL_SHARED_LIBRARIES += SDL2
-endif
 include $(BUILD_SHARED_LIBRARY)
