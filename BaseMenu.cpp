@@ -38,6 +38,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 cvar_t		*ui_precache;
 cvar_t		*ui_showmodels;
+#ifndef NDEBUG
+cvar_t		*ui_borderclip;
+#endif
 
 uiStatic_t	uiStatic;
 
@@ -129,6 +132,27 @@ bool UI_CursorInRect( int x, int y, int w, int h )
 
 /*
 =================
+UI_EnableAlphaFactor
+=================
+*/
+void UI_EnableAlphaFactor(float a)
+{
+	uiStatic.enableAlphaFactor = true;
+	uiStatic.alphaFactor = bound( 0.0f, a, 1.0f );
+}
+
+/*
+=================
+UI_DisableAlphaFactor
+=================
+*/
+void UI_DisableAlphaFactor()
+{
+	uiStatic.enableAlphaFactor = false;
+}
+
+/*
+=================
 UI_DrawPic
 =================
 */
@@ -142,7 +166,8 @@ void UI_DrawPic( int x, int y, int width, int height, const int color, const cha
 	UnpackRGBA( r, g, b, a, color );
 
 	EngFuncs::PIC_Set( hPic, r, g, b, a );
-	EngFuncs::PIC_Draw( x, y, width, height );
+	// a1ba: should be just PIC_Draw, but we need alpha here
+	EngFuncs::PIC_DrawTrans( x, y, width, height );
 }
 
 /*
@@ -261,7 +286,7 @@ void UI_DrawRectangleExt( int in_x, int in_y, int in_w, int in_h, const int colo
 UI_DrawString
 =================
 */
-void UI_DrawString( HFont font, int x, int y, int w, int h, const char *string, const int color, int forceColor, int charW, int charH, ETextAlignment justify, bool shadow, EVertAlignment vertAlignment )
+void UI_DrawString( HFont font, int x, int y, int w, int h, const char *string, const int color, int forceColor, int charW, int charH, ETextAlignment justify, bool shadow )
 {
 	int	modulate, shadowModulate;
 	char	line[1024], *l;
@@ -287,14 +312,19 @@ void UI_DrawString( HFont font, int x, int y, int w, int h, const char *string, 
 
 	modulate = color;
 
-	switch( vertAlignment )
+	if( justify & QM_TOP )
 	{
-	case QM_TOP: yy = y; break;
-	case QM_VCENTER: yy = y + (h - charH)/2; break;
-	case QM_BOTTOM: yy = y + h - charH; break;
+		yy = y;
+	}
+	else if( justify & QM_BOTTOM )
+	{
+		yy = y + h - charH;
+	}
+	else
+	{
+		yy = y + (h - charH)/2;
 	}
 
-	yy = y;
 	while( *string )
 	{
 		// get a line of text
@@ -314,17 +344,17 @@ void UI_DrawString( HFont font, int x, int y, int w, int h, const char *string, 
 		line[len] = 0;
 
 		// align the text as appropriate
-		switch( justify )
+		if( justify & QM_LEFT  )
 		{
-		case QM_LEFT:
 			xx = x;
-			break;
-		case QM_CENTER:
-			xx = x + (w - g_FontMgr.GetTextWideScaled( font, line, charH )) / 2;
-			break;
-		case QM_RIGHT:
+		}
+		else if( justify & QM_RIGHT )
+		{
 			xx = x + (w - g_FontMgr.GetTextWideScaled( font, line, charH ));
-			break;
+		}
+		else // QM_LEFT
+		{
+			xx = x + (w - g_FontMgr.GetTextWideScaled( font, line, charH )) / 2;
 		}
 
 		// draw it
@@ -702,7 +732,7 @@ void UI_UpdateMenu( float flTime )
 		uiStatic.enterSound = -1;
 	}
 
-	g_FontMgr.DebugDraw( uiStatic.hDefaultFont );
+	// g_FontMgr.DebugDraw( uiStatic.hBigFont );
 }
 
 /*
@@ -1297,6 +1327,9 @@ void UI_Init( void )
 	// register our cvars and commands
 	ui_precache = EngFuncs::CvarRegister( "ui_precache", "0", FCVAR_ARCHIVE );
 	ui_showmodels = EngFuncs::CvarRegister( "ui_showmodels", "0", FCVAR_ARCHIVE );
+#ifndef NDEBUG
+	ui_borderclip = EngFuncs::CvarRegister( "ui_borderclip", "0", FCVAR_ARCHIVE );
+#endif
 
 	// show cl_predict dialog
 	EngFuncs::CvarRegister( "menu_mp_firsttime", "1", FCVAR_ARCHIVE );

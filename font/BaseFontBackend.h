@@ -9,7 +9,7 @@ class IBaseFont
 {
 public:
 	IBaseFont();
-	virtual ~IBaseFont( ) = 0;
+	virtual ~IBaseFont( );
 
 	virtual bool Create(
 		const char *name,
@@ -40,6 +40,8 @@ public:
 	};
 
 	void UploadGlyphsForRanges( charRange_t *range, int rangeSize );
+
+	void GetTextureName( char *dst, size_t len, int pageNum ) const;
 
 protected:
 	void ApplyBlurToTexture(Point rgbaPt, Size rgbaSz, unsigned char *rgba);

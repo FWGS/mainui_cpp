@@ -84,11 +84,30 @@ void IBaseFont::CreateGaussianDistribution()
 	}
 }
 
+void IBaseFont::GetTextureName(char *dst, size_t len, int pageNum) const
+{
+	char attribs[4];
+	int i = 0;
+	if( GetFlags() & FONT_ITALIC ) attribs[i++] = 'i';
+	if( GetFlags() & FONT_UNDERLINE ) attribs[i++] = 'u';
+	if( GetFlags() & FONT_GAUSSBLUR ) attribs[i++] = 'g';
+
+	if( i == 0 )
+	{
+		snprintf( dst, len, "%s%i_%i_%i_font.bmp", GetName(), pageNum, GetTall(), GetWeight() );
+	}
+	else
+	{
+		attribs[i] = 0;
+		snprintf( dst, len, "%s%i_%i_%i_%s_font.bmp", GetName(), pageNum, GetTall(), GetWeight(), attribs );
+	}
+}
+
 #define MAX_PAGE_SIZE 256
 
 void IBaseFont::UploadGlyphsForRanges(IBaseFont::charRange_t *range, int rangeSize)
 {
-	char name[128];
+	char name[256];
 	const int maxWidth = GetMaxCharWidth();
 	const int height = GetHeight();
 
@@ -124,10 +143,9 @@ void IBaseFont::UploadGlyphsForRanges(IBaseFont::charRange_t *range, int rangeSi
 				// No free space now
 				if( ystart - height <= 0 )
 				{
-					snprintf( name, 128, "#%s_%i_%i_%i_font.bmp", GetName(), GetTall(), GetHeight(), m_iPages);
-					HIMAGE hImage = EngFuncs::PIC_Load( name, bmp, bmpSize, 0 );
+					GetTextureName( name, sizeof( name ), m_iPages );
+					HIMAGE hImage = EngFuncs::PIC_Load( name, bmp, bmpSize, PIC_KEEP_RGBDATA );
 					Con_DPrintf( "Uploaded %s to %i\n", name, hImage );
-					delete[] bmp;
 
 					for( int i = lastCharPageChanged; i < ch; i++ )
 					{
@@ -140,7 +158,7 @@ void IBaseFont::UploadGlyphsForRanges(IBaseFont::charRange_t *range, int rangeSi
 
 					// m_Pages.AddToTail( hImage );
 					m_iPages++;
-					rgbdata = UI::Graphics::MakeBMP( MAX_PAGE_SIZE, MAX_PAGE_SIZE, &bmp, &bmpSize, NULL );
+					memset( rgbdata, 0, MAX_PAGE_SIZE * MAX_PAGE_SIZE * 4 );
 					ystart = MAX_PAGE_SIZE-1;
 				}
 			}
@@ -180,8 +198,8 @@ void IBaseFont::UploadGlyphsForRanges(IBaseFont::charRange_t *range, int rangeSi
 		}
 	}
 
-	snprintf( name, 128, "#%s_%i_%i_%i_font.bmp", GetName(), GetTall(), GetHeight(), m_iPages );
-	HIMAGE hImage = EngFuncs::PIC_Load( name, bmp, bmpSize, 0 );
+	GetTextureName( name, sizeof( name ), m_iPages );
+	HIMAGE hImage = EngFuncs::PIC_Load( name, bmp, bmpSize, PIC_KEEP_RGBDATA );
 	Con_DPrintf( "Uploaded %s to %i\n", name, hImage );
 	delete[] bmp;
 	delete[] temp;
@@ -199,10 +217,10 @@ void IBaseFont::UploadGlyphsForRanges(IBaseFont::charRange_t *range, int rangeSi
 
 IBaseFont::~IBaseFont()
 {
-	char name[128];
+	char name[256];
 	for( int i = 0; i < m_iPages; i++ )
 	{
-		snprintf( name, 128, "#%s_%i_%i_%i_font.bmp", GetName(), GetTall(), GetHeight(), i );
+		GetTextureName( name, sizeof( name ), i );
 		EngFuncs::PIC_Free( name );
 	}
 	m_iPages = 0;
@@ -273,12 +291,12 @@ int IBaseFont::GetTall() const
 void IBaseFont::DebugDraw() const
 {
 	HIMAGE hImage;
-	char name[128];
+	char name[256];
 
 	for( int i = 0; i < m_iPages; i++ )
 	{
 		int x = i * MAX_PAGE_SIZE;
-		snprintf( name, 128, "#%s_%i_%i_%i_font.bmp", GetName(), GetTall(), GetHeight(), i );
+		GetTextureName( name, sizeof( name ), i );
 
 		hImage = EngFuncs::PIC_Load( name );
 

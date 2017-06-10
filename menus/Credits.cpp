@@ -36,8 +36,9 @@ static const char *uiCreditsDefault[] =
 class CMenuCredits : public CMenuFramework
 {
 public:
-	virtual void Draw();
-	virtual const char *Key(int key, int down);
+	void Draw();
+	const char *Key(int key, int down);
+	bool DrawAnimation(EAnimation anim) { }
 
 	friend void UI_DrawFinalCredits( void );
 	friend void UI_FinalCredits( void );
@@ -45,8 +46,6 @@ public:
 
 private:
 	virtual void _Init();
-
-	
 
 	const char	**credits;
 	int		startTime;

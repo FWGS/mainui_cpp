@@ -34,8 +34,8 @@ public:
 	void DeleteAllFonts();
 
 	HFont CreateFont(const char *name, int tall, int weight, int blur, float brighten, int flags);
+	void DeleteFont( HFont hFont );
 
-	void UploadTextureForFont( HFont font );
 	HFont GetFontByName( const char *name );
 	void  GetCharABCWide( HFont font, int ch, int &a, int &b, int &c );
 	int   GetFontTall( HFont font );
@@ -59,6 +59,9 @@ public:
 	void DebugDraw( HFont font );
 
 private:
+	IBaseFont *GetIFontFromHandle( HFont font );
+	void UploadTextureForFont(IBaseFont *font );
+
 	CUtlVector<IBaseFont*> m_Fonts;
 };
 

@@ -60,20 +60,19 @@ const char *CMenuBaseItem::Key(int key, int down)
 
 void CMenuBaseItem::SetCharSize(EFontSizes fs)
 {
+	font = fs + 1; // It's guaranteed that handles will match font sizes
+
 	switch( fs )
 	{
 	case QM_DEFAULTFONT:
-		font = uiStatic.hDefaultFont;
 		charSize.w = UI_MED_CHAR_WIDTH;
 		charSize.h = UI_MED_CHAR_HEIGHT;
 		break;
 	case QM_SMALLFONT:
-		font = uiStatic.hSmallFont;
 		charSize.w = UI_SMALL_CHAR_WIDTH;
 		charSize.h = UI_SMALL_CHAR_HEIGHT;
 		break;
 	case QM_BIGFONT:
-		font = uiStatic.hBigFont;
 		charSize.w = UI_BIG_CHAR_WIDTH;
 		charSize.h = UI_BIG_CHAR_HEIGHT;
 		break;

@@ -111,6 +111,9 @@ typedef int HFont;
 
 extern cvar_t	*ui_precache;
 extern cvar_t	*ui_showmodels;
+#ifndef NDEBUG
+extern cvar_t	*ui_borderclip;
+#endif
 
 #define MAX_BACKGROUNDS 48 // SC 5.0 have 35 tiled backgrounds!
 
@@ -181,6 +184,9 @@ typedef struct
 	int		buttons_draw_height;
 	int		width;
 	bool		textInput;
+
+	bool	enableAlphaFactor;
+	float	alphaFactor;
 } uiStatic_t;
 
 extern float	cursorDY;			// use for touch scroll
@@ -218,13 +224,18 @@ void UI_ScaleCoords( int &x, int &y, int &w, int &h );
 void UI_ScaleCoords( int &x, int &y );
 
 bool UI_CursorInRect( int x, int y, int w, int h );
+
+// temporarily override alpha by multiplying given alpha and factor
+void UI_EnableAlphaFactor( float a );
+void UI_DisableAlphaFactor();
+
 void UI_DrawPic( int x, int y, int w, int h, const int color, const char *pic );
 void UI_DrawPicAdditive( int x, int y, int w, int h, const int color, const char *pic );
 void UI_DrawPicTrans( int x, int y, int width, int height, const int color, const char *pic );
 void UI_DrawPicHoles( int x, int y, int width, int height, const int color, const char *pic );
 void UI_FillRect( int x, int y, int w, int h, const int color );
 void UI_DrawRectangleExt( int in_x, int in_y, int in_w, int in_h, const int color, int outlineWidth );
-void UI_DrawString( HFont font, int x, int y, int w, int h, const char *str, const int col, int forceCol, int charW, int charH, ETextAlignment justify, bool shadow, EVertAlignment vertAlign = QM_TOP);
+void UI_DrawString(HFont font, int x, int y, int w, int h, const char *str, const int col, int forceCol, int charW, int charH, ETextAlignment justify, bool shadow);
 inline void UI_DrawRectangle( int x, int y, int w, int h, const int color )
 {
 	UI_DrawRectangleExt( x, y, w, h, color, uiStatic.outlineWidth );
@@ -262,9 +273,9 @@ inline void UI_DrawRectangleExt( Point pos, Size size, const int color, int outl
 {
 	UI_DrawRectangleExt( pos.x, pos.y, size.w, size.h, color, outlineWidth );
 }
-inline void UI_DrawString( HFont font, Point pos, Size size, const char *str, const int col, int forceCol, Size chSize, ETextAlignment justify, bool shadow, EVertAlignment verticalAlignment = QM_TOP  )
+inline void UI_DrawString( HFont font, Point pos, Size size, const char *str, const int col, int forceCol, Size chSize, ETextAlignment justify, bool shadow  )
 {
-	UI_DrawString( font, pos.x, pos.y, size.w, size.h, str, col, forceCol, chSize.w, chSize.h, justify, shadow, verticalAlignment );
+	UI_DrawString( font, pos.x, pos.y, size.w, size.h, str, col, forceCol, chSize.w, chSize.h, justify, shadow );
 }
 
 void UI_StartSound( const char *sound );

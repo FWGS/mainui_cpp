@@ -95,9 +95,10 @@ bool CFreeTypeFont::FindFontDataFile( const char *name, int tall, int weight, in
 		slant = FC_SLANT_ITALIC;
 
 	pattern = FontMatch(
-		"family", FcTypeString, name,
-		"weight", FcTypeInteger, nFcWeight,
-		"slant",  FcTypeInteger, slant, NULL );
+		FC_FAMILY, FcTypeString,  name,
+		FC_WEIGHT, FcTypeInteger, nFcWeight,
+		FC_SLANT,  FcTypeInteger, slant,
+		NULL );
 
 	if( !pattern )
 		return false;
@@ -180,14 +181,14 @@ void CFreeTypeFont::GetCharRGBA(int ch, Point pt, Size sz, unsigned char *rgba, 
 		ystart = -pushDown;
 
 	int xstart = 0;
-	if( slot->bitmap_left < 0 )
+	if( pushLeft < 0 )
 		xstart = -pushLeft;
 
 	int yend = slot->bitmap.rows;
 	if( pushDown + yend > sz.h )
 		yend += sz.h - ( pushDown + yend );
 
-	int xend = slot->bitmap.width + pushLeft;
+	int xend = slot->bitmap.width + (pushLeft > 0 ? pushLeft : 0);
 	if( pushLeft + xend > sz.w )
 		xend += sz.w - ( pushLeft + xend );
 

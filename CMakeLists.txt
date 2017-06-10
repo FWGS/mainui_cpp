@@ -83,6 +83,7 @@ set (MAINUI_SOURCES
 	font/FreeTypeFont.cpp
 	font/BaseFontBackend.cpp
 	EventSystem.h
+	EngineCallback.cpp
 	BaseMenu.cpp
 	Btns.cpp
 	MenuStrings.cpp

@@ -1,6 +1,7 @@
 /*
 enginecallback.h - actual engine callbacks
 Copyright (C) 2010 Uncle Mike
+Copyright (C) 2017 a1batross
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,7 +18,8 @@ GNU General Public License for more details.
 #define ENGINECALLBACKS_H
 
 #include "menu_int.h"
-#include "BaseMenu.h"
+#include "Coord.h"
+
 class EngFuncs
 {
 public:
@@ -32,8 +34,7 @@ public:
 	{ return engfuncs.pfnPIC_Width( hPic ); }
 	static inline int	PIC_Height( HIMAGE hPic )
 	{ return engfuncs.pfnPIC_Height( hPic ); }
-	static inline void	PIC_Set( HIMAGE hPic, int r, int g, int b, int a = 255 )
-	{ engfuncs.pfnPIC_Set( hPic, r, g, b, a );	}
+	static void	PIC_Set( HIMAGE hPic, int r, int g, int b, int a = 255 );
 
 	static inline void	PIC_Draw( int x, int y, int width, int height, const wrect_t *prc = NULL )
 	{ engfuncs.pfnPIC_Draw( x, y, width, height, prc ); }
