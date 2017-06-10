@@ -20,16 +20,16 @@ enum
 
 enum ETextAlignment
 {
-	QM_LEFT = 0, // justify by left
-	QM_CENTER,   // justify by center
-	QM_RIGHT,     // justify by right
-};
+	QM_CENTER		 = 0,
+	QM_TOP           = BIT( 0 ),
+	QM_BOTTOM        = BIT( 1 ),
+	QM_LEFT          = BIT( 2 ),
+	QM_RIGHT         = BIT( 3 ),
 
-enum EVertAlignment
-{
-	QM_BOTTOM = 0,
-	QM_VCENTER,
-	QM_TOP
+	QM_TOPLEFT       = QM_TOP     | QM_LEFT,
+	QM_TOPRIGHT      = QM_TOP     | QM_RIGHT,
+	QM_BOTTOMLEFT    = QM_BOTTOM  | QM_LEFT,
+	QM_BOTTOMRIGHT   = QM_BOTTOM  | QM_RIGHT,
 };
 
 enum EFontSizes

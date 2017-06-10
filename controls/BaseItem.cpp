@@ -18,7 +18,7 @@ CMenuBaseItem::CMenuBaseItem()
 	iColor = uiPromptTextColor;
 	iFocusColor = uiPromptFocusColor;
 
-	eTextAlignment = QM_LEFT;
+	eTextAlignment = QM_TOPLEFT;
 	eFocusAnimation = QM_NOFOCUSANIMATION;
 	eLetterCase = QM_NOLETTERCASE;
 
@@ -55,7 +55,7 @@ void CMenuBaseItem::Char(int key)
 
 const char *CMenuBaseItem::Key(int key, int down)
 {
-	return uiSoundNull;
+	return 0;
 }
 
 void CMenuBaseItem::SetCharSize(EFontSizes fs)
