@@ -36,11 +36,6 @@ void CMenuFramework::Hide()
 	uiStatic.rootPosition = 0;
 }
 
-bool CMenuFramework::IsVisible()
-{
-	return this == uiStatic.rootActive;
-}
-
 void CMenuFramework::Init()
 {
 	CMenuBaseWindow::Init();
@@ -59,9 +54,6 @@ void CMenuFramework::VidInit()
 
 bool CMenuFramework::DrawAnimation(EAnimation anim)
 {
-	if( anim == ANIM_IN )
-		Draw();
-
-	return CMenuPicButton::DrawTitleAnim( anim );
+	return CMenuBaseWindow::DrawAnimation( anim );
 }
 

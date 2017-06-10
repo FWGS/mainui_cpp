@@ -15,17 +15,25 @@ void CMenuBaseWindow::Show()
 	Init();
 	VidInit();
 	PushMenu();
+	EnableTransition();
 	m_bAllowEnterActivate = false;
 }
 
 void CMenuBaseWindow::Hide()
 {
 	PopMenu();
+	EnableTransition();
 }
 
 bool CMenuBaseWindow::IsVisible()
 {
-	return this == uiStatic.menuStack[uiStatic.menuDepth-1];
+	// slow!
+	for( int i = uiStatic.rootPosition; i < uiStatic.menuDepth; i++  )
+	{
+		if( uiStatic.menuStack[i] == this )
+			return true;
+	}
+	return false;
 }
 
 void CMenuBaseWindow::PushMenu()
@@ -60,13 +68,10 @@ void CMenuBaseWindow::PushMenu()
 		uiStatic.menuStack[uiStatic.menuDepth++] = this;
 	}
 
-	if(( uiStatic.prevMenu = uiStatic.menuActive ))
-	{
-		uiStatic.prevMenu->bInTransition = true;
-	}
-
+	uiStatic.prevMenu = uiStatic.menuActive;
+	if( this->IsRoot() && uiStatic.prevMenu && uiStatic.prevMenu->IsRoot() )
+		uiStatic.prevMenu->EnableTransition();
 	uiStatic.menuActive = this;
-	bInTransition = true; // enable transitions
 
 	uiStatic.firstDraw = true;
 	uiStatic.enterSound = gpGlobals->time + 0.15;	// make some delay
@@ -102,10 +107,10 @@ void CMenuBaseWindow::PopMenu()
 
 	if( uiStatic.menuDepth )
 	{
-		if(( uiStatic.prevMenu = uiStatic.menuActive ))
-			uiStatic.prevMenu->bInTransition = true;
-
+		uiStatic.prevMenu = this;
 		uiStatic.menuActive = uiStatic.menuStack[uiStatic.menuDepth-1];
+		if( this->IsRoot() && uiStatic.menuActive->IsRoot() )
+			uiStatic.menuActive->EnableTransition();
 
 		uiStatic.firstDraw = true;
 	}
@@ -167,5 +172,34 @@ void CMenuBaseWindow::Draw()
 
 bool CMenuBaseWindow::DrawAnimation(EAnimation anim)
 {
+	float alpha;
+
+	if( anim == ANIM_IN )
+	{
+		alpha = ( uiStatic.realTime - m_iTransitionStartTime ) / 200.0f;
+	}
+	else if( anim == ANIM_OUT )
+	{
+		alpha = 1.0f - ( uiStatic.realTime - m_iTransitionStartTime ) / 200.0f;
+	}
+
+	if(	   anim == ANIM_IN  && alpha < 1.0f
+		|| anim == ANIM_OUT && alpha > 0.0f )
+	{
+		UI_EnableAlphaFactor( alpha );
+
+		Draw();
+
+		UI_DisableAlphaFactor();
+
+		return false; // continue animation
+	}
+
 	return true;
+}
+
+void CMenuBaseWindow::EnableTransition()
+{
+	bInTransition = true;
+	m_iTransitionStartTime = uiStatic.realTime;
 }
