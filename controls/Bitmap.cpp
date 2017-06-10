@@ -68,6 +68,7 @@ const char *CMenuBitmap::Key( int key, int down )
 		sound = uiSoundLaunch;
 		break;
 	}
+
 	if( sound && ( iFlags & QMF_SILENT ))
 		sound = uiSoundNull;
 
@@ -165,6 +166,14 @@ CMenuBackgroundBitmap::Draw
 */
 void CMenuBackgroundBitmap::Draw()
 {
+	if( m_pParent->IsWindow() )
+	{
+		CMenuBaseWindow *parentWindow = (CMenuBaseWindow*)m_pParent;
+
+		if( parentWindow->bInTransition && parentWindow->IsRoot() && !parentWindow->IsVisible() )
+			return;
+	}
+
 	if( bFillColor )
 	{
 		UI_FillRect( m_scPos, m_scSize, iColor );
