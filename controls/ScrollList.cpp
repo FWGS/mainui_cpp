@@ -510,7 +510,7 @@ void CMenuScrollList::Draw( )
 	y = m_scPos.y + m_scChSize.h;
 
 	// prevent the columns out of rectangle bounds
-	UI::PushScissor( x, y, m_scSize.w - arrow.w - uiStatic.outlineWidth, m_scSize.h );
+	UI::Scissor::PushScissor( x, y, m_scSize.w - arrow.w - uiStatic.outlineWidth, m_scSize.h );
 
 	for( i = iTopItem; i < iTopItem + iNumRows; i++, y += m_scChSize.h )
 	{
@@ -541,5 +541,5 @@ void CMenuScrollList::Draw( )
 		}
 	}
 
-	UI::PopScissor();
+	UI::Scissor::PopScissor();
 }

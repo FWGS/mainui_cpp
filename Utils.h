@@ -69,6 +69,11 @@ extern void UI_FinalCredits( void );
 // ScreenWidth returns the width of the screen, in ppos.xels
 #define ScreenWidth		((float)(gpGlobals->scrWidth))
 
+#define Alpha( x )	( ((x) & 0xFF000000 ) >> 24 )
+#define Red( x )	( ((x) & 0xFF0000) >> 16 )
+#define Green( x )	( ((x) & 0xFF00 ) >> 8 )
+#define Blue( x )	( ((x) & 0xFF ) >> 0 )
+
 inline unsigned int PackRGB( int r, int g, int b )
 {
 	return ((0xFF)<<24|(r)<<16|(g)<<8|(b));
@@ -103,6 +108,22 @@ inline int UnpackAlpha( unsigned int ulRGBA )
 {
 	return ((ulRGBA & 0xFF000000) >> 24);	
 }
+
+inline float InterpVal( float from, float to, float frac )
+{
+	return from + (to - from) * frac;
+}
+
+inline int InterpColor( int from, int to, float frac )
+{
+	return PackRGBA(
+		InterpVal( Red( from ), Red( to ), frac ),
+		InterpVal( Green( from ), Green( to ), frac ),
+		InterpVal( Blue( from ), Blue( to ), frac ),
+		InterpVal( Alpha( from ), Alpha( to ), frac ) );
+}
+
+
 
 inline float RemapVal( float val, float A, float B, float C, float D)
 {

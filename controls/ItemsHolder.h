@@ -19,6 +19,7 @@ public:
 	virtual void Draw( void );
 
 	virtual bool MouseMove( int x, int y );
+	virtual bool IsWindow() { return false; }
 
 	void CursorMoved( void );
 	void SetCursor( int newCursor, bool notify = true );

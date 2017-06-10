@@ -12,6 +12,9 @@
 #endif
 
 
+#define DEFAULT_MENUFONT "Impact"
+#define DEFAULT_CONFONT  "Arial"
+
 // Probably isn't a good idea until I don't have implemented SDF
 #define SCALE_FONTS 1
 
@@ -56,9 +59,9 @@ void CFontManager::VidInit( void )
 
 		// ordering is important!
 		// See CBaseMenuItem::SetCharSize()
-		uiStatic.hDefaultFont = CreateFont( "Noto Sans", 26 * scale, 100, 0, 0, FONT_NONE );
-		uiStatic.hSmallFont   = CreateFont( "Noto Sans", 20 * scale, 100, 0, 0, FONT_NONE );
-		uiStatic.hBigFont     = CreateFont( "Noto Sans", 40 * scale, 100, 0, 0, FONT_NONE );
+		uiStatic.hDefaultFont = CreateFont( DEFAULT_MENUFONT, UI_MED_CHAR_HEIGHT * scale, 100, 0, 0, FONT_NONE );
+		uiStatic.hSmallFont   = CreateFont( DEFAULT_MENUFONT, UI_SMALL_CHAR_HEIGHT * scale, 100, 0, 0, FONT_NONE );
+		uiStatic.hBigFont     = CreateFont( DEFAULT_MENUFONT, UI_BIG_CHAR_HEIGHT * scale, 100, 0, 0, FONT_NONE );
 	}
 
 	int consoleFontHeight;
@@ -70,7 +73,7 @@ void CFontManager::VidInit( void )
 	if( consoleFontHeight != prevConsoleFontHeight || forceUpdateConsoleFont )
 	{
 		DeleteFont( uiStatic.hConsoleFont );
-		uiStatic.hConsoleFont = CreateFont( "Arial", consoleFontHeight, 100, 0, 0, FONT_NONE );
+		uiStatic.hConsoleFont = CreateFont( DEFAULT_CONFONT, consoleFontHeight, 100, 0, 0, FONT_NONE );
 		prevConsoleFontHeight = consoleFontHeight;
 	}
 
@@ -291,7 +294,7 @@ int CFontManager::GetTextWideScaled(HFont font, const wchar_t *text, const int h
 	{
 		return GetTextWide( font, text )
 #if SCALE_FONTS
-			* ((float)height / (float)pFont->GetHeight())
+			* ((float)height / (float)pFont->GetTall())
 #endif
 		;
 	}
@@ -306,7 +309,7 @@ int CFontManager::GetTextWideScaled(HFont font, const char *text, const int heig
 	{
 		return GetTextWide( font, text )
 #if SCALE_FONTS
-			* ((float)height / (float)pFont->GetHeight())
+			* ((float)height / (float)pFont->GetTall())
 #endif
 		;
 	}
@@ -337,11 +340,10 @@ int CFontManager::DrawCharacter(HFont fontHandle, wchar_t ch, Point pt, Size sz,
 		return 0;
 
 	Size charSize;
-	int a, b, c, width, height;
+	int a, b, c, width;
 
 	font->GetCharABCWidths( ch, a, b, c );
-	width = a + b + c; // TODO: Rework this to have a nice looking Italic fonts
-	height = font->GetHeight();
+	width = a + b + c;
 
 	// skip whitespace
 	if( ch == ' ' )
@@ -349,7 +351,7 @@ int CFontManager::DrawCharacter(HFont fontHandle, wchar_t ch, Point pt, Size sz,
 #if SCALE_FONTS
 		if( sz.h > 0 )
 		{
-			return width * ((float)sz.h / (float)height);
+			return width * ((float)sz.h / (float)font->GetTall())  - 0.5f;
 		}
 		else
 #endif
@@ -372,7 +374,7 @@ int CFontManager::DrawCharacter(HFont fontHandle, wchar_t ch, Point pt, Size sz,
 #if SCALE_FONTS	// Scale font
 		if( sz.h > 0 )
 		{
-			charSize.w = width * ((float)sz.h / (float)height);
+			charSize.w = width * ((float)sz.h / (float)font->GetTall()) - 0.5f;
 			charSize.h = sz.h;
 		}
 		else
@@ -389,7 +391,9 @@ int CFontManager::DrawCharacter(HFont fontHandle, wchar_t ch, Point pt, Size sz,
 	return charSize.w;
 }
 
-void CFontManager::DebugDraw(HFont font)
+void CFontManager::DebugDraw(HFont fontHandle)
 {
-	GetIFontFromHandle(font)->DebugDraw();
+	IBaseFont *font = GetIFontFromHandle(fontHandle);
+
+	font->DebugDraw();
 }

@@ -144,7 +144,7 @@ void IBaseFont::UploadGlyphsForRanges(IBaseFont::charRange_t *range, int rangeSi
 				if( ystart - height <= 0 )
 				{
 					GetTextureName( name, sizeof( name ), m_iPages );
-					HIMAGE hImage = EngFuncs::PIC_Load( name, bmp, bmpSize, PIC_KEEP_RGBDATA );
+					HIMAGE hImage = EngFuncs::PIC_Load( name, bmp, bmpSize, 0 );
 					Con_DPrintf( "Uploaded %s to %i\n", name, hImage );
 
 					for( int i = lastCharPageChanged; i < ch; i++ )
@@ -166,7 +166,7 @@ void IBaseFont::UploadGlyphsForRanges(IBaseFont::charRange_t *range, int rangeSi
 			// set rgbdata rect
 			wrect_t rect;
 			rect.top    = MAX_PAGE_SIZE - ystart;
-			rect.bottom = MAX_PAGE_SIZE - ystart + height;
+			rect.bottom = MAX_PAGE_SIZE - ystart + height - 1;
 			rect.left   = xstart;
 			rect.right  = xstart + drawSize.w;
 
@@ -199,7 +199,7 @@ void IBaseFont::UploadGlyphsForRanges(IBaseFont::charRange_t *range, int rangeSi
 	}
 
 	GetTextureName( name, sizeof( name ), m_iPages );
-	HIMAGE hImage = EngFuncs::PIC_Load( name, bmp, bmpSize, PIC_KEEP_RGBDATA );
+	HIMAGE hImage = EngFuncs::PIC_Load( name, bmp, bmpSize, 0 );
 	Con_DPrintf( "Uploaded %s to %i\n", name, hImage );
 	delete[] bmp;
 	delete[] temp;

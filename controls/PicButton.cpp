@@ -29,6 +29,8 @@ CMenuPicButton::CMenuPicButton() : CMenuBaseItem()
 
 	iFocusStartTime = 0;
 
+	eTextAlignment = QM_LEFT;
+
 	hPic = 0;
 	button_id = 0;
 	iOldState = BUTTON_NOFOCUS;
@@ -44,10 +46,16 @@ CMenuPicButton::Init
 void CMenuPicButton::VidInit( void )
 {
 	if( size.w < 1 )
-		size.w = g_FontMgr.GetTextWideScaled( font, szName, charSize.h );
+	{
+		//size.w = g_FontMgr.GetTextWideScaled( font, szName, charSize.h );
+		size.w = UI_BUTTONS_WIDTH;
+	}
 
 	if( size.h < 1 )
-		size.h = charSize.h * 1.5;
+	{
+		// size.h = charSize.h * 1.5;
+		size.h = UI_BUTTONS_HEIGHT;
+	}
 
 	CalcPosition();
 	CalcSizes();
@@ -105,7 +113,7 @@ const char *CMenuPicButton::Key( int key, int down )
 	return sound;
 }
 
-#define ALT_PICBUTTON_FOCUS_ANIM
+// #define ALT_PICBUTTON_FOCUS_ANIM
 
 /*
 =================
@@ -149,11 +157,11 @@ void CMenuPicButton::Draw( )
 
 	if( state != BUTTON_NOFOCUS )
 	{
-		flFill = (uiStatic.realTime - iFocusStartTime) / 600.0f;
+		flFill = (uiStatic.realTime - iFocusStartTime) / 200.0f;
 	}
 	else
 	{
-		flFill = 1 - (uiStatic.realTime - m_iLastFocusTime ) / 600.0f;
+		flFill = (uiStatic.realTime - m_iLastFocusTime ) / 200.0f;
 	}
 	flFill = bound( 0, flFill, 1 );
 
@@ -232,12 +240,34 @@ void CMenuPicButton::Draw( )
 
 		if(this != m_pParent->ItemAtCursor())
 		{
-			UI_DrawString( font, m_scPos, m_scSize, szName, iColor, false, m_scChSize, eTextAlignment, shadow );
+			HFont newFont;
+			Size size = m_scChSize;
+			Point newPos = m_scPos;
+
+			if( flFill >= 1.0f )
+			{
+				newFont = font;
+			}
+			else
+			{
+				newFont = uiStatic.hBigFont;
+				size.h = round(InterpVal( UI_BIG_CHAR_HEIGHT * uiStatic.scaleX, m_scChSize.h, flFill ));
+			}
+
+			UI_DrawString( newFont, newPos, m_scSize, szName, InterpColor( iFocusColor, iColor, flFill ), false, size, eTextAlignment, shadow );
 			return; // no focus
 		}
 
 		if( eFocusAnimation == QM_HIGHLIGHTIFFOCUS )
-			UI_DrawString( font, m_scPos, m_scSize, szName, iFocusColor, false, m_scChSize, eTextAlignment, shadow );
+		{
+			HFont newFont = uiStatic.hBigFont;
+			Size size = m_scChSize;
+			Point newPos = m_scPos;
+
+			size.h = UI_BIG_CHAR_HEIGHT * uiStatic.scaleX;
+
+			UI_DrawString( newFont, newPos, m_scSize, szName, iFocusColor, false, size, eTextAlignment, shadow );
+		}
 		else if( eFocusAnimation == QM_PULSEIFFOCUS )
 		{
 			int	color;
@@ -274,6 +304,8 @@ void CMenuPicButton::SetPicture( int ID )
 
 void CMenuPicButton::SetPicture(const char *filename)
 {
+	return;
+
 	size.w = UI_BUTTONS_WIDTH;
 	size.h = UI_BUTTONS_HEIGHT;
 

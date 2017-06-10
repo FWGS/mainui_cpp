@@ -199,8 +199,8 @@ void CMenuSwitch::Draw( void )
 	stringRightPoint.x += fTextOffsetX * uiStatic.scaleX;
 	stringRightPoint.y += fTextOffsetY * uiStatic.scaleY;
 
-	UI_DrawString( font, stringLeftPoint, m_leftSize, szLeftName, bState?iBgTextColor: iFgTextColor, iColor, m_scChSize, eTextAlignment, shadow, QM_VCENTER );
-	UI_DrawString( font, stringRightPoint, m_rightSize, szRightName, bState?iFgTextColor:iBgTextColor, iColor, m_scChSize, eTextAlignment, shadow, QM_VCENTER );
+	UI_DrawString( font, stringLeftPoint, m_leftSize, szLeftName, bState?iBgTextColor: iFgTextColor, iColor, m_scChSize, eTextAlignment, shadow );
+	UI_DrawString( font, stringRightPoint, m_rightSize, szRightName, bState?iFgTextColor:iBgTextColor, iColor, m_scChSize, eTextAlignment, shadow );
 
 	// draw rectangle
 	UI_DrawRectangle( m_scPos, m_scSize, uiInputFgColor );
