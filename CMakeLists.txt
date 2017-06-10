@@ -45,6 +45,9 @@ set (MAINUI_CONTROLS_SOURCES
 	controls/Switch.cpp
 	controls/BaseWindow.cpp
 	controls/ProgressBar.cpp
+	controls/Table.cpp
+	#controls/TabWidget.cpp
+	#controls/ScrollView.cpp
 	)
 
 set (MAINUI_MENUS_SOURCES
