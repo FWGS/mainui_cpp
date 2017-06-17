@@ -9,88 +9,22 @@ bool GlyphLessFunc( const IBaseFont::glyph_t &a, const IBaseFont::glyph_t &b )
 
 IBaseFont::IBaseFont()
 	: m_szName(), m_iTall(), m_iWeight(), m_iFlags(),
-	m_iHeight(), m_iMaxCharWidth(), m_bUnderlined(), m_iAscent(),
+	m_iHeight(), m_iMaxCharWidth(), m_iAscent(),
 	m_iGLTexture(), m_iBlur(), m_pGaussianDistribution(), m_fBrighten(),
 	m_glyphs(0, 0, GlyphLessFunc), m_iPages()
 {
 }
 
-void IBaseFont::ApplyBlurToTexture(Point rgbaPt, Size rgbaSz, unsigned char *rgba)
-{
-	if( !m_pGaussianDistribution )
-		return;
-
-	const int size = rgbaSz.w * rgbaSz.h * 4;
-	unsigned char *src = new unsigned char[size];
-	memcpy( src, rgba, size );
-	unsigned char *dest = rgba;
-
-	for( int y = 0; y < rgbaSz.h; y++ )
-	{
-		for( int x = 0; x < rgbaSz.w; x++, dest += 4 )
-		{
-			GetBlurValueForPixel( rgba, Point(x, y), rgbaSz, dest );
-		}
-	}
-
-	delete[] src;
-}
-
-void IBaseFont::GetBlurValueForPixel(unsigned char *src, Point srcPt, Size srcSz, unsigned char *dest)
-{
-	float accum;
-
-	accum = 0.0f;
-
-	// scan the positive x direction
-	int maxX = min( srcPt.x + m_iBlur, srcSz.w );
-	int minX = max( srcPt.x - m_iBlur, 0 );
-	for( int x = minX; x <= maxX; x++ )
-	{
-		int maxY = min( srcPt.y + m_iBlur, srcSz.h - 1);
-		int minY = max( srcPt.y - m_iBlur, 0);
-		for (int y = minY; y <= maxY; y++)
-		{
-			unsigned char *srcPos = src + ((x + (y * srcSz.w)) * 4);
-
-			// muliply by the value matrix
-			float weight = m_pGaussianDistribution[x - srcPt.x + m_iBlur];
-			float weight2 = m_pGaussianDistribution[y - srcPt.y + m_iBlur];
-			accum += (srcPos[0] * (weight * weight2));
-		}
-	}
-
-	// all the values are the same for fonts, just use the calculated alpha
-	dest[0] = dest[1] = dest[2] = 255;
-	dest[3] = min( (int)accum, 255);
-}
-
-void IBaseFont::CreateGaussianDistribution()
-{
-	double sigma2;
-	if( m_iBlur < 1 )
-		return;
-
-	sigma2 = 0.683 * m_iBlur;
-	sigma2 *= sigma2;
-	m_pGaussianDistribution = new float[m_iBlur * 2 + 1];
-	for( int x = 0; x <= m_iBlur * 2; x++ )
-	{
-		int val = x - m_iBlur;
-		m_pGaussianDistribution[x] = (float)(1.0f / sqrt(2 * M_PI * sigma2)) * pow(M_E, -1 * (val * val) / (2 * sigma2));
-
-		// brightening factor
-		m_pGaussianDistribution[x] *= m_fBrighten;
-	}
-}
 
 void IBaseFont::GetTextureName(char *dst, size_t len, int pageNum) const
 {
-	char attribs[4];
+	char attribs[6];
 	int i = 0;
 	if( GetFlags() & FONT_ITALIC ) attribs[i++] = 'i';
 	if( GetFlags() & FONT_UNDERLINE ) attribs[i++] = 'u';
-	if( GetFlags() & FONT_GAUSSBLUR ) attribs[i++] = 'g';
+	if( m_iBlur ) attribs[i++] = 'g';
+	if( m_iOutlineSize ) attribs[i++] = 'o';
+	if( m_iScanlineOffset ) attribs[i++] = 's';
 
 	if( i == 0 )
 	{
@@ -248,11 +182,6 @@ bool IBaseFont::IsEqualTo(const char *name, int tall, int weight, int blur, int 
 	return true;
 }
 
-bool IBaseFont::GetUnderlined() const
-{
-	return m_bUnderlined;
-}
-
 const char *IBaseFont::GetName() const
 {
 	return m_szName;
@@ -260,7 +189,7 @@ const char *IBaseFont::GetName() const
 
 int IBaseFont::GetHeight() const
 {
-	return m_iHeight;
+	return m_iHeight + m_iBlur + m_iOutlineSize;
 }
 
 int IBaseFont::GetAscent() const
@@ -285,7 +214,7 @@ int IBaseFont::GetWeight() const
 
 int IBaseFont::GetTall() const
 {
-	return m_iTall;
+	return m_iTall + m_iBlur + m_iOutlineSize;
 }
 
 void IBaseFont::DebugDraw() const
@@ -302,5 +231,151 @@ void IBaseFont::DebugDraw() const
 
 		EngFuncs::PIC_Set( hImage, 255, 255, 255 );
 		EngFuncs::PIC_DrawTrans( Point(x, 0), Size( MAX_PAGE_SIZE, MAX_PAGE_SIZE ) );
+	}
+}
+
+void IBaseFont::ApplyBlur(Size rgbaSz, byte *rgba)
+{
+	if( !m_pGaussianDistribution )
+		return;
+
+	const int size = rgbaSz.w * rgbaSz.h * 4;
+	byte *src = new byte[size];
+	memcpy( src, rgba, size );
+
+	for( int y = 0; y < rgbaSz.h; y++ )
+	{
+		for( int x = 0; x < rgbaSz.w; x++ )
+		{
+			GetBlurValueForPixel( src, Point(x, y), rgbaSz, rgba );
+
+			rgba += 4;
+		}
+	}
+
+	delete[] src;
+}
+
+void IBaseFont::GetBlurValueForPixel(byte *src, Point srcPt, Size srcSz, byte *dest)
+{
+	float accum = 0.0f;
+
+	// scan the positive x direction
+	int maxX = min( srcPt.x + m_iBlur, srcSz.w );
+	int minX = max( srcPt.x - m_iBlur, 0 );
+	for( int x = minX; x <= maxX; x++ )
+	{
+		int maxY = min( srcPt.y + m_iBlur, srcSz.h - 1);
+		int minY = max( srcPt.y - m_iBlur, 0);
+		for (int y = minY; y <= maxY; y++)
+		{
+			byte *srcPos = src + ((x + (y * srcSz.w)) * 4);
+
+			// muliply by the value matrix
+			float weight = m_pGaussianDistribution[x - srcPt.x + m_iBlur];
+			float weight2 = m_pGaussianDistribution[y - srcPt.y + m_iBlur];
+			accum += (srcPos[3] * (weight * weight2));
+		}
+	}
+
+	// all the values are the same for fonts, just use the calculated alpha
+	dest[0] = dest[1] = dest[2] = 255;
+	dest[3] = min( (int)accum, 255);
+}
+
+void IBaseFont::CreateGaussianDistribution()
+{
+	double sigma2;
+	if( m_iBlur < 1 )
+		return;
+
+	sigma2 = 0.683 * m_iBlur;
+	sigma2 *= sigma2;
+	m_pGaussianDistribution = new float[m_iBlur * 2 + 1];
+	for( int x = 0; x <= m_iBlur * 2; x++ )
+	{
+		int val = x - m_iBlur;
+		m_pGaussianDistribution[x] = (float)(1.0f / sqrt(2 * M_PI * sigma2)) * pow(M_E, -1 * (val * val) / (2 * sigma2));
+
+		// brightening factor
+		m_pGaussianDistribution[x] *= m_fBrighten;
+	}
+}
+
+void IBaseFont::ApplyOutline(Point pt, Size rgbaSz, byte *rgba)
+{
+	if( !m_iOutlineSize )
+		return;
+
+	int x, y;
+
+	for( y = pt.x; y < rgbaSz.h; y++ )
+	{
+		for( x = pt.y; x < rgbaSz.w; x++ )
+		{
+			byte *src = &rgba[(x + (y * rgbaSz.w)) * 4];
+
+			if( src[3] != 0 )
+				continue;
+
+			int shadowX, shadowY;
+
+			for( shadowX = -m_iOutlineSize; shadowX <= m_iOutlineSize; shadowX++ )
+			{
+				for( shadowY = -m_iOutlineSize; shadowY <= m_iOutlineSize; shadowY++ )
+				{
+					if( !shadowX && !shadowY )
+						continue;
+
+					int testX = shadowX + x, testY = shadowY + y;
+					if( testX < 0 || testX >= rgbaSz.w ||
+						testY < 0 || testY >= rgbaSz.h )
+						continue;
+
+					byte *test = &rgba[(testX + (testY * rgbaSz.w)) * 4];
+					if( test[0] == 0 || test[1] == 0 || test[3] == 0 )
+						continue;
+
+					src[0] = src[1] = src[2] = 0;
+					src[3] = -1;
+				}
+			}
+		}
+	}
+}
+
+void IBaseFont::ApplyScanline(Size rgbaSz, byte *rgba)
+{
+	if( m_iScanlineOffset < 2 )
+		return;
+
+	for( int y = 0; y < rgbaSz.h; y++ )
+	{
+		if( y % m_iScanlineOffset == 0 )
+			continue;
+
+		byte *src = &rgba[(y * rgbaSz.w) * 4];
+		for( int x = 0; x < rgbaSz.w; x++, src += 4 )
+		{
+			src[0] *= m_fScanlineScale;
+			src[1] *= m_fScanlineScale;
+			src[2] *= m_fScanlineScale;
+		}
+	}
+}
+
+void IBaseFont::ApplyStrikeout(Size rgbaSz, byte *rgba)
+{
+	if( !(m_iFlags & FONT_STRIKEOUT) )
+		return;
+
+	const int y = rgbaSz.h * 0.5f;
+
+	byte *src = &rgba[(y*rgbaSz.w) * 4];
+
+	for( int x = 0; x < rgbaSz.w; x++, src += 4 )
+	{
+		src[0] = src[1] = src[2] = 127;
+		src[3] = 255;
 	}
 }

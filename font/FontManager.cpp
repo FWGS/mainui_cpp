@@ -59,9 +59,13 @@ void CFontManager::VidInit( void )
 
 		// ordering is important!
 		// See CBaseMenuItem::SetCharSize()
-		uiStatic.hDefaultFont = CreateFont( DEFAULT_MENUFONT, UI_MED_CHAR_HEIGHT * scale, 100, 0, 0, FONT_NONE );
-		uiStatic.hSmallFont   = CreateFont( DEFAULT_MENUFONT, UI_SMALL_CHAR_HEIGHT * scale, 100, 0, 0, FONT_NONE );
-		uiStatic.hBigFont     = CreateFont( DEFAULT_MENUFONT, UI_BIG_CHAR_HEIGHT * scale, 100, 0, 0, FONT_NONE );
+		uiStatic.hDefaultFont = CFontBuilder( DEFAULT_MENUFONT, UI_BIG_CHAR_HEIGHT * scale, 1000 )
+			.Create();
+		uiStatic.hSmallFont   = CFontBuilder( DEFAULT_MENUFONT, UI_SMALL_CHAR_HEIGHT * scale, 100 )
+			.Create();
+		uiStatic.hBigFont     = CFontBuilder( DEFAULT_MENUFONT, UI_BIG_CHAR_HEIGHT * scale, 1000 )
+			.SetBlurParams( 5, 1.5f )
+			.Create();
 	}
 
 	int consoleFontHeight;
@@ -73,7 +77,9 @@ void CFontManager::VidInit( void )
 	if( consoleFontHeight != prevConsoleFontHeight || forceUpdateConsoleFont )
 	{
 		DeleteFont( uiStatic.hConsoleFont );
-		uiStatic.hConsoleFont = CreateFont( DEFAULT_CONFONT, consoleFontHeight, 100, 0, 0, FONT_NONE );
+		uiStatic.hConsoleFont = CFontBuilder( DEFAULT_CONFONT, consoleFontHeight, 100 )
+			.SetOutlineSize()
+			.Create();
 		prevConsoleFontHeight = consoleFontHeight;
 	}
 
@@ -98,34 +104,6 @@ void CFontManager::DeleteFont(HFont hFont)
 
 		m_Fonts.FastRemove( hFont - 1 );
 	}
-}
-
-HFont CFontManager::CreateFont(const char *name, int tall, int weight, int blur, float brighten, int flags)
-{
-	// check existing font at first
-	for( int i = 0; i < m_Fonts.Count(); i++ )
-	{
-		IBaseFont *font = m_Fonts[i];
-
-		if( font->IsEqualTo( name, tall, weight, blur, flags ) )
-			return i;
-	}
-
-	#ifdef _WIN32
-	CWinAPIFont *font = new CWinAPIFont();
-	#else
-	CFreeTypeFont *font = new CFreeTypeFont();
-	#endif
-
-	if( !font->Create( name, tall, weight, blur, brighten, flags ) )
-	{
-		delete font;
-		return -1;
-	}
-
-	UploadTextureForFont( font );
-
-	return m_Fonts.AddToTail(font) + 1;
 }
 
 IBaseFont *CFontManager::GetIFontFromHandle(HFont font)
@@ -182,7 +160,7 @@ bool CFontManager::GetFontUnderlined(HFont font)
 {
 	IBaseFont *pFont = GetIFontFromHandle( font );
 	if( pFont )
-		return pFont->GetUnderlined();
+		return pFont->GetFlags() & FONT_UNDERLINE;
 	return false;
 }
 
@@ -374,21 +352,29 @@ int CFontManager::DrawCharacter(HFont fontHandle, wchar_t ch, Point pt, Size sz,
 #if SCALE_FONTS	// Scale font
 		if( sz.h > 0 )
 		{
-			charSize.w = width * ((float)sz.h / (float)font->GetTall()) - 0.5f;
+			charSize.w = (glyph.rect.right - glyph.rect.left) * ((float)sz.h / (float)font->GetTall()) - 0.5f;
 			charSize.h = sz.h;
 		}
 		else
 #endif
 		{
-			charSize.w = width;
+			charSize.w = glyph.rect.right - glyph.rect.left;
 			charSize.h = font->GetHeight();
 		}
+
+		pt.x += a;
 
 		EngFuncs::PIC_Set( glyph.texture, r, g, b, alpha );
 		EngFuncs::PIC_DrawTrans( pt, charSize, &glyph.rect );
 	}
 
-	return charSize.w;
+#if SCALE_FONTS
+	if( sz.h > 0 )
+	{
+		return width * ((float)sz.h / (float)font->GetTall())  - 0.5f;
+	}
+#endif
+	return width;
 }
 
 void CFontManager::DebugDraw(HFont fontHandle)
@@ -396,4 +382,34 @@ void CFontManager::DebugDraw(HFont fontHandle)
 	IBaseFont *font = GetIFontFromHandle(fontHandle);
 
 	font->DebugDraw();
+}
+
+
+HFont CFontBuilder::Create()
+{
+	// check existing font at first
+	for( int i = 0; i < g_FontMgr.m_Fonts.Count(); i++ )
+	{
+		IBaseFont *font = g_FontMgr.m_Fonts[i];
+
+		if( font->IsEqualTo( m_szName, m_iTall, m_iWeight, m_iBlur, m_iFlags ) )
+			return i;
+	}
+
+#ifdef _WIN32
+	CWinAPIFont *font = new CWinAPIFont();
+#else
+	CFreeTypeFont *font = new CFreeTypeFont();
+#endif
+
+	if( !font->Create( m_szName, m_iTall, m_iWeight, m_iBlur, m_fBrighten, m_iOutlineSize, m_iScanlineOffset, m_fScanlineScale, m_iFlags ) )
+	{
+		delete font;
+		return -1;
+	}
+
+	g_FontMgr.UploadTextureForFont( font );
+
+	return g_FontMgr.m_Fonts.AddToTail(font) + 1;
+
 }

@@ -26,16 +26,17 @@ public:
 	CFreeTypeFont();
 	~CFreeTypeFont();
 
-	bool Create(const char *name, int tall, int weight, int blur, float brighten, int flags);
+	bool Create(const char *name,
+		int tall, int weight,
+		int blur, float brighten,
+		int outlineSize,
+		int scanlineOffset, float scanlineScale,
+		int flags);
 	void GetCharRGBA(int ch, Point pt, Size sz, unsigned char *rgba, Size &drawSize);
 	bool IsValid() const;
 	void GetCharABCWidths( int ch, int &a, int &b, int &c );
 	bool HasChar( int ch ) const;
 private:
-	int  m_iOutlineSize;
-
-	bool m_bAntialiased, m_bAdditive;
-
 	CUtlRBTree<abc_t, int> m_ABCCache;
 
 	FT_Face face;

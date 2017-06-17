@@ -13,11 +13,7 @@ enum EFontFlags
 	FONT_ITALIC    = BIT( 0 ),
 	FONT_UNDERLINE = BIT( 1 ),
 	FONT_STRIKEOUT = BIT( 2 ),
-	FONT_SYMBOL    = BIT( 3 ),
-	FONT_ANTIALIAS = BIT( 4 ),
-	FONT_GAUSSBLUR = BIT( 5 ),
-	// FONT_ROTARY    = BIT( 7 ),
-	// FONT_DROPSHADOW = BIT( 8 )
+	// FONT_DROPSHADOW = BIT( 7 )
 };
 
 /*
@@ -33,7 +29,6 @@ public:
 
 	void DeleteAllFonts();
 
-	HFont CreateFont(const char *name, int tall, int weight, int blur, float brighten, int flags);
 	void DeleteFont( HFont hFont );
 
 	HFont GetFontByName( const char *name );
@@ -63,6 +58,60 @@ private:
 	void UploadTextureForFont(IBaseFont *font );
 
 	CUtlVector<IBaseFont*> m_Fonts;
+
+	friend class CFontBuilder;
+};
+
+class CFontBuilder
+{
+public:
+	CFontBuilder( const char *name, int tall, int weight )
+	{
+		m_szName = name;
+		m_iTall = tall;
+		m_iWeight = weight;
+
+		m_iFlags = FONT_NONE;
+		m_iBlur = m_iScanlineOffset = m_iOutlineSize = 0;
+	}
+
+	CFontBuilder &SetBlurParams( int blur, float brighten = 1.0f )
+	{
+		m_iBlur = blur;
+		m_fBrighten = brighten;
+		return *this;
+	}
+
+	CFontBuilder &SetOutlineSize( int outlineSize = 1 )
+	{
+		m_iOutlineSize = outlineSize;
+		return *this;
+	}
+
+	CFontBuilder &SetScanlineParams( int offset = 2, float scale = 0.7f )
+	{
+		m_iScanlineOffset = offset;
+		m_fScanlineScale = scale;
+		return *this;
+	}
+
+	CFontBuilder &SetFlags( int flags )
+	{
+		m_iFlags = flags;
+		return *this;
+	}
+
+	HFont Create();
+private:
+	const char *m_szName;
+	int m_iTall, m_iWeight, m_iFlags;
+	int m_iBlur;
+	float m_fBrighten;
+
+	int m_iOutlineSize;
+
+	int m_iScanlineOffset;
+	float m_fScanlineScale;
 };
 
 extern CFontManager g_FontMgr;

@@ -17,8 +17,6 @@ bool ABCCacheLessFunc( const abc_t &a, const abc_t &b )
 }
 
 CFreeTypeFont::CFreeTypeFont() : IBaseFont(),
-	m_iOutlineSize(),
-	m_bAntialiased(), m_bAdditive(),
 	m_ABCCache(0, 0, ABCCacheLessFunc), face(), m_szRealFontFile()
 {
 }
@@ -115,21 +113,21 @@ bool CFreeTypeFont::FindFontDataFile( const char *name, int tall, int weight, in
 	return bRet;
 }
 
-bool CFreeTypeFont::Create(const char *name, int tall, int weight, int blur, float brighten, int flags)
+bool CFreeTypeFont::Create(const char *name, int tall, int weight, int blur, float brighten, int outlineSize, int scanlineOffset, float scanlineScale, int flags)
 {
 	strncpy( m_szName, name, sizeof( m_szName ) - 1 );
 	m_szName[sizeof( m_szName ) - 1] = 0;
 	m_iTall = tall;
 	m_iWeight = weight;
 	m_iFlags = flags;
-	m_bAntialiased = flags & FONT_ANTIALIAS;
-	m_bUnderlined = flags & FONT_UNDERLINE;
-	if( flags & FONT_GAUSSBLUR )
-	{
-		m_iBlur = blur;
-		m_fBrighten = brighten;
-	}
-	m_iOutlineSize = 0;
+
+	m_iBlur = blur;
+	m_fBrighten = brighten;
+
+	m_iOutlineSize = outlineSize;
+
+	m_iScanlineOffset = scanlineOffset;
+	m_fScanlineScale = scanlineScale;
 
 
 	if( !FindFontDataFile( name, tall, weight, flags, m_szRealFontFile, 4096 ) )
@@ -146,7 +144,7 @@ bool CFreeTypeFont::Create(const char *name, int tall, int weight, int blur, flo
 
 	FT_Set_Pixel_Sizes( face, 0, tall - 1 );
 	m_iAscent = PIXEL(face->size->metrics.ascender );
-	m_iHeight = 2 * m_iOutlineSize + PIXEL( face->size->metrics.height );
+	m_iHeight = PIXEL( face->size->metrics.height );
 	m_iMaxCharWidth = PIXEL(face->size->metrics.max_advance );
 
 	CreateGaussianDistribution();
@@ -160,12 +158,16 @@ void CFreeTypeFont::GetCharRGBA(int ch, Point pt, Size sz, unsigned char *rgba, 
 	FT_Error error;
 	FT_GlyphSlot slot;
 	byte *buf, *dst;
+	int a, b, c;
 
-	if( ( error = FT_Load_Glyph( face, idx, FT_LOAD_RENDER | FT_LOAD_TARGET_LIGHT ) ) )
+	GetCharABCWidths( ch, a, b, c );
+
+	if( ( error = FT_Load_Glyph( face, idx, FT_LOAD_RENDER | FT_LOAD_TARGET_NORMAL ) ) )
 	{
 		printf( "Error in FT_Load_Glyph: %x\n", error );
 		return;
 	}
+
 
 	slot = face->glyph;
 	buf = slot->bitmap.buffer;
@@ -188,35 +190,39 @@ void CFreeTypeFont::GetCharRGBA(int ch, Point pt, Size sz, unsigned char *rgba, 
 	if( pushDown + yend > sz.h )
 		yend += sz.h - ( pushDown + yend );
 
-	int xend = slot->bitmap.width + (pushLeft > 0 ? pushLeft : 0);
+	int xend = slot->bitmap.width;
 	if( pushLeft + xend > sz.w )
 		xend += sz.w - ( pushLeft + xend );
 
 	buf = &slot->bitmap.buffer[ ystart * slot->bitmap.width ];
 	dst = rgba + 4 * sz.w * ( ystart + pushDown );
+
 	// iterate through copying the generated dib into the texture
-	for (int j = ystart; j < yend; j++)
+	for (int j = ystart; j < yend; j++, dst += 4 * sz.w, buf += slot->bitmap.width )
 	{
-		byte *xdst = dst + 4 * ( xstart + m_iBlur + pushLeft );
-		for (int i = xstart; i < xend; i++)
+		uint32_t *xdst = (uint32_t*)(dst + 4 * ( m_iBlur + m_iOutlineSize ));
+		for (int i = xstart; i < xend; i++, xdst++)
 		{
-			xdst[0] = -1;
-			xdst[1] = -1;
-			xdst[2] = -1;
-			xdst[3] = buf[i];
-
-			xdst += 4;
+			if( buf[i] > 0 )
+			{
+				// paint white and alpha
+				*xdst = 0x00FFFFFF | buf[i] << 24;
+			}
+			else
+			{
+				// paint black and null alpha
+				*xdst = 0;
+			}
 		}
-
-
-		buf += slot->bitmap.width;
-		dst += 4 * sz.w;
 	}
 
-	drawSize.w = xend - xstart;
-	drawSize.h = yend - ystart;
+	drawSize.w = xend - xstart + m_iBlur * 2 + m_iOutlineSize * 2;
+	drawSize.h = yend - ystart + m_iBlur * 2 + m_iOutlineSize * 2;
 
-	ApplyBlurToTexture( pt, sz, rgba );
+	ApplyBlur( sz, rgba );
+	ApplyOutline( Point( xstart, ystart ), sz, rgba );
+	ApplyScanline( sz, rgba );
+	ApplyStrikeout( sz, rgba );
 }
 
 bool CFreeTypeFont::IsValid()  const
@@ -251,7 +257,7 @@ void CFreeTypeFont::GetCharABCWidths(int ch, int &a, int &b, int &c)
 	else
 	{
 		find.a = PIXEL(face->glyph->metrics.horiBearingX) - m_iBlur;
-		find.b = PIXEL(face->glyph->metrics.width) + m_iBlur * 2;
+		find.b = PIXEL(face->glyph->metrics.width) + m_iBlur * 2 + m_iOutlineSize * 2;
 		find.c = PIXEL(face->glyph->metrics.horiAdvance -
 			 face->glyph->metrics.horiBearingX -
 			 face->glyph->metrics.width) - m_iBlur;
