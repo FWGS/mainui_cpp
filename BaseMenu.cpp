@@ -444,7 +444,7 @@ UI_LoadBackgroundImage
 void UI_LoadBackgroundImage( void )
 {
 	char filename[512];
-	char *afile, *pfile;
+	char *afile = NULL, *pfile;
 	char token[4096];
 
 	uiStatic.m_iSteamBackgroundCount = 0;
@@ -502,10 +502,11 @@ void UI_LoadBackgroundImage( void )
 	return;
 
 fallback:
-	EngFuncs::COM_FreeFile( afile );
+	if( afile )
+		EngFuncs::COM_FreeFile( afile );
 	uiStatic.m_iSteamBackgroundCount = 0;
 
-	if( EngFuncs::FileExists( "gfx/shell/splash.bmp", TRUE ))
+	if( EngFuncs::FileExists( "gfx/shell/splash.bmp", FALSE ))
 	{
 		// if we doesn't have logo.avi in gamedir we don't want to draw it
 		if( !EngFuncs::FileExists( "media/logo.avi", TRUE ))
