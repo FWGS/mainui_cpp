@@ -46,19 +46,6 @@ void CMenuSpinControl::VidInit( void )
 {
 	CalcPosition();
 	CalcSizes();
-
-	// scale the center box
-	m_scCenterBox = size.Scale();
-	m_scCenterBox.w -= m_scSize.h * 3;
-
-	m_scCenterPos = pos.Scale();
-	m_scCenterPos.x += m_scSize.h * 1.5;
-
-	// extend the width so it has room for the arrows
-	// m_scSize.w += (m_scSize.h * 3);
-
-	// calculate new X for the control
-	// m_scPos.x -= (m_scSize.h + (m_scSize.h/2));
 }
 
 /*
@@ -82,8 +69,8 @@ const char *CMenuSpinControl::Key( int key, int down )
 			break;
 
 		// calculate size and position for the arrows
-		arrow.w = m_scCenterBox.h + UI_OUTLINE_WIDTH * 2 * uiStatic.scaleX;
-		arrow.h = m_scCenterBox.h + UI_OUTLINE_WIDTH * 2 * uiStatic.scaleY;
+		arrow.w = m_scSize.h + UI_OUTLINE_WIDTH * 2 * uiStatic.scaleX;
+		arrow.h = m_scSize.h + UI_OUTLINE_WIDTH * 2 * uiStatic.scaleY;
 
 		left.x = m_scPos.x + UI_OUTLINE_WIDTH * uiStatic.scaleX;
 		left.y = m_scPos.y - UI_OUTLINE_WIDTH * uiStatic.scaleY;
@@ -141,6 +128,8 @@ void CMenuSpinControl::Draw( void )
 	int	leftFocus, rightFocus;
 	Size arrow;
 	Point left, right;
+	Point scCenterPos;
+	Size scCenterBox;
 
 	shadow = (iFlags & QMF_DROPSHADOW);
 
@@ -159,30 +148,37 @@ void CMenuSpinControl::Draw( void )
 	}
 
 	// calculate size and position for the arrows
-	arrow.w = m_scCenterBox.h + UI_OUTLINE_WIDTH * 2 * uiStatic.scaleX;
-	arrow.h = m_scCenterBox.h + UI_OUTLINE_WIDTH * 2 * uiStatic.scaleY;
+	arrow.w = m_scSize.h + UI_OUTLINE_WIDTH * 2;
+	arrow.h = m_scSize.h + UI_OUTLINE_WIDTH * 2;
 
-	left.x = m_scPos.x + UI_OUTLINE_WIDTH * uiStatic.scaleX;
-	left.y = m_scPos.y - UI_OUTLINE_WIDTH * uiStatic.scaleY;
-	right.x = m_scPos.x + (m_scSize.w - arrow.w) - UI_OUTLINE_WIDTH * uiStatic.scaleX;
-	right.y = m_scPos.y - UI_OUTLINE_WIDTH * uiStatic.scaleY;
+	left.x = m_scPos.x - UI_OUTLINE_WIDTH;
+	left.y = m_scPos.y - UI_OUTLINE_WIDTH;
+	right.x = m_scPos.x + (m_scSize.w - arrow.w) + UI_OUTLINE_WIDTH;
+	right.y = m_scPos.y - UI_OUTLINE_WIDTH;
+
+	scCenterPos.x = m_scPos.x + arrow.w;
+	scCenterPos.y = m_scPos.y;
+
+	scCenterBox.w = m_scSize.w - arrow.w * 2;
+	scCenterBox.h = m_scSize.h;
+
 
 	if( m_szBackground )
 	{
-		UI_DrawPic( m_scCenterPos, m_scCenterBox, uiColorWhite, m_szBackground );
+		UI_DrawPic( scCenterPos, scCenterBox, uiColorWhite, m_szBackground );
 	}
 	else
 	{
 		// draw the background
-		UI_FillRect( m_scCenterPos, m_scCenterBox, uiColorBlack );
+		UI_FillRect( scCenterPos, scCenterBox, uiColorBlack );
 
 		// draw the rectangle
-		UI_DrawRectangle( m_scCenterPos, m_scCenterBox, uiInputFgColor );
+		UI_DrawRectangle( scCenterPos, scCenterBox, uiInputFgColor );
 	}
 
 	if( iFlags & QMF_GRAYED )
 	{
-		UI_DrawString( m_scCenterPos, m_scCenterBox, m_szDisplay, uiColorDkGrey, true, m_scChSize, eTextAlignment, shadow );
+		UI_DrawString( scCenterPos, scCenterBox, m_szDisplay, uiColorDkGrey, true, m_scChSize, eTextAlignment, shadow );
 		UI_DrawPic( left, arrow, uiColorDkGrey, m_szLeftArrow );
 		UI_DrawPic( right, arrow, uiColorDkGrey, m_szRightArrow );
 		return; // grayed
@@ -190,7 +186,7 @@ void CMenuSpinControl::Draw( void )
 
 	if(this != m_pParent->ItemAtCursor())
 	{
-		UI_DrawString( m_scCenterPos, m_scCenterBox, m_szDisplay, iColor, false, m_scChSize, eTextAlignment, shadow );
+		UI_DrawString( scCenterPos, scCenterBox, m_szDisplay, iColor, false, m_scChSize, eTextAlignment, shadow );
 		UI_DrawPic(left, arrow, iColor, m_szLeftArrow);
 		UI_DrawPic(right, arrow, iColor, m_szRightArrow);
 		return;		// No focus
@@ -202,7 +198,7 @@ void CMenuSpinControl::Draw( void )
 
 	if( eFocusAnimation == QM_HIGHLIGHTIFFOCUS )
 	{
-		UI_DrawString( m_scCenterPos, m_scCenterBox, m_szDisplay, iFocusColor, false, m_scChSize, eTextAlignment, shadow );
+		UI_DrawString( scCenterPos, scCenterBox, m_szDisplay, iFocusColor, false, m_scChSize, eTextAlignment, shadow );
 		UI_DrawPic( left, arrow, iColor, (leftFocus) ? m_szLeftArrowFocus : m_szLeftArrow );
 		UI_DrawPic( right, arrow, iColor, (rightFocus) ? m_szRightArrowFocus : m_szRightArrow );
 	}
@@ -212,7 +208,7 @@ void CMenuSpinControl::Draw( void )
 
 		color = PackAlpha( iColor, 255 * (0.5 + 0.5 * sin( (float)uiStatic.realTime / UI_PULSE_DIVISOR )));
 
-		UI_DrawString( m_scCenterPos, m_scCenterBox, m_szDisplay, color, false, m_scChSize, eTextAlignment, shadow );
+		UI_DrawString( scCenterPos, scCenterBox, m_szDisplay, color, false, m_scChSize, eTextAlignment, shadow );
 		UI_DrawPic( left, arrow, (leftFocus) ? color : iColor, (leftFocus) ? m_szLeftArrowFocus : m_szLeftArrow );
 		UI_DrawPic( right, arrow, (rightFocus) ? color : iColor, (rightFocus) ? m_szRightArrowFocus : m_szRightArrow );
 	}

@@ -62,9 +62,6 @@ private:
 	short m_iFloatPrecision;
 
 	char m_szDisplay[CS_SIZE];
-
-	Point m_scCenterPos;
-	Size m_scCenterBox;
 };
 
 #endif // MENU_SPINCONTROL_H
