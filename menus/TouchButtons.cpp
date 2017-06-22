@@ -527,7 +527,7 @@ void CMenuTouchButtons::_VidInit()
 	precision.SetCoord( 400, 470 );
 	buttonList.SetRect( 72, 150, 300, 370 );
 
-	save.SetCoord( 384 - 72 + 320, 550 );
+	save.SetCoord( 384 - 42 + 320, 550 );
 	editor.SetCoord( 384 - 42 + 320, 600 );
 	select.SetRect( 400 + fields_w - 95, 300, 150,50 );
 
