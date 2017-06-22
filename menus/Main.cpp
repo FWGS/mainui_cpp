@@ -411,9 +411,9 @@ UI_Main_Init
 */
 void CMenuMain::_VidInit( void )
 {
-	if( gpGlobals->developer )
-		console.SetCoord( 72, CL_IsActive() ? 130: 230 );
+	Activate();
 
+	console.pos.x = 72;
 	resumeGame.SetCoord( 72, 230 );
 	disconnect.SetCoord( 72, 180 );
 	newGame.SetCoord( 72, 280 );
@@ -422,14 +422,12 @@ void CMenuMain::_VidInit( void )
 	if( CL_IsActive( ))
 	{
 		saveRestore.SetNameAndStatus( "Save\\Load Game", MenuStrings[IDS_MAIN_LOADSAVEHELP] );
-		saveRestore.SetPicture( PC_SAVE_LOAD_GAME);
+		saveRestore.SetPicture( PC_SAVE_LOAD_GAME );
 	}
 	else
 	{
 		saveRestore.SetNameAndStatus( "Load Game", MenuStrings[IDS_MAIN_LOADHELP] );
 		saveRestore.SetPicture( PC_LOAD_GAME );
-		resumeGame.Show();
-		disconnect.Show();
 	}
 
 	saveRestore.SetCoord( 72, bTrainMap ? 380 : 330 );
