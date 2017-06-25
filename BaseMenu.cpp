@@ -450,7 +450,7 @@ static bool UI_LoadBackgroundImageOld( bool gamedirOnly )
 		for( int x = 0; x < backgroundColumns; x++ )
 		{
 			sprintf( filename, "resource/background/800_%d_%c_loading.tga", y + 1, 'a' + x );
-			if( !EngFuncs::FileExists( filename, true ) )
+			if( !EngFuncs::FileExists( filename, gamedirOnly ) )
 				return false;
 
 			uiStatic.m_iSteamBackgroundCount++;
@@ -586,7 +586,7 @@ void UI_LoadBackgroundImage( )
 	bool haveBg;
 
 	// try to load backgrounds from mod
-	haveBg = UI_LoadBackgroundImageNew( true );
+	haveBg = UI_LoadBackgroundImageNew( false ); // vgui background layouts are inherited
 	if( haveBg ) return;
 
 	haveBg = UI_CheckBackgroundSplash( true );
