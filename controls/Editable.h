@@ -74,7 +74,8 @@ public:
 			switch( m_eType )
 			{
 			case CVAR_STRING:
-				strncpy( m_szOriginalString, m_szString, CS_SIZE);
+				strncpy( m_szString, EngFuncs::GetCvarString( m_szCvarName ), CS_SIZE );
+				strncpy( m_szOriginalString, m_szString, CS_SIZE );
 				m_szOriginalString[CS_SIZE-1] = 0;
 
 				SetCvarString( m_szOriginalString );
