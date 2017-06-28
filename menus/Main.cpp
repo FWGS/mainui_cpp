@@ -168,6 +168,7 @@ void CMenuMain::QuitCb(CMenuBaseItem *, void *)
 
 void CMenuMain::QuitDialog()
 {
+	dialog.Link( this );
 	if( CL_IsActive() )
 		dialog.SetMessage( MenuStrings[IDS_MAIN_QUITPROMPTINGAME] );
 	else
