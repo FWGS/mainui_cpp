@@ -184,6 +184,7 @@ void CMenuConnectionProgress::_Init( void )
 	disconnectButton.onActivated = DisconnectCb;
 	dialog.SetMessage( "Really disconnect?" );
 	dialog.onPositive = DisconnectCb;
+	dialog.Link( this );
 
 	title.iFlags = QMF_INACTIVE|QMF_DROPSHADOW;
 	title.eTextAlignment = QM_CENTER;
@@ -318,6 +319,13 @@ void UI_ConnectionProgress_f( void )
 		uiConnectionProgress.m_iSource = SOURCE_CREATEGAME;
 		uiConnectionProgress.SetServer( "" );
 		uiConnectionProgress.SetCommonText( "Starting local server...");
+		uiConnectionProgress.Show();
+	}
+
+	else if( !strcmp( EngFuncs::CmdArgv(1), "changelevel" ) )
+	{
+		uiConnectionProgress.m_iState = STATE_MENU;
+		uiConnectionProgress.SetCommonText( "Changing level on server");
 		uiConnectionProgress.Show();
 	}
 
