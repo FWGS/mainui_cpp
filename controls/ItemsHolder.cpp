@@ -13,7 +13,7 @@ CMenuItemsHolder::CMenuItemsHolder() :
 
 const char *CMenuItemsHolder::Key( int key, int down )
 {
-	const char *sound = NULL;
+	const char *sound = uiSoundNull;
 
 	if( m_numItems )
 	{
@@ -32,7 +32,7 @@ const char *CMenuItemsHolder::Key( int key, int down )
 			{
 				sound = item->Key( key, down );
 
-				if( sound && sound != uiSoundNull ) return sound;
+				if( sound ) return sound;
 			}
 		}
 
@@ -102,7 +102,7 @@ const char *CMenuItemsHolder::Key( int key, int down )
 		return uiSoundOut;
 	}
 
-	return uiSoundNull;
+	return sound;
 }
 
 void CMenuItemsHolder::Char( int ch )

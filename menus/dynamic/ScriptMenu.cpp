@@ -201,7 +201,7 @@ void CMenuScriptConfig::_Init( void )
 
 	CMenuScriptConfigPage *page = new CMenuScriptConfigPage;
 	page->SetRect( 340, 255, 660, 500 );
-	page->iFlags &= ~(QMF_GRAYED|QMF_INACTIVE);
+	page->iFlags &= ~(QMF_GRAYED|QMF_INACTIVE|QMF_MOUSEONLY);
 	page->Show();
 	m_iCurrentPage = 0;
 	m_iPagesCount = 1;
@@ -280,7 +280,7 @@ void CMenuScriptConfig::_Init( void )
 		editable->szStatusText = var->desc;
 		editable->SetCharSize( 12, 25 );
 		editable->LinkCvar( var->name, cvarType );
-		editable->iFlags &= ~(QMF_GRAYED|QMF_INACTIVE);
+		editable->iFlags &= ~(QMF_GRAYED|QMF_INACTIVE|QMF_MOUSEONLY);
 		editable->Show();
 
 		// create new page
