@@ -49,8 +49,11 @@ public:
 	}
 	void SetCvarString( const char *string )
 	{
-		strncpy( m_szString, string, CS_SIZE );
-		m_szString[CS_SIZE-1] = 0;
+		if( string != m_szString )
+		{
+			strncpy( m_szString, string, CS_SIZE );
+			m_szString[CS_SIZE-1] = 0;
+		}
 
 		if( onCvarChange ) onCvarChange( this );
 	}
