@@ -4,7 +4,7 @@ CXX ?= wine cmd /c cl
 CFLAGS ?= -O2 -fPIC -ggdb
 TOPDIR = $(PWD)
 XASH3D ?= $(PWD)/..
-INCLUDES = -I$(XASH3D)/common -I$(XASH3D)/engine -I$(XASH3D)/engine/common -I$(XASH3D)/engine/client -I$(XASH3D)/pm_shared -I$(TOPDIR) -I$(TOPDIR)/controls
+INCLUDES = -I$(XASH3D)/common -I$(XASH3D)/engine -I$(XASH3D)/engine/common -I$(XASH3D)/engine/client -I$(XASH3D)/pm_shared -I$(TOPDIR) -I$(TOPDIR)/controls -I$(TOPDIR)/menus
 INCLUDES += -I$(VGUI_DIR)/include/
 DEFINES = -DMY_COMPILER_SUCKS
 LDFLAGS = -Wl,--no-undefined
@@ -70,7 +70,7 @@ $(OBJS): | obj
 
 
 obj:
-	mkdir -p obj obj/menus obj/controls
+	mkdir -p obj obj/menus obj/controls obj/menus/dynamic
 
 obj/%.o : %.cpp
 	$(CXX) $(CFLAGS) $(INCLUDES) $(DEFINES) -c $< -o $@
