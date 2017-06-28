@@ -203,8 +203,28 @@ const char *CMenuField::Key( int key, int down )
 
 		if( UI_CursorInRect( m_scPos.x, y, m_scSize.w, m_scSize.h ) )
 		{
-			int charpos = (uiStatic.cursorX - m_scPos.x) / m_scChSize.w;
-			iCursor = iScroll + charpos;
+			int x = m_scPos.x, charpos;
+			char	text[UI_MAX_FIELD_LINE];
+
+			memcpy( text, szBuffer + iScroll, iWidthInChars - iScroll );
+			text[iWidthInChars] = 0;
+
+			switch( eTextAlignment )
+			{
+			case QM_LEFT:
+				x = m_scPos.x;
+				break;
+			case QM_CENTER:
+				x = m_scPos.x + ((m_scSize.w - (ColorStrlen( text ) * m_scChSize.w )) / 2 );
+				break;
+			case QM_RIGHT:
+				x = m_scPos.x + (m_scSize.w - (ColorStrlen( text ) * m_scChSize.w ));
+				break;
+			}
+
+			charpos = (uiStatic.cursorX - x) / m_scChSize.w;
+			text[charpos] = 0;
+			iCursor = charpos + iScroll + ColorPrexfixCount( text );
 			if( charpos == 0 && iScroll )
 				iScroll--;
 			if( charpos == iWidthInChars && iScroll < len - 1 )
@@ -385,7 +405,7 @@ void CMenuField::Draw( void )
 	// find cursor position
 	x = drawLen - (ColorStrlen( text ) + 1 );
 	if( x < 0 ) x = 0;
-	cursor = ( iCursor - prestep - x );
+	cursor = ( iCursor - prestep - x ) + 1;
 	if( cursor < 0 ) cursor = 0;
 
 	switch( eTextAlignment )
