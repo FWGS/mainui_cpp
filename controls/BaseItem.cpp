@@ -15,6 +15,8 @@ CMenuBaseItem::CMenuBaseItem()
 	SetCoord( 0, 0 );
 	SetSize( 0, 0 );
 
+	iFlags = 0;
+
 	iColor = uiPromptTextColor;
 	iFocusColor = uiPromptFocusColor;
 
@@ -23,9 +25,9 @@ CMenuBaseItem::CMenuBaseItem()
 	eLetterCase = QM_NOLETTERCASE;
 
 	m_iLastFocusTime = 0;
-	m_bPressed = 0;
+	m_bPressed = false;
 
-	m_pParent = 0;
+	m_pParent = NULL;
 }
 
 CMenuBaseItem::~CMenuBaseItem()
