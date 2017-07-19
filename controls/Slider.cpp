@@ -19,7 +19,8 @@ GNU General Public License for more details.
 #include "Slider.h"
 #include "Utils.h"
 
-CMenuSlider::CMenuSlider() : CMenuEditable()
+CMenuSlider::CMenuSlider() : CMenuEditable(), m_flMinValue(), m_flMaxValue(), m_flCurValue(),
+	m_flDrawStep(), m_iNumSteps(), m_flRange(), m_iKeepSlider()
 {
 	iColor = uiColorWhite;
 	iFocusColor = uiColorWhite;

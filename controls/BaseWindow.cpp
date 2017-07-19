@@ -8,6 +8,8 @@
 CMenuBaseWindow::CMenuBaseWindow() : CMenuItemsHolder()
 {
 	bAllowDrag = false; // UNDONE
+	m_bHolding = false;
+	bInTransition = false;
 }
 
 void CMenuBaseWindow::Show()

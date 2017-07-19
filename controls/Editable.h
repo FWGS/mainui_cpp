@@ -25,7 +25,7 @@ class CMenuEditable : public CMenuBaseItem
 {
 public:
 	CMenuEditable() : CMenuBaseItem(),
-		m_szCvarName(), m_eType(), m_szString(), m_flValue()
+		m_szCvarName(), m_eType(), m_szString(), m_szOriginalString(), m_flValue(), m_flOriginalValue()
 	{
 	}
 

@@ -7,6 +7,7 @@ CMenuProgressBar::CMenuProgressBar() : CMenuBaseItem()
 	m_flMin = 0.0f;
 	m_flMax = 100.0f;
 	m_flValue = 0.0f;
+	m_pCvar	= NULL;
 }
 
 void CMenuProgressBar::VidInit( void )

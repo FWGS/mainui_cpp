@@ -34,6 +34,7 @@ CMenuPicButton::CMenuPicButton() : CMenuBaseItem()
 	iOldState = BUTTON_NOFOCUS;
 	flFill = 0.0f;
 	m_iLastFocusTime = -512;
+	bPulse = false;
 }
 
 /*

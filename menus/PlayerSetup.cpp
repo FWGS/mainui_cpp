@@ -67,6 +67,7 @@ CMenuPlayerModelView::CMenuPlayerModelView() : CMenuBaseItem()
 	ent = NULL;
 	mouseYawControl = false;
 	prevCursorX = 0;
+	prevCursorY = 0;
 	hPlayerImage = 0;
 	eFocusAnimation = QM_HIGHLIGHTIFFOCUS;
 }

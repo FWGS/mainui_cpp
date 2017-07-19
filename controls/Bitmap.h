@@ -60,8 +60,6 @@ public:
 	void VidInit( void );
 	void SetInactive(bool) { }
 	void ToggleInactive() { }
-private:
-	bool m_bTransitionSet;
 };
 
 class CMenuBackgroundBitmap: public CMenuBitmap

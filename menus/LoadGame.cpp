@@ -235,7 +235,7 @@ void CMenuLoadGame::_Init( void )
 			char	cmd[128];
 
 			sprintf( cmd, "save/%s.bmp", saveName );
-			EngFuncs::PIC_Free( saveName );
+			EngFuncs::PIC_Free( cmd );
 
 			sprintf( cmd, "save \"%s\"\n", saveName );
 

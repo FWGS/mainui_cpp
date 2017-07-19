@@ -33,6 +33,7 @@ CMenuCheckBox::CMenuCheckBox() : CMenuEditable()
 	iFlags |= QMF_ACT_ONRELEASE|QMF_DROPSHADOW;
 	iColor = uiColorWhite;
 	iFocusColor = uiColorWhite;
+	iMask = 0;
 }
 
 /*
