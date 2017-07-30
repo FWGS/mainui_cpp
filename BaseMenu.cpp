@@ -562,6 +562,17 @@ static bool UI_CheckBackgroundSplash( bool gamedirOnly )
 
 	if( EngFuncs::FileExists( "gfx/shell/splash.bmp", gamedirOnly ))
 	{
+		HIMAGE img = EngFuncs::PIC_Load( "gfx/shell/splash" );
+
+		if( !img )
+		{
+			uiStatic.m_fNoOldBackground = true;
+			return false;
+		}
+
+		uiStatic.m_SteamBackgroundSize.w = EngFuncs::PIC_Width( img );
+		uiStatic.m_SteamBackgroundSize.h = EngFuncs::PIC_Height( img );
+
 		if( gamedirOnly )
 		{
 			// if we doesn't have logo.avi in gamedir we don't want to draw it
@@ -569,9 +580,12 @@ static bool UI_CheckBackgroundSplash( bool gamedirOnly )
 				uiStatic.m_fDisableLogo = TRUE;
 		}
 		uiStatic.m_fDisableLogo = TRUE; // don't load logo if background was loaded from base mod
+		uiStatic.m_fNoOldBackground = false;
 
 		return true;
 	}
+
+	uiStatic.m_fNoOldBackground = true;
 
 	return false;
 }

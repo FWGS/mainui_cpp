@@ -173,6 +173,7 @@ typedef struct
 	bool	m_fDisableLogo;
 	bool	m_fDemosPlayed;
 	int		m_iOldMenuDepth;
+	bool	m_fNoOldBackground;
 
 	float	scaleX;
 	float	scaleY;

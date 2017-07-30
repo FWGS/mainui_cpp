@@ -201,13 +201,15 @@ void CMenuBackgroundBitmap::Draw()
 	xScale = ScreenWidth / uiStatic.m_SteamBackgroundSize.w * (1 + flParallaxScale);
 	yScale = xScale;
 
-	if (!uiStatic.m_iSteamBackgroundCount || bForceBackground)
+	if( !uiStatic.m_iSteamBackgroundCount || bForceBackground )
 	{
-		UI_DrawPic( xoffset * xScale, yoffset * yScale,
-			ScreenWidth * xScale, ScreenWidth * 3.0f / 4.0f * yScale, uiColorWhite, szPic );
+		if( uiStatic.m_fNoOldBackground )
+			UI_FillRect( 0, 0, ScreenWidth, ScreenHeight, 0xFF505050 );
+		else
+			UI_DrawPic( xoffset * xScale, yoffset * yScale,
+				ScreenWidth * xScale, ScreenWidth * 3.0f / 4.0f * yScale, uiColorWhite, szPic );
 		return;
 	}
-
 
 	// iterate and draw all the background pieces
 	for (int i = 0; i < uiStatic.m_iSteamBackgroundCount; i++)
