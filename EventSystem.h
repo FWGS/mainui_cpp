@@ -80,7 +80,7 @@ public:
 		callback = VoidCallbackWrapperCb;
 		return cb;
 	}
-	int operator =( int null )
+	size_t operator =( size_t null )
 	{
 		callback = (EventCallback)null;
 		return null;
