@@ -148,6 +148,12 @@ const char *CMenuBaseWindow::Key(int key, int down)
 		m_bHoldOffset.y = uiStatic.cursorY / uiStatic.scaleX;
 	}
 
+	if( down && key == K_ESCAPE )
+	{
+		Hide( );
+		return uiSoundOut;
+	}
+
 	return CMenuItemsHolder::Key( key, down );
 }
 

@@ -97,12 +97,6 @@ const char *CMenuItemsHolder::Key( int key, int down )
 		}
 	}
 
-	if( down && key == K_ESCAPE )
-	{
-		Hide( );
-		return uiSoundOut;
-	}
-
 	return sound;
 }
 
