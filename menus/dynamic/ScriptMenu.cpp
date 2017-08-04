@@ -30,6 +30,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "SpinControl.h"
 #include "Field.h"
 #include "ItemsHolder.h"
+#include "Action.h"
 #include "dynamic/DynamicItemsHolder.h"
 
 #define ART_BANNER_SERVER "gfx/shell/head_advoptions"
@@ -75,17 +76,20 @@ public:
 
 
 	CMenuBannerBitmap banner;
+
+	scrvardef_t *m_pVars;
+
 private:
 	CMenuPicButton done;
 	CMenuPicButton cancel;
 	CMenuSpinControl pageSelector;
+	// CMenuAction unavailable;
 
 	void FreeItems( void );
 
 	virtual void _Init();
 
 	const char *m_szConfig;
-	scrvardef_t *m_pVars;
 	int m_iVarsCount;
 	int m_iPagesIndex;
 	int m_iPagesCount;
@@ -187,16 +191,17 @@ void CMenuScriptConfig::_Init( void )
 	cancel.SetCoord( 72, 280 );
 	cancel.onActivated = HideCb;
 
-	pageSelector.SetRect( 780, 180, 160, 32 );
-
 	AddItem( background );
 	AddItem( banner );
 	AddItem( done );
 	AddItem( cancel );
-	AddItem( pageSelector );
 
 	if( !m_pVars )
-		return; // Show "Unavailable" label?
+		return;
+
+	// RemoveItem( unavailable );
+	pageSelector.SetRect( 780, 180, 160, 32 );
+	AddItem( pageSelector );
 
 
 	CMenuScriptConfigPage *page = new CMenuScriptConfigPage;
@@ -366,4 +371,14 @@ void UI_LoadScriptConfig()
 	// yes, create cvars if needed
 	staticServerOptions.SetScriptConfig( "settings.scr", true );
 	staticUserOptions.SetScriptConfig( "user.scr", true );
+}
+
+bool UI_AdvUserOptions_IsAvailable()
+{
+	return staticUserOptions.m_pVars != NULL;
+}
+
+bool UI_AdvServerOptions_IsAvailable()
+{
+	return staticServerOptions.m_pVars != NULL;
 }

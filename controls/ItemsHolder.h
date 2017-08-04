@@ -22,17 +22,18 @@ public:
 
 	void CursorMoved( void );
 	void SetCursor( int newCursor, bool notify = true );
-	void SetCursorToItem( CMenuBaseItem *item, bool notify = true );
+	void SetCursorToItem( CMenuBaseItem &item, bool notify = true );
 	void AdjustCursor( int dir );
 
 	void AddItem( CMenuBaseItem &item );
-	void AddItem( CMenuBaseItem *item ) { AddItem( *item ); }
+	void RemoveItem( CMenuBaseItem &item );
 	CMenuBaseItem *ItemAtCursor( void );
 	CMenuBaseItem *ItemAtCursorPrev( void );
 
 	void CalcItemsPositions();
 	void CalcItemsSizes();
 
+	inline void AddItem(CMenuBaseItem *item ) { return AddItem( *item ); }
 	inline int GetCursor() const { return m_iCursor; }
 	inline int GetCursorPrev() const { return m_iCursorPrev; }
 	inline int ItemCount() const { return m_numItems; }

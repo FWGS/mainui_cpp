@@ -491,6 +491,8 @@ void CMenuPlayerSetup::_VidInit()
 	clLW.SetCoord( 72, 430 );
 	showModels.SetCoord( 340, 380 );
 	hiModels.SetCoord( 340, 430 );
+
+	advOptions.SetGrayed( !UI_AdvUserOptions_IsAvailable() );
 }
 
 /*

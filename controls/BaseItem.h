@@ -128,6 +128,17 @@ public:
 		else Hide();
 	}
 
+	void SetGrayed( bool grayed )
+	{
+		if( grayed ) iFlags |= QMF_GRAYED;
+		else iFlags &= ~(QMF_GRAYED);
+	}
+
+	void ToggleGrayed( )
+	{
+		iFlags ^= QMF_GRAYED;
+	}
+
 	// Checks item is current selected in parent Framework
 	bool IsCurrentSelected( void );
 

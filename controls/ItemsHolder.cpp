@@ -4,6 +4,7 @@
 #include "PicButton.h"
 #include "ItemsHolder.h"
 #include "Scissor.h"
+#include <string.h>
 
 CMenuItemsHolder::CMenuItemsHolder() :
 	CMenuBaseItem(), m_iCursor( 0 ), m_iCursorPrev( 0 ), m_pItems( ), m_numItems( 0 ), m_bInit( false ), m_bAllowEnterActivate( false )
@@ -285,7 +286,7 @@ wrap:
 	while( m_iCursor >= 0 && m_iCursor < m_numItems )
 	{
 		item = m_pItems[m_iCursor];
-		if( !item->IsVisible() || item->iFlags & (QMF_GRAYED|QMF_INACTIVE|QMF_MOUSEONLY) )
+		if( !item->IsVisible() || item->iFlags & (QMF_INACTIVE|QMF_MOUSEONLY) )
 		{
 			m_iCursor += dir;
 		}
@@ -346,11 +347,11 @@ CMenuBaseItem *CMenuItemsHolder::ItemAtCursorPrev()
 	return m_pItems[m_iCursorPrev];
 }
 
-void CMenuItemsHolder::SetCursorToItem( CMenuBaseItem *item, bool notify )
+void CMenuItemsHolder::SetCursorToItem(CMenuBaseItem &item, bool notify )
 {
 	for( int i = 0; i < m_numItems; i++ )
 	{
-		if( m_pItems[i] == item )
+		if( m_pItems[i] == &item )
 		{
 			SetCursor( i, notify );
 			return;
@@ -379,7 +380,7 @@ void CMenuItemsHolder::SetCursor( int newCursor, bool notify )
 	if( newCursor < 0 || newCursor >= m_numItems )
 		return;
 
-	if( !m_pItems[newCursor]->IsVisible() || (m_pItems[newCursor]->iFlags & (QMF_GRAYED|QMF_INACTIVE)) )
+	if( !m_pItems[newCursor]->IsVisible() || (m_pItems[newCursor]->iFlags & (QMF_INACTIVE)) )
 		return;
 
 	m_iCursorPrev = m_iCursor;
@@ -423,4 +424,20 @@ void CMenuItemsHolder::AddItem(CMenuBaseItem &item)
 	m_numItems++;
 
 	item.Init();
+}
+
+void CMenuItemsHolder::RemoveItem(CMenuBaseItem &item)
+{
+	for( int i = m_numItems; i >= 0; i-- )
+	{
+		if( m_pItems[i] == &item )
+		{
+			item.m_pParent = NULL;
+
+			memmove( m_pItems + i, m_pItems + i + 1, ( m_numItems - i + 1 ) * sizeof( *m_pItems ) );
+
+			m_numItems--;
+			break;
+		}
+	}
 }

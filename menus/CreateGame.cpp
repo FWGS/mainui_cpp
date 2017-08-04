@@ -274,6 +274,8 @@ void CMenuCreateGame::_VidInit()
 	hostName.SetRect( 350, 260, 205, 32 );
 	maxClients.SetRect( 350, 360, 205, 32 );
 	password.SetRect( 350, 460, 205, 32 );
+
+	advOptions.SetGrayed( !UI_AdvServerOptions_IsAvailable() );
 }
 
 /*
