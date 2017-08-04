@@ -123,10 +123,10 @@ const char *CMenuItemsHolder::Activate()
 
 bool CMenuItemsHolder::MouseMove( int x, int y )
 {
+	int i;
 	// region test the active menu items
-
 	// go in reverse direction, so last items will be first
-	for( int i = m_numItems - 1; i >= 0; i-- )
+	for( i = m_numItems - 1; i >= 0; i-- )
 	{
 		CMenuBaseItem *item = m_pItems[i];
 
@@ -168,7 +168,7 @@ bool CMenuItemsHolder::MouseMove( int x, int y )
 	}
 
 	// out of any region
-	if( m_numItems )
+	if( !i )
 	{
 		m_pItems[m_iCursor]->iFlags &= ~QMF_HASMOUSEFOCUS;
 		m_pItems[m_iCursor]->m_bPressed = false;
