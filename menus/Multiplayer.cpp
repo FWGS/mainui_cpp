@@ -34,6 +34,8 @@ private:
 	virtual void _Init();
 	virtual void _VidInit();
 public:
+	CMenuMultiplayer() : CMenuFramework( "CMenuMultiplayer" ) { }
+
 	CMenuPicButton	internetGames;
 	CMenuPicButton	spectateGames;
 	CMenuPicButton	LANGame;

@@ -40,6 +40,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 class CMenuMain: public CMenuFramework
 {
 public:
+	CMenuMain() : CMenuFramework( "CMenuMain" ) { }
+
 	virtual const char *Key( int key, int down );
 	virtual const char *Activate( );
 

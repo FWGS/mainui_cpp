@@ -336,12 +336,14 @@ void CMenuLoadGame::SetSaveMode(bool saveMode)
 		banner.SetPicture( ART_BANNER_SAVE );
 		save.SetVisibility( true );
 		load.SetVisibility( false );
+		szName = "CMenuSaveGame";
 	}
 	else
 	{
 		banner.SetPicture( ART_BANNER_LOAD );
 		save.SetVisibility( false );
 		load.SetVisibility( true );
+		szName = "CMenuLoadGame";
 	}
 	GetGameList();
 }

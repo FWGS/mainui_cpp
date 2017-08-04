@@ -267,6 +267,8 @@ private:
 	void _Init();
 	void _VidInit();
 public:
+	CMenuPlayerSetup() : CMenuFramework( "CMenuPlayerSetup" ) { }
+
 	void FindModels();
 	void SetConfig();
 	void SaveAndPopMenu();

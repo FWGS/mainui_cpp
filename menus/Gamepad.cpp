@@ -55,7 +55,11 @@ static const char *axisNames[7] =
 
 class CMenuGamePad : public CMenuFramework
 {
+public:
+	CMenuGamePad() : CMenuFramework("CMenuGamePad") { }
+
 private:
+
 	virtual void _Init();
 	virtual void _VidInit();
 	void GetConfig();

@@ -33,9 +33,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "BtnsBMPTable.h"
 #include "YesNoMessageBox.h"
 #include "ConnectionProgress.h"
+#include "con_nprint.h"
 
 cvar_t		*ui_precache;
 cvar_t		*ui_showmodels;
+cvar_t		*ui_show_window_stack;
 
 uiStatic_t	uiStatic;
 
@@ -804,6 +806,23 @@ void UI_UpdateMenu( float flTime )
 		EngFuncs::PlayLocalSound( uiSoundIn );
 		uiStatic.enterSound = -1;
 	}
+
+	con_nprint_t con;
+	con.color[0] = con.color[1] = con.color[2] = 1.0f;
+	con.time_to_live = 0.1;
+
+	if( ui_show_window_stack && ui_show_window_stack->value )
+	{
+		for( int i = 0; i < uiStatic.menuDepth; i++ )
+		{
+			con.index++;
+
+			if( uiStatic.menuStack[i]->IsRoot() )
+				Con_NXPrintf( &con, "%p - %s\n", uiStatic.menuStack[i], uiStatic.menuStack[i]->szName );
+			else
+				Con_NXPrintf( &con, "     %p - %s\n", uiStatic.menuStack[i], uiStatic.menuStack[i]->szName );
+		}
+	}
 }
 
 /*
@@ -1395,6 +1414,7 @@ void UI_Init( void )
 	// register our cvars and commands
 	ui_precache = EngFuncs::CvarRegister( "ui_precache", "0", FCVAR_ARCHIVE );
 	ui_showmodels = EngFuncs::CvarRegister( "ui_showmodels", "0", FCVAR_ARCHIVE );
+	ui_show_window_stack = EngFuncs::CvarRegister( "ui_show_window_stack", 0, FCVAR_ARCHIVE );
 
 	// show cl_predict dialog
 	EngFuncs::CvarRegister( "menu_mp_firsttime", "1", FCVAR_ARCHIVE );

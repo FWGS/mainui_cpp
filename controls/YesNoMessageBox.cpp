@@ -53,6 +53,8 @@ CMenuYesNoMessageBox::CMenuYesNoMessageBox( bool alert )
 
 	m_bSetYes = m_bSetNo = false;
 	m_bIsAlert = alert;
+
+	szName = "CMenuYesNoMessageBox";
 }
 
 /*

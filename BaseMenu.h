@@ -134,6 +134,7 @@ struct Size
 
 extern cvar_t	*ui_precache;
 extern cvar_t	*ui_showmodels;
+extern cvar_t   *ui_show_window_stack;
 
 #define MAX_BACKGROUNDS 48 // SC 5.0 have 35 tiled backgrounds!
 

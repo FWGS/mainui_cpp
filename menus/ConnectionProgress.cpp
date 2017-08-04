@@ -100,6 +100,7 @@ CMenuConnectionProgress::CMenuConnectionProgress() : CMenuBaseWindow()
 	sDownloadString[0] = sCommonString[0] = sTitleString[0] = '\0';
 	m_iSource = SOURCE_CONSOLE;
 	m_iState = STATE_NONE;
+	szName = "ConnectionProgress";
 }
 
 const char *CMenuConnectionProgress::Key( int key, int down )

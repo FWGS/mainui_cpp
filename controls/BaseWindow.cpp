@@ -5,11 +5,12 @@
 #include "ItemsHolder.h"
 #include "BaseWindow.h"
 
-CMenuBaseWindow::CMenuBaseWindow() : CMenuItemsHolder()
+CMenuBaseWindow::CMenuBaseWindow(const char *name) : CMenuItemsHolder()
 {
 	bAllowDrag = false; // UNDONE
 	m_bHolding = false;
 	bInTransition = false;
+	szName = name;
 }
 
 void CMenuBaseWindow::Show()

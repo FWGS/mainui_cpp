@@ -7,7 +7,7 @@
 class CMenuFramework : public CMenuBaseWindow
 {
 public:
-	CMenuFramework();
+	CMenuFramework( const char *name = "Unnamed Framework" );
 
 	void Show();
 	void Init();

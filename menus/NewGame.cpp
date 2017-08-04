@@ -32,6 +32,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 class CMenuNewGame : public CMenuFramework
 {
+public:
+	CMenuNewGame() : CMenuFramework( "CMenuNewGame" ) { }
 private:
 	virtual void _Init();
 

@@ -10,7 +10,7 @@
 class CMenuBaseWindow : public CMenuItemsHolder
 {
 public:
-	CMenuBaseWindow();
+	CMenuBaseWindow( const char *name = "Unnamed Window" );
 
 	// Overloaded functions
 	// Window visibility is switched through window stack

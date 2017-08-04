@@ -3,7 +3,7 @@
 #include "Utils.h"
 #include "PicButton.h"
 
-CMenuFramework::CMenuFramework() : CMenuBaseWindow()
+CMenuFramework::CMenuFramework( const char *name ) : CMenuBaseWindow( name )
 {
 	SetCoord( 0, 0 );
 }

@@ -37,6 +37,7 @@ private:
 	void _VidInit();
 
 public:
+	CMenuVidOptions() : CMenuFramework( "CMenuVidOptions" ) { }
 	void SaveAndPopMenu();
 	void GetConfig();
 

@@ -357,12 +357,14 @@ static CMenuScriptConfig staticUserOptions;
 void UI_AdvServerOptions_Menu()
 {
 	staticServerOptions.banner.SetPicture( ART_BANNER_SERVER );
+	staticUserOptions.szName = "Server Options";
 	staticServerOptions.Show();
 }
 
 void UI_AdvUserOptions_Menu()
 {
 	staticUserOptions.banner.SetPicture( ART_BANNER_USER );
+	staticUserOptions.szName = "User Options";
 	staticUserOptions.Show();
 }
 

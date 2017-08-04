@@ -66,6 +66,7 @@ class CMenuVidModes : public CMenuFramework
 private:
 	void _Init();
 public:
+	CMenuVidModes() : CMenuFramework( "CMenuVidModes" ) { }
 	void GetConfig();
 	void SetConfig();
 

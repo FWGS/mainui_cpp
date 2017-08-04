@@ -35,6 +35,8 @@ uiFileDialogGlobal_t	uiFileDialogGlobal;
 class CMenuFileDialog : public CMenuFramework
 {
 public:
+	CMenuFileDialog() : CMenuFramework("CMenuFileDialog") { }
+
 private:
 	virtual void _Init( void );
 	virtual void _VidInit( void );

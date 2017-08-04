@@ -36,6 +36,8 @@ private:
 	virtual void _VidInit( void );
 
 public:
+	CMenuOptions() : CMenuFramework("CMenuOptions") { }
+
 	CMenuPicButton	controls;
 	CMenuPicButton	audio;
 	CMenuPicButton	video;

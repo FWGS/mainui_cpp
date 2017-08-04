@@ -37,6 +37,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 class CMenuTouchButtons : public CMenuFramework
 {
 public:
+	CMenuTouchButtons() : CMenuFramework( "CMenuTouchButtons" ) { }
+
 	void AddButtonToList( const char *name, const char *texture, const char *command, unsigned char *color, int flags );
 	void GetButtonList();
 	bool gettingList;
