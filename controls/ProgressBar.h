@@ -7,7 +7,6 @@ class CMenuProgressBar : public CMenuBaseItem
 {
 public:
     CMenuProgressBar();
-	void VidInit( void );
 	void Draw( void );
 	void LinkCvar( const char *cvName, float flMin, float flMax );
 	void SetValue( float flValue );

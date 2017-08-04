@@ -10,12 +10,6 @@ CMenuProgressBar::CMenuProgressBar() : CMenuBaseItem()
 	m_pCvar	= NULL;
 }
 
-void CMenuProgressBar::VidInit( void )
-{
-	CalcPosition();
-	CalcSizes();
-}
-
 void CMenuProgressBar::LinkCvar( const char *cvName, float flMin, float flMax )
 {
 	m_pCvar = EngFuncs::CvarRegister( cvName, "0", 0 );
