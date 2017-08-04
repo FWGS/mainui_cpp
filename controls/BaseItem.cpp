@@ -42,7 +42,8 @@ void CMenuBaseItem::Init()
 
 void CMenuBaseItem::VidInit()
 {
-	;
+	CalcPosition();
+	CalcSizes();
 }
 
 void CMenuBaseItem::Draw()
@@ -113,14 +114,17 @@ void CMenuBaseItem::_Event( int ev )
 
 bool CMenuBaseItem::IsCurrentSelected()
 {
-	return this == m_pParent->ItemAtCursor();
+	if( m_pParent )
+		return this == m_pParent->ItemAtCursor();
+	return false;
 }
 
 void CMenuBaseItem::CalcPosition()
 {
 	m_scPos = pos.Scale();
 
-	if( m_pParent ) m_scPos += m_pParent->m_scPos;
+	if( !IsAbsolutePositioned() && m_pParent )
+		m_scPos += m_pParent->m_scPos;
 }
 
 void CMenuBaseItem::CalcSizes()

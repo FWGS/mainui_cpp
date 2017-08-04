@@ -179,6 +179,10 @@ protected:
 	// calls specific EventCallback
 	virtual void _Event( int ev );
 
+	// Determine, is this item is absolute positioned
+	// If false, it will be positiond relative to it's parent
+	virtual bool IsAbsolutePositioned( void ) { return false; }
+
 	friend int UI_VidInit( void );
 
 	CMenuItemsHolder	*m_pParent;

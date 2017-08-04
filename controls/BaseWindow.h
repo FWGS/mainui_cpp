@@ -51,6 +51,8 @@ private:
 	friend void UI_DrawMouseCursor( void ); // HACKHACK: Cursor should be set by menu item
 	friend void UI_UpdateMenu( float flTime );
 
+	virtual bool IsAbsolutePositioned( void ) { return true; }
+
 	bool bInTransition;
 	bool m_bHolding;
 	Point m_bHoldOffset;
