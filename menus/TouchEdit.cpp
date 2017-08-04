@@ -30,15 +30,35 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 class CMenuTouchEdit : public CMenuFramework
 {
 public:
+	void Show();
+	void Hide();
 	void Draw();
 	const char *Key(int key, int down);
 private:
-	void _VidInit();
-	int active;
+	float saveTouchEnable;
 };
 
 static CMenuTouchEdit uiTouchEdit;
 
+void CMenuTouchEdit::Show()
+{
+	saveTouchEnable = EngFuncs::GetCvarFloat( "touch_enable" );
+
+	EngFuncs::CvarSetValue( "touch_enable", 1 );
+	EngFuncs::CvarSetValue( "touch_in_menu", 1 );
+	EngFuncs::ClientCmd(FALSE, "touch_enableedit");
+
+	CMenuFramework::Show();
+}
+
+void CMenuTouchEdit::Hide()
+{
+	EngFuncs::CvarSetValue( "touch_enable", saveTouchEnable );
+	EngFuncs::CvarSetValue( "touch_in_menu", 0 );
+	EngFuncs::ClientCmd(FALSE, "touch_disableedit");
+
+	CMenuFramework::Hide();
+}
 
 /*
 =================
@@ -63,23 +83,10 @@ const char *CMenuTouchEdit::Key( int key, int down )
 {
 	if( down && key == K_ESCAPE )
 	{
-		EngFuncs::CvarSetString("touch_in_menu", "0");
-		EngFuncs::ClientCmd(0, "touch_disableedit");
 		Hide();
 		return uiSoundOut;
 	}
 	return uiSoundNull;
-}
-
-/*
-=================
-UI_TouchEdit_Init
-=================
-*/
-void CMenuTouchEdit::_VidInit()
-{
-	EngFuncs::CvarSetString("touch_in_menu", "1");
-	EngFuncs::ClientCmd(0, "touch_enableedit");
 }
 
 /*
