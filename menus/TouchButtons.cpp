@@ -516,7 +516,6 @@ void CMenuTouchButtons::_VidInit()
 	blue.SetCoord( sliders_x, 270 );
 	alpha.SetCoord( sliders_x, 330 );
 
-
 	additive.SetCoord( 650, 470 );
 
 	mp.SetCoord( 400, 420 );
@@ -527,8 +526,8 @@ void CMenuTouchButtons::_VidInit()
 	precision.SetCoord( 400, 470 );
 	buttonList.SetRect( 72, 150, 300, 370 );
 
-	save.SetCoord( 384 - 42 + 320, 550 );
-	editor.SetCoord( 384 - 42 + 320, 600 );
+	save.SetRect( 384 - 42 + 320, 550, 130, 50 );
+	editor.SetRect( 384 - 42 + 320, 600, 130, 50 );
 	select.SetRect( 400 + fields_w - 95, 300, 150,50 );
 
 	name.SetRect( 400, 550, 205, 32 );
@@ -537,8 +536,8 @@ void CMenuTouchButtons::_VidInit()
 	color.SetRect( sliders_x + 120, 360, 70, 50 );
 	preview.SetRect( 400, 300, 70, 70 );
 
-	reset.SetCoord( 384 - 72 + 480, 600 );
-	remove.SetCoord( 384 - 72 + 480, 550 );
+	reset.SetRect( 384 - 72 + 480, 600, 130, 50 );
+	remove.SetRect( 384 - 72 + 480, 550, 130, 50 );
 }
 
 /*
