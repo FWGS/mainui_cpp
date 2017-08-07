@@ -10,6 +10,7 @@ CMenuFramework::CMenuFramework( const char *name ) : CMenuBaseWindow( name )
 
 void CMenuFramework::Show()
 {
+	CMenuPicButton::RootChanged( true );
 	CMenuBaseWindow::Show();
 
 	uiStatic.rootActive = this;
@@ -27,9 +28,11 @@ void CMenuFramework::Hide()
 		{
 			uiStatic.rootActive = uiStatic.menuStack[i];
 			uiStatic.rootPosition = i;
+			CMenuPicButton::RootChanged( false );
 			return;
 		}
 	}
+
 
 	// looks like we are have a modal or some window over game
 	uiStatic.rootActive = NULL;

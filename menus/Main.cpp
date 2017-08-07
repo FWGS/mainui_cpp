@@ -245,6 +245,8 @@ const char *CMenuMain::Activate( void )
 		console.pos.y = CL_IsActive() ? 130 : 230;
 	}
 
+	CMenuPicButton::ClearButtonStack();
+
 	return 0;
 }
 

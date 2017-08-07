@@ -35,6 +35,9 @@ CMenuPicButton::CMenuPicButton() : CMenuBaseItem()
 	flFill = 0.0f;
 	m_iLastFocusTime = -512;
 	bPulse = false;
+
+	TransPic = 0;
+	memset( TitleLerpQuads, 0, sizeof( TitleLerpQuads ));
 }
 
 /*
@@ -94,14 +97,16 @@ const char *CMenuPicButton::Key( int key, int down )
 				m_bPressed = true;
 			}
 			else
+			{
+				temp = this;
 				event = QM_ACTIVATED;
+			}
 
-			TACheckMenuDepth();
 			_Event( event );
-			SetTitleAnim( AS_TO_TITLE );
 		}
 		else if( down )
 		{
+			temp = this;
 			_Event( QM_ACTIVATED );
 		}
 	}
@@ -285,48 +290,44 @@ void CMenuPicButton::SetPicture(const char *filename)
 
 }
 
-// ============================ Animations ===========================
+// =========================== Animations ===========================
 
 // Title Transition Time period
 #define TTT_PERIOD		200.0f
 
+// Button stack
+CMenuPicButton *ButtonStack[UI_MAX_MENUDEPTH] = { 0 };
+int		ButtonStackDepth = 0;
 
-CMenuPicButton *ButtonStack[UI_MAX_MENUDEPTH];
-int		ButtonStackDepth;
-
-CMenuPicButton::Quad	CMenuPicButton::TitleLerpQuads[2];
-int		CMenuPicButton::transition_state = CMenuPicButton::AS_TO_TITLE;
-HIMAGE	CMenuPicButton::TransPic = 0;
-wrect_t*CMenuPicButton::TransRect;
-bool	CMenuPicButton::hold_button_stack = false;
-int		CMenuPicButton::transition_initial_time;
-int		CMenuPicButton::PreClickDepth;
-
-
-void CMenuPicButton::TACheckMenuDepth( void )
-{
-	PreClickDepth = uiStatic.menuDepth;
-}
-
-
+// Pressed cancel, done or ESC in menu
 void CMenuPicButton::PopPButtonStack()
 {
-	if( hold_button_stack ) return;
-
-	if( ButtonStack[ButtonStackDepth] )
-		ButtonStack[ButtonStackDepth]->SetTitleAnim( AS_TO_BUTTON );
-
 	if( ButtonStackDepth )
+	{
+		if( ButtonStack[ButtonStackDepth-1] )
+		{
+			ButtonStack[ButtonStackDepth-1]->SetTitleAnim( AS_TO_BUTTON );
+		}
+
 		ButtonStackDepth--;
+	}
 }
 
+// Opened new menu, awaiting Quad from Banner
 void CMenuPicButton::PushPButtonStack()
 {
-	if( ButtonStack[ButtonStackDepth] == this )
+	if( ButtonStack[ButtonStackDepth-1] == this )
 		return;
 
-	ButtonStack[++ButtonStackDepth] = this;
+	ButtonStack[ButtonStackDepth++] = this;
 }
+
+int	CMenuPicButton::transition_state = CMenuPicButton::AS_TO_TITLE;
+int	CMenuPicButton::transition_initial_time;
+CMenuPicButton* CMenuPicButton::temp = NULL;
+HIMAGE CMenuPicButton::s_hCurrentTransPic = 0;
+wrect_t CMenuPicButton::s_pCurrentTransRect = { 0 };
+CMenuPicButton::Quad CMenuPicButton::s_CurrentLerpQuads[2] = { 0 };
 
 float CMenuPicButton::GetTitleTransFraction( void )
 {
@@ -338,16 +339,93 @@ float CMenuPicButton::GetTitleTransFraction( void )
 	return fraction;
 }
 
+void CMenuPicButton::SetTitleAnim( int anim_state )
+{
+	static	wrect_t r = { 0, uiStatic.buttons_width, 26, 51 };
+	CMenuPicButton *button = NULL;
+
+	// choose target button
+	if( anim_state == AS_TO_TITLE )
+	{
+		if( temp )
+			temp->PushPButtonStack();
+
+		button = temp;
+	}
+	else
+	{
+		if( !ButtonStackDepth )
+			return;
+
+		button = ButtonStack[ButtonStackDepth-1];
+	}
+
+	if(	!button )
+		return;
+
+	if( !button->bEnableTransitions )
+		return;
+
+	transition_state = anim_state;
+
+	button->TitleLerpQuads[0].x = button->m_scPos.x;
+	button->TitleLerpQuads[0].y = button->m_scPos.y;
+	button->TitleLerpQuads[0].lx = button->m_scSize.w;
+	button->TitleLerpQuads[0].ly = button->m_scSize.h;
+
+	transition_initial_time = uiStatic.realTime;
+	s_hCurrentTransPic = button->TransPic;
+	s_pCurrentTransRect = r;
+	memcpy( s_CurrentLerpQuads, button->TitleLerpQuads, sizeof( s_CurrentLerpQuads ));
+}
+
+void CMenuPicButton::RootChanged( bool isForward )
+{
+	// A guarantee, that we have changed root active menu
+	if( isForward > 0 )
+	{
+		SetTitleAnim( AS_TO_TITLE );
+	}
+	else
+	{
+		SetTitleAnim( AS_TO_BUTTON );
+		PopPButtonStack();
+	}
+}
 
 CMenuPicButton::Quad CMenuPicButton::LerpQuad( Quad a, Quad b, float frac )
 {
 	Quad c;
+
 	c.x = a.x + (b.x - a.x) * frac;
 	c.y = a.y + (b.y - a.y) * frac;
 	c.lx = a.lx + (b.lx - a.lx) * frac;
 	c.ly = a.ly + (b.ly - a.ly) * frac;
 
 	return c;
+}
+
+void CMenuPicButton::SetupTitleQuadForLast(int x, int y, int w, int h)
+{
+	if( !ButtonStackDepth )
+		return;
+
+	if( !ButtonStack[ButtonStackDepth-1] )
+		return;
+
+	ButtonStack[ButtonStackDepth-1]->SetupTitleQuad( x, y, w, h );
+
+}
+
+void CMenuPicButton::SetTransPicForLast( HIMAGE pic )
+{
+	if( !ButtonStackDepth )
+		return;
+
+	if( !ButtonStack[ButtonStackDepth-1] )
+		return;
+
+	ButtonStack[ButtonStackDepth-1]->SetTransPic( pic );
 }
 
 // TODO: Find CMenuBannerBitmap in next menu page and correct
@@ -357,19 +435,19 @@ void CMenuPicButton::SetupTitleQuad( int x, int y, int w, int h )
 	TitleLerpQuads[1].y  = y * ScreenHeight / 768;
 	TitleLerpQuads[1].lx = w * ScreenHeight / 768;
 	TitleLerpQuads[1].ly = h * ScreenHeight / 768;
+
+	s_CurrentLerpQuads[1] = TitleLerpQuads[1];
 }
 
-void CMenuPicButton::SetTransPic(HIMAGE pic, wrect_t *r )
+void CMenuPicButton::SetTransPic(HIMAGE pic)
 {
 	TransPic = pic;
-	TransRect = r;
+
+	s_hCurrentTransPic = TransPic;
 }
 
 bool CMenuPicButton::DrawTitleAnim( CMenuBaseWindow::EAnimation state )
 {
-	if( !TransPic )
-		return true;
-
 	if( ((state == CMenuBaseWindow::ANIM_IN) ^ (transition_state == AS_TO_TITLE)) )
 		return true;
 
@@ -387,84 +465,44 @@ bool CMenuPicButton::DrawTitleAnim( CMenuBaseWindow::EAnimation state )
 		return true;
 #endif
 
-	Quad c;
+	/*if( !ButtonStackDepth )
+		return true;
+
+	CMenuPicButton *button = ButtonStack[ButtonStackDepth-1];
+
+	if( !button || !button->TransPic )
+		return true;*/
+
+/*	Quad c;
 
 	if( state == CMenuBaseWindow::ANIM_IN )
-		c = LerpQuad( TitleLerpQuads[0], TitleLerpQuads[1], frac );
+		c = LerpQuad( button->TitleLerpQuads[0], button->TitleLerpQuads[1], frac );
 	else if( state == CMenuBaseWindow::ANIM_OUT )
-		c = LerpQuad( TitleLerpQuads[1], TitleLerpQuads[0], frac );
+		c = LerpQuad( button->TitleLerpQuads[1], button->TitleLerpQuads[0], frac );
 
 	//UI_FillRect( c.x, c.y, c.lx, c.ly, 0xFF0F00FF );
 
-	EngFuncs::PIC_Set( TransPic, 255, 255, 255 );
-	EngFuncs::PIC_DrawAdditive( c.x, c.y, c.lx, c.ly, TransRect );
+	EngFuncs::PIC_Set( button->TransPic, 255, 255, 255 );
+	EngFuncs::PIC_DrawAdditive( c.x, c.y, c.lx, c.ly );
+
+	return false;*/
+	Quad c;
+
+	if( state == CMenuBaseWindow::ANIM_IN )
+		c = LerpQuad( s_CurrentLerpQuads[0], s_CurrentLerpQuads[1], frac );
+	else if( state == CMenuBaseWindow::ANIM_OUT )
+		c = LerpQuad( s_CurrentLerpQuads[1], s_CurrentLerpQuads[0], frac );
+
+	//UI_FillRect( c.x, c.y, c.lx, c.ly, 0xFF0F00FF );
+
+	EngFuncs::PIC_Set( s_hCurrentTransPic, 255, 255, 255 );
+	EngFuncs::PIC_DrawAdditive( c.x, c.y, c.lx, c.ly );
 
 	return false;
+
 }
 
-void CMenuPicButton::SetTitleAnim( int anim_state )
-{
-	static	wrect_t r = { 0, uiStatic.buttons_width, 26, 51 };
-	CMenuPicButton *button = this;
-
-	// check this before any button changes
-	if( !bEnableTransitions )
-		return;
-
-	// skip buttons which don't call new menu
-	if( uiStatic.menuDepth && !uiStatic.menuStack[uiStatic.menuDepth-1]->IsRoot() )
-		return;
-
-	if( PreClickDepth == uiStatic.menuDepth && anim_state == AS_TO_TITLE )
-		return;
-
-	// replace cancel\done button with button which called this menu
-	if( PreClickDepth > uiStatic.menuDepth && anim_state == AS_TO_TITLE )
-	{
-		anim_state = AS_TO_BUTTON;
-
-		// HACK HACK HACK
-		if( ButtonStack[ButtonStackDepth + 1] )
-			button = ButtonStack[ButtonStackDepth+1];
-	}
-
-	// don't reset anim if dialog buttons pressed
-	//if( button->id == ID_YES || button->id == ID_NO )
-	//	return;
-
-	if( !button->bEnableTransitions )
-		return;
-
-	if( anim_state == AS_TO_TITLE )
-		PushPButtonStack();
-
-	transition_state = anim_state;
-
-	TitleLerpQuads[0].x = button->m_scPos.x;
-	TitleLerpQuads[0].y = button->m_scPos.y;
-	TitleLerpQuads[0].lx = button->m_scSize.w;
-	TitleLerpQuads[0].ly = button->m_scSize.h;
-
-	transition_initial_time = uiStatic.realTime;
-#ifdef TA_ALT_MODE2
-	if( !TransPic )
-#endif
-	{
-		button->SetTransPic( button->hPic, &r );
-	}
-}
-
-void CMenuPicButton::InitTitleAnim()
-{
-	memset( TitleLerpQuads, 0, sizeof( CMenuPicButton::Quad ) * 2 );
-
-	SetupTitleQuad( UI_BANNER_POSX, UI_BANNER_POSY, UI_BANNER_WIDTH, UI_BANNER_HEIGHT );
-
-	ButtonStackDepth = 0;
-	memset( ButtonStack, 0, sizeof( ButtonStack ));
-}
-
-void CMenuPicButton::ClearButtonStack( void )
+void CMenuPicButton::ClearButtonStack()
 {
 	ButtonStackDepth = 0;
 	memset( ButtonStack, 0, sizeof( ButtonStack ));

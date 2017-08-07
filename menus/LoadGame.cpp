@@ -375,8 +375,8 @@ void UI_LoadGame_Menu( void )
 	if( !EngFuncs::CheckGameDll( )) return;
 
 	UI_LoadGame_Precache();
-	uiLoadGame.Show();
 	uiLoadGame.SetSaveMode(false);
+	uiLoadGame.Show();
 }
 
 void UI_SaveGame_Menu( void )
@@ -390,6 +390,6 @@ void UI_SaveGame_Menu( void )
 	if( !EngFuncs::CheckGameDll( )) return;
 
 	UI_LoadGame_Precache();
-	uiLoadGame.Show();
 	uiLoadGame.SetSaveMode(true);
+	uiLoadGame.Show();
 }

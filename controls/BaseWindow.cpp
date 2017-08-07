@@ -123,9 +123,6 @@ void CMenuBaseWindow::PopMenu()
 		UI_Main_Menu();
 	}
 
-	if( uiStatic.menuActive && uiStatic.menuActive->IsRoot() )
-		CMenuPicButton::PopPButtonStack();
-
 	if( uiStatic.m_fDemosPlayed && uiStatic.m_iOldMenuDepth == uiStatic.menuDepth )
 	{
 		EngFuncs::ClientCmd( FALSE, "demos\n" );

@@ -169,9 +169,9 @@ void CMenuBannerBitmap::VidInit()
 	if( !szPic )
 		return;
 	// CMenuPicButton::SetTitleAnim( CMenuPicButton::AS_TO_TITLE );
-	CMenuPicButton::SetupTitleQuad( pos.x, pos.y, size.w, size.h );
+	CMenuPicButton::SetupTitleQuadForLast( pos.x, pos.y, size.w, size.h );
 #if defined(TA_ALT_MODE2) && !defined(TA_ALT_MODE)
-	HIMAGE hPic = EngFuncs::PIC_Load( szPic );
-	CMenuPicButton::SetTransPic( hPic );
+	CMenuPicButton::SetTransPicForLast( EngFuncs::PIC_Load( szPic ) );
 #endif
+
 }

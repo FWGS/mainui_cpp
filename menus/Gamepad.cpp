@@ -233,6 +233,7 @@ void CMenuGamePad::_Init( void )
 	invYaw.SetNameAndStatus( "Invert", "Invert yaw axis" );
 
 	controls.SetPicture( PC_CONTROLS );
+	controls.onActivated = UI_Controls_Menu;
 
 	AddItem( background );
 	AddItem( banner );
