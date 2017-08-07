@@ -207,7 +207,7 @@ void CMenuBackgroundBitmap::Draw()
 			UI_FillRect( 0, 0, ScreenWidth, ScreenHeight, 0xFF505050 );
 		else
 			UI_DrawPic( xoffset * xScale, yoffset * yScale,
-				ScreenWidth * xScale, ScreenWidth * 3.0f / 4.0f * yScale, uiColorWhite, szPic );
+				uiStatic.m_SteamBackgroundSize.w * xScale, uiStatic.m_SteamBackgroundSize.h * yScale, uiColorWhite, szPic );
 		return;
 	}
 
