@@ -33,6 +33,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "BtnsBMPTable.h"
 #include "YesNoMessageBox.h"
 #include "ConnectionProgress.h"
+#include "BackgroundBitmap.h"
 #include "con_nprint.h"
 
 cvar_t		*ui_precache;
@@ -436,177 +437,6 @@ const char *COM_ExtractExtension( const char *s )
 		if( s[i] == '.' )
 			return s + i + 1;
 	return s;
-}
-
-// fallback to old background loader, if new was failed(some game builds does not have this file)
-static bool UI_LoadBackgroundImageOld( bool gamedirOnly )
-{
-	const int backgroundRows    = 3;
-	const int backgroundColumns = 4;
-	char filename[512];
-
-	uiStatic.m_iSteamBackgroundCount = 0;
-
-	for( int y = 0; y < backgroundRows; y++ )
-	{
-		for( int x = 0; x < backgroundColumns; x++ )
-		{
-			sprintf( filename, "resource/background/800_%d_%c_loading.tga", y + 1, 'a' + x );
-			if( !EngFuncs::FileExists( filename, gamedirOnly ) )
-				return false;
-
-			uiStatic.m_iSteamBackgroundCount++;
-		}
-	}
-
-	for( int y = 0; y < backgroundRows; y++ )
-	{
-		for( int x = 0; x < backgroundColumns; x++ )
-		{
-			bimage_t &bimage = uiStatic.m_SteamBackground[y * backgroundRows + x];
-			sprintf(filename, "resource/background/800_%d_%c_loading.tga", y + 1, 'a' + x);
-
-			bimage.hImage = EngFuncs::PIC_Load( filename, PIC_NOFLIP_TGA );
-
-			if( !bimage.hImage )
-				return false;
-
-			bimage.size.w = EngFuncs::PIC_Width( bimage.hImage );
-			bimage.size.h = EngFuncs::PIC_Height( bimage.hImage );
-
-			if( x > 0 )
-			{
-				bimage_t &prevbimage = uiStatic.m_SteamBackground[y * backgroundRows + x - 1];
-				bimage.coord.x = prevbimage.coord.x + prevbimage.size.w;
-			}
-			else bimage.coord.x = 0;
-
-			if( y > 0 )
-			{
-				bimage_t &prevbimage = uiStatic.m_SteamBackground[(y - 1) * backgroundRows + x];
-				bimage.coord.y = prevbimage.coord.y + prevbimage.size.h;
-			}
-			else bimage.coord.y = 0;
-		}
-	}
-
-	return true;
-}
-
-static bool UI_LoadBackgroundImageNew( bool gamedirOnly )
-{
-	char *afile = NULL, *pfile;
-	char token[4096];
-
-	bool loaded = false;
-
-	uiStatic.m_iSteamBackgroundCount = 0;
-
-	if( !EngFuncs::FileExists("resource/BackgroundLayout.txt", gamedirOnly ) )
-		return UI_LoadBackgroundImageOld( gamedirOnly ); // fallback to hardcoded values
-
-	afile = (char*)EngFuncs::COM_LoadFile( "resource/BackgroundLayout.txt" );
-
-	pfile = afile;
-
-	pfile = EngFuncs::COM_ParseFile( pfile, token );
-	if( !pfile || strcmp( token, "resolution" )) // resolution at first!
-		goto freefile;
-
-	pfile = EngFuncs::COM_ParseFile( pfile, token );
-	if( !pfile ) goto freefile;
-
-	uiStatic.m_SteamBackgroundSize.w = atoi( token );
-
-	pfile = EngFuncs::COM_ParseFile( pfile, token );
-	if( !pfile ) goto freefile;
-
-	uiStatic.m_SteamBackgroundSize.h = atoi( token );
-
-	// Now read all tiled background list
-	while(( pfile = EngFuncs::COM_ParseFile( pfile, token )))
-	{
-		bimage_t img;
-
-		img.hImage = EngFuncs::PIC_Load( token, PIC_NOFLIP_TGA );
-
-		if( !img.hImage ) goto freefile;
-
-		// ignore "scaled" attribute. What does it mean?
-		pfile = EngFuncs::COM_ParseFile( pfile, token );
-		if( !pfile ) goto freefile;
-
-		pfile = EngFuncs::COM_ParseFile( pfile, token );
-		if( !pfile ) goto freefile;
-		img.coord.x = atoi( token );
-
-		pfile = EngFuncs::COM_ParseFile( pfile, token );
-		if( !pfile ) goto freefile;
-		img.coord.y = atoi( token );
-
-		img.size.w = EngFuncs::PIC_Width( img.hImage );
-		img.size.h = EngFuncs::PIC_Height( img.hImage );
-
-		uiStatic.m_SteamBackground[uiStatic.m_iSteamBackgroundCount] = img;
-		uiStatic.m_iSteamBackgroundCount++;
-	}
-
-	loaded = true;
-
-freefile:
-	EngFuncs::COM_FreeFile( afile );
-	return loaded;
-}
-
-static bool UI_CheckBackgroundSplash( bool gamedirOnly )
-{
-	uiStatic.m_iSteamBackgroundCount = 0; // not a steam background
-
-	if( EngFuncs::FileExists( "gfx/shell/splash.bmp", gamedirOnly ))
-	{
-		HIMAGE img = EngFuncs::PIC_Load( "gfx/shell/splash" );
-
-		if( !img )
-		{
-			uiStatic.m_fNoOldBackground = true;
-			return false;
-		}
-
-		uiStatic.m_SteamBackgroundSize.w = EngFuncs::PIC_Width( img );
-		uiStatic.m_SteamBackgroundSize.h = EngFuncs::PIC_Height( img );
-
-		if( gamedirOnly )
-		{
-			// if we doesn't have logo.avi in gamedir we don't want to draw it
-			if( !EngFuncs::FileExists( "media/logo.avi", TRUE ))
-				uiStatic.m_fDisableLogo = TRUE;
-		}
-		uiStatic.m_fDisableLogo = TRUE; // don't load logo if background was loaded from base mod
-		uiStatic.m_fNoOldBackground = false;
-
-		return true;
-	}
-
-	uiStatic.m_fNoOldBackground = true;
-
-	return false;
-}
-
-/*
-=================
-UI_LoadBackgroundImage
-=================
-*/
-void UI_LoadBackgroundImage( )
-{
-	bool haveBg;
-
-	// try to load backgrounds from mod
-	haveBg = UI_LoadBackgroundImageNew( false ); // vgui background layouts are inherited
-	if( haveBg ) return;
-
-	haveBg = UI_CheckBackgroundSplash( true );
-	if( haveBg ) return;
 }
 
 // =====================================================================
@@ -1351,7 +1181,7 @@ int UI_VidInit( void )
 	// register menu font
 	uiStatic.hFont = EngFuncs::PIC_Load( "#XASH_SYSTEMFONT_001.bmp", menufont_bmp, sizeof( menufont_bmp ));
 
-	UI_LoadBackgroundImage( );
+	CMenuBackgroundBitmap::LoadBackground( );
 #if 0
 	FILE *f;
 

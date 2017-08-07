@@ -111,7 +111,7 @@ void CMenuMain::CMenuMainBackground::Draw( )
 
 void CMenuMain::CMenuMainBanner::Draw()
 {
-	if( uiStatic.m_iSteamBackgroundCount || uiStatic.m_fDisableLogo )
+	if( !uiMain.background.ShouldDrawLogoMovie() )
 		return; // no logos for steam background
 
 	if( EngFuncs::GetLogoLength() <= 0.05f || EngFuncs::GetLogoWidth() <= 32 )

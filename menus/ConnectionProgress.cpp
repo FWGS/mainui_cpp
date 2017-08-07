@@ -179,7 +179,7 @@ void CMenuConnectionProgress::_Init( void )
 {
 	iFlags |= QMF_DIALOG;
 
-	background.bFillColor = true;
+	background.bForceColor = true;
 	background.iColor = uiPromptBgColor;
 
 	consoleButton.SetPicture( PC_CONSOLE );

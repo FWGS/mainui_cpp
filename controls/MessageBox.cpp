@@ -12,7 +12,7 @@ CMenuMessageBox::CMenuMessageBox() : CMenuBaseWindow()
 
 void CMenuMessageBox::_Init()
 {
-	background.bFillColor = true;
+	background.bForceColor = true;
 	background.iColor = uiPromptBgColor;
 
 	dlgMessage.iFlags = QMF_INACTIVE|QMF_DROPSHADOW;

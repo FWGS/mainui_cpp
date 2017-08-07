@@ -136,15 +136,6 @@ extern cvar_t	*ui_precache;
 extern cvar_t	*ui_showmodels;
 extern cvar_t   *ui_show_window_stack;
 
-#define MAX_BACKGROUNDS 48 // SC 5.0 have 35 tiled backgrounds!
-
-typedef struct
-{
-	HIMAGE	hImage;
-	Point coord;
-	Size size;
-} bimage_t;
-
 typedef struct
 {
 	CMenuBaseWindow *rootActive; // current active fullscreen holder(menu framework)
@@ -166,12 +157,6 @@ typedef struct
 
 	HIMAGE	hFont;		// mainfont
 
-	// handle steam background images
-	bimage_t m_SteamBackground[MAX_BACKGROUNDS];
-	Size    m_SteamBackgroundSize;
-	int     m_iSteamBackgroundCount;
-
-	bool	m_fDisableLogo;
 	bool	m_fDemosPlayed;
 	int		m_iOldMenuDepth;
 	bool	m_fNoOldBackground;

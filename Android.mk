@@ -44,6 +44,7 @@ LOCAL_SRC_FILES := 	controls/Framework.cpp                          \
 	controls/Switch.cpp                             \
 	controls/ProgressBar.cpp                        \
 	controls/BaseWindow.cpp                         \
+	controls/BackgroundBitmap.cpp                   \
 	menus/AdvancedControls.cpp                      \
 	menus/Audio.cpp                                 \
 	menus/Configuration.cpp                         \

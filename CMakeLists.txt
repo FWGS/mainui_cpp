@@ -45,6 +45,7 @@ set (MAINUI_CONTROLS_SOURCES
 	controls/Switch.cpp
 	controls/BaseWindow.cpp
 	controls/ProgressBar.cpp
+	controls/BackgroundBitmap.cpp
 	)
 
 set (MAINUI_MENUS_SOURCES

@@ -18,7 +18,6 @@ GNU General Public License for more details.
 #ifndef MENU_BITMAP_H
 #define MENU_BITMAP_H
 
-#define ART_BACKGROUND		"gfx/shell/splash"
 
 class CMenuBitmap : public CMenuBaseItem
 {
@@ -62,23 +61,5 @@ public:
 	void ToggleInactive() { }
 };
 
-class CMenuBackgroundBitmap: public CMenuBitmap
-{
-public:
-	CMenuBackgroundBitmap() : CMenuBitmap()
-	{
-		szPic = ART_BACKGROUND;
-		iFlags = QMF_INACTIVE;
-		bForceBackground = false;
-		bFillColor = false;
-	}
-	void VidInit( void );
-	void Draw( void );
-	void SetInactive(bool) { }
-	void ToggleInactive() { }
-
-	bool bForceBackground; // if true, szPic will be drawn, instead of Steam-background
-	bool bFillColor; // dialogs should set this
-};
 
 #endif // MENU_BITMAP_H

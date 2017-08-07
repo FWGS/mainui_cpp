@@ -3,7 +3,7 @@
 #define BASEWINDOW_H
 
 #include "ItemsHolder.h"
-#include "Bitmap.h"
+#include "BackgroundBitmap.h"
 
 // Base class for windows.
 // Should be used for message boxes, dialogs, root menus(e.g. frameworks)
