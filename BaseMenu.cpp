@@ -638,7 +638,6 @@ void UI_UpdateMenu( float flTime )
 	}
 
 	con_nprint_t con;
-	con.color[0] = con.color[1] = con.color[2] = 1.0f;
 	con.time_to_live = 0.1;
 
 	if( ui_show_window_stack && ui_show_window_stack->value )
@@ -646,11 +645,33 @@ void UI_UpdateMenu( float flTime )
 		for( int i = 0; i < uiStatic.menuDepth; i++ )
 		{
 			con.index++;
+			if( uiStatic.menuActive == uiStatic.menuStack[i] )
+			{
+				con.color[0] = 0.0f;
+				con.color[1] = 1.0f;
+				con.color[2] = 0.0f;
+			}
+			else
+			{
+				con.color[0] = con.color[1] = con.color[2] = 1.0f;
+			}
+
 
 			if( uiStatic.menuStack[i]->IsRoot() )
+			{
+				if( uiStatic.rootActive == uiStatic.menuStack[i] &&
+					uiStatic.rootActive != uiStatic.menuActive )
+				{
+					con.color[0] = 1.0f;
+					con.color[1] = 1.0f;
+					con.color[2] = 0.0f;
+				}
 				Con_NXPrintf( &con, "%p - %s\n", uiStatic.menuStack[i], uiStatic.menuStack[i]->szName );
+			}
 			else
+			{
 				Con_NXPrintf( &con, "     %p - %s\n", uiStatic.menuStack[i], uiStatic.menuStack[i]->szName );
+			}
 		}
 	}
 }
@@ -1292,7 +1313,7 @@ void UI_Init( void )
 	UI_LoadScriptConfig();
 
 	//CR
-	CMenuPicButton::InitTitleAnim();
+	CMenuPicButton::ClearButtonStack();
 }
 
 /*
