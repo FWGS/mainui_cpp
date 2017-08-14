@@ -28,11 +28,16 @@ CMenuBaseItem::CMenuBaseItem()
 	m_bPressed = false;
 
 	m_pParent = NULL;
+
+	m_bAllocName = false;
 }
 
 CMenuBaseItem::~CMenuBaseItem()
 {
-	;
+	if( m_bAllocName )
+	{
+		delete[] szName;
+	}
 }
 
 void CMenuBaseItem::Init()
@@ -131,4 +136,70 @@ void CMenuBaseItem::CalcSizes()
 {
 	m_scSize = size.Scale();
 	m_scChSize = charSize.Scale();
+}
+
+#define BIND_KEY_TO_INTEGER_VALUE( _key, _val ) if( !strcmp( key, (_key) ) ) { (_val) = atoi( data ); }
+
+bool CMenuBaseItem::KeyValueData(const char *key, const char *data)
+{
+
+	if( !strcmp( key, "xpos" ) )
+	{
+		// TODO: special keys here
+		pos.x = atoi( data );
+	}
+	else if( !strcmp( key, "ypos" ) )
+	{
+		pos.y = atoi( data );
+	}
+	else BIND_KEY_TO_INTEGER_VALUE( "wide", size.w )
+	else BIND_KEY_TO_INTEGER_VALUE( "tall", size.h )
+	else if( !strcmp( key, "visible" ) )
+	{
+		SetVisibility( (bool) atoi( data ) );
+	}
+	else if( !strcmp( key, "enabled" ) )
+	{
+		SetInactive( (bool) atoi( data ) );
+		SetGrayed( (bool) atoi( data ) );
+	}
+	else if( !strcmp( key, "labelText" ) )
+	{
+		/*if( *data == '#')
+		{
+			szName = Localize( data + 1 );
+			if( szName == data + 1 ) // not localized
+			{
+				m_bAllocName = true;
+			}
+		}
+		else*/ m_bAllocName = true;
+
+		if( m_bAllocName )
+		{
+			char *name = new char[strlen( data ) + 1];
+			strcpy( name, data );
+
+			szName = name;
+		}
+	}
+	else if( !strcmp( key, "textAlignment" ) )
+	{
+		if( !strcmp( data, "west" ) )
+		{
+			eTextAlignment = QM_LEFT;
+		}
+		else if( !strcmp( data, "east" ) )
+		{
+			eTextAlignment = QM_RIGHT;
+		}
+		else
+		{
+			Con_DPrintf( "unknown textAlignment %s\n", data );
+		}
+	}
+	// TODO: nomulti, nosingle, nosteam
+	// TODO: command(named events?), ask parent about registered event?
+
+	return true;
 }

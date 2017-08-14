@@ -29,15 +29,19 @@ public:
 	void RemoveItem( CMenuBaseItem &item );
 	CMenuBaseItem *ItemAtCursor( void );
 	CMenuBaseItem *ItemAtCursorPrev( void );
+	CMenuBaseItem *FindItemByTag( const char *tag );
 
 	void CalcItemsPositions();
 	void CalcItemsSizes();
+
 
 	inline void AddItem(CMenuBaseItem *item ) { return AddItem( *item ); }
 	inline int GetCursor() const { return m_iCursor; }
 	inline int GetCursorPrev() const { return m_iCursorPrev; }
 	inline int ItemCount() const { return m_numItems; }
 	inline bool WasInit() const { return m_bInit; }
+
+	void SetResourceFilename( const char *filename ) { m_szResFile = filename; }
 
 	DECLARE_EVENT_TO_MENU_METHOD( CMenuItemsHolder, Show );
 	DECLARE_EVENT_TO_MENU_METHOD( CMenuItemsHolder, Hide );
@@ -46,6 +50,8 @@ protected:
 	virtual void _Init() {}
 	virtual void _VidInit() {}
 
+	bool LoadRES( const char *filename );
+
 	int m_iCursor;
 	int m_iCursorPrev;
 
@@ -53,6 +59,8 @@ protected:
 	int m_numItems;
 	bool m_bInit;
 	bool m_bAllowEnterActivate;
+
+	const char *m_szResFile;
 };
 
 #endif // EMBEDITEM_H
