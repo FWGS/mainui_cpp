@@ -19,15 +19,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 
-#include "extdll.h"
-#include "BaseMenu.h"
+#include "Framework.h"
 #include "Action.h"
 #include "Bitmap.h"
 #include "PicButton.h"
 #include "YesNoMessageBox.h"
-#include "Utils.h"
 #include "keydefs.h"
-#include "BtnsBMPTable.h"
 #include "MenuStrings.h"
 
 #define ART_MINIMIZE_N	"gfx/shell/min_n"

@@ -18,17 +18,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
+#include "Framework.h"
 #include "mathlib.h"
-#include "extdll.h"
 #include "const.h"
-#include "BaseMenu.h"
-#include "Utils.h"
 #include "keydefs.h"
 #include "ref_params.h"
 #include "cl_entity.h"
 #include "com_model.h"
 #include "entity_types.h"
-#include "BtnsBMPTable.h"
 #include "Bitmap.h"
 #include "PicButton.h"
 #include "CheckBox.h"

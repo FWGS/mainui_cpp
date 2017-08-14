@@ -18,6 +18,8 @@ GNU General Public License for more details.
 #ifndef MENU_SCROLLLIST_H
 #define MENU_SCROLLLIST_H
 
+#include "BaseItem.h"
+
 // TODO: This should be rewritten
 // because preformatted strings ScrollList for table simulating
 // is a TOTALLY BAD IDEA

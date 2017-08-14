@@ -1,6 +1,8 @@
 #ifndef MESSAGEBOX_H
 #define MESSAGEBOX_H
 
+#include "BaseWindow.h"
+
 class CMenuMessageBox : public CMenuBaseWindow
 {
 public:

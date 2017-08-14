@@ -18,16 +18,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-#include "extdll.h"
-#include "BaseMenu.h"
+#include "Framework.h"
 #include "Bitmap.h"
 #include "PicButton.h"
 #include "Action.h"
 #include "ScrollList.h"
 #include "YesNoMessageBox.h"
-#include "Utils.h"
 #include "keydefs.h"
-#include "BtnsBMPTable.h"
 
 #define ART_BANNER		"gfx/shell/head_custom"
 

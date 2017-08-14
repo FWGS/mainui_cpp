@@ -17,9 +17,7 @@ GNU General Public License for more details.
 #ifndef MENU_EDITABLE_H
 #define MENU_EDITABLE_H
 
-#include <assert.h>
-#include "cvardef.h"
-#include "Utils.h"
+#include "BaseItem.h"
 
 class CMenuEditable : public CMenuBaseItem
 {

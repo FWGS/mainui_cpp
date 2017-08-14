@@ -14,9 +14,9 @@ GNU General Public License for more details.
 */
 
 
-#include "extdll.h"
+#include "extdll_menu.h"
 #include "BaseMenu.h"
-#include "enginecallback.h"
+#include "enginecallback_menu.h"
 #include "CFGScript.h"
 
 #define CVAR_USERINFO BIT(1)

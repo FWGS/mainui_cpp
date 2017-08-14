@@ -18,6 +18,7 @@ GNU General Public License for more details.
 #ifndef MENU_BITMAP_H
 #define MENU_BITMAP_H
 
+#include "BaseItem.h"
 
 class CMenuBitmap : public CMenuBaseItem
 {

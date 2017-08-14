@@ -15,32 +15,11 @@ GNU General Public License for more details.
 
 #ifndef BASEMENU_H
 #define BASEMENU_H
-#include "netadr.h"
+#include "enginecallback_menu.h"
 #include "keydefs.h"
+#include "EventSystem.h"
+#include "Utils.h"
 
-#define BIT( x ) ( 1U << x )
-
-// engine constants
-enum
-{
-	GAME_NORMAL = 0,
-	GAME_SINGLEPLAYER_ONLY,
-	GAME_MULTIPLAYER_ONLY
-};
-
-enum
-{
-	KEY_CONSOLE = 0,
-	KEY_GAME,
-	KEY_MENU
-};
-
-#define CS_SIZE			64	// size of one config string
-#define CS_TIME			16	// size of time string
-
-// color strings
-#define ColorIndex( c )		((( c ) - '0' ) & 7 )
-#define IsColorString( p )		( p && *( p ) == '^' && *(( p ) + 1) && *(( p ) + 1) >= '0' && *(( p ) + 1 ) <= '9' )
 
 #define UI_MAX_MENUDEPTH		64
 #define UI_MAX_MENUITEMS		64
@@ -85,49 +64,7 @@ enum
 #define UI_DOWNARROWFOCUS		"gfx/shell/dnarrowf"
 #define UI_DOWNARROWPRESSED		"gfx/shell/dnarrowp"
 
-struct Point
-{
-	Point() {}
-	Point( int x, int y ) : x(x), y(y) {}
 
-	int x, y;
-	Point Scale();
-	friend Point operator +( Point &a, Point &b ) { return Point( a.x + b.x, a.y + b.y ); }
-	friend Point operator -( Point &a, Point &b ) { return Point( a.x - b.x, a.y - b.y ); }
-
-	Point& operator+=( Point &a )
-	{
-		x += a.x;
-		y += a.y;
-		return *this;
-	}
-
-	Point& operator-=( Point &a )
-	{
-		x -= a.x;
-		y -= a.y;
-		return *this;
-	}
-
-	Point operator *( float scale ) { return Point( x * scale, y * scale );	}
-	Point operator /( float scale ) { return Point( x / scale, y / scale );	}
-};
-
-struct Size
-{
-	Size() {}
-	Size( int w, int h ) : w(w), h(h) {}
-
-	int w, h;
-	Size Scale();
-};
-
-#include "extdll.h"
-#include "enginecallback.h"
-#include "EventSystem.h"
-#include "Framework.h"
-#include "BaseItem.h"
-#include "BaseWindow.h"
 
 // =====================================================================
 // Main menu interface
@@ -135,6 +72,7 @@ struct Size
 extern cvar_t	*ui_precache;
 extern cvar_t	*ui_showmodels;
 extern cvar_t   *ui_show_window_stack;
+class CMenuBaseWindow;
 
 typedef struct
 {

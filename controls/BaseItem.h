@@ -2,56 +2,7 @@
 #ifndef BASEITEM_H
 #define BASEITEM_H
 
-enum
-{
-	QMF_GRAYED             = BIT( 1 ), // Grays and disables
-	QMF_INACTIVE           = BIT( 2 ), // Disables any input
-	QMF_DROPSHADOW         = BIT( 4 ),
-	QMF_SILENT             = BIT( 5 ), // Don't play sounds
-	QMF_HASMOUSEFOCUS      = BIT( 6 ),
-	QMF_MOUSEONLY          = BIT( 7 ), // Only mouse input allowed
-	QMF_NOTIFY             = BIT( 9 ), // draw notify at right screen side
-	QMF_ACT_ONRELEASE      = BIT( 10 ), // call Key_Event when button is released
-	QMF_HASKEYBOARDFOCUS   = BIT( 11 ),
-	QMF_DIALOG             = BIT( 12 ), // modal windows. Will grab key, char and mousemove events
-
-	QMF_HIDDEN             = BIT( 31 ), // DEPREACTED: Use Show/Hide/SetVisibility/ToggleVisibility
-};
-
-enum ETextAlignment
-{
-	QM_LEFT = 0, // justify by left
-	QM_CENTER,   // justify by center
-	QM_RIGHT,     // justify by right
-};
-
-enum EVertAlignment
-{
-	QM_BOTTOM = 0,
-	QM_VCENTER,
-	QM_TOP
-};
-
-enum EFontSizes
-{
-	QM_DEFAULTFONT = 0, // medium size font
-	QM_SMALLFONT,       // small
-	QM_BIGFONT          // big
-};
-
-enum EFocusAnimation
-{
-	QM_NOFOCUSANIMATION = 0,
-	QM_HIGHLIGHTIFFOCUS,      // just simple hightlight
-	QM_PULSEIFFOCUS           // pulse animation
-};
-
-enum ELetterCase
-{
-	QM_NOLETTERCASE = 0,
-	QM_LOWERCASE,
-	QM_UPPERCASE
-};
+#include "BaseMenu.h"
 
 class CMenuItemsHolder;
 class CMenuBaseItem
@@ -214,5 +165,7 @@ protected:
 	Size m_scSize;
 	Size m_scChSize;
 };
+
+#include "ItemsHolder.h"
 
 #endif // BASEITEM_H
