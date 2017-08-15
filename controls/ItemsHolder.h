@@ -43,6 +43,9 @@ public:
 
 	void SetResourceFilename( const char *filename ) { m_szResFile = filename; }
 
+	void RegisterNamedEvent( CEventCallback ev, const char *name );
+	CEventCallback FindEventByName( const char *name );
+
 	DECLARE_EVENT_TO_MENU_METHOD( CMenuItemsHolder, Show );
 	DECLARE_EVENT_TO_MENU_METHOD( CMenuItemsHolder, Hide );
 
@@ -57,6 +60,11 @@ protected:
 
 	CMenuBaseItem *m_pItems[UI_MAX_MENUITEMS];
 	int m_numItems;
+
+	// it's unnecessary to register here, it's only for searching events by res file
+	CEventCallback m_events[UI_MAX_MENUITEMS];
+	int m_numEvents;
+
 	bool m_bInit;
 	bool m_bAllowEnterActivate;
 

@@ -7,7 +7,8 @@
 #include <string.h>
 
 CMenuItemsHolder::CMenuItemsHolder() :
-	CMenuBaseItem(), m_iCursor( 0 ), m_iCursorPrev( 0 ), m_pItems( ), m_numItems( 0 ), m_bInit( false ), m_bAllowEnterActivate( false ),
+	CMenuBaseItem(), m_iCursor( 0 ), m_iCursorPrev( 0 ), m_pItems( ), m_numItems( 0 ),
+	m_events(), m_numEvents(), m_bInit( false ), m_bAllowEnterActivate( false ),
 	m_szResFile( 0 )
 {
 	;
@@ -560,4 +561,29 @@ bool CMenuItemsHolder::LoadRES(const char *filename)
 	}
 
 	return FreeFile( pfile, true );
+}
+
+void CMenuItemsHolder::RegisterNamedEvent(CEventCallback ev, const char *name)
+{
+	if( m_numEvents >= UI_MAX_MENUITEMS )
+		Host_Error( "RegisterNamedEvent: UI_MAX_MENUITEMS limit exceeded\n" );
+
+	ASSERT( name );
+	ASSERT( ev );
+
+	ev.szName = name;
+	m_events[m_numItems] = ev;
+
+	m_numItems++;
+}
+
+CEventCallback CMenuItemsHolder::FindEventByName(const char *name)
+{
+	for( int i = 0; i < m_numItems; i++ )
+	{
+		if( !strcmp( m_events[i].szName, name ))
+			return m_events[i];
+	}
+
+	return CEventCallback();
 }

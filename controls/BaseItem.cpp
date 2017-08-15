@@ -158,8 +158,10 @@ bool CMenuBaseItem::KeyValueData(const char *key, const char *data)
 	}
 	else if( !strcmp( key, "enabled" ) )
 	{
-		SetInactive( (bool) atoi( data ) );
-		SetGrayed( (bool) atoi( data ) );
+		bool enabled = (bool) atoi( data );
+
+		SetInactive( !enabled );
+		SetGrayed( !enabled );
 	}
 	else if( !strcmp( key, "labelText" ) )
 	{
@@ -193,11 +195,30 @@ bool CMenuBaseItem::KeyValueData(const char *key, const char *data)
 		}
 		else
 		{
-			Con_DPrintf( "unknown textAlignment %s\n", data );
+			Con_DPrintf( "KeyValueData: unknown textAlignment %s\n", data );
+		}
+	}
+	else if( !strcmp( key, "command" ) )
+	{
+		CEventCallback ev;
+
+		if( m_pParent )
+		{
+			ev = m_pParent->FindEventByName( data );
+
+			if( ev )
+				onActivated = ev;
+			else
+				Con_DPrintf( "KeyValueData: cannot find event named %s", data );
+		}
+		else
+		{
+			// should not happen, as parent parses the resource file and sends KeyValueData to every item inside
+			// if this happens, there is a bug
+			Con_DPrintf( "KeyValueData: no parent on '%s'\n", szName );
 		}
 	}
 	// TODO: nomulti, nosingle, nosteam
-	// TODO: command(named events?), ask parent about registered event?
 
 	return true;
 }
