@@ -131,7 +131,7 @@ void CMenuScriptConfigPage::Save()
 }
 
 CMenuScriptConfig::CMenuScriptConfig() : CMenuFramework(),
-	m_szConfig(), m_pVars(), m_iVarsCount(), m_iPagesIndex(), m_iPagesCount(), m_iCurrentPage()
+	m_pVars(), m_szConfig(), m_iVarsCount(), m_iPagesIndex(), m_iPagesCount(), m_iCurrentPage()
 {
 
 }

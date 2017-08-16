@@ -21,6 +21,8 @@ public:
 	virtual const char *Key( int key, int down );
 	virtual void Draw();
 
+	virtual bool KeyValueData(const char *key, const char *data);
+
 	enum EAnimation
 	{
 		ANIM_IN = 0,

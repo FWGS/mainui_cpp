@@ -20,6 +20,8 @@ public:
 
 	virtual bool MouseMove( int x, int y );
 
+	virtual bool KeyValueData(const char *key, const char *data);
+
 	void CursorMoved( void );
 	void SetCursor( int newCursor, bool notify = true );
 	void SetCursorToItem( CMenuBaseItem &item, bool notify = true );

@@ -136,22 +136,53 @@ void CMenuBaseItem::CalcSizes()
 	m_scChSize = charSize.Scale();
 }
 
-#define BIND_KEY_TO_INTEGER_VALUE( _key, _val ) if( !strcmp( key, (_key) ) ) { (_val) = atoi( data ); }
+// we need to remap position, because resource files are keep screen at 640x480, but we in 1024x768
+#define REMAP_RATIO ( 1.6f )
 
 bool CMenuBaseItem::KeyValueData(const char *key, const char *data)
 {
-
-	if( !strcmp( key, "xpos" ) )
+	if( !strcmp( key, "xpos" ))
 	{
-		// TODO: special keys here
-		pos.x = atoi( data );
+		int coord;
+		if( data[0] == 'c' ) // center
+		{
+			data++;
+
+			coord = 320 + atoi( data );
+		}
+		else
+		{
+			coord = atoi( data );
+			if( coord  < 0 )
+				coord += 640;
+		}
+		pos.x = coord * REMAP_RATIO;
 	}
 	else if( !strcmp( key, "ypos" ) )
 	{
-		pos.y = atoi( data );
+		int coord;
+		if( data[0] == 'c' ) // center
+		{
+			data++;
+
+			coord = 240 + atoi( data );
+		}
+		else
+		{
+			coord = atoi( data );
+			if( coord  < 0 )
+				coord += 480;
+		}
+		pos.y = coord * REMAP_RATIO;
 	}
-	else BIND_KEY_TO_INTEGER_VALUE( "wide", size.w )
-	else BIND_KEY_TO_INTEGER_VALUE( "tall", size.h )
+	else if( !strcmp( key, "wide" ) )
+	{
+		size.w = atoi( data ) * REMAP_RATIO;
+	}
+	else if( !strcmp( key, "tall" ) )
+	{
+		size.h = atoi( data ) * REMAP_RATIO;
+	}
 	else if( !strcmp( key, "visible" ) )
 	{
 		SetVisibility( (bool) atoi( data ) );
@@ -202,20 +233,20 @@ bool CMenuBaseItem::KeyValueData(const char *key, const char *data)
 	{
 		CEventCallback ev;
 
-		if( m_pParent )
+		if( m_pParent && ( ev = m_pParent->FindEventByName( data )) )
 		{
-			ev = m_pParent->FindEventByName( data );
+			onActivated = ev;
 
-			if( ev )
-				onActivated = ev;
-			else
-				Con_DPrintf( "KeyValueData: cannot find event named %s", data );
+		}
+		else if( !strcmp( data, "engine " ) )
+		{
+			onActivated.SetCommand( FALSE, data + sizeof( "engine " ) );
 		}
 		else
 		{
 			// should not happen, as parent parses the resource file and sends KeyValueData to every item inside
 			// if this happens, there is a bug
-			Con_DPrintf( "KeyValueData: no parent on '%s'\n", szName );
+			Con_DPrintf( "KeyValueData: cannot set command '%s' on '%s'\n", data, szName );
 		}
 	}
 	// TODO: nomulti, nosingle, nosteam

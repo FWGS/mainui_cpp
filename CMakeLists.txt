@@ -79,7 +79,7 @@ set (MAINUI_MENUS_SOURCES
 	)
 
 set (MAINUI_SOURCES
-	EventSystem.h
+	EventSystem.cpp
 	BaseMenu.cpp
 	Btns.cpp
 	MenuStrings.cpp

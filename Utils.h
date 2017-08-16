@@ -131,4 +131,8 @@ extern void UI_EnableTextInput( bool enable );
 #define ColorIndex( c )		((( c ) - '0' ) & 7 )
 #define IsColorString( p )		( p && *( p ) == '^' && *(( p ) + 1) && *(( p ) + 1) >= '0' && *(( p ) + 1 ) <= '9' )
 
+// stringize utilites
+#define STR( x ) #x
+#define STR2( x ) STR( x )
+
 #endif//UTILS_H

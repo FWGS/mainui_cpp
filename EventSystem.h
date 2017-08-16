@@ -1,3 +1,18 @@
+/*
+EventSystem.h -- event system implementation
+Copyright(C) 2017 a1batross
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+*/
+#pragma once
 #ifndef EVENTSYSTEM_H
 #define EVENTSYSTEM_H
 
@@ -65,53 +80,55 @@ typedef void (*VoidCallback)(void);
 class CEventCallback
 {
 public:
-	CEventCallback() : pExtra( NULL ), callback( NULL ), szName( NULL ) {}
-	CEventCallback( EventCallback cb, void *ex = NULL ) : pExtra( ex ), callback( cb ), szName( NULL ) {}
+	CEventCallback();
+	CEventCallback( EventCallback cb, void *ex = 0 );
+	~CEventCallback();
 
 	void *pExtra;
 
-	operator bool() { return callback != NULL; }
+	// convert to boolean for easy check in conditionals
+	operator bool()          { return callback != 0; }
 	operator EventCallback() { return callback; }
 
 	void operator() ( CMenuBaseItem *pSelf ) { callback( pSelf, pExtra ); }
 
 	EventCallback operator =( EventCallback cb ) { return callback = cb; }
+	size_t        operator =( size_t null )      { return (size_t)(callback = (EventCallback)null); }
+	void*         operator =( void *null )       { return (void*)(callback = (EventCallback)null); }
 	VoidCallback  operator =( VoidCallback cb )
 	{
-		pExtra = (void*)cb; // extradata can't be used anyway
 		callback = VoidCallbackWrapperCb;
-		return cb;
-	}
-	size_t operator =( size_t null )
-	{
-		callback = (EventCallback)null;
-		return null;
-	}
-	void *operator =( void *null )
-	{
-		callback = (EventCallback)null;
-		return null;
+		return (VoidCallback)(pExtra = (void*)cb); // extradata can't be used anyway;
 	}
 
 	void SetCommand( int execute_now, const char *sz )
 	{
-		cmd.execute_now = execute_now;
-		cmd.cmd = sz;
+		FreeCommand();
 
-		pExtra = &cmd;
+		cmd = new struct CmdCallback(execute_now, sz);
+
+		pExtra = cmd;
 		callback = CmdCallbackWrapperCb;
 	}
 
 	static void NoopCb( CMenuBaseItem *, void * ) {}
 
 private:
-	struct CmdCallback
-	{
-		int execute_now;
-		const char *cmd;
-	} cmd;
 	EventCallback callback;
 
+	struct CmdCallback
+	{
+		CmdCallback( int _execute_now, const char *sz );
+
+		int execute_now;
+		char cmd[128];
+	} *cmd;
+
+	void FreeCommand()
+	{
+		delete cmd;
+		cmd = 0;
+	}
 
 	static void VoidCallbackWrapperCb( CMenuBaseItem *pSelf, void *pExtra )
 	{

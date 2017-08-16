@@ -489,3 +489,25 @@ void CMenuField::UpdateEditable()
 		szBuffer[iMaxLength-1] = 0;
 	}
 }
+
+bool CMenuField::KeyValueData(const char *key, const char *data)
+{
+	if( !strcmp( key, "maxchars" ) )
+	{
+		iMaxLength = atoi( data );
+	}
+	else if( !strcmp( key, "NumericInputOnly" ) )
+	{
+		bNumbersOnly = (bool) atoi( data );
+	}
+	else if( !strcmp( key, "textHidden" ) )
+	{
+		bHideInput = (bool) atoi( data );
+	}
+	else
+	{
+		return CMenuBaseItem::KeyValueData(key, data);
+	}
+
+	return true;
+}

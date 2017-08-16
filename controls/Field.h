@@ -32,6 +32,8 @@ public:
 	virtual void Draw( void );
 	virtual void Char( int key );
 	virtual void UpdateEditable();
+
+	virtual bool KeyValueData(const char *key, const char *data);
 	void LinkCvar(const char *name)
 	{
 		CMenuEditable::LinkCvar( name, CVAR_STRING );

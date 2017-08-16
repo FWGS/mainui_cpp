@@ -71,6 +71,7 @@ LOCAL_SRC_FILES := 	controls/Framework.cpp                          \
 	menus/VideoModes.cpp                            \
 	menus/VideoOptions.cpp                          \
 	menus/dynamic/ScriptMenu.cpp                    \
+	EventSystem.cpp                                 \
 	BaseMenu.cpp                                    \
 	Btns.cpp                                        \
 	MenuStrings.cpp                                 \

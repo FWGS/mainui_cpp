@@ -252,6 +252,7 @@ void UI_TouchEdit_Precache( void );
 void UI_FileDialog_Precache( void );
 void UI_GamePad_Precache( void );
 void UI_DynamicMenu_Precache( void );
+void UI_Zoo_Precache( void );
 
 // Menus
 void UI_Main_Menu( void );
@@ -283,6 +284,7 @@ void UI_FileDialog_Menu( void );
 void UI_TouchButtons_AddButtonToList( const char *name, const char *texture, const char *command, unsigned char *color, int flags );
 void UI_TouchButtons_GetButtonList();
 void UI_GamePad_Menu( void );
+void UI_Zoo_Menu( void );
 
 bool UI_AdvUserOptions_IsAvailable( void );
 void UI_AdvUserOptions_Menu( void );

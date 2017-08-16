@@ -175,3 +175,25 @@ bool CMenuBaseWindow::DrawAnimation(EAnimation anim)
 {
 	return true;
 }
+
+bool CMenuBaseWindow::KeyValueData(const char *key, const char *data)
+{
+	if( !strcmp( key, "enabled" ) || !strcmp( key, "visible" ) )
+	{
+
+	}
+	else
+	{
+		if( !strcmp( key, "xpos" ) ||
+		!strcmp( key, "ypos" ) ||
+		!strcmp( key, "wide" ) ||
+		!strcmp( key, "tall" ) )
+		{
+			background.KeyValueData( key, data );
+		}
+
+		return CMenuBaseItem::KeyValueData(key, data);
+	}
+
+	return true;
+}

@@ -8,7 +8,7 @@
 
 CMenuItemsHolder::CMenuItemsHolder() :
 	CMenuBaseItem(), m_iCursor( 0 ), m_iCursorPrev( 0 ), m_pItems( ), m_numItems( 0 ),
-	m_events(), m_numEvents(), m_bInit( false ), m_bAllowEnterActivate( false ),
+	m_events(), m_numEvents( 0 ), m_bInit( false ), m_bAllowEnterActivate( false ),
 	m_szResFile( 0 )
 {
 	;
@@ -33,9 +33,16 @@ const char *CMenuItemsHolder::Key( int key, int down )
 			}
 			else
 			{
-				sound = item->Key( key, down );
-
-				if( sound ) return sound;
+				// mouse keys must be checked for item bounds
+				if( key < K_MOUSE1 || key > K_MOUSE5 ||
+					( uiStatic.cursorX >= item->m_scPos.x &&
+					uiStatic.cursorY >= item->m_scPos.y &&
+					uiStatic.cursorX <= item->m_scPos.x + item->m_scSize.w &&
+					uiStatic.cursorY <= item->m_scPos.y + item->m_scSize.h ) )
+				{
+					sound = item->Key( key, down );
+					if( sound ) return sound;
+				}
 			}
 		}
 
@@ -183,13 +190,13 @@ void CMenuItemsHolder::Init()
 {
 	if( !WasInit() )
 	{
+		m_bInit = true;
+
 		_Init();
 		// m_pLayout->Init();
 
 		if( m_szResFile )
 			LoadRES( m_szResFile );
-
-		m_bInit = true;
 	}
 }
 
@@ -352,8 +359,14 @@ CMenuBaseItem *CMenuItemsHolder::FindItemByTag(const char *tag)
 	if( !tag )
 		return NULL;
 
+	if( this->szTag && !strcmp( this->szTag, tag ) )
+		return this;
+
 	for( int i = 0; i < m_numItems; i++ )
 	{
+		if( !m_pItems[i]->szTag )
+			continue;
+
 		if( !strcmp( m_pItems[i]->szTag, tag ) )
 			return m_pItems[i];
 	}
@@ -572,18 +585,23 @@ void CMenuItemsHolder::RegisterNamedEvent(CEventCallback ev, const char *name)
 	ASSERT( ev );
 
 	ev.szName = name;
-	m_events[m_numItems] = ev;
+	m_events[m_numEvents] = ev;
 
-	m_numItems++;
+	m_numEvents++;
 }
 
 CEventCallback CMenuItemsHolder::FindEventByName(const char *name)
 {
-	for( int i = 0; i < m_numItems; i++ )
+	for( int i = 0; i < m_numEvents; i++ )
 	{
 		if( !strcmp( m_events[i].szName, name ))
 			return m_events[i];
 	}
 
 	return CEventCallback();
+}
+
+bool CMenuItemsHolder::KeyValueData(const char *key, const char *data)
+{
+	return CMenuBaseItem::KeyValueData( key, data );
 }
