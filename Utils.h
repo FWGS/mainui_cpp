@@ -21,6 +21,7 @@ GNU General Public License for more details.
 
 #include "enginecallback_menu.h"
 #include "gameinfo.h"
+#include "FontManager.h"
 
 #define FILE_GLOBAL	static
 #define DLL_GLOBAL
@@ -185,14 +186,7 @@ wchar_t *ConvertToWChar( const char *text, int *length = NULL );
 
 namespace Font
 {
-	inline int GetTextWide( HFont font, const char *szName, Size charSize )
-	{
-		#ifdef MAINUI_USE_CUSTOM_FONT_RENDER
-		return g_FontMgr.GetTextWideScaled( font, szName, charSize.h );
-		#else
-		return strlen( szName ) * charSize.w;
-		#endif
-	}
+int GetTextWide( HFont font, const char *szName, Size charSize );
 }
 }
 

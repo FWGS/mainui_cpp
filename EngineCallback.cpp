@@ -49,6 +49,7 @@ void EngFuncs::DrawCharacter(int x, int y, int width, int height, int ch, int ul
 	engfuncs.pfnDrawCharacter( x, y, width, height, ch, ulRGBA, hFont );
 }
 
+#ifndef MAINUI_USE_CUSTOM_FONT_RENDER
 void EngFuncs::DrawSetTextColor(int r, int g, int b, int alpha)
 {
 	if( uiStatic.enableAlphaFactor )
@@ -56,6 +57,7 @@ void EngFuncs::DrawSetTextColor(int r, int g, int b, int alpha)
 
 	engfuncs.pfnDrawSetTextColor( r, g, b, alpha );
 }
+#endif
 
 #ifdef MAINUI_USE_CUSTOM_FONT_RENDER
 
@@ -89,6 +91,8 @@ int EngFuncs::DrawConsoleString(int x, int y, const char *string)
 	}
 
 	delete[] atext;
+
+	return pt.x;
 }
 
 void EngFuncs::ConsoleStringLen(const char *string, int *length, int *height)

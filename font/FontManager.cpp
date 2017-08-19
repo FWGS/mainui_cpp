@@ -3,7 +3,6 @@
 
 #include "BaseFontBackend.h"
 
-#if defined(MAINUI_USE_CUSTOM_FONT_RENDERER)
 #if defined(MAINUI_USE_FREETYPE)
 #include "FreeTypeFont.h"
 #elif defined(MAINUI_USE_STB)
@@ -12,7 +11,6 @@
 #include "WinAPIFont.h"
 #else
 #error "No font rendering backend found"
-#endif
 #endif
 
 #include "BitmapFont.h"
@@ -343,7 +341,7 @@ int CFontManager::DrawCharacter(HFont fontHandle, wchar_t ch, Point pt, Size sz,
 		}
 	}
 
-	IBaseFont::glyph_t find = { ch };
+	IBaseFont::glyph_t find( ch );
 	int idx = font->m_glyphs.Find( find );
 
 	if( font->m_glyphs.IsValidIndex( idx ) )
@@ -399,40 +397,17 @@ HFont CFontBuilder::Create()
 	{
 		font = g_FontMgr.m_Fonts[i];
 
-#if defined(MAINUI_USE_CUSTOM_FONT_RENDER)
-		// skip legacy
-		if( m_bPreferRender && font->IsLegacyFont() )
-			continue;
-#endif
-
-		// skip legacy
-		if( m_bPreferVarWidth && font->IsLegacyFont() )
-			continue;
-
 		if( font->IsEqualTo( m_szName, m_iTall, m_iWeight, m_iBlur, m_iFlags ) )
 			return i;
 	}
 
-#if defined(MAINUI_USE_CUSTOM_FONT_RENDER)
-	if( m_bPreferRender )
-	{
 	#if defined(MAINUI_USE_FREETYPE)
 		font = new CFreeTypeFont();
-	#elseif defined(MAINUI_USE_STB)
+	#elif defined(MAINUI_USE_STB)
 		font = new CStbFont();
 	#else
 		font = new CWinAPIFont();
 	#endif
-	}
-	else
-#endif
-	{
-		// we added var width, because we can use VGUI1 bitmap fonts, that are variable width
-		//if( m_bPreferVarWidth )
-		//	font = new CBitmapFont_VGUI1();
-		//else
-			font = new CBitmapFont_XASH(); // or just fallback to XASH_SYSTEMFONT
-	}
 
 	if( !font->Create( m_szName, m_iTall, m_iWeight, m_iBlur, m_fBrighten, m_iOutlineSize, m_iScanlineOffset, m_fScanlineScale, m_iFlags ) )
 	{

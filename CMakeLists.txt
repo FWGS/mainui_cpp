@@ -46,7 +46,7 @@ set (MAINUI_CONTROLS_SOURCES
 	controls/BaseWindow.cpp
 	controls/ProgressBar.cpp
 	controls/BackgroundBitmap.cpp
-	controls/Table.cpp
+	#controls/Table.cpp
 	#controls/TabWidget.cpp
 	#controls/ScrollView.cpp
 	)
@@ -129,7 +129,7 @@ if( MAINUI_CPP_ENABLE_FONT_RENDER )
 	# Win32 will always use GDI font renderer
 	if( NOT WIN32 )
 		if( MAINUI_USE_STB )
-			add_defintions( -DMAINUI_USE_STB )
+			add_definitions( -DMAINUI_USE_STB )
 		else()
 			find_package(PkgConfig)
 			pkg_check_modules(FC REQUIRED fontconfig)

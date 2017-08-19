@@ -210,15 +210,16 @@ protected:
 	// Remove and add back an element in the tree.
 	void	Unlink( I elem );
 	void	Link( I elem );
+	
+	CUtlMemory<Node_t> m_Elements;
 
 	// Used for sorting.
 	LessFunc_t m_LessFunc;
-	
-	CUtlMemory<Node_t> m_Elements;
+
 	I m_Root;
 	I m_NumElements;
-	I m_FirstFree;
 	I m_TotalElements;
+	I m_FirstFree;
 
 	Node_t*   m_pElements;
 	

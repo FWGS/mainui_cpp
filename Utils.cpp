@@ -425,3 +425,12 @@ wchar_t *UI::String::ConvertToWChar( const char *text, int *length )
 
 	return wText;
 }
+
+int UI::Font::GetTextWide( HFont font, const char *szName, Size charSize )
+{
+#ifdef MAINUI_USE_CUSTOM_FONT_RENDER
+	return g_FontMgr.GetTextWideScaled( font, szName, charSize.h );
+#else
+	return strlen( szName ) * charSize.w;
+#endif
+}

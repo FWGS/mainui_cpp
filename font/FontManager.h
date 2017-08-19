@@ -75,9 +75,6 @@ public:
 
 		m_iFlags = FONT_NONE;
 		m_iBlur = m_iScanlineOffset = m_iOutlineSize = 0;
-
-		m_bPreferRender = false;
-		m_bPreferVarWidth = false;
 	}
 
 	CFontBuilder &SetBlurParams( int blur, float brighten = 1.0f )

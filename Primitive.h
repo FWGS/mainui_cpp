@@ -90,7 +90,7 @@ typedef int HFont; // handle to a font
 
 struct Point
 {
-	Point() {}
+	Point() : x(0), y(0) {}
 	Point( int x, int y ) : x(x), y(y) {}
 
 	int x, y;
@@ -118,7 +118,7 @@ struct Point
 
 struct Size
 {
-	Size() {}
+	Size() : w(0), h(0) {}
 	Size( int w, int h ) : w(w), h(h) {}
 
 	int w, h;

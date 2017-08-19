@@ -42,10 +42,6 @@ void IBaseFont::GetTextureName(char *dst, size_t len, int pageNum) const
 
 void IBaseFont::UploadGlyphsForRanges(IBaseFont::charRange_t *range, int rangeSize)
 {
-	// HACKHACK: Skip for legacy fon
-	if( IsLegacyFont() )
-		return;
-
 	char name[256];
 	const int maxWidth = GetMaxCharWidth();
 	const int height = GetHeight();
@@ -62,7 +58,6 @@ void IBaseFont::UploadGlyphsForRanges(IBaseFont::charRange_t *range, int rangeSi
 
 	// texture is reversed by Y coordinates
 	int xstart = 0, ystart = MAX_PAGE_SIZE-1;
-	int lastCharPageChanged = range[0].chMin;
 	for( int iRange = 0; iRange < rangeSize; iRange++ )
 	{
 		for( int ch = range[iRange].chMin; ch <= range[iRange].chMax; ch++ )
@@ -86,14 +81,13 @@ void IBaseFont::UploadGlyphsForRanges(IBaseFont::charRange_t *range, int rangeSi
 					HIMAGE hImage = EngFuncs::PIC_Load( name, bmp, bmpSize, 0 );
 					Con_DPrintf( "Uploaded %s to %i\n", name, hImage );
 
-					for( int i = lastCharPageChanged; i < ch; i++ )
+					for( int i = m_glyphs.FirstInorder();
+						i != m_glyphs.LastInorder();
+						i = m_glyphs.NextInorder( i ) )
 					{
-						glyph_t find = { i };
-						int idx = m_glyphs.Find( find );
-						m_glyphs[idx].texture = hImage;
+						if( !m_glyphs[i].texture )
+							m_glyphs[i].texture = hImage;
 					}
-
-					lastCharPageChanged = ch;
 
 					// m_Pages.AddToTail( hImage );
 					m_iPages++;
@@ -143,11 +137,10 @@ void IBaseFont::UploadGlyphsForRanges(IBaseFont::charRange_t *range, int rangeSi
 	delete[] bmp;
 	delete[] temp;
 
-	for( int i = lastCharPageChanged; i < range[rangeSize-1].chMin; i++ )
+	for( int i = m_glyphs.FirstInorder(); i != m_glyphs.LastInorder(); i = m_glyphs.NextInorder( i ) )
 	{
-		glyph_t find = { i };
-		int idx = m_glyphs.Find( find );
-		m_glyphs[idx].texture = hImage;
+		if( !m_glyphs[i].texture )
+			m_glyphs[i].texture = hImage;
 	}
 	// m_Pages.AddToTail(hImage);
 	m_iPages++;
@@ -156,16 +149,13 @@ void IBaseFont::UploadGlyphsForRanges(IBaseFont::charRange_t *range, int rangeSi
 
 IBaseFont::~IBaseFont()
 {
-	if( !IsLegacyFont() )
+	char name[256];
+	for( int i = 0; i < m_iPages; i++ )
 	{
-		char name[256];
-		for( int i = 0; i < m_iPages; i++ )
-		{
-			GetTextureName( name, sizeof( name ), i );
-			EngFuncs::PIC_Free( name );
-		}
-		m_iPages = 0;
+		GetTextureName( name, sizeof( name ), i );
+		EngFuncs::PIC_Free( name );
 	}
+	m_iPages = 0;
 
 	delete[] m_pGaussianDistribution;
 }

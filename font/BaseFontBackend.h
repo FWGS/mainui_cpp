@@ -73,6 +73,8 @@ private:
 
 	struct glyph_t
 	{
+		glyph_t() : ch( 0 ), texture( 0 ), rect() { }
+		glyph_t( int ch ) : ch( ch ), texture( 0 ), rect() { }
 		int ch;
 		HIMAGE texture;
 		wrect_t rect;

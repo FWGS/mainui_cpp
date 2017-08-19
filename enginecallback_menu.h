@@ -61,7 +61,7 @@ public:
 	static inline void PIC_DrawTrans( Point p, Size s, const wrect_t *prc = NULL )
 	{ PIC_DrawTrans( p.x, p.y, s.w, s.h, prc ); }
 	static inline void PIC_DrawAdditive( Point p, Size s, const wrect_t *prc = NULL )
-	{ PIC_DrawAdditive( p.x, p.y, prc ); }
+	{ PIC_DrawAdditive( p.x, p.y, s.w, s.h, prc ); }
 	static inline void PIC_Draw( Point p, const wrect_t *prc = NULL )
 	{ PIC_Draw( p.x, p.y, prc ); }
 	static inline void PIC_DrawHoles( Point p, const wrect_t *prc = NULL )
