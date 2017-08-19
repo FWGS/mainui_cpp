@@ -23,13 +23,16 @@ public:
 	virtual void GetCharABCWidths( int ch, int &a, int &b, int &c ) = 0;
 	virtual bool HasChar( int ch ) const = 0;
 
-	int GetHeight() const;
-	int GetTall() const;
-	const char *GetName() const;
-	int GetAscent() const;
-	int GetMaxCharWidth() const;
-	int GetFlags() const;
-	int GetWeight() const;
+	inline int GetHeight() const       { return m_iHeight + GetEfxOffset(); }
+	inline int GetTall() const         { return m_iTall; }
+	inline const char *GetName() const { return m_szName; }
+	inline int GetAscent() const       { return m_iAscent; }
+	inline int GetMaxCharWidth() const { return m_iMaxCharWidth; }
+	inline int GetFlags() const        { return m_iFlags; }
+	inline int GetWeight() const       { return m_iWeight; }
+	inline int GetEfxOffset() const    { return m_iBlur + m_iOutlineSize; }
+	inline bool IsAdditive() const     { return GetFlags() & FONT_ADDITIVE; }
+
 	bool IsEqualTo( const char *name, int tall, int weight, int blur, int flags ) const;
 
 	void DebugDraw() const;
@@ -55,8 +58,9 @@ protected:
 	int	 m_iTall, m_iWeight, m_iFlags, m_iHeight, m_iMaxCharWidth;
 	int  m_iAscent;
 	int  m_iGLTexture;
+	bool m_bAdditive;
 
-	// blurring. UNDONE.
+	// blurring
 	int  m_iBlur;
 	float *m_pGaussianDistribution;
 	float m_fBrighten;

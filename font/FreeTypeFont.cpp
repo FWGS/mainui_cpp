@@ -4,6 +4,7 @@
 
 #include "FontManager.h"
 #include "FreeTypeFont.h"
+#include "Utils.h"
 
 FT_Library CFreeTypeFont::m_Library;
 
@@ -54,7 +55,7 @@ FcPattern* FontMatch(const char* type, FcType vtype, const void* value, ...)
 				fcvalue.u.i = (int)(intptr_t)value;
 				break;
 			default:
-				assert(("FontMatch unhandled type"));
+				ASSERT(("FontMatch unhandled type"));
 		}
 		FcPatternAdd(pattern, type, fcvalue, FcFalse);
 
@@ -164,7 +165,7 @@ void CFreeTypeFont::GetCharRGBA(int ch, Point pt, Size sz, unsigned char *rgba, 
 
 	if( ( error = FT_Load_Glyph( face, idx, FT_LOAD_RENDER | FT_LOAD_TARGET_NORMAL ) ) )
 	{
-		printf( "Error in FT_Load_Glyph: %x\n", error );
+		Con_DPrintf( "Error in FT_Load_Glyph: %x\n", error );
 		return;
 	}
 
@@ -197,6 +198,8 @@ void CFreeTypeFont::GetCharRGBA(int ch, Point pt, Size sz, unsigned char *rgba, 
 	buf = &slot->bitmap.buffer[ ystart * slot->bitmap.width ];
 	dst = rgba + 4 * sz.w * ( ystart + pushDown );
 
+	bool additive = IsAdditive();
+
 	// iterate through copying the generated dib into the texture
 	for (int j = ystart; j < yend; j++, dst += 4 * sz.w, buf += slot->bitmap.width )
 	{
@@ -206,12 +209,20 @@ void CFreeTypeFont::GetCharRGBA(int ch, Point pt, Size sz, unsigned char *rgba, 
 			if( buf[i] > 0 )
 			{
 				// paint white and alpha
-				*xdst = 0x00FFFFFF | buf[i] << 24;
+				if( !additive )
+				{
+					// paint white and alpha
+					*xdst = PackRGBA( 0xFF, 0xFF, 0xFF, buf[i] );
+				}
+				else
+				{
+					*xdst = PackRGBA( buf[i], buf[i], buf[i], 0xFF );
+				}
 			}
 			else
 			{
 				// paint black and null alpha
-				*xdst = 0;
+				*xdst = PackRGBA( 0x00, 0x00, 0x00, additive ? 0xFF : 0x00 );
 			}
 		}
 	}
@@ -256,18 +267,19 @@ void CFreeTypeFont::GetCharABCWidths(int ch, int &a, int &b, int &c)
 	}
 	else
 	{
-		find.a = PIXEL(face->glyph->metrics.horiBearingX) - m_iBlur;
-		find.b = PIXEL(face->glyph->metrics.width) + m_iBlur * 2 + m_iOutlineSize * 2;
+	#if 1
+		find.a = PIXEL(face->glyph->metrics.horiBearingX) - m_iBlur - m_iOutlineSize;
+		find.b = PIXEL(face->glyph->metrics.width) + (m_iBlur + m_iOutlineSize) * 2;
 		find.c = PIXEL(face->glyph->metrics.horiAdvance -
 			 face->glyph->metrics.horiBearingX -
-			 face->glyph->metrics.width) - m_iBlur;
-		/*find.a = find.c = 0;
-		find.b = (PIXEL(face->glyph->metrics.horiAdvance - face->glyph->metrics.horiBearingX - face->glyph->metrics.width) +
-			PIXEL(face->glyph->metrics.width) + (m_iBlur * 2));*/
-
-		/*find.a = face->glyph->metrics.horiBearingX / 64.0;
-		find.b = face->glyph->metrics.width / 64.0;
-		find.c = (face->glyph->metrics.horiAdvance - face->glyph->metrics.horiBearingX - face->glyph->metrics.width) / 64;*/
+			 face->glyph->metrics.width) - m_iBlur - m_iOutlineSize;
+	#else
+		find.a = PIXEL(face->glyph->metrics.horiBearingX);/* - m_iBlur;*/
+		find.b = PIXEL(face->glyph->metrics.width) + m_iBlur;
+		find.c = PIXEL(face->glyph->metrics.horiAdvance -
+		 face->glyph->metrics.horiBearingX -
+		 face->glyph->metrics.width) - m_iBlur;
+	#endif
 	}
 
 	a = find.a;

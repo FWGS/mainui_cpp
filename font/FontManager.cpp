@@ -15,8 +15,8 @@
 
 #include "BitmapFont.h"
 
-#define DEFAULT_MENUFONT "Impact"
-#define DEFAULT_CONFONT  "Arial"
+#define DEFAULT_MENUFONT "Trebuchet MS"
+#define DEFAULT_CONFONT  "Tahoma"
 
 // Probably isn't a good idea until I don't have implemented SDF
 #define SCALE_FONTS 1
@@ -28,6 +28,7 @@ CFontManager::CFontManager()
 #ifdef MAINUI_USE_FREETYPE
 	FT_Init_FreeType( &CFreeTypeFont::m_Library );
 #endif
+	m_Fonts.EnsureCapacity( 4 );
 }
 
 CFontManager::~CFontManager()
@@ -41,7 +42,7 @@ CFontManager::~CFontManager()
 
 void CFontManager::VidInit( void )
 {
-	static bool calledOnce = false, forceUpdateConsoleFont = false;
+	static bool calledOnce = false;
 	static int prevConsoleFontHeight;
 
 	// Ordering is important!
@@ -56,18 +57,16 @@ void CFontManager::VidInit( void )
 		float scale = uiStatic.scaleY;
 #endif
 
-		// TODO: Remove this. We need to place basic fonts into appropriate handles
-		DeleteAllFonts();
-		forceUpdateConsoleFont = true;
-
 		// ordering is important!
 		// See CBaseMenuItem::SetCharSize()
 		uiStatic.hDefaultFont = CFontBuilder( DEFAULT_MENUFONT, UI_MED_CHAR_HEIGHT * scale, 1000 )
+			.SetHandleNum( QM_DEFAULTFONT )
 			.Create();
 		uiStatic.hSmallFont   = CFontBuilder( DEFAULT_MENUFONT, UI_SMALL_CHAR_HEIGHT * scale, 100 )
+			.SetHandleNum( QM_SMALLFONT )
 			.Create();
 		uiStatic.hBigFont     = CFontBuilder( DEFAULT_MENUFONT, UI_BIG_CHAR_HEIGHT * scale, 1000 )
-			.SetBlurParams( 5, 1.5f )
+			.SetHandleNum( QM_BIGFONT )
 			.Create();
 	}
 
@@ -77,7 +76,7 @@ void CFontManager::VidInit( void )
 	else if( ScreenHeight < 640 ) consoleFontHeight = 14;
 	else consoleFontHeight = 18;
 
-	if( consoleFontHeight != prevConsoleFontHeight || forceUpdateConsoleFont )
+	if( consoleFontHeight != prevConsoleFontHeight )
 	{
 		DeleteFont( uiStatic.hConsoleFont );
 		uiStatic.hConsoleFont = CFontBuilder( DEFAULT_CONFONT, consoleFontHeight, 100 )
@@ -323,6 +322,10 @@ int CFontManager::DrawCharacter(HFont fontHandle, wchar_t ch, Point pt, Size sz,
 	Size charSize;
 	int a, b, c, width;
 
+#if SCALE_FONTS
+	float factor = (float)sz.h / (float)font->GetTall();
+#endif
+
 	font->GetCharABCWidths( ch, a, b, c );
 	width = a + b + c;
 
@@ -332,7 +335,7 @@ int CFontManager::DrawCharacter(HFont fontHandle, wchar_t ch, Point pt, Size sz,
 #if SCALE_FONTS
 		if( sz.h > 0 )
 		{
-			return width * ((float)sz.h / (float)font->GetTall())  - 0.5f;
+			return width * factor + 0.5f;
 		}
 		else
 #endif
@@ -355,8 +358,8 @@ int CFontManager::DrawCharacter(HFont fontHandle, wchar_t ch, Point pt, Size sz,
 #if SCALE_FONTS	// Scale font
 		if( sz.h > 0 )
 		{
-			charSize.w = (glyph.rect.right - glyph.rect.left) * ((float)sz.h / (float)font->GetTall()) - 0.5f;
-			charSize.h = sz.h;
+			charSize.w = (glyph.rect.right - glyph.rect.left) * factor + 0.5f;
+			charSize.h = font->GetHeight() * factor + 0.5f;
 		}
 		else
 #endif
@@ -368,13 +371,16 @@ int CFontManager::DrawCharacter(HFont fontHandle, wchar_t ch, Point pt, Size sz,
 		pt.x += a;
 
 		EngFuncs::PIC_Set( glyph.texture, r, g, b, alpha );
-		EngFuncs::PIC_DrawTrans( pt, charSize, &glyph.rect );
+		if( font->IsAdditive() )
+			EngFuncs::PIC_DrawAdditive( pt, charSize, &glyph.rect );
+		else
+			EngFuncs::PIC_DrawTrans( pt, charSize, &glyph.rect );
 	}
 
 #if SCALE_FONTS
 	if( sz.h > 0 )
 	{
-		return width * ((float)sz.h / (float)font->GetTall())  - 0.5f;
+		return width * factor + 0.5f;
 	}
 #endif
 	return width;
@@ -398,7 +404,7 @@ HFont CFontBuilder::Create()
 		font = g_FontMgr.m_Fonts[i];
 
 		if( font->IsEqualTo( m_szName, m_iTall, m_iWeight, m_iBlur, m_iFlags ) )
-			return i;
+			return i + 1;
 	}
 
 	#if defined(MAINUI_USE_FREETYPE)
@@ -417,6 +423,14 @@ HFont CFontBuilder::Create()
 
 	g_FontMgr.UploadTextureForFont( font );
 
-	return g_FontMgr.m_Fonts.AddToTail(font) + 1;
+	if( m_hForceHandle != -1 && g_FontMgr.m_Fonts.Count() != m_hForceHandle )
+	{
+		if( g_FontMgr.m_Fonts.IsValidIndex( m_hForceHandle ) )
+		{
+			g_FontMgr.m_Fonts.FastRemove( m_hForceHandle );
+			return g_FontMgr.m_Fonts.InsertBefore( m_hForceHandle, font );
+		}
+	}
 
+	return g_FontMgr.m_Fonts.AddToTail(font) + 1;
 }

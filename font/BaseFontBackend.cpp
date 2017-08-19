@@ -1,7 +1,15 @@
 #include "BaseFontBackend.h"
 #include "FontManager.h"
-#include <cmath>
+#include <math.h>
 #include "Utils.h"
+
+#ifndef M_PI
+# define M_PI		3.14159265358979323846	/* pi */
+#endif
+
+#ifndef M_E
+# define M_E		2.7182818284590452354	/* e */
+#endif
 
 bool GlyphLessFunc( const IBaseFont::glyph_t &a, const IBaseFont::glyph_t &b )
 {
@@ -17,24 +25,47 @@ IBaseFont::IBaseFont()
 }
 
 
+/*
+=========================
+IBaseFont::GetTextureName
+
+Mangle texture name, so using same font names with different attributes will not confuse engine or font renderer
+=========================
++*/
 void IBaseFont::GetTextureName(char *dst, size_t len, int pageNum) const
 {
-	char attribs[6];
+	char attribs[256];
 	int i = 0;
-	if( GetFlags() & FONT_ITALIC ) attribs[i++] = 'i';
-	if( GetFlags() & FONT_UNDERLINE ) attribs[i++] = 'u';
-	if( m_iBlur ) attribs[i++] = 'g';
-	if( m_iOutlineSize ) attribs[i++] = 'o';
-	if( m_iScanlineOffset ) attribs[i++] = 's';
+	if( GetFlags() & FONT_ITALIC ) attribs[i++] = 'i'; // 1 parameter
+	if( GetFlags() & FONT_UNDERLINE ) attribs[i++] = 'u'; // 1 parameter
+	if( IsAdditive() ) attribs[i++] = 'a'; // 1
+	if( m_iBlur )
+	{
+		int chars = snprintf( attribs + i, sizeof( attribs ) - 1 - i, "g%i%.2f", m_iBlur, m_fBrighten );
+		i += chars;
+	}
+	if( m_iOutlineSize )
+	{
+		int chars = snprintf( attribs + i, sizeof( attribs ) - 1 - i, "o%i", m_iOutlineSize );
+		i += chars;
+	}
+	if( m_iScanlineOffset )
+	{
+		int chars = snprintf( attribs + i, sizeof( attribs ) - 1 - i, "s%i%.2f", m_iScanlineOffset, m_fScanlineScale );
+		i += chars;
+	}
+	attribs[i] = 0;
 
 	if( i == 0 )
 	{
-		snprintf( dst, len, "%s%i_%i_%i_font.bmp", GetName(), pageNum, GetTall(), GetWeight() );
+		snprintf( dst, len - 1, "%s%i_%i_%i_font.bmp", GetName(), pageNum, GetTall(), GetWeight() );
+		dst[len - 1] = 0;
 	}
 	else
 	{
 		attribs[i] = 0;
-		snprintf( dst, len, "%s%i_%i_%i_%s_font.bmp", GetName(), pageNum, GetTall(), GetWeight(), attribs );
+		snprintf( dst, len - 1, "%s%i_%i_%i_%s_font.bmp", GetName(), pageNum, GetTall(), GetWeight(), attribs );
+		dst[len - 1] = 0;
 	}
 }
 
@@ -180,41 +211,6 @@ bool IBaseFont::IsEqualTo(const char *name, int tall, int weight, int blur, int 
 	return true;
 }
 
-const char *IBaseFont::GetName() const
-{
-	return m_szName;
-}
-
-int IBaseFont::GetHeight() const
-{
-	return m_iHeight + m_iBlur + m_iOutlineSize;
-}
-
-int IBaseFont::GetAscent() const
-{
-	return m_iAscent;
-}
-
-int IBaseFont::GetMaxCharWidth() const
-{
-	return m_iMaxCharWidth;
-}
-
-int IBaseFont::GetFlags() const
-{
-	return m_iFlags;
-}
-
-int IBaseFont::GetWeight() const
-{
-	return m_iWeight;
-}
-
-int IBaseFont::GetTall() const
-{
-	return m_iTall + m_iBlur + m_iOutlineSize;
-}
-
 void IBaseFont::DebugDraw() const
 {
 	HIMAGE hImage;
@@ -228,7 +224,10 @@ void IBaseFont::DebugDraw() const
 		hImage = EngFuncs::PIC_Load( name );
 
 		EngFuncs::PIC_Set( hImage, 255, 255, 255 );
-		EngFuncs::PIC_DrawTrans( Point(x, 0), Size( MAX_PAGE_SIZE, MAX_PAGE_SIZE ) );
+		if( IsAdditive() )
+			EngFuncs::PIC_DrawAdditive(  Point(x, 0), Size( MAX_PAGE_SIZE, MAX_PAGE_SIZE ) );
+		else
+			EngFuncs::PIC_DrawTrans( Point(x, 0), Size( MAX_PAGE_SIZE, MAX_PAGE_SIZE ) );
 	}
 }
 
@@ -257,6 +256,7 @@ void IBaseFont::ApplyBlur(Size rgbaSz, byte *rgba)
 void IBaseFont::GetBlurValueForPixel(byte *src, Point srcPt, Size srcSz, byte *dest)
 {
 	float accum = 0.0f;
+	bool additive = IsAdditive();
 
 	// scan the positive x direction
 	int maxX = min( srcPt.x + m_iBlur, srcSz.w );
@@ -272,13 +272,21 @@ void IBaseFont::GetBlurValueForPixel(byte *src, Point srcPt, Size srcSz, byte *d
 			// muliply by the value matrix
 			float weight = m_pGaussianDistribution[x - srcPt.x + m_iBlur];
 			float weight2 = m_pGaussianDistribution[y - srcPt.y + m_iBlur];
-			accum += (srcPos[3] * (weight * weight2));
+			accum += ( additive ? srcPos[0] : srcPos[3] ) * (weight * weight2);
 		}
 	}
 
 	// all the values are the same for fonts, just use the calculated alpha
-	dest[0] = dest[1] = dest[2] = 255;
-	dest[3] = min( (int)accum, 255);
+	if( additive )
+	{
+		dest[0] = dest[1] = dest[2] = 255;
+		dest[3] = min( (int)accum, 255);
+	}
+	else
+	{
+		dest[0] = dest[1] = dest[2] = min( (int)accum, 255 );
+		dest[3] = 255;
+	}
 }
 
 void IBaseFont::CreateGaussianDistribution()

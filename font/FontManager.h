@@ -15,6 +15,7 @@ enum EFontFlags
 	FONT_ITALIC    = BIT( 0 ),
 	FONT_UNDERLINE = BIT( 1 ),
 	FONT_STRIKEOUT = BIT( 2 ),
+	FONT_ADDITIVE  = BIT( 3 )
 	// FONT_DROPSHADOW = BIT( 7 )
 };
 
@@ -54,9 +55,9 @@ public:
 	int DrawCharacter(HFont font, wchar_t ch, Point pt, Size sz, const int color );
 
 	void DebugDraw( HFont font );
+	IBaseFont *GetIFontFromHandle( HFont font );
 
 private:
-	IBaseFont *GetIFontFromHandle( HFont font );
 	void UploadTextureForFont(IBaseFont *font );
 
 	CUtlVector<IBaseFont*> m_Fonts;
@@ -75,6 +76,7 @@ public:
 
 		m_iFlags = FONT_NONE;
 		m_iBlur = m_iScanlineOffset = m_iOutlineSize = 0;
+		m_hForceHandle = -1;
 	}
 
 	CFontBuilder &SetBlurParams( int blur, float brighten = 1.0f )
@@ -106,6 +108,12 @@ public:
 	HFont Create();
 
 private:
+	CFontBuilder &SetHandleNum( HFont num )
+	{
+		m_hForceHandle = num;
+		return *this;
+	}
+
 	const char *m_szName;
 	int m_iTall, m_iWeight, m_iFlags;
 	int m_iBlur;
@@ -116,6 +124,8 @@ private:
 
 	int m_iScanlineOffset;
 	float m_fScanlineScale;
+	HFont m_hForceHandle;
+	friend class CFontManager;
 };
 
 extern CFontManager g_FontMgr;
