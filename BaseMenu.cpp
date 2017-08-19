@@ -1,5 +1,6 @@
 /*
 Copyright (C) 1997-2001 Id Software, Inc.
+Copyright (C) 2017 a1batross
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -28,17 +29,21 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "BaseMenu.h"
 #include "PicButton.h"
 #include "keydefs.h"
+#ifndef MAINUI_USE_CUSTOM_FONT_RENDER
 #include "menufont.h"	// built-in menu font
+#endif
 #include "Utils.h"
 #include "BtnsBMPTable.h"
 #include "YesNoMessageBox.h"
 #include "ConnectionProgress.h"
 #include "BackgroundBitmap.h"
 #include "con_nprint.h"
+#include "FontManager.h"
 
 cvar_t		*ui_precache;
 cvar_t		*ui_showmodels;
 cvar_t		*ui_show_window_stack;
+cvar_t		*ui_borderclip;
 
 uiStatic_t	uiStatic;
 
@@ -130,6 +135,27 @@ bool UI_CursorInRect( int x, int y, int w, int h )
 
 /*
 =================
+UI_EnableAlphaFactor
+=================
+*/
+void UI_EnableAlphaFactor(float a)
+{
+	uiStatic.enableAlphaFactor = true;
+	uiStatic.alphaFactor = bound( 0.0f, a, 1.0f );
+}
+
+/*
+=================
+UI_DisableAlphaFactor
+=================
+*/
+void UI_DisableAlphaFactor()
+{
+	uiStatic.enableAlphaFactor = false;
+}
+
+/*
+=================
 UI_DrawPic
 =================
 */
@@ -143,7 +169,8 @@ void UI_DrawPic( int x, int y, int width, int height, const int color, const cha
 	UnpackRGBA( r, g, b, a, color );
 
 	EngFuncs::PIC_Set( hPic, r, g, b, a );
-	EngFuncs::PIC_Draw( x, y, width, height );
+	// a1ba: should be just PIC_Draw, but we need alpha here
+	EngFuncs::PIC_DrawTrans( x, y, width, height );
 }
 
 /*
@@ -259,26 +286,10 @@ void UI_DrawRectangleExt( int in_x, int in_y, int in_w, int in_h, const int colo
 
 /*
 =================
-UI_DrawCharacter
-=================
-*/
-void UI_DrawCharacter( int x, int y, int width, int height, int ch, int ulRGBA, HIMAGE hFont )
-{
-#if 1
-	EngFuncs::DrawCharacter( x, y, width, height, ch, ulRGBA, hFont );
-#else
-	// TODO: Custom font rendering!
-#endif
-}
-
-
-
-/*
-=================
 UI_DrawString
 =================
 */
-void UI_DrawString( int x, int y, int w, int h, const char *string, const int color, int forceColor, int charW, int charH, ETextAlignment justify, bool shadow, EVertAlignment vertAlignment )
+void UI_DrawString( HFont font, int x, int y, int w, int h, const char *string, const int color, int forceColor, int charW, int charH, ETextAlignment justify, bool shadow )
 {
 	int	modulate, shadowModulate;
 	char	line[1024], *l;
@@ -304,14 +315,19 @@ void UI_DrawString( int x, int y, int w, int h, const char *string, const int co
 
 	modulate = color;
 
-	switch( vertAlignment )
+	if( justify & QM_TOP )
 	{
-	case QM_TOP: yy = y; break;
-	case QM_VCENTER: yy = y + (h - charH)/2; break;
-	case QM_BOTTOM: yy = y + h - charH; break;
+		yy = y;
+	}
+	else if( justify & QM_BOTTOM )
+	{
+		yy = y + h - charH;
+	}
+	else
+	{
+		yy = y + (h - charH)/2;
 	}
 
-	yy = y;
 	while( *string )
 	{
 		// get a line of text
@@ -331,11 +347,17 @@ void UI_DrawString( int x, int y, int w, int h, const char *string, const int co
 		line[len] = 0;
 
 		// align the text as appropriate
-		switch( justify )
+		if( justify & QM_LEFT  )
 		{
-		case QM_LEFT: xx = x; break;
-		case QM_CENTER: xx = x + ((w - (ColorStrlen( line ) * charW )) / 2); break;
-		case QM_RIGHT: xx = x + (w - (ColorStrlen( line ) * charW )); break;
+			xx = x;
+		}
+		else if( justify & QM_RIGHT )
+		{
+			xx = x + (w - UI::Font::GetTextWide( font, line, Size( charW, charH ) ));
+		}
+		else // QM_LEFT
+		{
+			xx = x + (w - UI::Font::GetTextWide( font, line, Size( charW, charH ) )) / 2;
 		}
 
 		// draw it
@@ -371,14 +393,22 @@ void UI_DrawString( int x, int y, int w, int h, const char *string, const int co
 			ch = EngFuncs::UtfProcessChar( (unsigned char) ch );
 			if( !ch )
 				continue;
-			if( ch != ' ' )
+			if( shadow )
 			{
-				if( shadow ) UI_DrawCharacter( xx + ofsX, yy + ofsY, charW, charH, ch, shadowModulate, uiStatic.hFont );
-				UI_DrawCharacter( xx, yy, charW, charH, ch, modulate, uiStatic.hFont );
+			#ifdef MAINUI_USE_CUSTOM_FONT_RENDER
+				g_FontMgr.DrawCharacter( font, ch, Point( xx + ofsX, yy + ofsY ), Size( charW, charH ), shadowModulate );
+			#else
+				EngFuncs::DrawCharacter( xx + ofsX, yy + ofsY, charW, charH, ch, shadowModulate, uiStatic.hFont );
+			#endif
 			}
+#ifdef MAINUI_USE_CUSTOM_FONT_RENDER
+			xx += g_FontMgr.DrawCharacter( font, ch, Point( xx, yy ), Size( charW, charH ), modulate );
+#else
+			EngFuncs::DrawCharacter( xx, yy, charW, charH, ch, modulate, uiStatic.hFont );
 			xx += charW;
+#endif
 		}
-          	yy += charH;
+		yy += charH;
 	}
 }
 
@@ -674,6 +704,7 @@ void UI_UpdateMenu( float flTime )
 			}
 		}
 	}
+	// g_FontMgr.DebugDraw( uiStatic.hBigFont );
 }
 
 /*
@@ -1199,10 +1230,17 @@ int UI_VidInit( void )
 	// trying to load chapterbackgrounds.txt
 	UI_LoadBackgroundMapList ();
 
+	CMenuBackgroundBitmap::LoadBackground( );
+
+	// reload all menu buttons
+	UI_LoadBmpButtons ();
+
+	// VidInit FontManager
+#ifdef MAINUI_USE_CUSTOM_FONT_RENDER
+	g_FontMgr.VidInit();
+#else
 	// register menu font
 	uiStatic.hFont = EngFuncs::PIC_Load( "#XASH_SYSTEMFONT_001.bmp", menufont_bmp, sizeof( menufont_bmp ));
-
-	CMenuBackgroundBitmap::LoadBackground( );
 #if 0
 	FILE *f;
 
@@ -1212,8 +1250,7 @@ int UI_VidInit( void )
 	fclose( f );
 #endif
 
-	// reload all menu buttons
-	UI_LoadBmpButtons ();
+#endif
 
 	// now recalc all the menus in stack
 	for( int i = 0; i < uiStatic.menuDepth; i++ )
@@ -1266,6 +1303,7 @@ void UI_Init( void )
 	ui_precache = EngFuncs::CvarRegister( "ui_precache", "0", FCVAR_ARCHIVE );
 	ui_showmodels = EngFuncs::CvarRegister( "ui_showmodels", "0", FCVAR_ARCHIVE );
 	ui_show_window_stack = EngFuncs::CvarRegister( "ui_show_window_stack", 0, FCVAR_ARCHIVE );
+	ui_borderclip = EngFuncs::CvarRegister( "ui_borderclip", "0", FCVAR_ARCHIVE );
 
 	// show cl_predict dialog
 	EngFuncs::CvarRegister( "menu_mp_firsttime", "1", FCVAR_ARCHIVE );

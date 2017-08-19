@@ -17,9 +17,10 @@ GNU General Public License for more details.
 #define BASEMENU_H
 #include "enginecallback_menu.h"
 #include "keydefs.h"
+#include "Primitive.h"
 #include "EventSystem.h"
 #include "Utils.h"
-
+#include "FontManager.h"
 
 #define UI_MAX_MENUDEPTH		64
 #define UI_MAX_MENUITEMS		64
@@ -31,7 +32,7 @@ GNU General Public License for more details.
 #define UI_SMALL_CHAR_WIDTH		10
 #define UI_SMALL_CHAR_HEIGHT	20
 
-#define UI_MED_CHAR_WIDTH		18
+#define UI_MED_CHAR_WIDTH		13
 #define UI_MED_CHAR_HEIGHT		26
 
 #define UI_BIG_CHAR_WIDTH		20
@@ -65,13 +66,14 @@ GNU General Public License for more details.
 #define UI_DOWNARROWPRESSED		"gfx/shell/dnarrowp"
 
 
-
 // =====================================================================
 // Main menu interface
 
 extern cvar_t	*ui_precache;
 extern cvar_t	*ui_showmodels;
 extern cvar_t   *ui_show_window_stack;
+extern cvar_t	*ui_borderclip;
+
 class CMenuBaseWindow;
 
 typedef struct
@@ -93,8 +95,12 @@ typedef struct
 	char	bgmaps[UI_MAX_BGMAPS][80];
 	int		bgmapcount;
 
-	HIMAGE	hFont;		// mainfont
+	HIMAGE	hFont;		// legacy qfont
 
+	HFont hDefaultFont;
+	HFont hSmallFont;
+	HFont hBigFont;
+	HFont hConsoleFont;
 	bool	m_fDemosPlayed;
 	int		m_iOldMenuDepth;
 	bool	m_fNoOldBackground;
@@ -124,6 +130,9 @@ typedef struct
 	int		buttons_draw_height;
 	int		width;
 	bool		textInput;
+
+	bool	enableAlphaFactor;
+	float	alphaFactor;
 } uiStatic_t;
 
 extern float	cursorDY;			// use for touch scroll
@@ -161,13 +170,18 @@ void UI_ScaleCoords( int &x, int &y, int &w, int &h );
 void UI_ScaleCoords( int &x, int &y );
 
 bool UI_CursorInRect( int x, int y, int w, int h );
+
+// temporarily override alpha by multiplying given alpha and factor
+void UI_EnableAlphaFactor( float a );
+void UI_DisableAlphaFactor();
+
 void UI_DrawPic( int x, int y, int w, int h, const int color, const char *pic );
 void UI_DrawPicAdditive( int x, int y, int w, int h, const int color, const char *pic );
 void UI_DrawPicTrans( int x, int y, int width, int height, const int color, const char *pic );
 void UI_DrawPicHoles( int x, int y, int width, int height, const int color, const char *pic );
 void UI_FillRect( int x, int y, int w, int h, const int color );
 void UI_DrawRectangleExt( int in_x, int in_y, int in_w, int in_h, const int color, int outlineWidth );
-void UI_DrawString(int x, int y, int w, int h, const char *str, const int col, int forceCol, int charW, int charH, ETextAlignment justify, bool shadow, EVertAlignment vertAlign = QM_TOP);
+void UI_DrawString(HFont font, int x, int y, int w, int h, const char *str, const int col, int forceCol, int charW, int charH, ETextAlignment justify, bool shadow);
 inline void UI_DrawRectangle( int x, int y, int w, int h, const int color )
 {
 	UI_DrawRectangleExt( x, y, w, h, color, uiStatic.outlineWidth );
@@ -205,9 +219,9 @@ inline void UI_DrawRectangleExt( Point pos, Size size, const int color, int outl
 {
 	UI_DrawRectangleExt( pos.x, pos.y, size.w, size.h, color, outlineWidth );
 }
-inline void UI_DrawString( Point pos, Size size, const char *str, const int col, int forceCol, Size chSize, ETextAlignment justify, bool shadow, EVertAlignment verticalAlignment = QM_TOP  )
+inline void UI_DrawString( HFont font, Point pos, Size size, const char *str, const int col, int forceCol, Size chSize, ETextAlignment justify, bool shadow  )
 {
-	UI_DrawString( pos.x, pos.y, size.w, size.h, str, col, forceCol, chSize.w, chSize.h, justify, shadow, verticalAlignment );
+	UI_DrawString( font, pos.x, pos.y, size.w, size.h, str, col, forceCol, chSize.w, chSize.h, justify, shadow );
 }
 
 void UI_StartSound( const char *sound );

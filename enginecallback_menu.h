@@ -1,6 +1,7 @@
 /*
 enginecallback.h - actual engine callbacks
 Copyright (C) 2010 Uncle Mike
+Copyright (C) 2017 a1batross
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -34,8 +35,7 @@ public:
 	{ return engfuncs.pfnPIC_Width( hPic ); }
 	static inline int	PIC_Height( HIMAGE hPic )
 	{ return engfuncs.pfnPIC_Height( hPic ); }
-	static inline void	PIC_Set( HIMAGE hPic, int r, int g, int b, int a = 255 )
-	{ engfuncs.pfnPIC_Set( hPic, r, g, b, a );	}
+	static void	PIC_Set( HIMAGE hPic, int r, int g, int b, int a = 255 );
 
 	static inline void	PIC_Draw( int x, int y, int width, int height, const wrect_t *prc = NULL )
 	{ engfuncs.pfnPIC_Draw( x, y, width, height, prc ); }
@@ -76,8 +76,7 @@ public:
 	{ engfuncs.pfnPIC_DisableScissor(); }
 
 	// screen handlers
-	static inline void	FillRGBA( int x, int y, int width, int height, int r, int g, int b, int a )
-	{ engfuncs.pfnFillRGBA( x, y, width, height, r, g, b, a ); }
+	static void	FillRGBA( int x, int y, int width, int height, int r, int g, int b, int a );
 
 	// cvar handlers
 	static inline cvar_t*	CvarRegister( const char *szName, const char *szValue, int flags )
@@ -123,16 +122,21 @@ public:
 	{ return engfuncs.pfnGetLogoLength(); }
 
 	// text message system
-	static inline void	DrawCharacter( int x, int y, int width, int height, int ch, int ulRGBA, HIMAGE hFont )
-	{ engfuncs.pfnDrawCharacter( x, y, width, height, ch, ulRGBA, hFont ); }
+	static void	DrawCharacter( int x, int y, int width, int height, int ch, int ulRGBA, HIMAGE hFont );
+#ifndef MAINUI_USE_CUSTOM_FONT_RENDER
 	static inline int	DrawConsoleString( int x, int y, const char *string )
 	{ return  engfuncs.pfnDrawConsoleString( x, y, string ); }
-	static inline int   DrawConsoleString( Point coord, const char *string )
-	{ return DrawConsoleString( coord.x, coord.y, string ); }
-	static inline void	DrawSetTextColor( int r, int g, int b, int alpha = 255 )
-	{ engfuncs.pfnDrawSetTextColor( r, g, b, alpha ); }
+	static void	DrawSetTextColor( int r, int g, int b, int alpha = 255 );
 	static inline void	ConsoleStringLen(  const char *string, int *length, int *height )
 	{ engfuncs.pfnDrawConsoleStringLen( string, length, height ); }
+#else
+	static int DrawConsoleString( int x, int y, const char *string );
+	static void	DrawSetTextColor( int r, int g, int b, int alpha = 255 );
+	static void	ConsoleStringLen(  const char *string, int *length, int *height );
+#endif
+
+	static inline int   DrawConsoleString( Point coord, const char *string )
+	{ return DrawConsoleString( coord.x, coord.y, string ); }
 
 	// TODO: Move into UI class
 	static inline int   ConsoleCharacterHeight()

@@ -13,7 +13,6 @@ public:
 	void Init() FINAL;
 	void VidInit() FINAL;
 	void Hide();
-	bool IsVisible();
 	bool IsRoot() { return true; }
 
 	bool DrawAnimation(EAnimation anim);

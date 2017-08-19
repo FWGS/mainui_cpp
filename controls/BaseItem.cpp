@@ -9,7 +9,7 @@ CMenuBaseItem::CMenuBaseItem
 CMenuBaseItem::CMenuBaseItem()
 {
 	SetNameAndStatus( "", NULL );
-	SetCharSize( UI_MED_CHAR_WIDTH, UI_MED_CHAR_HEIGHT );
+	SetCharSize( QM_DEFAULTFONT );
 	SetCoord( 0, 0 );
 	SetSize( 0, 0 );
 
@@ -18,7 +18,7 @@ CMenuBaseItem::CMenuBaseItem()
 	iColor = uiPromptTextColor;
 	iFocusColor = uiPromptFocusColor;
 
-	eTextAlignment = QM_LEFT;
+	eTextAlignment = QM_TOPLEFT;
 	eFocusAnimation = QM_NOFOCUSANIMATION;
 	eLetterCase = QM_NOLETTERCASE;
 
@@ -61,21 +61,26 @@ void CMenuBaseItem::Char(int key)
 
 const char *CMenuBaseItem::Key(int key, int down)
 {
-	return uiSoundNull;
+	return 0;
 }
 
 void CMenuBaseItem::SetCharSize(EFontSizes fs)
 {
+	font = fs + 1; // It's guaranteed that handles will match font sizes
+
 	switch( fs )
 	{
 	case QM_DEFAULTFONT:
-		SetCharSize( UI_MED_CHAR_WIDTH, UI_MED_CHAR_HEIGHT );
+		charSize.w = UI_MED_CHAR_WIDTH;
+		charSize.h = UI_MED_CHAR_HEIGHT;
 		break;
 	case QM_SMALLFONT:
-		SetCharSize( UI_SMALL_CHAR_WIDTH, UI_SMALL_CHAR_HEIGHT );
+		charSize.w = UI_SMALL_CHAR_WIDTH;
+		charSize.h = UI_SMALL_CHAR_HEIGHT;
 		break;
 	case QM_BIGFONT:
-		SetCharSize( UI_BIG_CHAR_WIDTH, UI_BIG_CHAR_HEIGHT );
+		charSize.w = UI_BIG_CHAR_WIDTH;
+		charSize.h = UI_BIG_CHAR_HEIGHT;
 		break;
 	}
 }

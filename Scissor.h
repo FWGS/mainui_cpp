@@ -6,10 +6,13 @@
 
 namespace UI
 {
+namespace Scissor
+{
 void PushScissor( int x, int y, int w, int h );
 inline void PushScissor( Point pt, Size sz ) { PushScissor( pt.x, pt.y, sz.w, sz.h ); }
 
 void PopScissor();
+}
 }
 
 #endif // SCISSOR_H

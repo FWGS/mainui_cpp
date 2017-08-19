@@ -68,6 +68,7 @@ const char *CMenuBitmap::Key( int key, int down )
 		sound = uiSoundLaunch;
 		break;
 	}
+
 	if( sound && ( iFlags & QMF_SILENT ))
 		sound = uiSoundNull;
 
@@ -146,7 +147,6 @@ void CMenuBitmap::Draw( void )
 		UI_DrawPic( m_scPos, m_scSize, color, szFocusPic );
 	}
 }
-
 
 void CMenuBannerBitmap::Draw()
 {

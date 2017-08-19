@@ -26,9 +26,10 @@ CMenuYesNoMessageBox::CMenuYesNoMessageBox( bool alert )
 {
 	iFlags = QMF_DIALOG;
 	dlgMessage1.iFlags = QMF_INACTIVE|QMF_DROPSHADOW;
-	dlgMessage1.eTextAlignment = QM_CENTER;
+	dlgMessage1.eTextAlignment = QM_TOP;
 
 	yes.iFlags = no.iFlags = QMF_DROPSHADOW;
+	yes.eTextAlignment = no.eTextAlignment = QM_CENTER;
 	yes.onActivated.pExtra = no.onActivated.pExtra = this;
 	yes.bEnableTransitions = no.bEnableTransitions = false;
 
@@ -105,7 +106,7 @@ void CMenuYesNoMessageBox::_VidInit( void )
 		yes.SetRect( 188, 204, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
 	no.SetRect( 338, 204, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
 
-	dlgMessage1.SetCharSize( UI_MED_CHAR_WIDTH, UI_MED_CHAR_HEIGHT );
+	dlgMessage1.SetCharSize( QM_DEFAULTFONT );
 
 }
 

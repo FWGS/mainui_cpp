@@ -69,6 +69,11 @@ extern void UI_FinalCredits( void );
 // ScreenWidth returns the width of the screen, in ppos.xels
 #define ScreenWidth		((float)(gpGlobals->scrWidth))
 
+#define Alpha( x )	( ((x) & 0xFF000000 ) >> 24 )
+#define Red( x )	( ((x) & 0xFF0000) >> 16 )
+#define Green( x )	( ((x) & 0xFF00 ) >> 8 )
+#define Blue( x )	( ((x) & 0xFF ) >> 0 )
+
 inline unsigned int PackRGB( int r, int g, int b )
 {
 	return ((0xFF)<<24|(r)<<16|(g)<<8|(b));
@@ -104,6 +109,22 @@ inline int UnpackAlpha( unsigned int ulRGBA )
 	return ((ulRGBA & 0xFF000000) >> 24);	
 }
 
+inline float InterpVal( float from, float to, float frac )
+{
+	return from + (to - from) * frac;
+}
+
+inline int InterpColor( int from, int to, float frac )
+{
+	return PackRGBA(
+		InterpVal( Red( from ), Red( to ), frac ),
+		InterpVal( Green( from ), Green( to ), frac ),
+		InterpVal( Blue( from ), Blue( to ), frac ),
+		InterpVal( Alpha( from ), Alpha( to ), frac ) );
+}
+
+
+
 inline float RemapVal( float val, float A, float B, float C, float D)
 {
 	return C + (D - C) * (val - A) / (B - A);
@@ -134,5 +155,46 @@ extern void UI_EnableTextInput( bool enable );
 // stringize utilites
 #define STR( x ) #x
 #define STR2( x ) STR( x )
+
+namespace UI
+{
+namespace Graphics
+{
+/*
+ * Creates 32-bit RGBA BMP
+ *  w -- width
+ *  h -- height
+ * **ptr -- BMP header pointer. Should be freed by delete[]
+ * *size -- BMP size
+ * *texOffset -- rgbdata offset
+ * Return value is rgbdata
+ **/
+byte *MakeBMP( unsigned int w, unsigned int h, byte **ptr, int *size, int *texOffset );
+}
+
+namespace String
+{
+// void ConvertToWCharBuffered( wchar_t *dst, int dstlen, const char *src, int srclen );
+
+/*
+ * Returns converted to wide character buffer. Should be freed by delete[]
+ * length is optional. Pass a pointer to get a string length
+ **/
+wchar_t *ConvertToWChar( const char *text, int *length = NULL );
+}
+
+namespace Font
+{
+	inline int GetTextWide( HFont font, const char *szName, Size charSize )
+	{
+		#ifdef MAINUI_USE_CUSTOM_FONT_RENDER
+		return g_FontMgr.GetTextWideScaled( font, szName, charSize.h );
+		#else
+		return strlen( szName ) * charSize.w;
+		#endif
+	}
+}
+}
+
 
 #endif//UTILS_H

@@ -1,0 +1,54 @@
+#pragma once
+#if !defined( _WIN32 ) && !defined( FREETYPEFONT_H )
+#define FREETYPEFONT_H
+
+#if defined(MAINUI_USE_CUSTOM_FONT_RENDER) && defined(MAINUI_USE_FREETYPE)
+
+#include "BaseFontBackend.h"
+
+extern "C"
+{
+    #include <fontconfig/fontconfig.h>
+    #include <ft2build.h>
+    #include FT_FREETYPE_H
+}
+
+#include "utl/utlmemory.h"
+#include "utl/utlrbtree.h"
+
+struct abc_t
+{
+	int ch;
+	int a, b, c;
+};
+
+class CFreeTypeFont : public IBaseFont
+{
+public:
+	CFreeTypeFont();
+	~CFreeTypeFont();
+
+	bool Create(const char *name,
+		int tall, int weight,
+		int blur, float brighten,
+		int outlineSize,
+		int scanlineOffset, float scanlineScale,
+		int flags);
+	void GetCharRGBA(int ch, Point pt, Size sz, unsigned char *rgba, Size &drawSize);
+	bool IsValid() const;
+	void GetCharABCWidths( int ch, int &a, int &b, int &c );
+	bool HasChar( int ch ) const;
+private:
+	CUtlRBTree<abc_t, int> m_ABCCache;
+
+	FT_Face face;
+	static FT_Library m_Library;
+	char m_szRealFontFile[4096];
+	bool FindFontDataFile(const char *name, int tall, int weight, int flags, char *dataFile, int dataFileChars);
+
+	friend class CFontManager;
+};
+
+#endif // defined(MAINUI_USE_CUSTOM_FONT_RENDER) && defined(MAINUI_USE_FREETYPE)
+
+#endif // FREETYPEFONT_H

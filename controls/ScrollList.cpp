@@ -283,7 +283,7 @@ void CMenuScrollList::Draw( )
 			UI_DrawRectangle( x, y - m_scChSize.h * 1.75, w, m_scChSize.h * 1.75, uiInputFgColor );
 		}
 
-		UI_DrawString( x, y - m_scChSize.h * 1.5, w, h, szName, uiColorHelp, true, m_scChSize.w, m_scChSize.h, eTextAlignment, shadow );
+		UI_DrawString( font, x, y - m_scChSize.h * 1.5, w, h, szName, uiColorHelp, true, m_scChSize.w, m_scChSize.h, eTextAlignment, shadow );
 
 	}
 
@@ -510,7 +510,7 @@ void CMenuScrollList::Draw( )
 	y = m_scPos.y + m_scChSize.h;
 
 	// prevent the columns out of rectangle bounds
-	UI::PushScissor( x, y, m_scSize.w - arrow.w - uiStatic.outlineWidth, m_scSize.h );
+	UI::Scissor::PushScissor( x, y, m_scSize.w - arrow.w - uiStatic.outlineWidth, m_scSize.h );
 
 	for( i = iTopItem; i < iTopItem + iNumRows; i++, y += m_scChSize.h )
 	{
@@ -519,27 +519,27 @@ void CMenuScrollList::Draw( )
 
 		if( iFlags & QMF_GRAYED )
 		{
-			UI_DrawString( x, y, w, h, pszItemNames[i], uiColorDkGrey, true, m_scChSize.w, m_scChSize.h, eTextAlignment, shadow );
+			UI_DrawString( font, x, y, w, h, pszItemNames[i], uiColorDkGrey, true, m_scChSize.w, m_scChSize.h, eTextAlignment, shadow );
 			continue;	// grayed
 		}
 
 		if( i != iCurItem )
 		{
-			UI_DrawString( x, y, w, h, pszItemNames[i], iColor, false, m_scChSize.w, m_scChSize.h, eTextAlignment, shadow );
+			UI_DrawString( font, x, y, w, h, pszItemNames[i], iColor, false, m_scChSize.w, m_scChSize.h, eTextAlignment, shadow );
 			continue;	// no focus
 		}
 
 		if( eFocusAnimation == QM_HIGHLIGHTIFFOCUS )
-			UI_DrawString( x, y, w, h, pszItemNames[i], iFocusColor, false, m_scChSize.w, m_scChSize.h, eTextAlignment, shadow );
+			UI_DrawString( font, x, y, w, h, pszItemNames[i], iFocusColor, false, m_scChSize.w, m_scChSize.h, eTextAlignment, shadow );
 		else if( eFocusAnimation == QM_PULSEIFFOCUS )
 		{
 			int	color;
 
 			color = PackAlpha( iColor, 255 * (0.5 + 0.5 * sin( (float)uiStatic.realTime / UI_PULSE_DIVISOR )));
 
-			UI_DrawString( x, y, w, h, pszItemNames[i], color, false, m_scChSize.w, m_scChSize.h, eTextAlignment, shadow );
+			UI_DrawString( font, x, y, w, h, pszItemNames[i], color, false, m_scChSize.w, m_scChSize.h, eTextAlignment, shadow );
 		}
 	}
 
-	UI::PopScissor();
+	UI::Scissor::PopScissor();
 }

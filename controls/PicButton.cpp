@@ -29,6 +29,8 @@ CMenuPicButton::CMenuPicButton() : CMenuBaseItem()
 
 	iFocusStartTime = 0;
 
+	eTextAlignment = QM_LEFT;
+
 	hPic = 0;
 	button_id = 0;
 	iOldState = BUTTON_NOFOCUS;
@@ -47,13 +49,16 @@ CMenuPicButton::Init
 */
 void CMenuPicButton::VidInit( void )
 {
-	if( size.w < 1 || size.h < 1 )
+	if( size.w < 1 )
 	{
-		if( size.w < 1 )
-			size.w = charSize.w * strlen( szName );
+		//size.w = g_FontMgr.GetTextWideScaled( font, szName, charSize.h );
+		size.w = UI_BUTTONS_WIDTH;
+	}
 
-		if( size.h < 1 )
-			size.h = charSize.h * 1.5;
+	if( size.h < 1 )
+	{
+		// size.h = charSize.h * 1.5;
+		size.h = UI_BUTTONS_HEIGHT;
 	}
 
 	CalcPosition();
@@ -114,7 +119,7 @@ const char *CMenuPicButton::Key( int key, int down )
 	return sound;
 }
 
-//#define ALT_PICBUTTON_FOCUS_ANIM
+// #define ALT_PICBUTTON_FOCUS_ANIM
 
 /*
 =================
@@ -158,11 +163,11 @@ void CMenuPicButton::Draw( )
 
 	if( state != BUTTON_NOFOCUS )
 	{
-		flFill = (uiStatic.realTime - iFocusStartTime) / 600.0f;
+		flFill = (uiStatic.realTime - iFocusStartTime) / 200.0f;
 	}
 	else
 	{
-		flFill = 1 - (uiStatic.realTime - m_iLastFocusTime ) / 600.0f;
+		flFill = (uiStatic.realTime - m_iLastFocusTime ) / 200.0f;
 	}
 	flFill = bound( 0, flFill, 1 );
 
@@ -213,7 +218,8 @@ void CMenuPicButton::Draw( )
 			// special handling for focused
 			if( state == BUTTON_FOCUS )
 			{
-				DrawButton( r, g, b, 255, rects, BUTTON_FOCUS );
+				EngFuncs::PIC_Set( hPic, r, g, b, 255 );
+				EngFuncs::PIC_DrawAdditive( m_scPos.x, m_scPos.y, uiStatic.buttons_draw_width, uiStatic.buttons_draw_height, &rects[BUTTON_FOCUS] );
 
 				EngFuncs::PIC_Set( hPic, r, g, b, 255 ); // set colors again
 				EngFuncs::PIC_DrawAdditive( m_scPos.x, m_scPos.y, uiStatic.buttons_draw_width, uiStatic.buttons_draw_height, &rects[BUTTON_NOFOCUS] );
@@ -234,25 +240,27 @@ void CMenuPicButton::Draw( )
 
 		if( iFlags & QMF_GRAYED )
 		{
-			UI_DrawString( m_scPos, m_scSize, szName, uiColorDkGrey, true, m_scChSize, eTextAlignment, shadow );
+			UI_DrawString( font, m_scPos, m_scSize, szName, uiColorDkGrey, true, m_scChSize, eTextAlignment, shadow );
 			return; // grayed
 		}
 
 		if(this != m_pParent->ItemAtCursor())
 		{
-			UI_DrawString( m_scPos, m_scSize, szName, iColor, false, m_scChSize, eTextAlignment, shadow );
+			UI_DrawString( font, m_scPos, m_scSize, szName, InterpColor( iFocusColor, iColor, flFill ), false, m_scChSize, eTextAlignment, shadow );
 			return; // no focus
 		}
 
 		if( eFocusAnimation == QM_HIGHLIGHTIFFOCUS )
-			UI_DrawString( m_scPos, m_scSize, szName, iFocusColor, false, m_scChSize, eTextAlignment, shadow );
+		{
+			UI_DrawString( font, m_scPos, m_scSize, szName, iFocusColor, false, m_scChSize, eTextAlignment, shadow );
+		}
 		else if( eFocusAnimation == QM_PULSEIFFOCUS )
 		{
 			int	color;
 
 			color = PackAlpha( iColor, 255 * (0.5 + 0.5 * sin( (float)uiStatic.realTime / UI_PULSE_DIVISOR )));
 
-			UI_DrawString( m_scPos, m_scSize, szName, color, false, m_scChSize, eTextAlignment, shadow );
+			UI_DrawString( font, m_scPos, m_scSize, szName, color, false, m_scChSize, eTextAlignment, shadow );
 		}
 	}
 
@@ -448,9 +456,6 @@ void CMenuPicButton::SetTransPic(HIMAGE pic)
 
 bool CMenuPicButton::DrawTitleAnim( CMenuBaseWindow::EAnimation state )
 {
-	if( ((state == CMenuBaseWindow::ANIM_IN) ^ (transition_state == AS_TO_TITLE)) )
-		return true;
-
 #if 1
 	float frac = GetTitleTransFraction();
 #else
@@ -465,32 +470,11 @@ bool CMenuPicButton::DrawTitleAnim( CMenuBaseWindow::EAnimation state )
 		return true;
 #endif
 
-	/*if( !ButtonStackDepth )
-		return true;
-
-	CMenuPicButton *button = ButtonStack[ButtonStackDepth-1];
-
-	if( !button || !button->TransPic )
-		return true;*/
-
-/*	Quad c;
-
-	if( state == CMenuBaseWindow::ANIM_IN )
-		c = LerpQuad( button->TitleLerpQuads[0], button->TitleLerpQuads[1], frac );
-	else if( state == CMenuBaseWindow::ANIM_OUT )
-		c = LerpQuad( button->TitleLerpQuads[1], button->TitleLerpQuads[0], frac );
-
-	//UI_FillRect( c.x, c.y, c.lx, c.ly, 0xFF0F00FF );
-
-	EngFuncs::PIC_Set( button->TransPic, 255, 255, 255 );
-	EngFuncs::PIC_DrawAdditive( c.x, c.y, c.lx, c.ly );
-
-	return false;*/
 	Quad c;
 
-	if( state == CMenuBaseWindow::ANIM_IN )
+	if( transition_state == AS_TO_TITLE )
 		c = LerpQuad( s_CurrentLerpQuads[0], s_CurrentLerpQuads[1], frac );
-	else if( state == CMenuBaseWindow::ANIM_OUT )
+	else if( transition_state == AS_TO_BUTTON )
 		c = LerpQuad( s_CurrentLerpQuads[1], s_CurrentLerpQuads[0], frac );
 
 	//UI_FillRect( c.x, c.y, c.lx, c.ly, 0xFF0F00FF );

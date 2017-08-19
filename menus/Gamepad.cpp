@@ -257,12 +257,12 @@ void CMenuGamePad::_VidInit()
 	controls.SetCoord( 72, 580 );
 
 	axisBind_label.SetRect( 52, 180, 200, 26 );
-	axisBind_label.SetCharSize( 11, 30 );
+	axisBind_label.SetCharSize( QM_SMALLFONT );
 
 	for( int i = 0, y = 230; i < 6; i++, y += 50 )
 	{
 		axisBind[i].SetRect( 72, y, 256, 26 );
-		axisBind[i].SetCharSize( 11, 22 );
+		axisBind[i].SetCharSize( QM_SMALLFONT );
 	}
 
 	side.SetCoord( 400, 250 );

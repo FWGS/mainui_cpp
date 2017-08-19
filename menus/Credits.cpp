@@ -36,8 +36,9 @@ class CMenuCredits : public CMenuFramework
 public:
 	CMenuCredits() : CMenuFramework("CMenuCredits") { }
 
-	virtual void Draw();
-	virtual const char *Key(int key, int down);
+	void Draw();
+	const char *Key(int key, int down);
+	bool DrawAnimation(EAnimation anim) { return false; }
 
 	friend void UI_DrawFinalCredits( void );
 	friend void UI_FinalCredits( void );
@@ -45,8 +46,6 @@ public:
 
 private:
 	virtual void _Init();
-
-	
 
 	const char	**credits;
 	int		startTime;
@@ -102,9 +101,9 @@ void CMenuCredits::Draw( void )
 			if( !uiCredits.fadeTime ) uiCredits.fadeTime = (gpGlobals->time * 1000);
 			color = UI_FadeAlpha( uiCredits.fadeTime, uiCredits.showTime );
 			if( UnpackAlpha( color ))
-				UI_DrawString( 0, ( ScreenHeight - h ) / 2, ScreenWidth, h, uiCredits.credits[i], color, true, w, h, QM_CENTER, true );
+				UI_DrawString( font, 0, ( ScreenHeight - h ) / 2, ScreenWidth, h, uiCredits.credits[i], color, true, w, h, QM_CENTER, true );
 		}
-		else UI_DrawString( 0, y, ScreenWidth, h, uiCredits.credits[i], uiColorWhite, false, w, h, QM_CENTER, true );
+		else UI_DrawString( font, 0, y, ScreenWidth, h, uiCredits.credits[i], uiColorWhite, false, w, h, QM_CENTER, true );
 	}
 
 	if( y < 0 && UnpackAlpha( color ) == 0 )

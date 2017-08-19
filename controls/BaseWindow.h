@@ -42,10 +42,15 @@ public:
 	// Hide current window and save changes
 	virtual void SaveAndPopMenu();
 
+	virtual bool IsWindow() { return true; }
+
 	// Events library
 	DECLARE_EVENT_TO_MENU_METHOD( CMenuBaseWindow, SaveAndPopMenu );
 
+	void EnableTransition();
+
 	bool bAllowDrag;
+	bool bInTransition;
 	CMenuBackgroundBitmap background;
 protected:
 
@@ -55,7 +60,8 @@ private:
 
 	virtual bool IsAbsolutePositioned( void ) { return true; }
 
-	bool bInTransition;
+	int m_iTransitionStartTime;
+
 	bool m_bHolding;
 	Point m_bHoldOffset;
 

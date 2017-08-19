@@ -19,6 +19,7 @@ public:
 	virtual void Draw( void );
 
 	virtual bool MouseMove( int x, int y );
+	virtual bool IsWindow() { return false; }
 
 	virtual bool KeyValueData(const char *key, const char *data);
 

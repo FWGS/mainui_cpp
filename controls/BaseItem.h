@@ -115,8 +115,10 @@ public:
 	inline void SetCoord( int x, int y )                { pos.x = x, pos.y = y; }
 	inline void SetSize( int w, int h )                 { size.w = w; size.h = h; }
 	inline void SetRect( int x, int y, int w, int h )   { SetCoord( x, y ); SetSize( w, h ); }
-	inline void SetCharSize( int w, int h )             { charSize.w = w; charSize.h = h; }
+	// inline void SetCharSize( int w, int h )             { charSize.w = w; charSize.h = h; }
+
 	void SetCharSize( EFontSizes fs );
+
 	inline void SetNameAndStatus( const char *name, const char *status, const char *tag = NULL )
 	{
 		szName = name, szStatusText = status;
@@ -145,6 +147,7 @@ public:
 	EFocusAnimation eFocusAnimation;
 	ELetterCase eLetterCase;
 
+	HFont font;
 protected:
 	// calls specific EventCallback
 	virtual void _Event( int ev );

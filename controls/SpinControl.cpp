@@ -178,7 +178,7 @@ void CMenuSpinControl::Draw( void )
 
 	if( iFlags & QMF_GRAYED )
 	{
-		UI_DrawString( scCenterPos, scCenterBox, m_szDisplay, uiColorDkGrey, true, m_scChSize, eTextAlignment, shadow );
+		UI_DrawString( font, scCenterPos, scCenterBox, m_szDisplay, uiColorDkGrey, true, m_scChSize, eTextAlignment, shadow );
 		UI_DrawPic( left, arrow, uiColorDkGrey, m_szLeftArrow );
 		UI_DrawPic( right, arrow, uiColorDkGrey, m_szRightArrow );
 		return; // grayed
@@ -186,7 +186,7 @@ void CMenuSpinControl::Draw( void )
 
 	if(this != m_pParent->ItemAtCursor())
 	{
-		UI_DrawString( scCenterPos, scCenterBox, m_szDisplay, iColor, false, m_scChSize, eTextAlignment, shadow );
+		UI_DrawString( font, scCenterPos, scCenterBox, m_szDisplay, iColor, false, m_scChSize, eTextAlignment, shadow );
 		UI_DrawPic(left, arrow, iColor, m_szLeftArrow);
 		UI_DrawPic(right, arrow, iColor, m_szRightArrow);
 		return;		// No focus
@@ -198,7 +198,7 @@ void CMenuSpinControl::Draw( void )
 
 	if( eFocusAnimation == QM_HIGHLIGHTIFFOCUS )
 	{
-		UI_DrawString( scCenterPos, scCenterBox, m_szDisplay, iFocusColor, false, m_scChSize, eTextAlignment, shadow );
+		UI_DrawString( font, scCenterPos, scCenterBox, m_szDisplay, iFocusColor, false, m_scChSize, eTextAlignment, shadow );
 		UI_DrawPic( left, arrow, iColor, (leftFocus) ? m_szLeftArrowFocus : m_szLeftArrow );
 		UI_DrawPic( right, arrow, iColor, (rightFocus) ? m_szRightArrowFocus : m_szRightArrow );
 	}
@@ -208,7 +208,7 @@ void CMenuSpinControl::Draw( void )
 
 		color = PackAlpha( iColor, 255 * (0.5 + 0.5 * sin( (float)uiStatic.realTime / UI_PULSE_DIVISOR )));
 
-		UI_DrawString( scCenterPos, scCenterBox, m_szDisplay, color, false, m_scChSize, eTextAlignment, shadow );
+		UI_DrawString( font, scCenterPos, scCenterBox, m_szDisplay, color, false, m_scChSize, eTextAlignment, shadow );
 		UI_DrawPic( left, arrow, (leftFocus) ? color : iColor, (leftFocus) ? m_szLeftArrowFocus : m_szLeftArrow );
 		UI_DrawPic( right, arrow, (rightFocus) ? color : iColor, (rightFocus) ? m_szRightArrowFocus : m_szRightArrow );
 	}

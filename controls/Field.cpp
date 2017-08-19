@@ -209,19 +209,18 @@ const char *CMenuField::Key( int key, int down )
 			memcpy( text, szBuffer + iScroll, iWidthInChars - iScroll );
 			text[iWidthInChars] = 0;
 
-			switch( eTextAlignment )
+			if( eTextAlignment & QM_LEFT )
 			{
-			case QM_LEFT:
 				x = m_scPos.x;
-				break;
-			case QM_CENTER:
-				x = m_scPos.x + ((m_scSize.w - (ColorStrlen( text ) * m_scChSize.w )) / 2 );
-				break;
-			case QM_RIGHT:
-				x = m_scPos.x + (m_scSize.w - (ColorStrlen( text ) * m_scChSize.w ));
-				break;
 			}
-
+			else if( eTextAlignment & QM_RIGHT )
+			{
+				x = m_scPos.x + (m_scSize.w - (ColorStrlen( text ) * m_scChSize.w ));
+			}
+			else
+			{
+				x = m_scPos.x + ((m_scSize.w - (ColorStrlen( text ) * m_scChSize.w )) / 2 );
+			}
 			charpos = (uiStatic.cursorX - x) / m_scChSize.w;
 			text[charpos] = 0;
 			iCursor = charpos + iScroll + ColorPrexfixCount( text );
@@ -408,17 +407,17 @@ void CMenuField::Draw( void )
 	cursor = ( iCursor - prestep - x ) + 1;
 	if( cursor < 0 ) cursor = 0;
 
-	switch( eTextAlignment )
+	if( eTextAlignment & QM_LEFT )
 	{
-	case QM_LEFT:
 		x = m_scPos.x;
-		break;
-	case QM_CENTER:
-		x = m_scPos.x + ((m_scSize.w - (ColorStrlen( text ) * m_scChSize.w )) / 2 );
-		break;
-	case QM_RIGHT:
+	}
+	else if( eTextAlignment & QM_RIGHT )
+	{
 		x = m_scPos.x + (m_scSize.w - (ColorStrlen( text ) * m_scChSize.w ));
-		break;
+	}
+	else
+	{
+		x = m_scPos.x + ((m_scSize.w - (ColorStrlen( text ) * m_scChSize.w )) / 2 );
 	}
 
 	if( szBackground )
@@ -435,43 +434,43 @@ void CMenuField::Draw( void )
 	}
 
 	textHeight = y - (m_scChSize.h * 1.5f);
-	UI_DrawString( m_scPos.x, textHeight, m_scSize.w, m_scChSize.h, szName, uiColorHelp, true, m_scChSize.w, m_scChSize.h, QM_LEFT, shadow );
+	UI_DrawString( font, m_scPos.x, textHeight, m_scSize.w, m_scChSize.h, szName, uiColorHelp, true, m_scChSize.w, m_scChSize.h, QM_LEFT, shadow );
 
 	if( iFlags & QMF_GRAYED )
 	{
-		UI_DrawString( newPos, m_scSize, text, uiColorDkGrey, true, m_scChSize, eTextAlignment, shadow );
+		UI_DrawString( font, newPos, m_scSize, text, uiColorDkGrey, true, m_scChSize, eTextAlignment, shadow );
 		return; // grayed
 	}
 
 	if(this != m_pParent->ItemAtCursor())
 	{
-		UI_DrawString( newPos, m_scSize, text, iColor, false, m_scChSize, eTextAlignment, shadow );
+		UI_DrawString( font, newPos, m_scSize, text, iColor, false, m_scChSize, eTextAlignment, shadow );
 		return; // no focus
 	}
 
-	UI_DrawString( newPos, m_scSize, text, iColor, false, m_scChSize, eTextAlignment, shadow );
+	UI_DrawString( font, newPos, m_scSize, text, iColor, false, m_scChSize, eTextAlignment, shadow );
 
 	if(( uiStatic.realTime & 499 ) < 250 )
-		UI_DrawString( x + (cursor * m_scChSize.w), y, m_scChSize.w, m_scSize.h, cursor_char, iColor, true, m_scChSize.w, m_scChSize.h, QM_LEFT, shadow );
+		UI_DrawString( font, x + (cursor * m_scChSize.w), y, m_scChSize.w, m_scSize.h, cursor_char, iColor, true, m_scChSize.w, m_scChSize.h, QM_LEFT, shadow );
 
 
 	switch( eFocusAnimation )
 	{
 	case QM_HIGHLIGHTIFFOCUS:
-		UI_DrawString( newPos, m_scSize, text, iFocusColor, false, m_scChSize, eTextAlignment, shadow );
+		UI_DrawString( font, newPos, m_scSize, text, iFocusColor, false, m_scChSize, eTextAlignment, shadow );
 
 		if(( uiStatic.realTime & 499 ) < 250 )
-			UI_DrawString( x + (cursor * m_scChSize.w), y, m_scChSize.w, m_scSize.h, cursor_char, iFocusColor, true, m_scChSize.w, m_scChSize.h, QM_LEFT, shadow );
+			UI_DrawString( font, x + (cursor * m_scChSize.w), y, m_scChSize.w, m_scSize.h, cursor_char, iFocusColor, true, m_scChSize.w, m_scChSize.h, QM_LEFT, shadow );
 		break;
 	case QM_PULSEIFFOCUS:
 	{
 		int	color;
 
 		color = PackAlpha( iColor, 255 * (0.5 + 0.5 * sin( (float)uiStatic.realTime / UI_PULSE_DIVISOR )));
-		UI_DrawString( newPos, m_scSize, text, color, false, m_scChSize, eTextAlignment, shadow );
+		UI_DrawString( font, newPos, m_scSize, text, color, false, m_scChSize, eTextAlignment, shadow );
 
 		if(( uiStatic.realTime & 499 ) < 250 )
-			UI_DrawString( x + (cursor * m_scChSize.w), y, m_scChSize.w, m_scSize.h, cursor_char, color, true, m_scChSize.w, m_scChSize.h, QM_LEFT, shadow );
+			UI_DrawString( font, x + (cursor * m_scChSize.w), y, m_scChSize.w, m_scSize.h, cursor_char, color, true, m_scChSize.w, m_scChSize.h, QM_LEFT, shadow );
 
 		break;
 	}
