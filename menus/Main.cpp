@@ -55,11 +55,6 @@ private:
 	static void QuitCb( CMenuBaseItem *, void * );
 
 	CMenuPicButton	console;
-	class CMenuMainBackground : public CMenuBackgroundBitmap
-	{
-	public:
-		virtual void Draw();
-	} background;
 	class CMenuMainBanner : public CMenuBannerBitmap
 	{
 	public:
@@ -91,20 +86,6 @@ private:
 };
 
 static CMenuMain uiMain;
-
-/*
-=================
-CMenuMain::CMenuMainBackground::Draw
-=================
-*/
-void CMenuMain::CMenuMainBackground::Draw( )
-{
-	// map has background
-	if( EngFuncs::GetCvarFloat( "cl_background" ))
-		return;
-
-	CMenuBackgroundBitmap::Draw();
-}
 
 void CMenuMain::CMenuMainBanner::Draw()
 {
