@@ -34,8 +34,10 @@ CMenuSwitch::CMenuSwitch( ) : CMenuEditable( )
 	iFgTextColor = uiInputFgColor;
 	iBgTextColor = uiPromptTextColor;
 
-	fTextOffsetX = -10.0f;
-	fTextOffsetY = 5.0f;
+	// text offsets are not needed anymore,
+	// they are useless now
+	fTextOffsetX = 0.0f;
+	fTextOffsetY = 0.0f;
 
 	eTextAlignment = QM_CENTER;
 	iFlags |= QMF_DROPSHADOW;
