@@ -11,7 +11,7 @@
 # define M_E		2.7182818284590452354	/* e */
 #endif
 
-bool GlyphLessFunc( const IBaseFont::glyph_t &a, const IBaseFont::glyph_t &b )
+bool IBaseFont::GlyphLessFunc( const glyph_t &a, const glyph_t &b )
 {
 	return a.ch < b.ch;
 }
