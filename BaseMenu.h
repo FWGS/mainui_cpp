@@ -180,11 +180,11 @@ void UI_DrawPicAdditive( int x, int y, int w, int h, const int color, const char
 void UI_DrawPicTrans( int x, int y, int width, int height, const int color, const char *pic );
 void UI_DrawPicHoles( int x, int y, int width, int height, const int color, const char *pic );
 void UI_FillRect( int x, int y, int w, int h, const int color );
-void UI_DrawRectangleExt( int in_x, int in_y, int in_w, int in_h, const int color, int outlineWidth );
+void UI_DrawRectangleExt(int in_x, int in_y, int in_w, int in_h, const int color, int outlineWidth, int flag  = QM_TOP | QM_BOTTOM | QM_LEFT | QM_RIGHT);
 void UI_DrawString(HFont font, int x, int y, int w, int h, const char *str, const int col, int forceCol, int charW, int charH, ETextAlignment justify, bool shadow);
-inline void UI_DrawRectangle( int x, int y, int w, int h, const int color )
+inline void UI_DrawRectangle( int x, int y, int w, int h, const int color, int flag  = QM_TOP | QM_BOTTOM | QM_LEFT | QM_RIGHT)
 {
-	UI_DrawRectangleExt( x, y, w, h, color, uiStatic.outlineWidth );
+	UI_DrawRectangleExt( x, y, w, h, color, uiStatic.outlineWidth, flag );
 }
 
 inline bool UI_CursorInRect( Point pos, Size size )
@@ -211,13 +211,13 @@ inline void UI_FillRect( Point pos, Size size, const int color )
 {
 	UI_FillRect( pos.x, pos.y, size.w, size.h, color );
 }
-inline void UI_DrawRectangle( Point pos, Size size, const int color )
+inline void UI_DrawRectangle( Point pos, Size size, const int color, int flag = QM_TOP | QM_BOTTOM | QM_LEFT | QM_RIGHT )
 {
-	UI_DrawRectangleExt( pos.x, pos.y, size.w, size.h, color, uiStatic.outlineWidth );
+	UI_DrawRectangleExt( pos.x, pos.y, size.w, size.h, color, uiStatic.outlineWidth, flag );
 }
-inline void UI_DrawRectangleExt( Point pos, Size size, const int color, int outlineWidth )
+inline void UI_DrawRectangleExt( Point pos, Size size, const int color, int outlineWidth, int flag  = QM_TOP | QM_BOTTOM | QM_LEFT | QM_RIGHT )
 {
-	UI_DrawRectangleExt( pos.x, pos.y, size.w, size.h, color, outlineWidth );
+	UI_DrawRectangleExt( pos.x, pos.y, size.w, size.h, color, outlineWidth, flag );
 }
 inline void UI_DrawString( HFont font, Point pos, Size size, const char *str, const int col, int forceCol, Size chSize, ETextAlignment justify, bool shadow  )
 {

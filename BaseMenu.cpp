@@ -247,41 +247,53 @@ void UI_FillRect( int x, int y, int width, int height, const int color )
 UI_DrawRectangleExt
 =================
 */
-void UI_DrawRectangleExt( int in_x, int in_y, int in_w, int in_h, const int color, int outlineWidth )
+void UI_DrawRectangleExt( int in_x, int in_y, int in_w, int in_h, const int color, int outlineWidth, int flag )
 {
 	int	x, y, w, h;
 
-	x = in_x - outlineWidth;
-	y = in_y - outlineWidth;
-	w = outlineWidth;
-	h = in_h + outlineWidth + outlineWidth;
+	if( flag & QM_LEFT )
+	{
+		x = in_x - outlineWidth;
+		y = in_y - outlineWidth;
+		w = outlineWidth;
+		h = in_h + outlineWidth + outlineWidth;
 
-	// draw left
-	UI_FillRect( x, y, w, h, color );
+		// draw left
+		UI_FillRect( x, y, w, h, color );
+	}
 
-	x = in_x + in_w;
-	y = in_y - outlineWidth;
-	w = outlineWidth;
-	h = in_h + outlineWidth + outlineWidth;
+	if( flag & QM_RIGHT )
+	{
+		x = in_x + in_w;
+		y = in_y - outlineWidth;
+		w = outlineWidth;
+		h = in_h + outlineWidth + outlineWidth;
 
-	// draw right
-	UI_FillRect( x, y, w, h, color );
+		// draw right
+		UI_FillRect( x, y, w, h, color );
+	}
 
-	x = in_x;
-	y = in_y - outlineWidth;
-	w = in_w;
-	h = outlineWidth;
+	if( flag & QM_TOP )
+	{
+		x = in_x;
+		y = in_y - outlineWidth;
+		w = in_w;
+		h = outlineWidth;
 
-	// draw top
-	UI_FillRect( x, y, w, h, color );
+		// draw top
+		UI_FillRect( x, y, w, h, color );
+	}
 
-	// draw bottom
-	x = in_x;
-	y = in_y + in_h;
-	w = in_w;
-	h = outlineWidth;
+	if( flag & QM_BOTTOM )
+	{
+		// draw bottom
+		x = in_x;
+		y = in_y + in_h;
+		w = in_w;
+		h = outlineWidth;
 
-	UI_FillRect( x, y, w, h, color );
+		UI_FillRect( x, y, w, h, color );
+	}
 }
 
 /*

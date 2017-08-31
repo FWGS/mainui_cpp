@@ -98,15 +98,33 @@ void EngFuncs::ConsoleStringLen(const char *string, int *length, int *height)
 
 int EngFuncs::UtfProcessChar(int ch)
 {
+#ifdef MAINUI_USE_CUSTOM_FONT_RENDER
 	return Con_UtfProcessChar( ch );
+#else
+	if( textfuncs.pfnUtfProcessChar )
+		return textfuncs.pfnUtfProcessChar( ch );
+	else return ch;
+#endif
 }
 
 int EngFuncs::UtfMoveLeft(char *str, int pos)
 {
+#ifndef MAINUI_USE_CUSTOM_FONT_RENDER
+	if( textfuncs.pfnUtfMoveLeft )
+		return textfuncs.pfnUtfMoveLeft( str, pos );
+	else return pos - 1;
+#else
 	return Con_UtfMoveLeft( str, pos );
+#endif
 }
 
 int EngFuncs::UtfMoveRight(char *str, int pos, int length)
 {
-	return Con_UtfMoveRight(str, pos, length);
+#ifndef MAINUI_USE_CUSTOM_FONT_RENDER
+	if( textfuncs.pfnUtfMoveLeft )
+		return textfuncs.pfnUtfMoveRight( str, pos, length );
+	else return pos + 1;
+#else
+	return Con_UtfMoveRight( str, pos, length );
+#endif
 }
