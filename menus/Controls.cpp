@@ -79,7 +79,6 @@ public:
 
 private:
 	void UnbindCommand( const char *command );
-	void ParseKeysList( void );
 	void PromptDialog( void );
 	void ResetKeysList( void );
 
@@ -282,7 +281,7 @@ void CMenuControls::ResetKeysList( void )
 	}
 
 	EngFuncs::COM_FreeFile( afile );
-	ParseKeysList();
+	keysListModel.Update();
 }
 
 /*
@@ -311,7 +310,7 @@ const char *CMenuControls::Key( int key, int down )
 			}
 
 			bind_grab = false;
-			ParseKeysList();
+			keysListModel.Update();
 
 			PromptDialog();
 
@@ -330,7 +329,7 @@ void CMenuControls::UnbindEntry()
 
 	UnbindCommand( bindName );
 	EngFuncs::PlayLocalSound( uiSoundRemoveKey );
-	ParseKeysList();
+	keysListModel.Update();
 
 	PromptDialog();
 }

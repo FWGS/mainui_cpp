@@ -110,7 +110,6 @@ class CMenuLoadGame : public CMenuFramework
 public:
 	// true to turn this menu into save mode, false to turn into load mode
 	void SetSaveMode( bool saveMode );
-	void DeleteDialog();
 	bool IsSaveMode() { return m_fSaveMode; }
 
 	CMenuPicButton	load;
@@ -130,7 +129,6 @@ private:
 	virtual void _Init( void );
 	virtual void _VidInit( void );
 
-	DECLARE_EVENT_TO_MENU_METHOD( CMenuLoadGame, DeleteDialog )
 	bool m_fSaveMode;
 };
 
@@ -214,7 +212,7 @@ void CMenuSavesListModel::Update( void )
 
 void CMenuSavesListModel::OnDeleteEntry(int line)
 {
-	uiLoadGame.DeleteDialog();
+	uiLoadGame.msgBox.Show();
 }
 
 /*
