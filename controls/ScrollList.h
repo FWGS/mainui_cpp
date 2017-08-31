@@ -1,5 +1,5 @@
 /*
-ScrollList.h - animated button with picture
+ScrollList.h - scroll list
 Copyright (C) 2010 Uncle Mike
 Copyright (C) 2017 a1batross
 
@@ -52,7 +52,6 @@ public:
 		return pszItemNames[iCurItem];
 	}
 
-
 // TODO:
 #if 0
 	CMenuBaseItem *GetSelectedItem()
@@ -71,7 +70,6 @@ public:
 	const char	*szDownArrow;
 	const char	*szDownArrowFocus;
 	const char  *szDownArrowPressed;
-	const char	**pszItemNames;
 #if 0
 	CMenuBaseItem *pszItems;
 #endif
@@ -90,6 +88,7 @@ public:
 	bool    bFramedHintText;
 // a1batross // smooth scrolling
 	//float flFracScroll;
+	const char **pszItemNames;
 };
 
 #endif // MENU_SCROLLLIST_H

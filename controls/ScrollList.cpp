@@ -1,5 +1,5 @@
 /*
-ScrollList.h - animated button with picture
+ScrollList.cpp
 Copyright (C) 2010 Uncle Mike
 Copyright (C) 2017 a1batross
 
@@ -19,6 +19,7 @@ GNU General Public License for more details.
 #include "ScrollList.h"
 #include "Utils.h"
 #include "Scissor.h"
+
 
 CMenuScrollList::CMenuScrollList() : CMenuBaseItem()
 {
@@ -45,8 +46,7 @@ menuScrollList_t::Init
 */
 void CMenuScrollList::VidInit( )
 {
-	CalcPosition();
-	CalcSizes();
+	CMenuBaseItem::VidInit();
 
 	for( iNumItems = 0; pszItemNames && pszItemNames[iNumItems]; iNumItems++ );
 
@@ -269,7 +269,11 @@ void CMenuScrollList::Draw( )
 	w = m_scSize.w;
 	h = m_scSize.h;
 
-	if( !szBackground )
+	if( szBackground )
+	{
+		UI_DrawPic( x, y, w, h, uiColorWhite, szBackground );
+	}
+	else
 	{
 		// draw the opaque outlinebox first
 		UI_FillRect( x, y, w, h, uiColorBlack );
@@ -307,14 +311,8 @@ void CMenuScrollList::Draw( )
 		}
 	}
 
-	if( szBackground )
+	if( !szBackground )
 	{
-		// get size and position for the center box
-		UI_DrawPic( x, y, w, h, uiColorWhite, szBackground );
-	}
-	else
-	{
-
 		int color;
 
 		if( eFocusAnimation == QM_HIGHLIGHTIFFOCUS && iFlags & QMF_HASKEYBOARDFOCUS )
@@ -322,37 +320,7 @@ void CMenuScrollList::Draw( )
 		else
 			color = uiInputFgColor;
 
-		x = m_scPos.x - UI_OUTLINE_WIDTH;
-		y = m_scPos.y;
-		w = UI_OUTLINE_WIDTH;
-		h = m_scSize.h;
-
-		// draw left
-		UI_FillRect( x, y, w, h, color );
-
-		x = m_scPos.x + m_scSize.w;
-		y = m_scPos.y;
-		w = UI_OUTLINE_WIDTH;
-		h = m_scSize.h;
-
-		// draw right
-		UI_FillRect( x, y, w, h, color );
-
-		x = m_scPos.x;
-		y = m_scPos.y;
-		w = m_scSize.w + UI_OUTLINE_WIDTH;
-		h = UI_OUTLINE_WIDTH;
-
-		// draw top
-		UI_FillRect( x, y, w, h, color );
-
-		// draw bottom
-		x = m_scPos.x;
-		y = m_scPos.y + m_scSize.h - UI_OUTLINE_WIDTH;
-		w = m_scSize.w + UI_OUTLINE_WIDTH;
-		h = UI_OUTLINE_WIDTH;
-
-		UI_FillRect( x, y, w, h, color );
+		UI_DrawRectangle( m_scPos, m_scSize, color );
 	}
 
 	// glue with right top and right bottom corners
