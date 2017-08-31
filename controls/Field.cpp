@@ -407,19 +407,6 @@ void CMenuField::Draw( void )
 	cursor = ( iCursor - prestep - x ) + 1;
 	if( cursor < 0 ) cursor = 0;
 
-	if( eTextAlignment & QM_LEFT )
-	{
-		x = m_scPos.x;
-	}
-	else if( eTextAlignment & QM_RIGHT )
-	{
-		x = m_scPos.x + (m_scSize.w - (ColorStrlen( text ) * m_scChSize.w ));
-	}
-	else
-	{
-		x = m_scPos.x + ((m_scSize.w - (ColorStrlen( text ) * m_scChSize.w )) / 2 );
-	}
-
 	if( szBackground )
 	{
 		UI_DrawPic( newPos, m_scSize, uiColorWhite, szBackground );
@@ -448,10 +435,26 @@ void CMenuField::Draw( void )
 		return; // no focus
 	}
 
+	if( eTextAlignment & QM_LEFT )
+	{
+		x = newPos.x;
+	}
+	else if( eTextAlignment & QM_RIGHT )
+	{
+		x = newPos.x + (m_scSize.w - UI::Font::GetTextWide( font, text, m_scChSize ) );
+	}
+	else
+	{
+		x = newPos.x + (m_scSize.w - UI::Font::GetTextWide( font, text, m_scChSize )) / 2;
+	}
+
 	UI_DrawString( font, newPos, m_scSize, text, iColor, false, m_scChSize, eTextAlignment, shadow );
 
+	int cursorOffset = UI::Font::GetTextWide( font, text, m_scChSize, cursor );
+	// int cursorOffset = 0;
+
 	if(( uiStatic.realTime & 499 ) < 250 )
-		UI_DrawString( font, x + (cursor * m_scChSize.w), y, m_scChSize.w, m_scSize.h, cursor_char, iColor, true, m_scChSize.w, m_scChSize.h, QM_LEFT, shadow );
+		UI_DrawString( font, x + cursorOffset, y, m_scChSize.w, m_scSize.h, cursor_char, iColor, true, m_scChSize.w, m_scChSize.h, QM_LEFT, shadow );
 
 
 	switch( eFocusAnimation )
@@ -460,7 +463,7 @@ void CMenuField::Draw( void )
 		UI_DrawString( font, newPos, m_scSize, text, iFocusColor, false, m_scChSize, eTextAlignment, shadow );
 
 		if(( uiStatic.realTime & 499 ) < 250 )
-			UI_DrawString( font, x + (cursor * m_scChSize.w), y, m_scChSize.w, m_scSize.h, cursor_char, iFocusColor, true, m_scChSize.w, m_scChSize.h, QM_LEFT, shadow );
+			UI_DrawString( font, x + cursorOffset, y, m_scChSize.w, m_scSize.h, cursor_char, iFocusColor, true, m_scChSize.w, m_scChSize.h, QM_LEFT, shadow );
 		break;
 	case QM_PULSEIFFOCUS:
 	{
@@ -470,7 +473,7 @@ void CMenuField::Draw( void )
 		UI_DrawString( font, newPos, m_scSize, text, color, false, m_scChSize, eTextAlignment, shadow );
 
 		if(( uiStatic.realTime & 499 ) < 250 )
-			UI_DrawString( font, x + (cursor * m_scChSize.w), y, m_scChSize.w, m_scSize.h, cursor_char, color, true, m_scChSize.w, m_scChSize.h, QM_LEFT, shadow );
+			UI_DrawString( font, x + cursorOffset, y, m_scChSize.w, m_scSize.h, cursor_char, color, true, m_scChSize.w, m_scChSize.h, QM_LEFT, shadow );
 
 		break;
 	}
