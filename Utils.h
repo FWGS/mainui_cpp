@@ -146,6 +146,35 @@ extern int COM_CompareSaves( const void **a, const void **b );
 extern void UI_LoadCustomStrings( void );
 extern void UI_EnableTextInput( bool enable );
 
+inline size_t Q_strncpy( char *dst, const char *src, size_t size )
+{
+	register char	*d = dst;
+	register const char	*s = src;
+	register size_t	n = size;
+
+	if( !dst || !src || !size )
+		return 0;
+
+	// copy as many bytes as will fit
+	if( n != 0 && --n != 0 )
+	{
+		do
+		{
+			if(( *d++ = *s++ ) == 0 )
+				break;
+		} while( --n != 0 );
+	}
+
+	// not enough room in dst, add NULL and traverse rest of src
+	if( n == 0 )
+	{
+		if( size != 0 )
+			*d = '\0'; // NULL-terminate dst
+		while( *s++ );
+	}
+	return ( s - src - 1 ); // count does not include NULL
+}
+
 #define CS_SIZE			64	// size of one config string
 #define CS_TIME			16	// size of time string
 
@@ -173,22 +202,13 @@ namespace Graphics
 byte *MakeBMP( unsigned int w, unsigned int h, byte **ptr, int *size, int *texOffset );
 }
 
-namespace String
-{
-// void ConvertToWCharBuffered( wchar_t *dst, int dstlen, const char *src, int srclen );
-
-/*
- * Returns converted to wide character buffer. Should be freed by delete[]
- * length is optional. Pass a pointer to get a string length
- **/
-wchar_t *ConvertToWChar( const char *text, int *length = NULL );
-}
-
 namespace Font
 {
-int GetTextWide( HFont font, const char *szName, Size charSize );
+int GetTextWide(HFont font, const char *szName, Size charSize , int size = -1);
 }
 }
-
+int Con_UtfProcessChar( int in );
+int Con_UtfMoveLeft( char *str, int pos );
+int Con_UtfMoveRight( char *str, int pos, int length );
 
 #endif//UTILS_H

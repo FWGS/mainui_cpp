@@ -327,7 +327,7 @@ void UI_DrawString( HFont font, int x, int y, int w, int h, const char *string, 
 	{
 		yy = y + (h - charH)/2;
 	}
-
+	EngFuncs::UtfProcessChar( 0 );
 	while( *string )
 	{
 		// get a line of text
@@ -383,13 +383,8 @@ void UI_DrawString( HFont font, int x, int y, int w, int h, const char *string, 
 
 			ch = *l++;
 			ch &= 255;
-#if 0
-#ifdef _WIN32
-			// fpos.x for letter �
-			if( ch == 0xB8 ) ch = (byte)'�';
-			if( ch == 0xA8 ) ch = (byte)'�';
-#endif
-#endif
+
+// when using custom font render, we use utf-8
 			ch = EngFuncs::UtfProcessChar( (unsigned char) ch );
 			if( !ch )
 				continue;
@@ -410,6 +405,7 @@ void UI_DrawString( HFont font, int x, int y, int w, int h, const char *string, 
 		}
 		yy += charH;
 	}
+	EngFuncs::UtfProcessChar( 0 );
 }
 
 #ifdef XASH_DISABLE_FWGS_EXTENSIONS

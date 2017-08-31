@@ -1,3 +1,4 @@
+#include <locale.h>
 #include "FontManager.h"
 #include "Utils.h"
 
@@ -166,7 +167,7 @@ bool CFontManager::GetFontUnderlined(HFont font)
 	return false;
 }
 
-void CFontManager::GetTextSize(HFont fontHandle, const wchar_t *text, int *wide, int *tall)
+void CFontManager::GetTextSize(HFont fontHandle, const char *text, int *wide, int *tall, int size )
 {
 	IBaseFont *font = GetIFontFromHandle( fontHandle );
 
@@ -178,11 +179,14 @@ void CFontManager::GetTextSize(HFont fontHandle, const wchar_t *text, int *wide,
 	}
 
 	int fontTall = font->GetHeight(), x = 0;
-	int _wide, _tall;
-	const wchar_t *ch = text;
+	int _wide = 0, _tall;
+	const char *ch = text;
 	_tall = fontTall;
+	int i = 0;
 
-	while( *ch )
+	EngFuncs::UtfProcessChar( 0 );
+
+	while( *ch && ( size < 0 || i < size ) )
 	{
 		// Skip colorcodes
 		if( IsColorString( ch ) )
@@ -191,53 +195,44 @@ void CFontManager::GetTextSize(HFont fontHandle, const wchar_t *text, int *wide,
 			continue;
 		}
 
-		if( *ch == '\n' )
-		{
-			_tall += fontTall;
-			x = 0;
-		}
-		else
-		{
-			x += GetCharacterWidth( fontHandle, *ch );
-			if( x > _wide )
-				_wide = x;
-		}
+		int uch;
 
+		uch = EngFuncs::UtfProcessChar( (unsigned char)*ch );
+		if( uch )
+		{
+			if( uch == '\n' )
+			{
+				_tall += fontTall;
+				x = 0;
+			}
+			else
+			{
+				int a, b, c;
+				font->GetCharABCWidths( uch, a, b, c );
+				x += a + b + c;
+				if( x > _wide )
+					_wide = x;
+			}
+			i++;
+		}
 		ch++;
 	}
+	EngFuncs::UtfProcessChar( 0 );
 
 	if( tall ) *tall = _tall;
 	if( wide ) *wide = _wide;
 }
 
-void CFontManager::GetTextSize(HFont font, const char *text, int *wide, int *tall)
-{
-	wchar_t *wText = UI::String::ConvertToWChar( text );
-
-	GetTextSize( font, wText, wide, tall );
-
-	delete[] wText;
-}
-
-int CFontManager::GetTextWide(HFont font, const wchar_t *text)
+int CFontManager::GetTextWide(HFont font, const char *text, int size)
 {
 	int wide;
 
-	GetTextSize( font, text, &wide );
+	GetTextSize( font, text, &wide, NULL, size );
 
 	return wide;
 }
 
-int CFontManager::GetTextWide(HFont font, const char *text)
-{
-	wchar_t *wText = UI::String::ConvertToWChar(text);
-	int ret = GetTextWide( font, wText );
-
-	delete[] wText;
-	return ret;
-}
-
-int CFontManager::GetTextHeight(HFont fontHandle, const wchar_t *text )
+int CFontManager::GetTextHeight(HFont fontHandle, const char *text, int size )
 {
 	IBaseFont *font = GetIFontFromHandle( fontHandle );
 	if( !font || !text || !text[0] )
@@ -248,46 +243,24 @@ int CFontManager::GetTextHeight(HFont fontHandle, const wchar_t *text )
 	int height = font->GetHeight();
 
 	// lightweight variant only for getting text height
-	while( *text )
+	int i = 0;
+	while( *text&&( size < 0 || i < size ) )
 	{
 		if( *text == '\n' )
 			height += height;
 
 		text++;
+		i++;
 	}
 	return height;
 }
 
-int CFontManager::GetTextHeight(HFont font, const char *text)
-{
-	wchar_t *wText = UI::String::ConvertToWChar(text);
-	int ret = GetTextHeight( font, wText );
-
-	delete[] wText;
-	return ret;
-}
-
-int CFontManager::GetTextWideScaled(HFont font, const wchar_t *text, const int height)
+int CFontManager::GetTextWideScaled(HFont font, const char *text, const int height, int size)
 {
 	IBaseFont *pFont = GetIFontFromHandle( font );
 	if( pFont )
 	{
-		return GetTextWide( font, text )
-#if SCALE_FONTS
-			* ((float)height / (float)pFont->GetTall())
-#endif
-		;
-	}
-
-	return 0;
-}
-
-int CFontManager::GetTextWideScaled(HFont font, const char *text, const int height)
-{
-	IBaseFont *pFont = GetIFontFromHandle( font );
-	if( pFont )
-	{
-		return GetTextWide( font, text )
+		return GetTextWide( font, text, size )
 #if SCALE_FONTS
 			* ((float)height / (float)pFont->GetTall())
 #endif
@@ -306,13 +279,12 @@ void CFontManager::UploadTextureForFont(IBaseFont *font)
 	{
 	{ 33, 126 },			// ascii printable range
 	{ 0x0410, 0x044F },		// cyrillic range
-	// { 0x3040, 0x309f } // hiragana, just for test
 	};
 
 	font->UploadGlyphsForRanges( range, sizeof( range ) / sizeof( IBaseFont::charRange_t ) );
 }
 
-int CFontManager::DrawCharacter(HFont fontHandle, wchar_t ch, Point pt, Size sz, const int color )
+int CFontManager::DrawCharacter(HFont fontHandle, int ch, Point pt, Size sz, const int color )
 {
 	IBaseFont *font = GetIFontFromHandle( fontHandle );
 

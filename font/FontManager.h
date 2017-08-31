@@ -41,18 +41,14 @@ public:
 	int   GetCharacterWidth( HFont font, int ch );
 	bool  GetFontUnderlined( HFont font );
 
-	void  GetTextSize( HFont font, const wchar_t *text, int *wide, int *tall = NULL );
-	void  GetTextSize( HFont font, const char *text, int *wide, int *tall = NULL );
-	int   GetTextHeight( HFont font, const wchar_t *text );
-	int   GetTextHeight( HFont font, const char *text );
+	void  GetTextSize( HFont font, const char *text, int *wide, int *tall = NULL, int size = -1 );
+	int   GetTextHeight( HFont font, const char *text, int size = -1 );
 
-	int   GetTextWide( HFont font, const char *text );
-	int	  GetTextWide( HFont font, const wchar_t *text );
+	int   GetTextWide( HFont font, const char *text, int size = -1 );
 
-	int GetTextWideScaled( HFont font, const char *text, const int height );
-	int GetTextWideScaled( HFont font, const wchar_t *text, const int height );
+	int GetTextWideScaled(HFont font, const char *text, const int height, int size = -1 );
 
-	int DrawCharacter(HFont font, wchar_t ch, Point pt, Size sz, const int color );
+	int DrawCharacter(HFont font, int ch, Point pt, Size sz, const int color );
 
 	void DebugDraw( HFont font );
 	IBaseFont *GetIFontFromHandle( HFont font );

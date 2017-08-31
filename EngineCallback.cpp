@@ -70,12 +70,8 @@ void EngFuncs::DrawSetTextColor(int r, int g, int b, int alpha)
 
 int EngFuncs::DrawConsoleString(int x, int y, const char *string)
 {
-	int len = strlen( string );
-	wchar_t *atext = new wchar_t[len+1], *ptext;
-	mbstowcs( atext, string, len );
-	atext[len] = 0;
+	const char *ptext = string;
 
-	ptext = atext;
 	Point pt(x, y);
 
 	for( ; *ptext; ptext++ )
@@ -90,8 +86,6 @@ int EngFuncs::DrawConsoleString(int x, int y, const char *string)
 		pt.x += g_FontMgr.DrawCharacter( uiStatic.hConsoleFont, *ptext, pt, Size(), color );
 	}
 
-	delete[] atext;
-
 	return pt.x;
 }
 
@@ -101,3 +95,18 @@ void EngFuncs::ConsoleStringLen(const char *string, int *length, int *height)
 }
 
 #endif
+
+int EngFuncs::UtfProcessChar(int ch)
+{
+	return Con_UtfProcessChar( ch );
+}
+
+int EngFuncs::UtfMoveLeft(char *str, int pos)
+{
+	return Con_UtfMoveLeft( str, pos );
+}
+
+int EngFuncs::UtfMoveRight(char *str, int pos, int length)
+{
+	return Con_UtfMoveRight(str, pos, length);
+}

@@ -259,24 +259,15 @@ public:
 
 	// text funcs
 #ifndef XASH_DISABLE_FWGS_EXTENSIONS
+	static ui_textfuncs_t textfuncs;
 	static inline void EnableTextInput( int enable )
 	{ if( textfuncs.pfnEnableTextInput ) textfuncs.pfnEnableTextInput( enable ); }
-	static inline int UtfProcessChar( int ch )
-	{ if( textfuncs.pfnUtfProcessChar ) return textfuncs.pfnUtfProcessChar( ch );
-		return ch; }
-	static inline int UtfMoveLeft( char *str, int pos )
-	{ if( textfuncs.pfnUtfMoveLeft ) textfuncs.pfnUtfMoveLeft( str, pos );
-		return pos - 1; }
-	static inline int UtfMoveRight( char *str, int pos, int length )
-	{ if( textfuncs.pfnUtfMoveRight ) textfuncs.pfnUtfMoveRight( str, pos, length );
-		return pos + 1; }
-	static ui_textfuncs_t textfuncs;
 #else
 	static inline void EnableTextInput( int enable ) { }
-	static inline int UtfProcessChar( int ch ) { return ch; }
-	static inline int UtfMoveLeft( char *str, int pos ) { return pos - 1; }
-	static inline int UtfMoveRight( char *str, int pos, int length ) { return pos + 1; }
 #endif
+	static int UtfProcessChar( int ch );
+	static int UtfMoveLeft( char *str, int pos );
+	static int UtfMoveRight( char *str, int pos, int length );
 };
 
 
