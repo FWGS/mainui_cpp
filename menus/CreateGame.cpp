@@ -27,24 +27,41 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "ScrollList.h"
 #include "Action.h"
 #include "YesNoMessageBox.h"
+#include "Table.h"
 
 #define ART_BANNER		"gfx/shell/head_creategame"
 
 #define MAPNAME_LENGTH	20
 #define TITLE_LENGTH	20+MAPNAME_LENGTH
 
+class CMenuMapListModel : public CMenuBaseModel
+{
+public:
+	void Update();
+	int GetColumns() const { return 2; }
+	int GetRows() const { return m_iNumItems; }
+	const char *GetCellText( int line, int column )
+	{
+		switch( column )
+		{
+		case 0: return mapName[line];
+		case 1: return mapsDescription[line];
+		}
+
+		return NULL;
+	}
+
+	char		mapName[UI_MAXGAMES][64];
+	char		mapsDescription[UI_MAXGAMES][64];
+	int	m_iNumItems;
+};
+
 class CMenuCreateGame : public CMenuFramework
 {
 public:
 	CMenuCreateGame() : CMenuFramework("CMenuCreateGame") { }
-private:
-	virtual void _Init();
-	virtual void _VidInit();
 	static void Begin( CMenuBaseItem *pSelf, void *pExtra );
-	void GetMapsList();
 
-	char		mapName[UI_MAXGAMES][64];
-	char		mapsDescription[UI_MAXGAMES][256];
 	char		*mapsDescriptionPtr[UI_MAXGAMES];
 
 	CMenuPicButton	advOptions;
@@ -61,8 +78,11 @@ private:
 	// newgame prompt dialog
 	CMenuYesNoMessageBox msgBox;
 
-	CMenuScrollList	mapsList;
-	char		hintText[MAX_HINT_TEXT];
+	CMenuTable        mapsList;
+	CMenuMapListModel mapsListModel;
+private:
+	virtual void _Init();
+	virtual void _VidInit();
 };
 
 static CMenuCreateGame	uiCreateGame;
@@ -79,7 +99,7 @@ void CMenuCreateGame::Begin( CMenuBaseItem *pSelf, void *pExtra )
 	if( item < 0 || item > UI_MAXGAMES )
 		return;
 
-	const char *mapName = menu->mapName[menu->mapsList.iCurItem];
+	const char *mapName = menu->mapsListModel.mapName[menu->mapsList.iCurItem];
 
 	if( !EngFuncs::IsMapValid( mapName ))
 		return;	// bad map
@@ -134,17 +154,17 @@ void CMenuCreateGame::Begin( CMenuBaseItem *pSelf, void *pExtra )
 
 /*
 =================
-CMenuCreateGame::GetMapsList
+CMenuMapListModel::Update
 =================
 */
-void CMenuCreateGame::GetMapsList( void )
+void CMenuMapListModel::Update( void )
 {
 	char *afile;
 
 	if( !EngFuncs::CreateMapsList( FALSE ) || (afile = (char *)EngFuncs::COM_LoadFile( "maps.lst", NULL )) == NULL )
 	{
-		done.iFlags |= QMF_GRAYED;
-		mapsList.pszItemNames = (const char **)mapsDescriptionPtr;
+		uiCreateGame.done.iFlags |= QMF_GRAYED;
+		m_iNumItems = 0;
 		Con_Printf( "Cmd_GetMapsList: can't open maps.lst\n" );
 		return;
 	}
@@ -156,20 +176,16 @@ void CMenuCreateGame::GetMapsList( void )
 	while(( pfile = EngFuncs::COM_ParseFile( pfile, token )) != NULL )
 	{
 		if( numMaps >= UI_MAXGAMES ) break;
-		StringConcat( mapName[numMaps], token, sizeof( mapName[0] ));
-		StringConcat( mapsDescription[numMaps], token, MAPNAME_LENGTH );
-		AddSpaces( mapsDescription[numMaps], MAPNAME_LENGTH );
+
+		Q_strncpy( mapName[numMaps], token, 64 );
+		Q_strncpy( mapsDescription[numMaps], token, 64 );
 		if(( pfile = EngFuncs::COM_ParseFile( pfile, token )) == NULL ) break; // unexpected end of file
-		StringConcat( mapsDescription[numMaps], token, TITLE_LENGTH );
-		AddSpaces( mapsDescription[numMaps], TITLE_LENGTH );
-		mapsDescriptionPtr[numMaps] = mapsDescription[numMaps];
+		Q_strncpy( mapsDescription[numMaps], token, 64 );
 		numMaps++;
 	}
 
-	if( !numMaps ) done.iFlags |= QMF_GRAYED;
-
-	for( ; numMaps < UI_MAXGAMES; numMaps++ ) mapsDescriptionPtr[numMaps] = NULL;
-	mapsList.pszItemNames = (const char **)mapsDescriptionPtr;
+	if( !numMaps ) uiCreateGame.done.iFlags |= QMF_GRAYED;
+	m_iNumItems = numMaps;
 	EngFuncs::COM_FreeFile( afile );
 }
 
@@ -180,13 +196,6 @@ CMenuCreateGame::Init
 */
 void CMenuCreateGame::_Init( void )
 {
-	// memset( &uiCreateGame, 0, sizeof( uiCreateGame_t ));
-
-	StringConcat( hintText, "Map", MAPNAME_LENGTH );
-	AddSpaces( hintText, MAPNAME_LENGTH );
-	StringConcat( hintText, "Title", TITLE_LENGTH );
-	AddSpaces( hintText, TITLE_LENGTH );
-
 	banner.SetPicture( ART_BANNER );
 
 	advOptions.SetNameAndStatus( "Adv. Options", "Open the game advanced options menu" );
@@ -211,8 +220,9 @@ void CMenuCreateGame::_Init( void )
 	hltv.LinkCvar( "hltv" );
 
 	mapsList.SetCharSize( QM_SMALLFONT );
-	mapsList.szName = hintText;
-	GetMapsList();
+	mapsList.SetupColumn( 0, "Map", 0.5f );
+	mapsList.SetupColumn( 0, "Title", 0.5f );
+	mapsList.SetModel( &mapsListModel );
 
 	hostName.szName = "Server Name:";
 	hostName.iMaxLength = 28;

@@ -167,7 +167,6 @@ void CMenuMain::QuitCb(CMenuBaseItem *, void *)
 
 void CMenuMain::QuitDialog()
 {
-	dialog.Link( this );
 	if( CL_IsActive() )
 		dialog.SetMessage( MenuStrings[IDS_MAIN_QUITPROMPTINGAME] );
 	else
@@ -266,13 +265,13 @@ void CMenuMain::HazardCourseCb( CMenuBaseItem *pSelf, void* )
 	EngFuncs::PlayBackgroundTrack( NULL, NULL );
 
 	EngFuncs::ClientCmd( FALSE, "hazardcourse\n" );
-	((CMenuMain*)pSelf->Parent())->dialog.Hide( );
+	uiMain.dialog.Hide( );
 }
 
 void CMenuMain::DisconnectCb( CMenuBaseItem *pSelf, void* )
 {
 	EngFuncs::ClientCmd( FALSE, "cmd disconnect;endgame disconnect;wait;wait;wait;menu_options;menu_main\n");
-	((CMenuMain*)pSelf->Parent())->dialog.Hide( );
+	uiMain.dialog.Hide( );
 }
 
 void CMenuMain::_Init( void )
@@ -379,6 +378,8 @@ void CMenuMain::_Init( void )
 		hazardCourse.iFlags |= QMF_GRAYED;
 		newGame.iFlags |= QMF_GRAYED;
 	}
+
+	dialog.Link( this );
 
 	AddItem( background );
 	AddItem( banner );

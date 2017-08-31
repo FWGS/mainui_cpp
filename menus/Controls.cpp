@@ -25,7 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Action.h"
 #include "YesNoMessageBox.h"
 #include "MessageBox.h"
-#include "ScrollList.h"
+#include "Table.h"
 
 #define ART_BANNER		"gfx/shell/head_controls"
 
@@ -34,6 +34,38 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define KEY1_LENGTH		20+CMD_LENGTH
 #define KEY2_LENGTH		20+KEY1_LENGTH
 
+class CMenuKeysModel : public CMenuBaseModel
+{
+public:
+	void Update();
+	void OnActivateEntry( int line );
+	void OnDeleteEntry( int line );
+	int GetRows() const
+	{
+		return m_iNumItems;
+	}
+	int GetColumns() const
+	{
+		return 3; // cmd, key1, key2
+	}
+	const char *GetCellText( int line, int column )
+	{
+		switch( column )
+		{
+		case 0: return keysBind[line];
+		case 1: return firstKey[line];
+		case 2: return secondKey[line];
+		}
+
+		return NULL;
+	}
+
+	char keysBind[MAX_KEYS][CMD_LENGTH];
+	char firstKey[MAX_KEYS][20];
+	char secondKey[MAX_KEYS][20];
+	int m_iNumItems;
+};
+
 class CMenuControls : public CMenuFramework
 {
 public:
@@ -41,22 +73,15 @@ public:
 
 	void _Init();
 	const char *Key( int key, int down );
+	void EnterGrabMode( void );
+	void UnbindEntry( void );
+	static void GetKeyBindings( const char *command, int *twoKeys );
+
 private:
-
-	char		keysBind[MAX_KEYS][CMD_LENGTH];
-	char		firstKey[MAX_KEYS][20];
-	char		secondKey[MAX_KEYS][20];
-	char		keysDescription[MAX_KEYS][256];
-	char		*keysDescriptionPtr[MAX_KEYS];
-
-	void GetKeyBindings( const char *command, int *twoKeys );
 	void UnbindCommand( const char *command );
 	void ParseKeysList( void );
 	void PromptDialog( void );
-	// void RestartMenu( void );
 	void ResetKeysList( void );
-	void EnterGrabMode( void );
-	void UnbindEntry( void );
 
 	DECLARE_EVENT_TO_MENU_METHOD( CMenuControls, ResetKeysList )
 	DECLARE_EVENT_TO_MENU_METHOD( CMenuControls, EnterGrabMode )
@@ -70,7 +95,8 @@ private:
 	CMenuPicButton advanced;
 	CMenuPicButton done;
 	CMenuPicButton cancel;
-	CMenuScrollList keysList;
+	CMenuTable keysList;
+	CMenuKeysModel keysListModel;
 
 	// redefine key wait dialog
 	CMenuMessageBox msgBox1; // small msgbox
@@ -78,7 +104,6 @@ private:
 	CMenuYesNoMessageBox msgBox2; // large msgbox
 
 	int bind_grab;
-	char hintText[KEY2_LENGTH+1];
 } uiControls;
 
 void CMenuControls::PromptDialog( void )
@@ -139,7 +164,7 @@ void CMenuControls::UnbindCommand( const char *command )
 	}
 }
 
-void CMenuControls::ParseKeysList( void )
+void CMenuKeysModel::Update( void )
 {
 	char *afile = (char *)EngFuncs::COM_LoadFile( "gfx/shell/kb_act.lst", NULL );
 	char *pfile = afile;
@@ -148,8 +173,7 @@ void CMenuControls::ParseKeysList( void )
 
 	if( !afile )
 	{
-		for( ; i < MAX_KEYS; i++ ) keysDescriptionPtr[i] = NULL;
-		keysList.pszItemNames = (const char **)keysDescriptionPtr;
+		m_iNumItems = 0;
 
 		Con_Printf( "UI_Parse_KeysList: kb_act.lst not found\n" );
 		return;
@@ -158,8 +182,6 @@ void CMenuControls::ParseKeysList( void )
 	memset( keysBind, 0, sizeof( keysBind ));
 	memset( firstKey, 0, sizeof( firstKey ));
 	memset( secondKey, 0, sizeof( secondKey ));
-	memset( keysDescription, 0, sizeof( keysDescription ));
-	memset( keysDescriptionPtr, 0, sizeof( keysDescriptionPtr ));
 
 	while(( pfile = EngFuncs::COM_ParseFile( pfile, token )) != NULL )
 	{
@@ -171,12 +193,8 @@ void CMenuControls::ParseKeysList( void )
 			pfile = EngFuncs::COM_ParseFile( pfile, token );
 			if( !pfile ) break;	// technically an error
 
-			snprintf( str, sizeof(str), "^6%s^7", token );	// enable uiPromptTextColor
-			StringConcat( keysDescription[i], str, strlen( str ) + 1 );
-			keysDescriptionPtr[i] = keysDescription[i];
-			strcpy( keysBind[i], "" );
-			strcpy( firstKey[i], "" );
-			strcpy( secondKey[i], "" );
+			snprintf( keysBind[i], CMD_LENGTH, "^6%s^7", token );
+			firstKey[i][0] = secondKey[i][0] = 0;
 			i++;
 		}
 		else
@@ -184,46 +202,48 @@ void CMenuControls::ParseKeysList( void )
 			// key definition
 			int	keys[2];
 
-			GetKeyBindings( token, keys );
-			strncpy( keysBind[i], token, sizeof( keysBind[i] ));
+			CMenuControls::GetKeyBindings( token, keys );
+			Q_strncpy( keysBind[i], token, sizeof( keysBind[i] ));
 
 			pfile = EngFuncs::COM_ParseFile( pfile, token );
 			if( !pfile ) break; // technically an error
 
-			snprintf( str, sizeof( str ), "^6%s^7", token );	// enable uiPromptTextColor
+			snprintf( keysBind[i], CMD_LENGTH, "^6%s^7", token );
 
-			if( keys[0] == -1 ) strcpy( firstKey[i], "" );
-			else strncpy( firstKey[i], EngFuncs::KeynumToString( keys[0] ), sizeof( firstKey[i] ));
+			const char *firstKeyStr = NULL, *secondKeyStr = NULL;
 
-			if( keys[1] == -1 ) strcpy( secondKey[i], "" );
-			else strncpy( secondKey[i], EngFuncs::KeynumToString( keys[1] ), sizeof( secondKey[i] ));
+			if( keys[0] != -1 )	firstKeyStr = EngFuncs::KeynumToString( keys[0] );
+			if( keys[1] != -1 ) secondKeyStr = EngFuncs::KeynumToString( keys[1] );
 
-			StringConcat( keysDescription[i], str, CMD_LENGTH );
-			AddSpaces( keysDescription[i], CMD_LENGTH );
+			if( firstKeyStr )
+				if( !strnicmp( firstKeyStr, "MOUSE", 5 ) )
+					snprintf( firstKey[i], 20, "^5%s^7", firstKeyStr );
+				else snprintf( firstKey[i], 20, "^3%s^7", firstKeyStr );
+			else firstKey[i][0] = 0;
 
-			// HACKHACK this color should be get from kb_keys.lst
-			if( !strnicmp( firstKey[i], "MOUSE", 5 ))
-				snprintf( str, sizeof( str ), "^5%s^7", firstKey[i] );	// cyan
-			else snprintf( str, sizeof( str ), "^3%s^7", firstKey[i] );	// yellow
-			StringConcat( keysDescription[i], str, KEY1_LENGTH );
-			AddSpaces( keysDescription[i], KEY1_LENGTH );
+			if( secondKeyStr )
+				if( !strnicmp( secondKeyStr, "MOUSE", 5 ) )
+					snprintf( secondKey[i], 20, "^5%s^7", secondKeyStr );
+				else snprintf( secondKey[i], 20, "^3%s^7", secondKeyStr );
+			else secondKey[i][0] = 0;
 
-			// HACKHACK this color should be get from kb_keys.lst
-			if( !strnicmp( secondKey[i], "MOUSE", 5 ))
-				snprintf( str, sizeof( str ), "^5%s^7", secondKey[i] );// cyan
-			else snprintf( str, sizeof( str ), "^3%s^7", secondKey[i] );	// yellow
-
-			StringConcat( keysDescription[i], str, KEY2_LENGTH );
-			AddSpaces( keysDescription[i],KEY2_LENGTH );
-			keysDescriptionPtr[i] = keysDescription[i];
 			i++;
 		}
 	}
 
-	EngFuncs::COM_FreeFile( afile );
+	m_iNumItems = i;
 
-	for( ; i < MAX_KEYS; i++ ) keysDescriptionPtr[i] = NULL;
-	keysList.pszItemNames = (const char **)keysDescriptionPtr;
+	EngFuncs::COM_FreeFile( afile );
+}
+
+void CMenuKeysModel::OnActivateEntry(int line)
+{
+	uiControls.EnterGrabMode();
+}
+
+void CMenuKeysModel::OnDeleteEntry(int line)
+{
+	uiControls.UnbindEntry();
 }
 
 void CMenuControls::ResetKeysList( void )
@@ -285,7 +305,7 @@ const char *CMenuControls::Key( int key, int down )
 			}
 			else if( key != K_ESCAPE )
 			{
-				const char *bindName = keysBind[keysList.iCurItem];
+				const char *bindName = keysListModel.keysBind[keysList.iCurItem];
 				sprintf( cmd, "bind \"%s\" \"%s\"\n", EngFuncs::KeynumToString( key ), bindName );
 				EngFuncs::ClientCmd( TRUE, cmd );
 			}
@@ -303,7 +323,7 @@ const char *CMenuControls::Key( int key, int down )
 
 void CMenuControls::UnbindEntry()
 {
-	const char *bindName = keysBind[keysList.iCurItem];
+	const char *bindName = keysListModel.keysBind[keysList.iCurItem];
 
 	if( !bindName[0] )
 		EngFuncs::PlayLocalSound( uiSoundBuzz );
@@ -318,7 +338,7 @@ void CMenuControls::UnbindEntry()
 void CMenuControls::EnterGrabMode()
 {
 	// entering to grab-mode
-	const char *bindName = keysBind[keysList.iCurItem];
+	const char *bindName = keysListModel.keysBind[keysList.iCurItem];
 
 	if( !bindName[0] )
 	{
@@ -346,13 +366,6 @@ UI_Controls_Init
 */
 void CMenuControls::_Init( void )
 {
-	StringConcat( hintText, "Action", CMD_LENGTH );
-	AddSpaces( hintText, CMD_LENGTH-4 );
-	StringConcat( hintText, "Key/Button", KEY1_LENGTH );
-	AddSpaces( hintText, KEY1_LENGTH-8 );
-	StringConcat( hintText, "Alternate", KEY2_LENGTH );
-	AddSpaces( hintText, KEY2_LENGTH );
-
 	banner.SetPicture( ART_BANNER );
 
 	defaults.SetNameAndStatus( "Use defaults", "Reset all buttons binding to their default values" );
@@ -381,10 +394,10 @@ void CMenuControls::_Init( void )
 	END_EVENT( cancel, onActivated )
 
 	keysList.SetRect( 360, 255, 640, 440 );
-	keysList.onDeleteEntry = UnbindEntryCb;
-	keysList.onActivateEntry = EnterGrabModeCb;
-	keysList.szName = hintText;
-	ParseKeysList();
+	keysList.SetModel( &keysListModel );
+	keysList.SetupColumn( 0, "Action", 0.50f );
+	keysList.SetupColumn( 1, "Key/Button", 0.25f );
+	keysList.SetupColumn( 2, "Alternate", 0.25f );
 
 	msgBox1.SetRect( DLG_X + 192, 256, 640, 128 );
 	msgBox1.SetMessage( "Press a key or button" );

@@ -22,60 +22,41 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "MenuStrings.h"
 #include "Bitmap.h"
 #include "PicButton.h"
-#include "ScrollList.h"
+#include "Table.h"
 #include "CheckBox.h"
 #include "Action.h"
 
 #define ART_BANNER		"gfx/shell/head_vidmodes"
 
-#define MAX_VIDMODES	(sizeof( uiVideoModes ) / sizeof( uiVideoModes[0] )) + 1
-
-static const char *uiVideoModes[] =
+class CMenuVidModesModel : public CMenuBaseModel
 {
-	"640 x 480",
-	"800 x 600",
-	"960 x 720",
-	"1024 x 768",
-	"1152 x 864",
-	"1280 x 800",
-	"1280 x 960",
-	"1280 x 1024",
-	"1600 x 1200",
-	"2048 x 1536",
-	"800 x 480 (wide)",
-	"856 x 480 (wide)",
-	"960 x 540 (wide)",
-	"1024 x 576 (wide)",
-	"1024 x 600 (wide)",
-	"1280 x 720 (wide)",
-	"1360 x 768 (wide)",
-	"1366 x 768 (wide)",
-	"1440 x 900 (wide)",
-	"1680 x 1050 (wide)",
-	"1920 x 1080 (wide)",
-	"1920 x 1200 (wide)",
-	"2560 x 1600 (wide)",
-	"1600 x 900 (wide)",
+public:
+	void Update();
+	int GetColumns() const { return 1; }
+	int GetRows() const { return m_iNumModes; }
+	const char *GetCellText(int line, int column) { return m_szModes[line]; }
+private:
+	int m_iNumModes;
+	const char *m_szModes[32];
 };
 
 class CMenuVidModes : public CMenuFramework
 {
 private:
 	void _Init();
+	void _VidInit();
 public:
 	CMenuVidModes() : CMenuFramework( "CMenuVidModes" ) { }
-	void GetConfig();
 	void SetConfig();
 
-	const char	*videoModesPtr[MAX_VIDMODES];
 
 	CMenuPicButton	ok;
 	CMenuPicButton	cancel;
 	CMenuCheckBox	windowed;
 	CMenuCheckBox	vsync;
 
-	CMenuScrollList	vidList;
-	CMenuAction	listCaption;
+	CMenuTable	vidList;
+	CMenuVidModesModel vidListModel;
 } uiVidModes;
 
 
@@ -84,18 +65,17 @@ public:
 UI_VidModes_GetModesList
 =================
 */
-void CMenuVidModes::GetConfig( void )
+void CMenuVidModesModel::Update( void )
 {
 	unsigned int i;
 
-	for( i = 0; i < MAX_VIDMODES-1; i++ )
-		videoModesPtr[i] = uiVideoModes[i];
-	videoModesPtr[i] = NULL;	// terminator
-
-	vidList.pszItemNames = videoModesPtr;
-	vidList.iCurItem = EngFuncs::GetCvarFloat( "vid_mode" );
-
-	windowed.bChecked = !EngFuncs::GetCvarFloat( "fullscreen" );
+	for( i = 0; i < 64; i++ )
+	{
+		const char *mode = EngFuncs::GetModeString( i );
+		if( !mode ) break;
+		m_szModes[i] = mode;
+	}
+	m_iNumModes = i;
 }
 
 /*
@@ -106,7 +86,6 @@ UI_VidModes_SetConfig
 void CMenuVidModes::SetConfig( void )
 {
 	EngFuncs::CvarSetValue( "vid_mode", vidList.iCurItem );
-	// TODO: windowed.WriteCvar();
 	EngFuncs::CvarSetValue( "fullscreen", !windowed.bChecked );
 	vsync.WriteCvar();
 }
@@ -136,13 +115,9 @@ void CMenuVidModes::_Init( void )
 	cancel.SetPicture( PC_CANCEL );
 	cancel.onActivated = HideCb;
 
-	listCaption.iFlags = QMF_INACTIVE;
-	listCaption.SetCharSize( QM_SMALLFONT );
-	listCaption.iColor = uiColorHelp;
-	listCaption.szName = MenuStrings[IDS_VIDEO_MODECOL];
-	listCaption.SetCoord( 400, 270 );
-
 	vidList.SetRect( 400, 300, 560, 300 );
+	vidList.SetupColumn( 0, MenuStrings[IDS_VIDEO_MODECOL], 1.0f );
+	vidList.SetModel( &vidListModel );
 
 	windowed.SetNameAndStatus( "Run in a window", "Run game in window mode" );
 	windowed.SetCoord( 400, 620 );
@@ -151,16 +126,20 @@ void CMenuVidModes::_Init( void )
 	vsync.SetCoord( 400, 670 );
 	vsync.LinkCvar( "gl_swapInterval" );
 
-	GetConfig();
-
 	AddItem( background );
 	AddItem( banner );
 	AddItem( ok );
 	AddItem( cancel );
 	AddItem( windowed );
 	AddItem( vsync );
-	AddItem( listCaption );
 	AddItem( vidList );
+}
+
+void CMenuVidModes::_VidInit()
+{
+	vidList.iCurItem = EngFuncs::GetCvarFloat( "vid_mode" );
+
+	windowed.bChecked = !EngFuncs::GetCvarFloat( "fullscreen" );
 }
 
 /*

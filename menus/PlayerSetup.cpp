@@ -220,6 +220,7 @@ void CMenuPlayerModelView::Draw()
 			}
 
 			prevCursorX = uiStatic.cursorX;
+#if 0 // Disabled. Pitch changing is ugly
 			float diffY = uiStatic.cursorY - prevCursorY;
 			if( diffY )
 			{
@@ -234,6 +235,7 @@ void CMenuPlayerModelView::Draw()
 				refdef.viewangles[2] = pitch;
 				ent->angles[2] = ent->curstate.angles[2] = -pitch;
 			}
+#endif
 
 			prevCursorY = uiStatic.cursorY;
 		}
@@ -268,7 +270,10 @@ public:
 
 	void FindModels();
 	void SetConfig();
+	void UpdateModel();
 	void SaveAndPopMenu();
+
+	DECLARE_EVENT_TO_MENU_METHOD( CMenuPlayerSetup, UpdateModel );
 
 	char	models[MAX_PLAYERMODELS][CS_SIZE];
 	char	*modelsPtr[MAX_PLAYERMODELS];
@@ -357,6 +362,22 @@ void CMenuPlayerSetup::SaveAndPopMenu( void )
 	CMenuFramework::SaveAndPopMenu();
 }
 
+void CMenuPlayerSetup::UpdateModel()
+{
+	char image[256];
+	const char *mdl = model.GetCurrentString();
+
+	snprintf( image, 256, "models/player/%s/%s.bmp", mdl, mdl );
+	view.hPlayerImage = EngFuncs::PIC_Load( image );
+	EngFuncs::CvarSetString( "model", mdl );
+	if( !strcmp( mdl, "player" ) )
+		strcpy( image, "models/player.mdl" );
+	else
+		snprintf( image, sizeof(image), "models/player/%s/%s.mdl", mdl, mdl );
+	if( view.ent )
+		EngFuncs::SetModel( view.ent, image );
+}
+
 /*
 =================
 UI_PlayerSetup_Init
@@ -400,24 +421,7 @@ void CMenuPlayerSetup::_Init( void )
 	FindModels();
 	model.Setup( (const char **)modelsPtr, (size_t)num_models );
 	model.LinkCvar( "model", CMenuEditable::CVAR_STRING );
-	SET_EVENT( model, onChanged )
-	{
-		CMenuPlayerSetup *parent = (CMenuPlayerSetup*)pSelf->Parent();
-		CMenuSpinControl *self = (CMenuSpinControl*)pSelf;
-		char image[256];
-		const char *model = self->GetCurrentString();
-
-		snprintf( image, 256, "models/player/%s/%s.bmp", model, model );
-		parent->view.hPlayerImage = EngFuncs::PIC_Load( image );
-		EngFuncs::CvarSetString("model", model );
-		if( !strcmp( model, "player" ) )
-			strcpy( image, "models/player.mdl" );
-		else
-			snprintf( image, sizeof(image), "models/player/%s/%s.mdl", model, model );
-		if( parent->view.ent )
-			EngFuncs::SetModel( parent->view.ent, image );
-	}
-	END_EVENT( model, onChanged )
+	model.onChanged = UpdateModelCb;
 
 	topColor.iFlags |= addFlags;
 	topColor.SetNameAndStatus( "Top color", "Set a player model top color" );
@@ -448,6 +452,7 @@ void CMenuPlayerSetup::_Init( void )
 	hiModels.onCvarChange = CMenuEditable::WriteCvarCb;
 
 	view.iFlags |= addFlags;
+	UpdateModel();
 	//view.
 
 	AddItem( background );

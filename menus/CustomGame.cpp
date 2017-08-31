@@ -22,9 +22,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Bitmap.h"
 #include "PicButton.h"
 #include "Action.h"
-#include "ScrollList.h"
+#include "Table.h"
 #include "YesNoMessageBox.h"
 #include "keydefs.h"
+
 
 #define ART_BANNER		"gfx/shell/head_custom"
 
@@ -35,6 +36,24 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define NAME_LENGTH		32+TYPE_LENGTH
 #define VER_LENGTH		6+NAME_LENGTH
 #define SIZE_LENGTH		10+VER_LENGTH
+
+class CMenuModListModel : public CMenuBaseModel
+{
+public:
+	void Update();
+	int GetColumns() const { return 4; }
+	int GetRows() const { return m_iNumItems; }
+	const char *GetCellText( int line, int column )
+	{
+		return modsDescription[line][column];
+	}
+
+	char		modsDir[MAX_MODS][64];
+	char		modsWebSites[MAX_MODS][256];
+	char		modsDescription[MAX_MODS][5][32];
+
+	int m_iNumItems;
+};
 
 class CMenuCustomGame: public CMenuFramework
 {
@@ -48,13 +67,6 @@ private:
 	virtual void _Init( );
 	virtual void _VidInit( );
 
-	void GetModList( );
-
-	char		modsDir[MAX_MODS][64];
-	char		modsWebSites[MAX_MODS][256];
-	char		modsDescription[MAX_MODS][256];
-	char		*modsDescriptionPtr[MAX_MODS];
-
 	CMenuPicButton	load;
 	CMenuPicButton	go2url;
 	CMenuPicButton	done;
@@ -62,16 +74,14 @@ private:
 	// prompt dialog
 	CMenuYesNoMessageBox msgBox;
 
-	CMenuScrollList	modList;
-	char		hintText[MAX_HINT_TEXT];
+	CMenuTable	modList;
+	CMenuModListModel modListModel;
 };
 
 static CMenuCustomGame	uiCustomGame;
 
 void CMenuCustomGame::ChangeGame(CMenuBaseItem *pSelf, void *pExtra)
 {
-	CMenuCustomGame *parent = (CMenuCustomGame*)pSelf->Parent();
-
 	char cmd[128];
 	sprintf( cmd, "game %s\n", (const char*)pExtra );
 	EngFuncs::ClientCmd( FALSE, cmd );
@@ -87,31 +97,25 @@ void CMenuCustomGame::Go2Site(CMenuBaseItem *pSelf, void *pExtra)
 void CMenuCustomGame::UpdateExtras( CMenuBaseItem *pSelf, void *pExtra )
 {
 	CMenuCustomGame *parent = (CMenuCustomGame*)pSelf->Parent();
-	CMenuScrollList *self = (CMenuScrollList*)pSelf;
+	CMenuTable *self = (CMenuTable*)pSelf;
 
 	int i = self->iCurItem;
 
-	if( !stricmp( parent->modsDir[i], gMenu.m_gameinfo.gamefolder ) )
-		parent->load.iFlags |= QMF_GRAYED;
-	else
-		parent->load.iFlags &= ~QMF_GRAYED;
+	parent->load.onActivated.pExtra = parent->modListModel.modsDir[i];
+	parent->load.SetGrayed( !stricmp( parent->modListModel.modsDir[i], gMenu.m_gameinfo.gamefolder ) );
 
-	parent->go2url.onActivated.pExtra = parent->modsWebSites[i];
-	if( parent->modsWebSites[i][0] )
-		parent->go2url.iFlags &= ~QMF_GRAYED;
-	else
-		parent->go2url.iFlags |= QMF_GRAYED;
+	parent->go2url.onActivated.pExtra = parent->modListModel.modsWebSites[i];
+	parent->go2url.SetGrayed( parent->modListModel.modsWebSites[i][0] == 0 );
 
-	parent->msgBox.onPositive.pExtra = parent->modsDir[i];
-	parent->load.onActivated.pExtra = parent->modsDir[i];
+	parent->msgBox.onPositive.pExtra = parent->modListModel.modsDir[i];
 }
 
 /*
 =================
-UI_CustomGame_GetModList
+CMenuModListModel::Update
 =================
 */
-void CMenuCustomGame::GetModList( void )
+void CMenuModListModel::Update( void )
 {
 	int	numGames, i;
 	GAMEINFO	**games;
@@ -120,57 +124,28 @@ void CMenuCustomGame::GetModList( void )
 
 	for( i = 0; i < numGames; i++ )
 	{
-		strncpy( modsDir[i], games[i]->gamefolder, sizeof( modsDir[i] ));
-		strncpy( modsWebSites[i], games[i]->game_url, sizeof( modsWebSites[i] ));
+		Q_strncpy( modsDir[i], games[i]->gamefolder, sizeof( modsDir[i] ));
+		Q_strncpy( modsWebSites[i], games[i]->game_url, sizeof( modsWebSites[i] ));
 
-		if( games[i]->type[0] )
-		{
-			StringConcat( modsDescription[i], games[i]->type, TYPE_LENGTH );
-			AddSpaces( modsDescription[i], TYPE_LENGTH );
-		}
-		else
-		{
-			AddSpaces( modsDescription[i], TYPE_LENGTH+1 );
-		}
+		Q_strncpy( modsDescription[i][0], games[i]->type, 32 );
 
 		if( ColorStrlen( games[i]->title ) > 31 ) // NAME_LENGTH
 		{
-			StringConcat( modsDescription[i], games[i]->title, ( NAME_LENGTH - NAME_SPACE ));
-			StringConcat( modsDescription[i], "...", NAME_LENGTH );
+			Q_strncpy( modsDescription[i][1], games[i]->title, 32 - 4 );
+			// I am lazy to put strncat here :(
+			modsDescription[i][1][28] = modsDescription[i][1][29] = modsDescription[i][1][30] = '.';
+			modsDescription[i][1][31] = 0;
 		}
-		else StringConcat( modsDescription[i], games[i]->title, NAME_LENGTH );
+		else Q_strncpy( modsDescription[i][1], games[i]->title, 32 );
 
-		AddSpaces( modsDescription[i], NAME_LENGTH );
-		StringConcat( modsDescription[i], games[i]->version, VER_LENGTH );
-		AddSpaces( modsDescription[i], VER_LENGTH );
-		if( games[i]->size[0] )
-			StringConcat( modsDescription[i], games[i]->size, SIZE_LENGTH );
-		else StringConcat( modsDescription[i], "0.0 Mb", SIZE_LENGTH );
-		AddSpaces( modsDescription[i], SIZE_LENGTH );
-		modsDescriptionPtr[i] = modsDescription[i];
+		Q_strncpy( modsDescription[i][2], games[i]->version, 32 );
 
-		if( !strcmp( gMenu.m_gameinfo.gamefolder, games[i]->gamefolder ))
-			modList.iCurItem = i;
+		if( games[i]->size[0] && atoi( games[i]->size ) != 0 )
+			Q_strncpy( modsDescription[i][3], games[i]->size, 32 );
+		else Q_strncpy( modsDescription[i][3], "0.0 Mb", 32 );
 	}
 
-	for( ; i < MAX_MODS; i++ )
-		modsDescriptionPtr[i] = NULL;
-
-	modList.pszItemNames = (const char **)modsDescriptionPtr;
-
-	// see if the load button should be grayed
-	if( !stricmp( gMenu.m_gameinfo.gamefolder, modsDir[modList.iCurItem] ))
-		load.iFlags |= QMF_GRAYED;
-	else
-		load.iFlags &= ~QMF_GRAYED;
-
-	if( modsWebSites[modList.iCurItem][0] == '\0' )
-		go2url.iFlags |= QMF_GRAYED;
-	else
-	{
-		go2url.iFlags &= ~QMF_GRAYED;
-		go2url.onActivated.pExtra = modsWebSites[modList.iCurItem];
-	}
+	m_iNumItems = numGames;
 }
 
 /*
@@ -180,15 +155,6 @@ UI_CustomGame_Init
 */
 void CMenuCustomGame::_Init( void )
 {
-	StringConcat( hintText, "Type", TYPE_LENGTH );
-	AddSpaces( hintText, TYPE_LENGTH );
-	StringConcat( hintText, "Name", NAME_LENGTH );
-	AddSpaces( hintText, NAME_LENGTH );
-	StringConcat( hintText, "Ver", VER_LENGTH );
-	AddSpaces( hintText, VER_LENGTH );
-	StringConcat( hintText, "Size", SIZE_LENGTH );
-	AddSpaces( hintText, SIZE_LENGTH );
-
 	banner.SetPicture( ART_BANNER );
 
 	load.SetNameAndStatus("Activate", "Activate selected custom game" );
@@ -205,8 +171,11 @@ void CMenuCustomGame::_Init( void )
 	done.onActivated = HideCb;
 
 	modList.onChanged = UpdateExtras;
-	modList.szName = hintText;
-	GetModList();
+	modList.SetupColumn( 0, "Type", 0.20f );
+	modList.SetupColumn( 1, "Name", 0.50f );
+	modList.SetupColumn( 2, "Ver",  0.15f );
+	modList.SetupColumn( 3, "Size", 0.15f );
+	modList.SetModel( &modListModel );
 
 	msgBox.SetMessage( "Leave current game?" );
 	msgBox.onPositive = ChangeGame;
@@ -218,6 +187,16 @@ void CMenuCustomGame::_Init( void )
 	AddItem( go2url );
 	AddItem( done );
 	AddItem( modList );
+
+	for( int i = 0; i < modListModel.GetRows(); i++ )
+	{
+		if( !stricmp( modListModel.modsDir[i], gMenu.m_gameinfo.gamefolder ) )
+		{
+			modList.iCurItem = i;
+			modList.onChanged( &modList );
+			break;
+		}
+	}
 }
 
 void CMenuCustomGame::_VidInit()

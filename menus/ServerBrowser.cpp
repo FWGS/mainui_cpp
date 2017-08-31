@@ -20,7 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Framework.h"
 #include "Bitmap.h"
 #include "YesNoMessageBox.h"
-#include "ScrollList.h"
+#include "Table.h"
 #include "keydefs.h"
 #include "Switch.h"
 
@@ -33,19 +33,39 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define QMSB_MAXCL_LENGTH	10+QMSB_MAPNAME_LENGTH
 #define QMSB_PING_LENGTH    10+QMSB_MAXCL_LENGTH
 
+class CMenuGameListModel : public CMenuBaseModel
+{
+public:
+	void Update();
+	int GetColumns() const
+	{
+		return 4; // game, mapname, maxcl, ping
+	}
+	int GetRows() const
+	{
+		return m_iNumItems;
+	}
+	const char *GetCellText( int line, int column )
+	{
+		return m_szCells[line][column];
+	}
+	void OnActivateEntry(int line);
+
+private:
+	char	m_szCells[UI_MAX_SERVERS][4][64];
+	int m_iNumItems;
+};
+
 class CMenuServerBrowser: public CMenuFramework
 {
 public:
 	CMenuServerBrowser() : CMenuFramework( "CMenuServerBrowser" ) { }
 	virtual void Draw();
 
-	void SetLANOnly( bool lanOnly ) { m_bLanOnly = lanOnly; }
-
-private:
-	virtual void _Init();
-	virtual void _VidInit();
-
-public:
+	void SetLANOnly( bool lanOnly )
+	{
+		m_bLanOnly = lanOnly;
+	}
 	void GetGamesList( void );
 	void ClearList( void );
 	void RefreshList( void );
@@ -53,9 +73,7 @@ public:
 	DECLARE_EVENT_TO_MENU_METHOD( CMenuServerBrowser, RefreshList )
 
 	static void JoinGame( CMenuBaseItem *pSelf, void *pExtra );
-
-	char		gameDescription[UI_MAX_SERVERS][256];
-	char		*gameDescriptionPtr[UI_MAX_SERVERS];
+	static void Connect( netadr_t adr );
 
 	CMenuPicButton joinGame;
 	CMenuPicButton createGame;
@@ -65,13 +83,16 @@ public:
 	CMenuSwitch natOrDirect;
 
 	CMenuYesNoMessageBox msgBox;
-	CMenuScrollList	gameList;
+	CMenuTable	gameList;
+	CMenuGameListModel gameListModel;
 
-	char  hintText[MAX_HINT_TEXT];
 	int	  refreshTime;
 	int   refreshTime2;
 
 	bool m_bLanOnly;
+private:
+	virtual void _Init();
+	virtual void _VidInit();
 };
 
 static CMenuServerBrowser	uiServerBrowser;
@@ -81,7 +102,7 @@ static CMenuServerBrowser	uiServerBrowser;
 CMenuServerBrowser::GetGamesList
 =================
 */
-void CMenuServerBrowser::GetGamesList( void )
+void CMenuGameListModel::Update( void )
 {
 	int		i;
 	const char	*info;
@@ -92,51 +113,31 @@ void CMenuServerBrowser::GetGamesList( void )
 			break;
 		info = uiStatic.serverNames[i];
 
-		gameDescription[i][0] = 0; // mark this string as empty
-
-		StringConcat( gameDescription[i], Info_ValueForKey( info, "host" ), QMSB_GAME_LENGTH );
-		AddSpaces( gameDescription[i], QMSB_GAME_LENGTH );
-
-		StringConcat( gameDescription[i], Info_ValueForKey( info, "map" ), QMSB_MAPNAME_LENGTH );
-		AddSpaces( gameDescription[i], QMSB_MAPNAME_LENGTH );
-
-		StringConcat( gameDescription[i], Info_ValueForKey( info, "numcl" ), QMSB_MAXCL_LENGTH );
-		StringConcat( gameDescription[i], "\\", QMSB_MAXCL_LENGTH );
-		StringConcat( gameDescription[i], Info_ValueForKey( info, "maxcl" ), QMSB_MAXCL_LENGTH );
-		AddSpaces( gameDescription[i], QMSB_MAXCL_LENGTH );
-
-		char ping[10];
-		snprintf( ping, 10, "%.f ms", uiStatic.serverPings[i] * 1000 );
-		StringConcat( gameDescription[i], ping, QMSB_PING_LENGTH );
-		AddSpaces( gameDescription[i], QMSB_PING_LENGTH );
-
-		gameDescriptionPtr[i] = gameDescription[i];
+		Q_strncpy( m_szCells[i][0], Info_ValueForKey( info, "host" ), 64 );
+		Q_strncpy( m_szCells[i][1], Info_ValueForKey( info, "map" ), 64 );
+		snprintf( m_szCells[i][2], 64, "%s\\%s", Info_ValueForKey( info, "numcl" ), Info_ValueForKey( info, "maxcl" ) );
+		snprintf( m_szCells[i][3], 64, "%.f ms", uiStatic.serverPings[i] * 1000 );
 	}
 
-	for( ; i < UI_MAX_SERVERS; i++ )
-		gameDescriptionPtr[i] = NULL;
-
-	gameList.pszItemNames = (const char **)gameDescriptionPtr;
-	gameList.iNumItems = 0; // reset it
-	gameList.iCurItem = 0; // reset it
-
-	if( !gameList.charSize.h )
-		return; // to avoid divide integer by zero
-
-	// count number of items
-	while( gameList.pszItemNames[gameList.iNumItems] )
-		gameList.iNumItems++;
-
-	// calculate number of visible rows
-	int h = gameList.size.h;
-	UI_ScaleCoords( NULL, NULL, NULL, &h );
-
-	gameList.iNumRows = (h / gameList.charSize.h) - 2;
-	if( gameList.iNumRows > gameList.iNumItems )
-		gameList.iNumRows = gameList.iNumItems;
+	m_iNumItems = i;
 
 	if( uiStatic.numServers )
-		joinGame.iFlags &= ~QMF_GRAYED;
+		uiServerBrowser.joinGame.SetGrayed( false );
+}
+
+void CMenuGameListModel::OnActivateEntry( int line )
+{
+	CMenuServerBrowser::Connect( uiStatic.serverAddresses[line] );
+}
+
+void CMenuServerBrowser::Connect( netadr_t adr )
+{
+	// prevent refresh during connect
+	uiServerBrowser.refreshTime = uiStatic.realTime + 999999;
+	//BUGBUG: ClientJoin not guaranted to return, need use ClientCmd instead!!!
+	//BUGBUG: But server addres is known only as netadr_t here!!!
+	EngFuncs::ClientJoin( adr );
+	EngFuncs::ClientCmd( false, "menu_connectionprogress menu server\n" );
 }
 
 /*
@@ -148,23 +149,13 @@ void CMenuServerBrowser::JoinGame( CMenuBaseItem *pSelf, void *pExtra )
 {
 	CMenuServerBrowser *parent = (CMenuServerBrowser *)pSelf->Parent();
 
-	if( parent->gameDescription[parent->gameList.iCurItem][0] == 0 )
-		return;
-
-	// prevent refresh during connect
-	parent->refreshTime = uiStatic.realTime + 999999;
-	//BUGBUG: ClientJoin not guaranted to return, need use ClientCmd instead!!!
-	//BUGBUG: But server addres is known only as netadr_t here!!!
-	EngFuncs::ClientJoin( uiStatic.serverAddresses[parent->gameList.iCurItem] );
-	EngFuncs::ClientCmd( false, "menu_connectionprogress menu server\n" );
+	Connect( uiStatic.serverAddresses[parent->gameList.iCurItem] );
 }
 
 void CMenuServerBrowser::ClearList()
 {
 	uiStatic.numServers = 0;
-	gameList.iNumItems = 0;
-	gameList.iCurItem = 0;
-	memset( gameDescriptionPtr, 0, sizeof( gameDescriptionPtr ) );
+	gameListModel.Update();
 }
 
 void CMenuServerBrowser::RefreshList()
@@ -209,7 +200,7 @@ void CMenuServerBrowser::Draw( void )
 	// serverinfo has been changed update display
 	if( uiStatic.updateServers )
 	{
-		GetGamesList ();
+		gameListModel.Update();
 		uiStatic.updateServers = false;
 	}
 }
@@ -221,18 +212,6 @@ CMenuServerBrowser::Init
 */
 void CMenuServerBrowser::_Init( void )
 {
-	// memset( &uiServerBrowser, 0, sizeof( CMenuServerBrowser ));
-
-	StringConcat( hintText, "Name", QMSB_GAME_LENGTH );
-	AddSpaces( hintText, QMSB_GAME_LENGTH );
-	StringConcat( hintText, "Map", QMSB_MAPNAME_LENGTH );
-	AddSpaces( hintText, QMSB_MAPNAME_LENGTH );
-	StringConcat( hintText, "Players", QMSB_MAXCL_LENGTH );
-	AddSpaces( hintText, QMSB_MAXCL_LENGTH );
-	StringConcat( hintText, "Ping", QMSB_PING_LENGTH );
-	AddSpaces( hintText, QMSB_PING_LENGTH );
-
-
 	joinGame.iFlags |= QMF_GRAYED;
 	joinGame.SetNameAndStatus( "Join game", "Join to selected game" );
 	joinGame.SetPicture( PC_JOIN_GAME );
@@ -271,10 +250,12 @@ void CMenuServerBrowser::_Init( void )
 	msgBox.Link( this );
 
 	gameList.SetCharSize( QM_SMALLFONT );
-	gameList.eFocusAnimation = QM_HIGHLIGHTIFFOCUS;
-	gameList.pszItemNames = (const char **)gameDescriptionPtr;
+	gameList.SetupColumn( 0, "Name", 0.50f );
+	gameList.SetupColumn( 1, "Map", 0.28f );
+	gameList.SetupColumn( 2, "Players", 0.12f );
+	gameList.SetupColumn( 3, "Ping", 0.10f );
+	gameList.SetModel( &gameListModel );
 	gameList.bFramedHintText = true;
-	gameList.szName = hintText;
 
 	natOrDirect.szLeftName = "Direct";
 	natOrDirect.szRightName = "NAT";
@@ -318,9 +299,6 @@ CMenuServerBrowser::VidInit
 */
 void CMenuServerBrowser::_VidInit()
 {
-	memset( gameDescription, 0, sizeof( gameDescription ));
-	memset( gameDescriptionPtr, 0, sizeof( gameDescriptionPtr ));
-
 	if( m_bLanOnly )
 	{
 		banner.SetPicture( ART_BANNER_LAN );
