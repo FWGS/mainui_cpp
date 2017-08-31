@@ -255,6 +255,8 @@ public:
 	{ engfuncs.pfnProcessImage( texnum, gamma, topColor, bottomColor ); }
 	static inline int	CompareFileTime( char *filename1, char *filename2, int *iCompare )
 	{ return engfuncs.pfnCompareFileTime( filename1, filename2, iCompare ); }
+	static inline const char *GetModeString( int mode )
+	{ return engfuncs.pfnGetModeString( mode ); }
 	static ui_enginefuncs_t engfuncs;
 
 	// text funcs
