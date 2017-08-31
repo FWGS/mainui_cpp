@@ -281,7 +281,7 @@ void CMenuLoadGame::_Init( void )
 		CMenuLoadGame *parent = (CMenuLoadGame*)self->Parent();
 
 		// first item is for creating new saves
-		if( parent->m_fSaveMode && self->iCurItem == 0 )
+		if( parent->IsSaveMode() && self->iCurItem == 0 )
 		{
 			parent->remove.SetGrayed( true );
 			parent->levelShot.szName = NULL;

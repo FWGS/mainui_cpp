@@ -262,7 +262,7 @@ scrvardef_t *CSCR_LoadDefaultCVars( const char *scriptfilename, int *count )
 {
 	int length = 0;
 	char *start;
-	parserstate_t state = {};
+	parserstate_t state = { 0 };
 	bool success = false;
 	scrvardef_t *list = 0, *last;
 
@@ -291,7 +291,7 @@ scrvardef_t *CSCR_LoadDefaultCVars( const char *scriptfilename, int *count )
 
 	while( !CSCR_ExpectString( &state, "}", false, false ) )
 	{
-		scrvardef_t var = {};
+		scrvardef_t var = { 0 };
 
 		// Create a new object
 		if( CSCR_ParseSingleCvar( &state, &var ) )

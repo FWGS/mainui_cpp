@@ -34,7 +34,7 @@ CMenuBaseItem::~CMenuBaseItem()
 {
 	if( m_bAllocName )
 	{
-		delete[] szName;
+		delete[] (char*)szName;
 	}
 }
 
@@ -238,10 +238,9 @@ bool CMenuBaseItem::KeyValueData(const char *key, const char *data)
 	{
 		CEventCallback ev;
 
-		if( m_pParent && ( ev = m_pParent->FindEventByName( data )) )
+		if( m_pParent )
 		{
-			onActivated = ev;
-
+			onActivated = m_pParent->FindEventByName( data );
 		}
 		else if( !strcmp( data, "engine " ) )
 		{
