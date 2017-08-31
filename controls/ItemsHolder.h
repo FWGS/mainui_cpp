@@ -38,7 +38,7 @@ public:
 	void CalcItemsSizes();
 
 
-	inline void AddItem(CMenuBaseItem *item ) { return AddItem( *item ); }
+	inline void AddItem( CMenuBaseItem *item ) { return AddItem( *item ); }
 	inline int GetCursor() const { return m_iCursor; }
 	inline int GetCursorPrev() const { return m_iCursorPrev; }
 	inline int ItemCount() const { return m_numItems; }

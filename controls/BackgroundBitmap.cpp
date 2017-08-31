@@ -262,7 +262,7 @@ bool CMenuBackgroundBitmap::CheckBackgroundSplash( bool gamedirOnly )
 		s_Backgroudns[0].size.w = EngFuncs::PIC_Width( s_Backgroudns[0].hImage );
 		s_Backgroudns[0].size.h = EngFuncs::PIC_Height( s_Backgroudns[0].hImage );
 		s_BackgroundImageSize = s_Backgroudns[0].size;
-		s_iBackgroundCount++;
+		s_iBackgroundCount = 1;
 
 		if( gamedirOnly )
 		{
@@ -278,12 +278,11 @@ bool CMenuBackgroundBitmap::CheckBackgroundSplash( bool gamedirOnly )
 
 void CMenuBackgroundBitmap::LoadBackground()
 {
-	bool haveBg;
-
 	// try to load backgrounds from mod
-	haveBg = CMenuBackgroundBitmap::LoadBackgroundImageNew( false ); // gameui background layouts are inherited
-	if( haveBg ) return;
+	if( CMenuBackgroundBitmap::LoadBackgroundImageNew(  true ) ) return; // at first check new gameui backgrounds
+	if( CMenuBackgroundBitmap::CheckBackgroundSplash (  true ) ) return; // then check won-style
 
-	haveBg = CMenuBackgroundBitmap::CheckBackgroundSplash( true );
-	if( haveBg ) return;
+	// try from base directory
+	if( CMenuBackgroundBitmap::LoadBackgroundImageNew( false ) ) return; // gameui bgs are allowed to be inherited
+	if( CMenuBackgroundBitmap::CheckBackgroundSplash ( false ) ) return;
 }
