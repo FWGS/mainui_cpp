@@ -20,7 +20,10 @@
 #define DEFAULT_CONFONT  "Tahoma"
 
 // Probably isn't a good idea until I don't have implemented SDF
-#define SCALE_FONTS 1
+#ifdef __ANDROID__ // don't rape poor Android devices' CPU & GPU
+#define SCALE_FONTS
+#endif
+// #define SCALE_FONTS 1
 
 CFontManager g_FontMgr;
 
@@ -43,23 +46,21 @@ CFontManager::~CFontManager()
 
 void CFontManager::VidInit( void )
 {
-	static bool calledOnce = false;
 	static int prevConsoleFontHeight;
+	static float prevScale = 0;
 
-	// Ordering is important!
-#ifdef SCALE_FONTS
-	if( !calledOnce )
-#endif
-	{
+	bool updateConsoleFont = false; // a hint for re-render console font, because it was removed
 
 #ifdef SCALE_FONTS
-		float scale = 1;
+	float scale = 1; // complete disables font re-rendering
 #else
-		float scale = uiStatic.scaleY;
+	float scale = uiStatic.scaleY;
 #endif
 
-		// ordering is important!
-		// See CBaseMenuItem::SetCharSize()
+	if( !prevScale || abs( scale - prevScale ) > 0.1f )
+	{
+		DeleteAllFonts();
+		updateConsoleFont = true;
 		uiStatic.hDefaultFont = CFontBuilder( DEFAULT_MENUFONT, UI_MED_CHAR_HEIGHT * scale, 1000 )
 			.SetHandleNum( QM_DEFAULTFONT )
 			.Create();
@@ -69,7 +70,9 @@ void CFontManager::VidInit( void )
 		uiStatic.hBigFont     = CFontBuilder( DEFAULT_MENUFONT, UI_BIG_CHAR_HEIGHT * scale, 1000 )
 			.SetHandleNum( QM_BIGFONT )
 			.Create();
+		prevScale = scale;
 	}
+
 
 	int consoleFontHeight;
 
@@ -77,16 +80,18 @@ void CFontManager::VidInit( void )
 	else if( ScreenHeight < 640 ) consoleFontHeight = 14;
 	else consoleFontHeight = 18;
 
-	if( consoleFontHeight != prevConsoleFontHeight )
+	if( consoleFontHeight != prevConsoleFontHeight || updateConsoleFont )
 	{
-		DeleteFont( uiStatic.hConsoleFont );
+		if( uiStatic.hConsoleFont && !updateConsoleFont )
+		{
+			DeleteFont( uiStatic.hConsoleFont );
+			uiStatic.hConsoleFont = 0;
+		}
 		uiStatic.hConsoleFont = CFontBuilder( DEFAULT_CONFONT, consoleFontHeight, 100 )
 			.SetOutlineSize()
 			.Create();
 		prevConsoleFontHeight = consoleFontHeight;
 	}
-
-	calledOnce = true;
 }
 
 void CFontManager::DeleteAllFonts()
