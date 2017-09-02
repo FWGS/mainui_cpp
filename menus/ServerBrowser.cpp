@@ -149,7 +149,7 @@ void CMenuServerBrowser::JoinGame( CMenuBaseItem *pSelf, void *pExtra )
 {
 	CMenuServerBrowser *parent = (CMenuServerBrowser *)pSelf->Parent();
 
-	Connect( uiStatic.serverAddresses[parent->gameList.iCurItem] );
+	Connect( uiStatic.serverAddresses[parent->gameList.GetCurrentIndex()] );
 }
 
 void CMenuServerBrowser::ClearList()

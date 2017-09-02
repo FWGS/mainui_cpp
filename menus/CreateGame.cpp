@@ -95,11 +95,11 @@ CMenuCreateGame::Begin
 void CMenuCreateGame::Begin( CMenuBaseItem *pSelf, void *pExtra )
 {
 	CMenuCreateGame *menu = (CMenuCreateGame*)pSelf->Parent();
-	int item = menu->mapsList.iCurItem;
+	int item = menu->mapsList.GetCurrentIndex();
 	if( item < 0 || item > UI_MAXGAMES )
 		return;
 
-	const char *mapName = menu->mapsListModel.mapName[menu->mapsList.iCurItem];
+	const char *mapName = menu->mapsListModel.mapName[menu->mapsList.GetCurrentIndex()];
 
 	if( !EngFuncs::IsMapValid( mapName ))
 		return;	// bad map

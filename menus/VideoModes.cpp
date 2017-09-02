@@ -85,7 +85,7 @@ UI_VidModes_SetConfig
 */
 void CMenuVidModes::SetConfig( void )
 {
-	EngFuncs::CvarSetValue( "vid_mode", vidList.iCurItem );
+	EngFuncs::CvarSetValue( "vid_mode", vidList.GetCurrentIndex() );
 	EngFuncs::CvarSetValue( "fullscreen", !windowed.bChecked );
 	vsync.WriteCvar();
 }
@@ -137,7 +137,7 @@ void CMenuVidModes::_Init( void )
 
 void CMenuVidModes::_VidInit()
 {
-	vidList.iCurItem = EngFuncs::GetCvarFloat( "vid_mode" );
+	vidList.SetCurrentIndex(EngFuncs::GetCvarFloat( "vid_mode" ));
 
 	windowed.bChecked = !EngFuncs::GetCvarFloat( "fullscreen" );
 }

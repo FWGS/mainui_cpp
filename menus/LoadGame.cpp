@@ -227,7 +227,7 @@ void CMenuLoadGame::_Init( void )
 	SET_EVENT( save, onActivated )
 	{
 		CMenuLoadGame *parent = (CMenuLoadGame*)pSelf->Parent();
-		const char *saveName = parent->savesListModel.saveName[parent->savesList.iCurItem];
+		const char *saveName = parent->savesListModel.saveName[parent->savesList.GetCurrentIndex()];
 		if( saveName[0] )
 		{
 			char	cmd[128];
@@ -249,7 +249,7 @@ void CMenuLoadGame::_Init( void )
 	SET_EVENT( load, onActivated )
 	{
 		CMenuLoadGame *parent = (CMenuLoadGame*)pSelf->Parent();
-		const char *saveName = parent->savesListModel.saveName[parent->savesList.iCurItem];
+		const char *saveName = parent->savesListModel.saveName[parent->savesList.GetCurrentIndex()];
 		if( saveName[0] )
 		{
 			char	cmd[128];
@@ -279,7 +279,7 @@ void CMenuLoadGame::_Init( void )
 		CMenuLoadGame *parent = (CMenuLoadGame*)self->Parent();
 
 		// first item is for creating new saves
-		if( parent->IsSaveMode() && self->iCurItem == 0 )
+		if( parent->IsSaveMode() && self->GetCurrentIndex() == 0 )
 		{
 			parent->remove.SetGrayed( true );
 			parent->levelShot.szName = NULL;
@@ -287,7 +287,7 @@ void CMenuLoadGame::_Init( void )
 		else
 		{
 			parent->remove.SetGrayed( false );
-			parent->levelShot.szName = parent->savesListModel.saveName[self->iCurItem];
+			parent->levelShot.szName = parent->savesListModel.saveName[self->GetCurrentIndex()];
 		}
 	}
 	END_EVENT( savesList, onChanged )
@@ -303,7 +303,7 @@ void CMenuLoadGame::_Init( void )
 	SET_EVENT( msgBox, onPositive )
 	{
 		CMenuLoadGame *parent = (CMenuLoadGame*)pSelf->Parent();
-		const char *delName = parent->savesListModel.delName[parent->savesList.iCurItem];
+		const char *delName = parent->savesListModel.delName[parent->savesList.GetCurrentIndex()];
 
 		if( delName[0] )
 		{

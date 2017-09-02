@@ -304,7 +304,7 @@ const char *CMenuControls::Key( int key, int down )
 			}
 			else if( key != K_ESCAPE )
 			{
-				const char *bindName = keysListModel.keysBind[keysList.iCurItem];
+				const char *bindName = keysListModel.keysBind[keysList.GetCurrentIndex()];
 				sprintf( cmd, "bind \"%s\" \"%s\"\n", EngFuncs::KeynumToString( key ), bindName );
 				EngFuncs::ClientCmd( TRUE, cmd );
 			}
@@ -322,7 +322,7 @@ const char *CMenuControls::Key( int key, int down )
 
 void CMenuControls::UnbindEntry()
 {
-	const char *bindName = keysListModel.keysBind[keysList.iCurItem];
+	const char *bindName = keysListModel.keysBind[keysList.GetCurrentIndex()];
 
 	if( !bindName[0] )
 		EngFuncs::PlayLocalSound( uiSoundBuzz );
@@ -337,7 +337,7 @@ void CMenuControls::UnbindEntry()
 void CMenuControls::EnterGrabMode()
 {
 	// entering to grab-mode
-	const char *bindName = keysListModel.keysBind[keysList.iCurItem];
+	const char *bindName = keysListModel.keysBind[keysList.GetCurrentIndex()];
 
 	if( !bindName[0] )
 	{

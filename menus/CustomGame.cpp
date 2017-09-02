@@ -99,7 +99,7 @@ void CMenuCustomGame::UpdateExtras( CMenuBaseItem *pSelf, void *pExtra )
 	CMenuCustomGame *parent = (CMenuCustomGame*)pSelf->Parent();
 	CMenuTable *self = (CMenuTable*)pSelf;
 
-	int i = self->iCurItem;
+	int i = self->GetCurrentIndex();
 
 	parent->load.onActivated.pExtra = parent->modListModel.modsDir[i];
 	parent->load.SetGrayed( !stricmp( parent->modListModel.modsDir[i], gMenu.m_gameinfo.gamefolder ) );
@@ -192,7 +192,7 @@ void CMenuCustomGame::_Init( void )
 	{
 		if( !stricmp( modListModel.modsDir[i], gMenu.m_gameinfo.gamefolder ) )
 		{
-			modList.iCurItem = i;
+			modList.SetCurrentIndex( i );
 			modList.onChanged( &modList );
 			break;
 		}

@@ -21,6 +21,26 @@ GNU General Public License for more details.
 
 #define MAX_TABLE_COLUMNS 16
 
+/*
+ * CMenuTable
+ *
+ * In order to keep simplicity, there is some limitations.
+ * If you will keep them in mind, you will find tables simple, easy and fast to add on your window
+ *
+ * 1. CMenuTable uses a very simple MVC pattern, but there controller is merged with model(OnDelete, OnActivate)
+ * It means, that you have to inherit from CMenuBaseModel, implement all pure methods and only then you can put your data on table.
+ *
+ * 2. CMenuTable will call Update() only when you will pass a model pointer to table.
+ *
+ * 3. Don't try to add table on your items holder, before you have passed a model pointer.
+ *
+ * 4. You can't use columns more than MAX_TABLE_COLUMNS
+ *
+ * 5. Header text is set per Table instance.
+ *
+ * 6. Column widths are constant(at this moment). You should don't exceed 1.0 in total columns width
+ *
+ */
 class CMenuBaseModel
 {
 public:
@@ -75,7 +95,7 @@ public:
 	}
 
 	// widths are in [0.0; 1.0]
-	// sum of all widths should be 1.0f, but not necessary.
+	// Total of all widths should be 1.0f, but not necessary.
 	// to keep everything simple, if first few columns exceeds 1.0, the other will not be shown
 	void SetColumnWidth( int num, float width )
 	{
@@ -90,7 +110,9 @@ public:
 		SetColumnWidth( num, width );
 	}
 
-	int		iCurItem;
+	int GetCurrentIndex() { return iCurItem; }
+	void SetCurrentIndex( int idx );
+
 	bool    bFramedHintText;
 
 private:
@@ -118,6 +140,7 @@ private:
 	bool	iScrollBarSliding;
 // highlight // mittorn
 	int		iHighlight;
+	int		iCurItem;
 
 	int		m_iLastItemMouseChange;
 

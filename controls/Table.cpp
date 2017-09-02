@@ -78,6 +78,20 @@ bool CMenuTable::MoveCursor(int delta)
 	return true;
 }
 
+void CMenuTable::SetCurrentIndex( int idx )
+{
+	iCurItem = bound( 0, idx, m_pModel->GetRows() );
+
+	if( iCurItem < iTopItem )
+		iTopItem = iCurItem;
+	if( iCurItem > iTopItem + iNumRows - 1 )
+		iTopItem = iCurItem - iNumRows + 1;
+	if( iTopItem > m_pModel->GetRows() - iNumRows )
+		iTopItem = m_pModel->GetRows() - iNumRows;
+	if( iTopItem < 0 )
+		iTopItem = 0;
+}
+
 const char *CMenuTable::Key( int key, int down )
 {
 	const char *sound = 0;
