@@ -45,8 +45,7 @@ CMenuSwitch::CMenuSwitch( ) : CMenuEditable( )
 
 void CMenuSwitch::VidInit()
 {
-	CalcPosition();
-	CalcSizes();
+	CMenuBaseItem::VidInit();
 
 	int leftSize, rightSize;
 

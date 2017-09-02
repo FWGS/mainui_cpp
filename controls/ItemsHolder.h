@@ -55,6 +55,7 @@ public:
 protected:
 	virtual void _Init() {}
 	virtual void _VidInit() {}
+	void VidInitItems();
 
 	bool LoadRES( const char *filename );
 

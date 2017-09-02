@@ -82,6 +82,7 @@ private:
 	static HIMAGE s_hCurrentTransPic;
 	static wrect_t s_pCurrentTransRect;
 	static Quad s_CurrentLerpQuads[2];
+	friend class CMenuBannerBitmap;
 };
 
 #endif

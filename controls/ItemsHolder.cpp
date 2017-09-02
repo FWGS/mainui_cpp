@@ -205,13 +205,16 @@ void CMenuItemsHolder::VidInit()
 	CalcPosition();
 	CalcSizes();
 	_VidInit();
+	VidInitItems();
+	// m_pLayout->VidInit();
+}
 
+void CMenuItemsHolder::VidInitItems()
+{
 	for( CMenuBaseItem **i = m_pItems; i < m_pItems + m_numItems; i++ )
 	{
 		(*i)->VidInit();
 	}
-
-	// m_pLayout->VidInit();
 }
 
 void CMenuItemsHolder::ToggleInactive()

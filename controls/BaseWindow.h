@@ -5,6 +5,8 @@
 #include "ItemsHolder.h"
 #include "BackgroundBitmap.h"
 
+#define TRANSITION_TIME 300.0f
+
 // Base class for windows.
 // Should be used for message boxes, dialogs, root menus(e.g. frameworks)
 class CMenuBaseWindow : public CMenuItemsHolder
@@ -51,6 +53,7 @@ public:
 
 	bool bAllowDrag;
 	bool bInTransition;
+	EAnimation eTransitionType; // valid only when in transition
 	CMenuBackgroundBitmap background;
 protected:
 
@@ -64,7 +67,6 @@ private:
 
 	bool m_bHolding;
 	Point m_bHoldOffset;
-
 
 	void PushMenu();
 	void PopMenu();

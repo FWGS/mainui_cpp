@@ -19,7 +19,7 @@ GNU General Public License for more details.
 #include "Bitmap.h"
 #include "PicButton.h" // GetTitleTransFraction
 #include "Utils.h"
-
+#include "BaseWindow.h"
 
 CMenuBitmap::CMenuBitmap() : CMenuBaseItem()
 {
@@ -155,10 +155,16 @@ void CMenuBannerBitmap::Draw()
 	return;
 #endif
 
+	CMenuBaseWindow *window = NULL;
+	if( m_pParent->IsWindow() )
+		window = (CMenuBaseWindow*) m_pParent;
+
 	if( CMenuPicButton::GetTitleTransFraction() < 1.0f )
-	{
 		return;
-	}
+
+	if( window && window->IsRoot() && window->bInTransition &&
+		window->eTransitionType == CMenuBaseWindow::ANIM_OUT )
+		return;
 
 	CMenuBitmap::Draw();
 }

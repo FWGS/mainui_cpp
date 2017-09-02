@@ -627,7 +627,8 @@ void UI_UpdateMenu( float flTime )
 
 		if( window->bInTransition )
 		{
-			if( window->DrawAnimation( CMenuBaseWindow::ANIM_IN ) )
+			window->eTransitionType = CMenuBaseWindow::ANIM_IN;
+			if( window->DrawAnimation( window->eTransitionType ) )
 				window->bInTransition = false;
 		}
 
@@ -639,10 +640,13 @@ void UI_UpdateMenu( float flTime )
 	}
 
 	if( uiStatic.prevMenu && uiStatic.prevMenu->bInTransition )
-		if( uiStatic.prevMenu->DrawAnimation( CMenuBaseWindow::ANIM_OUT ) )
+	{
+		uiStatic.prevMenu->eTransitionType = CMenuBaseWindow::ANIM_OUT;
+		if( uiStatic.prevMenu->DrawAnimation( uiStatic.prevMenu->eTransitionType ) )
 		{
 			uiStatic.prevMenu->bInTransition = false;
 		}
+	}
 
 
 	if( uiStatic.firstDraw )

@@ -43,8 +43,7 @@ CMenuCheckBox::Init
 */
 void CMenuCheckBox::VidInit( void )
 {
-	CalcPosition();
-	CalcSizes();
+	CMenuBaseItem::VidInit();
 	m_scTextPos.x = m_scPos.x + (m_scSize.w * 1.7f );
 	m_scTextPos.y = m_scPos.y + (m_scSize.h >> 2);
 

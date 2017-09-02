@@ -463,10 +463,10 @@ bool CMenuPicButton::DrawTitleAnim( CMenuBaseWindow::EAnimation state )
 #endif
 
 #ifdef TA_ALT_MODE
-	if( frac == 1 && transition_state == AS_TO_BUTTON )
+	if( frac >= 1.0f && transition_state == AS_TO_BUTTON )
 		return true;
 #else
-	if( frac == 1 )
+	if( frac >= 1.0f )
 		return true;
 #endif
 

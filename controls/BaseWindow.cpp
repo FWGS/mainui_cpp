@@ -147,8 +147,8 @@ const char *CMenuBaseWindow::Key(int key, int down)
 	if( key == K_MOUSE1 && bAllowDrag )
 	{
 		m_bHolding = down;
-		m_bHoldOffset.x = uiStatic.cursorX / uiStatic.scaleX;
-		m_bHoldOffset.y = uiStatic.cursorY / uiStatic.scaleX;
+		m_bHoldOffset.x = uiStatic.cursorX;
+		m_bHoldOffset.y = uiStatic.cursorY;
 	}
 
 	if( down && key == K_ESCAPE )
@@ -162,14 +162,14 @@ const char *CMenuBaseWindow::Key(int key, int down)
 
 void CMenuBaseWindow::Draw()
 {
-	if( m_bHolding && bAllowDrag )
+	if( !IsRoot() && m_bHolding && bAllowDrag )
 	{
-		pos.x += uiStatic.cursorX / uiStatic.scaleX - m_bHoldOffset.x;
-		pos.y += uiStatic.cursorY / uiStatic.scaleX- m_bHoldOffset.y;
+		m_scPos.x += uiStatic.cursorX - m_bHoldOffset.x;
+		m_scPos.y += uiStatic.cursorY - m_bHoldOffset.y;
 
-		m_bHoldOffset.x = uiStatic.cursorX / uiStatic.scaleX;
-		m_bHoldOffset.y = uiStatic.cursorY / uiStatic.scaleX;
-		CalcPosition();
+		m_bHoldOffset.x = uiStatic.cursorX;
+		m_bHoldOffset.y = uiStatic.cursorY;
+		// CalcPosition();
 		CalcItemsPositions();
 	}
 	CMenuItemsHolder::Draw();
@@ -182,11 +182,11 @@ bool CMenuBaseWindow::DrawAnimation(EAnimation anim)
 
 	if( anim == ANIM_IN )
 	{
-		alpha = ( uiStatic.realTime - m_iTransitionStartTime ) / 200.0f;
+		alpha = ( uiStatic.realTime - m_iTransitionStartTime ) / TRANSITION_TIME;
 	}
 	else if( anim == ANIM_OUT )
 	{
-		alpha = 1.0f - ( uiStatic.realTime - m_iTransitionStartTime ) / 200.0f;
+		alpha = 1.0f - ( uiStatic.realTime - m_iTransitionStartTime ) / TRANSITION_TIME;
 	}
 
 	if(	( anim == ANIM_IN  && alpha < 1.0f )
@@ -230,6 +230,9 @@ bool CMenuBaseWindow::KeyValueData(const char *key, const char *data)
 
 void CMenuBaseWindow::EnableTransition()
 {
-	bInTransition = true;
-	m_iTransitionStartTime = uiStatic.realTime;
+	if( uiStatic.prevMenu )
+	{
+		bInTransition = true;
+		m_iTransitionStartTime = uiStatic.realTime;
+	}
 }
