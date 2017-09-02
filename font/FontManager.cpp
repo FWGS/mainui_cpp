@@ -61,13 +61,13 @@ void CFontManager::VidInit( void )
 	{
 		DeleteAllFonts();
 		updateConsoleFont = true;
-		uiStatic.hDefaultFont = CFontBuilder( DEFAULT_MENUFONT, UI_MED_CHAR_HEIGHT * scale, 1000 )
+		uiStatic.hDefaultFont = CFontBuilder( DEFAULT_MENUFONT, UI_MED_CHAR_HEIGHT * scale, 500 )
 			.SetHandleNum( QM_DEFAULTFONT )
 			.Create();
-		uiStatic.hSmallFont   = CFontBuilder( DEFAULT_MENUFONT, UI_SMALL_CHAR_HEIGHT * scale, 100 )
+		uiStatic.hSmallFont   = CFontBuilder( DEFAULT_MENUFONT, UI_SMALL_CHAR_HEIGHT * scale, 500 )
 			.SetHandleNum( QM_SMALLFONT )
 			.Create();
-		uiStatic.hBigFont     = CFontBuilder( DEFAULT_MENUFONT, UI_BIG_CHAR_HEIGHT * scale, 1000 )
+		uiStatic.hBigFont     = CFontBuilder( DEFAULT_MENUFONT, UI_BIG_CHAR_HEIGHT * scale, 500 )
 			.SetHandleNum( QM_BIGFONT )
 			.Create();
 		prevScale = scale;
@@ -87,7 +87,7 @@ void CFontManager::VidInit( void )
 			DeleteFont( uiStatic.hConsoleFont );
 			uiStatic.hConsoleFont = 0;
 		}
-		uiStatic.hConsoleFont = CFontBuilder( DEFAULT_CONFONT, consoleFontHeight, 100 )
+		uiStatic.hConsoleFont = CFontBuilder( DEFAULT_CONFONT, consoleFontHeight, 500 )
 			.SetOutlineSize()
 			.Create();
 		prevConsoleFontHeight = consoleFontHeight;
