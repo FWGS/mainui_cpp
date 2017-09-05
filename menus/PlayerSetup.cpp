@@ -314,7 +314,7 @@ void CMenuPlayerSetup::FindModels( void )
 	filenames = EngFuncs::GetFilesList(  "models/player/*", &numFiles, TRUE );
 	if( !numFiles )
 		filenames = EngFuncs::GetFilesList(  "models/player/*", &numFiles, FALSE );
-	// a1batross: do we need this at all?
+
 #if 1
 	// add default singleplayer model
 	strcpy( models[num_models], "player" );
@@ -366,6 +366,14 @@ void CMenuPlayerSetup::UpdateModel()
 {
 	char image[256];
 	const char *mdl = model.GetCurrentString();
+
+	// seems we DON'T have this model locally
+	// just force display string and do nothing
+	if( !mdl )
+	{
+		model.ForceDisplayString( EngFuncs::GetCvarString( "model" ) );
+		return;
+	}
 
 	snprintf( image, 256, "models/player/%s/%s.bmp", mdl, mdl );
 	view.hPlayerImage = EngFuncs::PIC_Load( image );
