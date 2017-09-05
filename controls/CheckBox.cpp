@@ -44,8 +44,8 @@ CMenuCheckBox::Init
 void CMenuCheckBox::VidInit( void )
 {
 	CMenuBaseItem::VidInit();
-	m_scTextPos.x = m_scPos.x + (m_scSize.w * 1.7f );
-	m_scTextPos.y = m_scPos.y + (m_scSize.h >> 2);
+	m_scTextPos.x = m_scPos.x + (m_scSize.w * 1.5f );
+	m_scTextPos.y = m_scPos.y;
 
 	m_scTextSize.w = UI::Font::GetTextWide( font, szName, m_scChSize );;
 	m_scTextSize.h = m_scChSize.h;

@@ -70,8 +70,8 @@ void CMenuSwitch::VidInit()
 	m_rightPoint = m_leftPoint = m_scPos; // correct positions based on width sizes
 	m_rightPoint.x += m_leftSize.w;
 
-	m_scTextPos.x = m_scPos.x + (m_scSize.w * 1.7f );
-	m_scTextPos.y = m_scPos.y + (m_scSize.h >> 2);
+	m_scTextPos.x = m_scPos.x + (m_scSize.w * 1.5f );
+	m_scTextPos.y = m_scPos.y;
 
 	m_scTextSize.w = UI::Font::GetTextWide( font, szName, m_scChSize );
 	m_scTextSize.h = m_scChSize.h;

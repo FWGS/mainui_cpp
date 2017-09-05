@@ -129,7 +129,11 @@ CMenuVidOptions::Init
 */
 void CMenuVidOptions::_Init( void )
 {
+#ifdef PIC_KEEP_RGBDATA
 	hTestImage = EngFuncs::PIC_Load( ART_GAMMA, PIC_KEEP_RGBDATA );
+#else
+	hTestImage = EngFuncs::PIC_Load( ART_GAMMA, PIC_KEEP_SOURCE );
+#endif
 
 	banner.SetPicture(ART_BANNER);
 

@@ -18,11 +18,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-#include "Framework.h"
 #include "mathlib.h"
 #include "const.h"
 #include "keydefs.h"
 #include "ref_params.h"
+#include "Framework.h"
 #include "cl_entity.h"
 #include "com_model.h"
 #include "entity_types.h"
@@ -76,8 +76,7 @@ void CMenuPlayerModelView::Init()
 
 void CMenuPlayerModelView::VidInit()
 {
-	CalcPosition();
-	m_scSize = size.Scale();
+	CMenuBaseItem::VidInit();
 
 	ent = EngFuncs::GetPlayerModel();
 
@@ -89,7 +88,6 @@ void CMenuPlayerModelView::VidInit()
 	// setup render and actor
 	refdef.fov_x = 40;
 
-	// NOTE: must be called after UI_AddItem whan we sure what UI_ScaleCoords is done
 	refdef.viewport[0] = m_scPos.x;
 	refdef.viewport[1] = m_scPos.y;
 	refdef.viewport[2] = m_scSize.w;
@@ -199,8 +197,10 @@ void CMenuPlayerModelView::Draw()
 		EngFuncs::ClearScene();
 
 		// update renderer timings
+#ifndef PRERELEASE_INTERFACE
 		refdef.time = gpGlobals->time;
 		refdef.frametime = gpGlobals->frametime;
+#endif
 		ent->curstate.body = 0;
 
 		if( mouseYawControl )
@@ -484,7 +484,7 @@ void CMenuPlayerSetup::_VidInit()
 
 	view.SetRect( 660, 260, 260, 320 );
 	name.SetRect( 320, 260, 256, 36 );
-	model.SetRect( 702, 590, 176, 32 );
+	model.SetRect( 660, 580 + UI_OUTLINE_WIDTH, 260, 32 );
 	topColor.SetCoord( 250, 550 );
 	topColor.size.w = 300;
 

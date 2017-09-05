@@ -52,8 +52,8 @@ CMenuField::Init
 */
 void CMenuField::VidInit( void )
 {
-	CalcPosition();
-	CalcSizes();
+	CMenuBaseItem::VidInit();
+
 	// calculate number of visible characters
 	iWidthInChars = (size.w / charSize.w);
 

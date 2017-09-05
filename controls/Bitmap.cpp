@@ -36,11 +36,9 @@ CMenuBitmap::Init
 */
 void CMenuBitmap::VidInit( )
 {
+	CMenuBaseItem::VidInit();
 	if( !szFocusPic )
 		szFocusPic = szPic;
-
-	CalcPosition();
-	CalcSizes();
 }
 
 /*

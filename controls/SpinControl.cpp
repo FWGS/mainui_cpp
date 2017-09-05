@@ -18,6 +18,7 @@ GNU General Public License for more details.
 #include "BaseMenu.h"
 #include "SpinControl.h"
 #include "Utils.h"
+#include "Scissor.h"
 
 CMenuSpinControl::CMenuSpinControl()  : CMenuEditable(), m_szBackground(),
 		m_szLeftArrow(), m_szRightArrow(), m_szLeftArrowFocus(), m_szRightArrowFocus(),
@@ -178,7 +179,9 @@ void CMenuSpinControl::Draw( void )
 
 	if( iFlags & QMF_GRAYED )
 	{
+		UI::Scissor::PushScissor( scCenterPos, scCenterBox );
 		UI_DrawString( font, scCenterPos, scCenterBox, m_szDisplay, uiColorDkGrey, true, m_scChSize, eTextAlignment, shadow );
+		UI::Scissor::PopScissor();
 		UI_DrawPic( left, arrow, uiColorDkGrey, m_szLeftArrow );
 		UI_DrawPic( right, arrow, uiColorDkGrey, m_szRightArrow );
 		return; // grayed
@@ -186,7 +189,9 @@ void CMenuSpinControl::Draw( void )
 
 	if(this != m_pParent->ItemAtCursor())
 	{
+		UI::Scissor::PushScissor( scCenterPos, scCenterBox );
 		UI_DrawString( font, scCenterPos, scCenterBox, m_szDisplay, iColor, false, m_scChSize, eTextAlignment, shadow );
+		UI::Scissor::PopScissor();
 		UI_DrawPic(left, arrow, iColor, m_szLeftArrow);
 		UI_DrawPic(right, arrow, iColor, m_szRightArrow);
 		return;		// No focus
@@ -198,7 +203,9 @@ void CMenuSpinControl::Draw( void )
 
 	if( eFocusAnimation == QM_HIGHLIGHTIFFOCUS )
 	{
+		UI::Scissor::PushScissor( scCenterPos, scCenterBox );
 		UI_DrawString( font, scCenterPos, scCenterBox, m_szDisplay, iFocusColor, false, m_scChSize, eTextAlignment, shadow );
+		UI::Scissor::PopScissor();
 		UI_DrawPic( left, arrow, iColor, (leftFocus) ? m_szLeftArrowFocus : m_szLeftArrow );
 		UI_DrawPic( right, arrow, iColor, (rightFocus) ? m_szRightArrowFocus : m_szRightArrow );
 	}
@@ -208,7 +215,9 @@ void CMenuSpinControl::Draw( void )
 
 		color = PackAlpha( iColor, 255 * (0.5 + 0.5 * sin( (float)uiStatic.realTime / UI_PULSE_DIVISOR )));
 
+		UI::Scissor::PushScissor( scCenterPos, scCenterBox );
 		UI_DrawString( font, scCenterPos, scCenterBox, m_szDisplay, color, false, m_scChSize, eTextAlignment, shadow );
+		UI::Scissor::PopScissor();
 		UI_DrawPic( left, arrow, (leftFocus) ? color : iColor, (leftFocus) ? m_szLeftArrowFocus : m_szLeftArrow );
 		UI_DrawPic( right, arrow, (rightFocus) ? color : iColor, (rightFocus) ? m_szRightArrowFocus : m_szRightArrow );
 	}
