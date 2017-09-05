@@ -40,6 +40,7 @@ CMenuField::CMenuField() : CMenuEditable(), szBuffer()
 
 void CMenuField::Init()
 {
+	Clear();
 	iMaxLength++;
 	if( iMaxLength <= 1 || iMaxLength >= UI_MAX_FIELD_LINE )
 		iMaxLength = UI_MAX_FIELD_LINE - 1;
@@ -185,7 +186,8 @@ const char *CMenuField::Key( int key, int down )
 			int pos = EngFuncs::UtfMoveLeft( szBuffer, iCursor );
 			memmove( szBuffer + pos, szBuffer + iCursor, len - iCursor + 1 );
 			iCursor = pos;
-			if( iScroll ) iScroll--;
+			if( iScroll )
+				iScroll--;
 		}
 	}
 	if( key == K_DEL )
@@ -215,11 +217,11 @@ const char *CMenuField::Key( int key, int down )
 			}
 			else if( eTextAlignment & QM_RIGHT )
 			{
-				x = m_scPos.x + (m_scSize.w - (ColorStrlen( text ) * m_scChSize.w ));
+				x = m_scPos.x + (m_scSize.w - UI::Font::GetTextWide( font, text, m_scChSize ) );
 			}
 			else
 			{
-				x = m_scPos.x + ((m_scSize.w - (ColorStrlen( text ) * m_scChSize.w )) / 2 );
+				x = m_scPos.x + (m_scSize.w - UI::Font::GetTextWide( font, text, m_scChSize )) / 2;
 			}
 			charpos = (uiStatic.cursorX - x) / m_scChSize.w;
 			text[charpos] = 0;
@@ -295,6 +297,10 @@ void CMenuField::Char( int key )
 		if( key < '0' || key > '9' )
 			return;
 	}
+
+	// non-printable
+	if( key <= 32 )
+		return;
 
 	if( eLetterCase == QM_LOWERCASE )
 		key = tolower( key );
