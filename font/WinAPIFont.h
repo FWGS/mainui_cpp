@@ -16,8 +16,8 @@ GNU General Public License for more details.
 #ifndef WINAPIFONT_H
 #define WINAPIFONT_H
 
-// #define UNICODE
 #define WIN32_LEAN_AND_MEAN
+#define UNICODE // use unicode fonts
 #include <windows.h>
 #undef GetCharABCWidths
 

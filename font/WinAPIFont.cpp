@@ -63,13 +63,13 @@ bool CWinAPIFont::Create( const char *name, int tall, int weight, int blur, floa
 	// create device context
 	m_hDC = ::CreateCompatibleDC( NULL );
 
-	int charset = ANSI_CHARSET;
+	int charset = RUSSIAN_CHARSET;
 
 	// check exists or not
 	LOGFONT font;
 	font.lfCharSet = RUSSIAN_CHARSET; //!!!
 	font.lfPitchAndFamily = 0;
-	strcpy( font.lfFaceName, m_szName );
+	mbstowcs( font.lfFaceName, m_szName, sizeof( font.lfFaceName ) );
 	::EnumFontFamiliesEx( m_hDC, &font, &FontEnumProc, (LPARAM)this, 0 );
 	if( !m_bFound )
 	{
@@ -82,7 +82,7 @@ bool CWinAPIFont::Create( const char *name, int tall, int weight, int blur, floa
 		m_iFlags & FONT_UNDERLINE,
 		m_iFlags & FONT_STRIKEOUT,
 		charset, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
-		ANTIALIASED_QUALITY, DEFAULT_PITCH | FF_DONTCARE, name );
+		PROOF_QUALITY, DEFAULT_PITCH | FF_DONTCARE, font.lfFaceName );
 
 	if( !m_hFont )
 	{

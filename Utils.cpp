@@ -446,6 +446,7 @@ Convert utf char to current font's single-byte encoding
 */
 int Con_UtfProcessChar( int in )
 {
+#ifndef XASH_DISABLE_FWGS_EXTENSIONS
 	static int m = -1, k = 0; //multibyte state
 	static int uc = 0; //unicode char
 
@@ -517,6 +518,14 @@ int Con_UtfProcessChar( int in )
 		// return '?';
 	}
 	return 0;
+#else
+	// remap in unicode
+	if( in >= 0xC0 && in <= 0xFF )
+	{
+		return in - 0xC0 + 0x410;
+	}
+	return in;
+#endif
 }
 
 /*
@@ -556,6 +565,7 @@ int Con_UtfMoveRight( char *str, int pos, int length )
 			return i+1;
 	}
 	Con_UtfProcessChar( 0 );
-	return pos+1;
+
+	return pos + 1;
 }
 

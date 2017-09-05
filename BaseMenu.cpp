@@ -1348,7 +1348,6 @@ void UI_Init( void )
 	EngFuncs::Cmd_AddCommand( "menu_resetping", UI_MenuResetPing_f );
 	EngFuncs::Cmd_AddCommand( "menu_showmessagebox", UI_ShowMessageBox );
 	EngFuncs::Cmd_AddCommand( "menu_connectionprogress", UI_ConnectionProgress_f );
-
 	EngFuncs::CreateMapsList( TRUE );
 
 	uiStatic.initialized = true;
