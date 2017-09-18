@@ -86,6 +86,7 @@ set( MAINUI_FONT_RENDER_SOURCES
 	font/BitmapFont.cpp
 	font/FontManager.cpp
 	font/FreeTypeFont.cpp
+	font/StbFont.cpp
 	font/BaseFontBackend.cpp
 	)
 

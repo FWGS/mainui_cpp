@@ -104,9 +104,9 @@ void IBaseFont::UploadGlyphsForRanges(IBaseFont::charRange_t *range, int rangeSi
 			if( xstart + drawSize.w > MAX_PAGE_SIZE )
 			{
 				xstart = 0;
-				ystart -= height;
+				ystart -= height + 1; // HACKHACK: Add more space between rows, this removes ugly 1 height pixel rubbish
 				// No free space now
-				if( ystart - height <= 0 )
+				if( ystart - height - 1 <= 0 )
 				{
 					GetTextureName( name, sizeof( name ), m_iPages );
 					HIMAGE hImage = EngFuncs::PIC_Load( name, bmp, bmpSize, 0 );
@@ -130,7 +130,7 @@ void IBaseFont::UploadGlyphsForRanges(IBaseFont::charRange_t *range, int rangeSi
 			// set rgbdata rect
 			wrect_t rect;
 			rect.top    = MAX_PAGE_SIZE - ystart;
-			rect.bottom = MAX_PAGE_SIZE - ystart + height - 1;
+			rect.bottom = MAX_PAGE_SIZE - ystart + height;
 			rect.left   = xstart;
 			rect.right  = xstart + drawSize.w;
 
@@ -277,7 +277,7 @@ void IBaseFont::GetBlurValueForPixel(byte *src, Point srcPt, Size srcSz, byte *d
 	}
 
 	// all the values are the same for fonts, just use the calculated alpha
-	if( additive )
+	if( !additive )
 	{
 		dest[0] = dest[1] = dest[2] = 255;
 		dest[3] = min( (int)accum, 255);
