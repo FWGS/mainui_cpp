@@ -402,12 +402,13 @@ void UI_DrawString( HFont font, int x, int y, int w, int h, const char *string, 
 				continue;
 			if( shadow )
 			{
-			#ifdef MAINUI_USE_CUSTOM_FONT_RENDER
+#ifdef MAINUI_USE_CUSTOM_FONT_RENDER
 				g_FontMgr.DrawCharacter( font, ch, Point( xx + ofsX, yy + ofsY ), Size( charW, charH ), shadowModulate );
-			#else
+#else
 				EngFuncs::DrawCharacter( xx + ofsX, yy + ofsY, charW, charH, ch, shadowModulate, uiStatic.hFont );
-			#endif
+#endif
 			}
+
 #ifdef MAINUI_USE_CUSTOM_FONT_RENDER
 			xx += g_FontMgr.DrawCharacter( font, ch, Point( xx, yy ), Size( charW, charH ), modulate );
 #else

@@ -9,10 +9,6 @@
 #include "StbFont.h"
 #include "Utils.h"
 
-/* round a 26.6 pixel coordinate to the nearest larger integer */
-#define PIXEL(x) ((((x)+63) & -64)>>6)
-
-
 bool ABCCacheLessFunc( const abc_t &a, const abc_t &b )
 {
 	return a.ch < b.ch;
@@ -30,15 +26,76 @@ CStbFont::~CStbFont()
 
 bool CStbFont::FindFontDataFile(const char *name, int tall, int weight, int flags, char *dataFile, int dataFileChars)
 {
-#if 0
-	strncpy( dataFile, "/usr/share/fonts/truetype/msttcorefonts/Trebuchet_MS.ttf", dataFileChars );
-	return true;
-#else
+#ifdef __ANDROID__
+	const char *fontFileName, *fontFileNamePost = NULL;
+
 	// Silly code to load fonts on Android.
 	// TODO: Find a way to find fonts on Android
-	snprintf( dataFile, dataFileChars, "/system/fonts/%s.ttf", name );
+	if( !strcmp( name, "Roboto" ) || !strcmp( name, "RobotoCondensed" ) )
+	{
+		fontFileName = name;
+		if( weight > 500 )
+		{
+			if( flags & FONT_ITALIC )
+				fontFileNamePost = "BoldItalic";
+			else
+				fontFileNamePost = "Bold";
+		}
+		else if( weight < 400 )
+		{
+			if( flags & FONT_ITALIC )
+				fontFileNamePost = "LightItalic";
+			else
+				fontFileNamePost = "Light";
+		}
+		else
+		{
+			if( flags & FONT_ITALIC )
+				fontFileNamePost = "Italic";
+			else
+				fontFileNamePost = "Regular";
+		}
+	}
+	else // DroidSans
+	{
+		fontFileName = "DroidSans";
+		if( weight > 500 )
+			fontFileNamePost = "Bold";
+	}
+
+	if( fontFileNamePost )
+		snprintf( dataFile, dataFileChars, "/system/fonts/%s-%s.ttf", fontFileName, fontFileNamePost );
+	else
+		snprintf( dataFile, dataFileChars, "/system/fonts/%s.ttf", fontFileName );
+
+	if( access( dataFile, R_OK ) != 0 )
+	{
+		// fallback to droid sans, if requested font is not droid sans
+		if( strcmp( fontFileName, "DroidSans" ) )
+		{
+			fontFileName = "DroidSans";
+			if( weight > 500 )
+				fontFileNamePost = "Bold";
+
+			if( fontFileNamePost )
+				snprintf( dataFile, dataFileChars, "/system/fonts/%s-%s.ttf", fontFileName, fontFileNamePost );
+			else
+				snprintf( dataFile, dataFileChars, "/system/fonts/%s.ttf", fontFileName );
+
+			if( access( dataFile, R_OK ) != 0 )
+			{
+				return false; // can't even fallback to droid sans
+			}
+		}
+		else
+		{
+			return false; // can't even fallback to droid sans
+		}
+	}
 
 	return true;
+#else
+#error "Can't find fonts!"
 #endif
 }
 
