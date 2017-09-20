@@ -8,27 +8,27 @@ include $(CLEAR_VARS)
 include $(XASH3D_CONFIG)
 
 ifeq ($(TARGET_ARCH_ABI),armeabi-v7a-hard)
-LOCAL_MODULE_FILENAME = libmenu_hardfp
+	LOCAL_MODULE_FILENAME = libmenu_hardfp
 endif
 
-
-
 LOCAL_MODULE := menu
-LOCAL_CPPFLAGS := -std=gnu++11 -DMY_COMPILER_SUCKS
+LOCAL_CPPFLAGS := -std=gnu++11 -DMAINUI_USE_STB -DMAINUI_USE_CUSTOM_FONT_RENDER
 
-APP_PLATFORM := android-9
+LOCAL_C_INCLUDES := \
+	$(SDL_PATH)/include				\
+	$(LOCAL_PATH)/. 				\
+	$(LOCAL_PATH)/../common 			\
+	$(LOCAL_PATH)/../pm_shared 			\
+	$(LOCAL_PATH)/../engine 			\
+	$(LOCAL_PATH)/../engine/common 			\
+	$(LOCAL_PATH)/../utils/vgui/include 		\
+	$(LOCAL_PATH)/menus 				\
+	$(LOCAL_PATH)/controls 				\
+	$(LOCAL_PATH)/font 				\
+	$(LOCAL_PATH)/utl 				\
 
-LOCAL_C_INCLUDES := $(SDL_PATH)/include \
-		    $(LOCAL_PATH)/.			    \
-		    $(LOCAL_PATH)/../common \
-	            $(LOCAL_PATH)/../pm_shared \
-	            $(LOCAL_PATH)/../engine \
-		    $(LOCAL_PATH)/../engine/common \
-		    $(LOCAL_PATH)/../utils/vgui/include \
-		    $(LOCAL_PATH)/menus \
-		    $(LOCAL_PATH)/controls
-
-LOCAL_SRC_FILES := 	controls/Framework.cpp                          \
+LOCAL_SRC_FILES := \
+	controls/Framework.cpp                          \
 	controls/BaseItem.cpp                           \
 	controls/Action.cpp                             \
 	controls/Bitmap.cpp                             \
@@ -72,6 +72,9 @@ LOCAL_SRC_FILES := 	controls/Framework.cpp                          \
 	menus/VideoModes.cpp                            \
 	menus/VideoOptions.cpp                          \
 	menus/dynamic/ScriptMenu.cpp                    \
+	font/FontManager.cpp				\
+	font/BaseFontBackend.cpp			\
+	font/StbFont.cpp				\
 	EventSystem.cpp                                 \
 	BaseMenu.cpp                                    \
 	Btns.cpp                                        \
@@ -79,6 +82,7 @@ LOCAL_SRC_FILES := 	controls/Framework.cpp                          \
 	Utils.cpp                                       \
 	Scissor.cpp                                     \
 	udll_int.cpp                                    \
-	CFGScript.cpp
+	CFGScript.cpp					\
+	EngineCallback.cpp
 
 include $(BUILD_SHARED_LIBRARY)

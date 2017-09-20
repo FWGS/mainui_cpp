@@ -23,7 +23,7 @@
 #ifdef __ANDROID__ // don't rape poor Android devices' CPU & GPU
 #define SCALE_FONTS
 #endif
-// #define SCALE_FONTS 1
+// #define SCALE_FONTS
 
 CFontManager g_FontMgr;
 
@@ -266,7 +266,7 @@ int CFontManager::GetTextWideScaled(HFont font, const char *text, const int heig
 	if( pFont )
 	{
 		return GetTextWide( font, text, size )
-#if SCALE_FONTS
+#ifdef SCALE_FONTS
 			* ((float)height / (float)pFont->GetTall())
 #endif
 		;
@@ -299,7 +299,7 @@ int CFontManager::DrawCharacter(HFont fontHandle, int ch, Point pt, Size sz, con
 	Size charSize;
 	int a, b, c, width;
 
-#if SCALE_FONTS
+#ifdef SCALE_FONTS
 	float factor = (float)sz.h / (float)font->GetTall();
 #endif
 
@@ -309,7 +309,7 @@ int CFontManager::DrawCharacter(HFont fontHandle, int ch, Point pt, Size sz, con
 	// skip whitespace
 	if( ch == ' ' )
 	{
-#if SCALE_FONTS
+#ifdef SCALE_FONTS
 		if( sz.h > 0 )
 		{
 			return width * factor + 0.5f;
@@ -332,7 +332,7 @@ int CFontManager::DrawCharacter(HFont fontHandle, int ch, Point pt, Size sz, con
 
 		UnpackRGBA(r, g, b, alpha, color );
 
-#if SCALE_FONTS	// Scale font
+#ifdef SCALE_FONTS	// Scale font
 		if( sz.h > 0 )
 		{
 			charSize.w = (glyph.rect.right - glyph.rect.left) * factor + 0.5f;
@@ -354,7 +354,7 @@ int CFontManager::DrawCharacter(HFont fontHandle, int ch, Point pt, Size sz, con
 			EngFuncs::PIC_DrawTrans( pt, charSize, &glyph.rect );
 	}
 
-#if SCALE_FONTS
+#ifdef SCALE_FONTS
 	if( sz.h > 0 )
 	{
 		return width * factor + 0.5f;

@@ -95,6 +95,9 @@ bool CStbFont::FindFontDataFile(const char *name, int tall, int weight, int flag
 
 	return true;
 #else
+
+	// strcpy( dataFile, "/usr/share/fonts/truetype/droid/DroidSans.ttf");
+	// return true;
 #error "Can't find fonts!"
 #endif
 }
@@ -263,10 +266,18 @@ void CStbFont::GetCharABCWidths(int ch, int &a, int &b, int &c)
 
 	// not found in cache
 
-	stbtt_GetCodepointHMetrics( &m_fontInfo, ch, &find.b, &find.a );
-	find.c = 0;
-	find.a *= scale;
-	find.b *= scale;
+	int glyphId = stbtt_FindGlyphIndex( &m_fontInfo, ch );
+
+	int x0, x1;
+	int width, horiBearingX, horiAdvance;
+
+	stbtt_GetGlyphBox( &m_fontInfo, glyphId, &x0, NULL, &x1, NULL );
+	stbtt_GetCodepointHMetrics( &m_fontInfo, ch, &horiAdvance, &horiBearingX );
+	width = x1 - x0;
+
+	find.a = horiBearingX * scale - m_iBlur - m_iOutlineSize;
+	find.b = width * scale + ( m_iBlur + m_iOutlineSize ) * 2;
+	find.c = (horiAdvance - horiBearingX - width) * scale - m_iBlur - m_iOutlineSize;
 
 	a = find.a;
 	b = find.b;
