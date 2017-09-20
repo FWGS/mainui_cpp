@@ -112,12 +112,14 @@ void IBaseFont::UploadGlyphsForRanges(IBaseFont::charRange_t *range, int rangeSi
 					HIMAGE hImage = EngFuncs::PIC_Load( name, bmp, bmpSize, 0 );
 					Con_DPrintf( "Uploaded %s to %i\n", name, hImage );
 
-					for( int i = m_glyphs.FirstInorder();
-						i != m_glyphs.LastInorder();
+					for( int i = m_glyphs.FirstInorder(); ;
 						i = m_glyphs.NextInorder( i ) )
 					{
-						if( !m_glyphs[i].texture )
-							m_glyphs[i].texture = hImage;
+						glyph_t &glyph = m_glyphs[i];
+						if( !glyph.texture )
+							glyph.texture = hImage;
+						if( i == m_glyphs.LastInorder() )
+							break;
 					}
 
 					// m_Pages.AddToTail( hImage );
@@ -168,10 +170,12 @@ void IBaseFont::UploadGlyphsForRanges(IBaseFont::charRange_t *range, int rangeSi
 	delete[] bmp;
 	delete[] temp;
 
-	for( int i = m_glyphs.FirstInorder(); i != m_glyphs.LastInorder(); i = m_glyphs.NextInorder( i ) )
+	for( int i = m_glyphs.FirstInorder();; i = m_glyphs.NextInorder( i ) )
 	{
 		if( !m_glyphs[i].texture )
 			m_glyphs[i].texture = hImage;
+		if( i == m_glyphs.LastInorder() )
+			break;
 	}
 	// m_Pages.AddToTail(hImage);
 	m_iPages++;
