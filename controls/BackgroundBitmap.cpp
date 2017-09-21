@@ -28,7 +28,7 @@ CMenuBackgroundBitmap::bimage_t CMenuBackgroundBitmap::s_Backgroudns[MAX_BACKGRO
 CMenuBackgroundBitmap::CMenuBackgroundBitmap() : CMenuBitmap()
 {
 	szPic = 0;
-	iFlags = QMF_INACTIVE;
+	iFlags = QMF_INACTIVE|QMF_DISABLESCAILING;
 	bForceWON = false;
 	bForceColor = false;
 	iColor = 0xFF505050;
@@ -39,10 +39,18 @@ void CMenuBackgroundBitmap::VidInit()
 	if( m_pParent )
 	{
 		pos.x = pos.y = 0;
-		size = m_pParent->size; // fill parent
-		CalcPosition();
-		CalcSizes();
+		// fill parent
+		if( m_pParent->iFlags & QMF_DISABLESCAILING )
+		{
+			size = m_pParent->size;
+		}
+		else
+		{
+			size = m_pParent->size.Scale();
+		}
 	}
+
+	CMenuBaseItem::VidInit();
 }
 
 void CMenuBackgroundBitmap::DrawInGameBackground()

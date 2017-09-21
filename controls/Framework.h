@@ -11,7 +11,6 @@ public:
 
 	void Show();
 	void Init() FINAL;
-	void VidInit() FINAL;
 	void Hide();
 	bool IsRoot() { return true; }
 

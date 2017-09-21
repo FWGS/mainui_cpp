@@ -3,7 +3,7 @@
 
 CMenuFramework::CMenuFramework( const char *name ) : CMenuBaseWindow( name )
 {
-	SetCoord( 0, 0 );
+	iFlags = QMF_DISABLESCAILING;
 }
 
 void CMenuFramework::Show()
@@ -41,16 +41,8 @@ void CMenuFramework::Init()
 {
 	CMenuBaseWindow::Init();
 	pos.x = pos.y = 0;
-	size.w = 1024;
-	size.h = 768;
-}
-
-void CMenuFramework::VidInit()
-{
-	CMenuBaseWindow::VidInit();
-	m_scPos.x = m_scPos.y = 0;
-	m_scSize.w = ScreenWidth;
-	m_scSize.h = ScreenHeight;
+	size.w = ScreenWidth;
+	size.h = ScreenHeight;
 }
 
 bool CMenuFramework::DrawAnimation(EAnimation anim)
