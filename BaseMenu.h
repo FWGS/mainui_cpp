@@ -101,6 +101,10 @@ typedef struct
 	HFont hSmallFont;
 	HFont hBigFont;
 	HFont hConsoleFont;
+#ifdef MAINUI_RENDER_PICBUTTON_TEXT
+	HFont hLightBlur;
+	HFont hHeavyBlur;
+#endif
 	bool	m_fDemosPlayed;
 	int		m_iOldMenuDepth;
 	bool	m_fNoOldBackground;
@@ -304,6 +308,9 @@ bool UI_AdvUserOptions_IsAvailable( void );
 void UI_AdvUserOptions_Menu( void );
 bool UI_AdvServerOptions_IsAvailable( void );
 void UI_AdvServerOptions_Menu( void );
+
+// time
+double Sys_DoubleTime( void );
 
 //
 //-----------------------------------------------------

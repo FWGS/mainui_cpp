@@ -332,10 +332,10 @@ bool CMenuBackgroundBitmap::CheckBackgroundSplash( bool gamedirOnly )
 void CMenuBackgroundBitmap::LoadBackground()
 {
 	// try to load backgrounds from mod
-	if( CMenuBackgroundBitmap::LoadBackgroundImageNew(  true ) ) return; // at first check new gameui backgrounds
-	if( CMenuBackgroundBitmap::CheckBackgroundSplash (  true ) ) return; // then check won-style
+	if( LoadBackgroundImageNew(  true ) ) return; // at first check new gameui backgrounds
+	if( CheckBackgroundSplash (  true ) ) return; // then check won-style
 
 	// try from base directory
-	if( CMenuBackgroundBitmap::LoadBackgroundImageNew( false ) ) return; // gameui bgs are allowed to be inherited
-	if( CMenuBackgroundBitmap::CheckBackgroundSplash ( false ) ) return;
+	if( LoadBackgroundImageNew( false ) ) return; // gameui bgs are allowed to be inherited
+	if( CheckBackgroundSplash ( false ) ) return;
 }

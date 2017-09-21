@@ -70,6 +70,20 @@ void CFontManager::VidInit( void )
 		uiStatic.hBigFont     = CFontBuilder( DEFAULT_MENUFONT, UI_BIG_CHAR_HEIGHT * scale, 500 )
 			.SetHandleNum( QM_BIGFONT )
 			.Create();
+
+#ifdef MAINUI_RENDER_PICBUTTON_TEXT
+		uiStatic.hLightBlur = CFontBuilder( DEFAULT_MENUFONT, UI_MED_CHAR_HEIGHT * scale, 1000 )
+			.SetHandleNum( QM_LIGHTBLUR )
+			.SetBlurParams( 2, 1.0f )
+			.SetFlags( FONT_ADDITIVE )
+			.Create();
+
+		uiStatic.hHeavyBlur = CFontBuilder( DEFAULT_MENUFONT, UI_MED_CHAR_HEIGHT * scale, 1000 )
+			.SetHandleNum( QM_HEAVYBLUR )
+			.SetBlurParams( 8, 1.75f )
+			.SetFlags( FONT_ADDITIVE )
+			.Create();
+#endif
 		prevScale = scale;
 	}
 
@@ -284,6 +298,8 @@ void CFontManager::UploadTextureForFont(IBaseFont *font)
 	{
 	{ 33, 126 },			// ascii printable range
 	{ 0x0410, 0x044F },		// cyrillic range
+	{ 0x0401, 0x0401 },     // cyrillic big yo
+	{ 0x0451, 0x0451 },     // cyrillic small yo
 	};
 
 	font->UploadGlyphsForRanges( range, sizeof( range ) / sizeof( IBaseFont::charRange_t ) );
@@ -392,6 +408,8 @@ HFont CFontBuilder::Create()
 		font = new CWinAPIFont();
 	#endif
 
+	double starttime = Sys_DoubleTime();
+
 	if( !font->Create( m_szName, m_iTall, m_iWeight, m_iBlur, m_fBrighten, m_iOutlineSize, m_iScanlineOffset, m_fScanlineScale, m_iFlags ) )
 	{
 		delete font;
@@ -399,6 +417,10 @@ HFont CFontBuilder::Create()
 	}
 
 	g_FontMgr.UploadTextureForFont( font );
+
+	double endtime = Sys_DoubleTime();
+
+	Con_DPrintf( "Rendering %s(%i, %i) took %f seconds\n", m_szName, m_iTall, m_iWeight, endtime - starttime );
 
 	if( m_hForceHandle != -1 && g_FontMgr.m_Fonts.Count() != m_hForceHandle )
 	{

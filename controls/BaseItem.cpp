@@ -71,8 +71,10 @@ void CMenuBaseItem::SetCharSize(EFontSizes fs)
 	switch( fs )
 	{
 	case QM_DEFAULTFONT:
+#ifdef MAINUI_RENDER_PICBUTTON_TEXT
 	case QM_LIGHTBLUR:
 	case QM_HEAVYBLUR:
+#endif
 		charSize.w = UI_MED_CHAR_WIDTH;
 		charSize.h = UI_MED_CHAR_HEIGHT;
 		break;

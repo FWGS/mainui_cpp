@@ -67,7 +67,6 @@ private:
 	int button_id;
 	int iFocusStartTime;
 	int iOldState;
-	float flFill;
 
 	Quad TitleLerpQuads[2];
 	HIMAGE TransPic;

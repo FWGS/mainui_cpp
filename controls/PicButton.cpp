@@ -20,6 +20,7 @@ GNU General Public License for more details.
 #include "PicButton.h"
 #include "Utils.h"
 #include "Scissor.h"
+#include <stdlib.h>
 
 CMenuPicButton::CMenuPicButton() : CMenuBaseItem()
 {
@@ -34,9 +35,14 @@ CMenuPicButton::CMenuPicButton() : CMenuBaseItem()
 	hPic = 0;
 	button_id = 0;
 	iOldState = BUTTON_NOFOCUS;
-	flFill = 0.0f;
 	m_iLastFocusTime = -512;
 	bPulse = false;
+
+	SetSize( UI_BUTTONS_WIDTH, UI_BUTTONS_HEIGHT );
+
+#ifdef MAINUI_RENDER_PICBUTTON_TEXT
+	SetCharSize( QM_LIGHTBLUR );
+#endif
 
 	TransPic = 0;
 	memset( TitleLerpQuads, 0, sizeof( TitleLerpQuads ));
@@ -49,20 +55,7 @@ CMenuPicButton::Init
 */
 void CMenuPicButton::VidInit( void )
 {
-	if( size.w < 1 )
-	{
-		//size.w = g_FontMgr.GetTextWideScaled( font, szName, charSize.h );
-		size.w = UI_BUTTONS_WIDTH;
-	}
-
-	if( size.h < 1 )
-	{
-		// size.h = charSize.h * 1.5;
-		size.h = UI_BUTTONS_HEIGHT;
-	}
-
-	CalcPosition();
-	CalcSizes();
+	CMenuBaseItem::VidInit();
 }
 
 /*
@@ -161,16 +154,6 @@ void CMenuPicButton::Draw( )
 	if( iOldState == BUTTON_NOFOCUS && state != BUTTON_NOFOCUS )
 		iFocusStartTime = uiStatic.realTime;
 
-	if( state != BUTTON_NOFOCUS )
-	{
-		flFill = (uiStatic.realTime - iFocusStartTime) / 200.0f;
-	}
-	else
-	{
-		flFill = (uiStatic.realTime - m_iLastFocusTime ) / 200.0f;
-	}
-	flFill = bound( 0, flFill, 1 );
-
 	if( szStatusText && iFlags & QMF_NOTIFY )
 	{
 		Point coord;
@@ -185,13 +168,13 @@ void CMenuPicButton::Draw( )
 		EngFuncs::DrawConsoleString( coord, szStatusText );
 	}
 
+	int a = (512 - (uiStatic.realTime - m_iLastFocusTime)) >> 1;
+
 	if( hPic )
 	{
-		int r, g, b, a;
+		int r, g, b;
 
 		UnpackRGB( r, g, b, iFlags & QMF_GRAYED ? uiColorDkGrey : uiColorWhite );
-
-		a = (512 - (uiStatic.realTime - m_iLastFocusTime)) >> 1;
 
 		wrect_t rects[] =
 		{
@@ -240,27 +223,54 @@ void CMenuPicButton::Draw( )
 
 		if( iFlags & QMF_GRAYED )
 		{
+#ifdef MAINUI_RENDER_PICBUTTON_TEXT
+			if( UI_CursorInRect( m_scPos, m_scSize ) )
+				a = 255;
+
+			if( a > 0 )
+			{
+				UI_DrawString( uiStatic.hHeavyBlur, m_scPos, m_scSize, szName,
+					InterpColor( uiColorBlack, uiColorDkGrey, a / 255.0f ), false, m_scChSize, eTextAlignment, shadow );
+			}
+#endif
 			UI_DrawString( font, m_scPos, m_scSize, szName, uiColorDkGrey, true, m_scChSize, eTextAlignment, shadow );
 			return; // grayed
 		}
 
 		if(this != m_pParent->ItemAtCursor())
 		{
-			UI_DrawString( font, m_scPos, m_scSize, szName, InterpColor( iFocusColor, iColor, flFill ), false, m_scChSize, eTextAlignment, shadow );
+#ifdef MAINUI_RENDER_PICBUTTON_TEXT
+			if( a > 0 )
+			{
+				UI_DrawString( uiStatic.hHeavyBlur, m_scPos, m_scSize, szName,
+					InterpColor( uiColorBlack, iColor, a / 255.0f ), false, m_scChSize, eTextAlignment, shadow );
+			}
+#endif
+			UI_DrawString( font, m_scPos, m_scSize, szName, iColor, false, m_scChSize, eTextAlignment, shadow );
 			return; // no focus
 		}
 
 		if( eFocusAnimation == QM_HIGHLIGHTIFFOCUS )
 		{
+#ifdef MAINUI_RENDER_PICBUTTON_TEXT
+			UI_DrawString( uiStatic.hHeavyBlur, m_scPos, m_scSize, szName, iColor, false, m_scChSize, eTextAlignment, shadow );
+			UI_DrawString( font, m_scPos, m_scSize, szName, iColor, false, m_scChSize, eTextAlignment, shadow );
+#else
 			UI_DrawString( font, m_scPos, m_scSize, szName, iFocusColor, false, m_scChSize, eTextAlignment, shadow );
+#endif
 		}
 		else if( eFocusAnimation == QM_PULSEIFFOCUS )
 		{
-			int	color;
+			float pulsar = 0.5 + 0.5 * sin( (float)uiStatic.realTime / UI_PULSE_DIVISOR );
+#ifdef MAINUI_RENDER_PICBUTTON_TEXT
 
-			color = PackAlpha( iColor, 255 * (0.5 + 0.5 * sin( (float)uiStatic.realTime / UI_PULSE_DIVISOR )));
-
-			UI_DrawString( font, m_scPos, m_scSize, szName, color, false, m_scChSize, eTextAlignment, shadow );
+			UI_DrawString( uiStatic.hHeavyBlur, m_scPos, m_scSize, szName,
+				InterpColor( uiColorBlack, iColor, pulsar ), false, m_scChSize, eTextAlignment, shadow );
+			UI_DrawString( font, m_scPos, m_scSize, szName, iColor, false, m_scChSize, eTextAlignment, shadow );
+#else
+			UI_DrawString( font, m_scPos, m_scSize, szName,
+				InterpColor( iColor, iFocusColor, pulsar ), false, m_scChSize, eTextAlignment, shadow );
+#endif
 		}
 	}
 
@@ -269,6 +279,7 @@ void CMenuPicButton::Draw( )
 
 void CMenuPicButton::SetPicture( int ID )
 {
+#ifndef MAINUI_RENDER_PICBUTTON_TEXT
 	if( ID < 0 || ID > PC_BUTTONCOUNT )
 		return; // bad id
 
@@ -284,10 +295,12 @@ void CMenuPicButton::SetPicture( int ID )
 
 	if( hPic ) // text buttons not use it
 		iFlags |= QMF_ACT_ONRELEASE;
+#endif
 }
 
 void CMenuPicButton::SetPicture(const char *filename)
 {
+#ifndef MAINUI_RENDER_PICBUTTON_TEXT
 	size.w = UI_BUTTONS_WIDTH;
 	size.h = UI_BUTTONS_HEIGHT;
 
@@ -295,7 +308,7 @@ void CMenuPicButton::SetPicture(const char *filename)
 
 	if( hPic ) // text buttons not use it
 		iFlags |= QMF_ACT_ONRELEASE;
-
+#endif
 }
 
 // =========================== Animations ===========================
