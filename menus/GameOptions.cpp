@@ -179,14 +179,14 @@ void CMenuGameOptions::_VidInit()
 {
 	done.SetCoord( 72, 230 );
 	cancel.SetCoord( 72, 280 );
-	maxFPS.SetRect( 280, 270, 200, 32 );
-	maxFPSmessage.SetCoord( 280, 230 );
-	hand.SetCoord( 280, 330 );
-	allowDownload.SetCoord( 280, 390 );
-	alwaysRun.SetCoord( 280, 450 );
-	maxPacket.SetRect( 280, 560, 200, 32 );
-	maxPacketmessage1.SetCoord( 280, 520 );
-	maxPacketmessage2.SetCoord( 280, 600 );
+	maxFPS.SetRect( 360, 270, 200, 32 );
+	maxFPSmessage.SetCoord( 360, 230 );
+	hand.SetCoord( 360, 330 );
+	allowDownload.SetCoord( 360, 390 );
+	alwaysRun.SetCoord( 360, 450 );
+	maxPacket.SetRect( 360, 560, 200, 32 );
+	maxPacketmessage1.SetCoord( 360, 520 );
+	maxPacketmessage2.SetCoord( 360, 600 );
 }
 
 /*
