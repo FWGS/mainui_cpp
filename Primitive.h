@@ -69,7 +69,9 @@ enum EFontSizes
 {
 	QM_DEFAULTFONT = 0, // medium size font
 	QM_SMALLFONT,       // small
-	QM_BIGFONT          // big
+	QM_BIGFONT,         // big
+	QM_LIGHTBLUR,
+	QM_HEAVYBLUR
 };
 
 enum EFocusAnimation

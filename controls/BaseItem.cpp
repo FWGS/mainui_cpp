@@ -71,6 +71,8 @@ void CMenuBaseItem::SetCharSize(EFontSizes fs)
 	switch( fs )
 	{
 	case QM_DEFAULTFONT:
+	case QM_LIGHTBLUR:
+	case QM_HEAVYBLUR:
 		charSize.w = UI_MED_CHAR_WIDTH;
 		charSize.h = UI_MED_CHAR_HEIGHT;
 		break;
@@ -129,7 +131,10 @@ bool CMenuBaseItem::IsCurrentSelected()
 
 void CMenuBaseItem::CalcPosition()
 {
-	m_scPos = pos.Scale();
+	if( iFlags & QMF_DISABLESCAILING )
+		m_scPos = pos;
+	else
+		m_scPos = pos.Scale();
 
 	if( !IsAbsolutePositioned() && m_pParent )
 		m_scPos += m_pParent->m_scPos;
@@ -137,8 +142,16 @@ void CMenuBaseItem::CalcPosition()
 
 void CMenuBaseItem::CalcSizes()
 {
-	m_scSize = size.Scale();
-	m_scChSize = charSize.Scale();
+	if( iFlags & QMF_DISABLESCAILING )
+	{
+		m_scSize = size;
+		m_scChSize = charSize;
+	}
+	else
+	{
+		m_scSize = size.Scale();
+		m_scChSize = charSize.Scale();
+	}
 }
 
 // we need to remap position, because resource files are keep screen at 640x480, but we in 1024x768
