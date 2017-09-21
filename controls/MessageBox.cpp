@@ -15,8 +15,10 @@ void CMenuMessageBox::_Init()
 	background.bForceColor = true;
 	background.iColor = uiPromptBgColor;
 
+	dlgMessage.eTextAlignment = QM_CENTER; // center
 	dlgMessage.iFlags = QMF_INACTIVE|QMF_DROPSHADOW;
-	dlgMessage.SetCoord( 128, 44 );
+	dlgMessage.SetCoord( 0, 0 );
+	dlgMessage.size = size;
 
 	AddItem( background );
 	AddItem( dlgMessage );
