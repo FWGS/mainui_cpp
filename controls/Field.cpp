@@ -40,7 +40,7 @@ CMenuField::CMenuField() : CMenuEditable(), szBuffer()
 
 void CMenuField::Init()
 {
-	Clear();
+	//Clear();
 	iMaxLength++;
 	if( iMaxLength <= 1 || iMaxLength >= UI_MAX_FIELD_LINE )
 		iMaxLength = UI_MAX_FIELD_LINE - 1;
@@ -152,7 +152,7 @@ const char *CMenuField::Key( int key, int down )
 	if( key == K_LEFTARROW )
 	{
 		if( iCursor > 0 ) iCursor = EngFuncs::UtfMoveLeft( szBuffer, iCursor );
-		if( iCursor < iScroll ) iScroll--;
+		if( iCursor < iScroll ) iScroll = EngFuncs::UtfMoveLeft( szBuffer, iScroll );
 		return uiSoundNull;
 	}
 
@@ -161,7 +161,7 @@ const char *CMenuField::Key( int key, int down )
 	{
 		if( iCursor < len ) iCursor = EngFuncs::UtfMoveRight( szBuffer, iCursor, len );
 		if( iCursor >= iScroll + iWidthInChars && iCursor <= len )
-			iScroll++;
+			iScroll = EngFuncs::UtfMoveRight( szBuffer, iScroll, len );
 		return uiSoundNull;
 	}
 
@@ -187,7 +187,7 @@ const char *CMenuField::Key( int key, int down )
 			memmove( szBuffer + pos, szBuffer + iCursor, len - iCursor + 1 );
 			iCursor = pos;
 			if( iScroll )
-				iScroll--;
+				iScroll = iScroll = EngFuncs::UtfMoveLeft( szBuffer, iScroll );
 		}
 	}
 	if( key == K_DEL )
@@ -223,13 +223,18 @@ const char *CMenuField::Key( int key, int down )
 			{
 				x = m_scPos.x + (m_scSize.w - UI::Font::GetTextWide( font, text, m_scChSize )) / 2;
 			}
-			charpos = (uiStatic.cursorX - x) / m_scChSize.w;
-			text[charpos] = 0;
-			iCursor = charpos + iScroll + ColorPrexfixCount( text );
+			charpos = UI::Font::CutText(font, szBuffer + iScroll, (uiStatic.cursorX - x));
+			//text[charpos] = 0;
+			iCursor = charpos + iScroll;
+			if( iCursor > 0 )
+			{
+				iCursor = EngFuncs::UtfMoveLeft( szBuffer, iCursor );
+				iCursor = EngFuncs::UtfMoveRight( szBuffer, iCursor, len );
+			}
 			if( charpos == 0 && iScroll )
-				iScroll--;
+				iScroll = EngFuncs::UtfMoveLeft( szBuffer, iScroll );
 			if( charpos == iWidthInChars && iScroll < len - 1 )
-				iScroll++;
+				iScroll = EngFuncs::UtfMoveRight( szBuffer, iScroll, len );
 			if( iScroll > len )
 				iScroll = len;
 			if( iCursor > len )
@@ -299,9 +304,11 @@ void CMenuField::Char( int key )
 	}
 
 	// non-printable
-	if( key <= 32 )
+	if( key < 32 )
 		return;
 
+
+	printf( "%d\n", key );
 	if( eLetterCase == QM_LOWERCASE )
 		key = tolower( key );
 	else if( eLetterCase == QM_UPPERCASE )
@@ -322,7 +329,7 @@ void CMenuField::Char( int key )
 		iCursor++;
 	}
 
-	if( iCursor >= iWidthInChars ) iScroll++;
+	if( iCursor >= iWidthInChars ) iScroll = EngFuncs::UtfMoveRight(szBuffer, iScroll, len);
 	if( iCursor == len + 1 ) szBuffer[iCursor] = 0;
 
 	SetCvarString( szBuffer );
@@ -410,7 +417,7 @@ void CMenuField::Draw( void )
 	// find cursor position
 	x = drawLen - (ColorStrlen( text ) + 1 );
 	if( x < 0 ) x = 0;
-	cursor = ( iCursor - prestep - x ) + 1;
+	cursor = ( iCursor - prestep );
 	if( cursor < 0 ) cursor = 0;
 
 	if( szBackground )
@@ -456,7 +463,8 @@ void CMenuField::Draw( void )
 
 	UI_DrawString( font, newPos, m_scSize, text, iColor, false, m_scChSize, eTextAlignment, shadow );
 
-	int cursorOffset = UI::Font::GetTextWide( font, text, m_scChSize, cursor );
+	int cursorOffset = cursor? UI::Font::GetTextWide( font, text, m_scChSize, cursor ):0;
+
 	// int cursorOffset = 0;
 
 	if(( uiStatic.realTime & 499 ) < 250 )

@@ -232,8 +232,8 @@ void CFontManager::GetTextSize(HFont fontHandle, const char *text, int *wide, in
 				if( x > _wide )
 					_wide = x;
 			}
-			i++;
 		}
+		i++;
 		ch++;
 	}
 	EngFuncs::UtfProcessChar( 0 );
@@ -241,6 +241,65 @@ void CFontManager::GetTextSize(HFont fontHandle, const char *text, int *wide, in
 	if( tall ) *tall = _tall;
 	if( wide ) *wide = _wide;
 }
+
+int CFontManager::CutText(HFont fontHandle, const char *text, int visibleSize )
+{
+	IBaseFont *font = GetIFontFromHandle( fontHandle );
+
+	if( !font || !text || !text[0] )
+
+		return 0;
+
+	int _wide = 0;
+	const char *ch = text;
+	int i = 0, x = 0;
+	if( visibleSize <= 0 )
+		return 0;
+#ifdef SCALE_FONTS
+			visibleSize  = (float)visibleSize / (float)pFont->GetTall()
+#endif
+	EngFuncs::UtfProcessChar( 0 );
+
+	while( *ch && _wide < visibleSize )
+	{
+		// Skip colorcodes
+		if( IsColorString( ch ) )
+		{
+			ch += 2;
+			continue;
+		}
+
+		int uch;
+
+		uch = EngFuncs::UtfProcessChar( (unsigned char)*ch );
+		if( uch )
+		{
+			if( uch == '\n' )
+			{
+				x = 0;
+			}
+			else
+			{
+				int a, b, c;
+				font->GetCharABCWidths( uch, a, b, c );
+				x += a + b + c;
+				if( x > _wide )
+					_wide = x;
+			}
+		}
+		i++;
+		ch++;
+	}
+	EngFuncs::UtfProcessChar( 0 );
+
+	if( _wide < visibleSize )
+		i++;
+	else if(i)
+		i--;
+
+	return i;
+}
+
 
 int CFontManager::GetTextWide(HFont font, const char *text, int size)
 {
@@ -297,9 +356,7 @@ void CFontManager::UploadTextureForFont(IBaseFont *font)
 	IBaseFont::charRange_t range[] =
 	{
 	{ 33, 126 },			// ascii printable range
-	{ 0x0410, 0x044F },		// cyrillic range
-	{ 0x0401, 0x0401 },     // cyrillic big yo
-	{ 0x0451, 0x0451 },     // cyrillic small yo
+	{ 0x0400, 0x045F },		// cyrillic range
 	};
 
 	font->UploadGlyphsForRanges( range, sizeof( range ) / sizeof( IBaseFont::charRange_t ) );

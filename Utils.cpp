@@ -80,6 +80,8 @@ int ColorStrlen( const char *str )
 			len++;
 	}
 
+	EngFuncs::UtfProcessChar( 0 );
+
 	return len;
 }
 
@@ -93,6 +95,8 @@ int ColorPrexfixCount( const char *str )
 	int len = 0;
 	p = str;
 
+	//EngFuncs::UtfProcessChar(0);
+
 	while( *p )
 	{
 		if( IsColorString( p ))
@@ -101,8 +105,12 @@ int ColorPrexfixCount( const char *str )
 			p += 2;
 			continue;
 		}
+		//if(!EngFuncs::UtfProcessChar((unsigned char)*p))
+			//len++;
 		p++;
 	}
+
+	//EngFuncs::UtfProcessChar(0);
 
 	return len;
 }
@@ -421,6 +429,15 @@ int UI::Font::GetTextWide( HFont font, const char *szName, Size charSize, int si
 	if( size > 0 )
 		return size * charSize.w;
 	return strlen( szName ) * charSize.w;
+#endif
+}
+
+int UI::Font::CutText(HFont fontHandle, const char *text, int visibleSize )
+{
+#ifdef MAINUI_USE_CUSTOM_FONT_RENDER
+	return g_FontMgr.CutText( fontHandle, text, visibleSize );
+#else //todo
+	return 0;
 #endif
 }
 

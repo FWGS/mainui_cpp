@@ -53,22 +53,13 @@ GNU General Public License for more details.
 #define CONSTEXPR
 
 #endif
-
-#ifdef max
-#undef max
-#endif
-
-#ifdef min
-#undef min
-#endif
-
 #ifdef bound
 #undef bound
 #endif
 
 #define bound( min, num, max )	((num) >= (min) ? ((num) < (max) ? (num) : (max)) : (min))
-#define min( a, b )	(((a) < (b)) ? (a) : (b))
-#define max( a, b ) (((a) < (b)) ? (b) : (a))
+#define Q_min( a, b )	(((a) < (b)) ? (a) : (b))
+#define Q_max( a, b ) (((a) < (b)) ? (b) : (a))
 
 #ifndef FALSE
 #define FALSE	0

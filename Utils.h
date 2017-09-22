@@ -205,6 +205,7 @@ byte *MakeBMP( unsigned int w, unsigned int h, byte **ptr, int *size, int *texOf
 namespace Font
 {
 int GetTextWide(HFont font, const char *szName, Size charSize , int size = -1);
+int CutText(HFont fontHandle, const char *text, int visibleSize );
 }
 }
 int Con_UtfProcessChar( int in );
