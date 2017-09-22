@@ -1,5 +1,5 @@
 /*
-YesNoMessageBox.h - simple generic message box
+YesNoMessageBox.h - simple generic yes/no message box
 Copyright (C) 2017 a1batross
 
 This program is free software: you can redistribute it and/or modify
