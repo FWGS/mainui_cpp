@@ -307,8 +307,6 @@ void CMenuField::Char( int key )
 	if( key < 32 )
 		return;
 
-
-	printf( "%d\n", key );
 	if( eLetterCase == QM_LOWERCASE )
 		key = tolower( key );
 	else if( eLetterCase == QM_UPPERCASE )

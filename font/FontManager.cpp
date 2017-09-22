@@ -252,7 +252,7 @@ int CFontManager::CutText(HFont fontHandle, const char *text, int visibleSize )
 
 	int _wide = 0;
 	const char *ch = text;
-	int i = 0, x = 0;
+	int i = 0, x = 0, len = 0, lastlen = 0;
 	if( visibleSize <= 0 )
 		return 0;
 #ifdef SCALE_FONTS
@@ -286,18 +286,18 @@ int CFontManager::CutText(HFont fontHandle, const char *text, int visibleSize )
 				if( x > _wide )
 					_wide = x;
 			}
+			lastlen = len;
+			len = i+1;
 		}
 		i++;
 		ch++;
 	}
 	EngFuncs::UtfProcessChar( 0 );
 
-	if( _wide < visibleSize )
-		i++;
-	else if(i)
-		i--;
+	if( !*ch && _wide < visibleSize )
+		return len;
 
-	return i;
+	return lastlen;
 }
 
 
