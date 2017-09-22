@@ -263,12 +263,12 @@ void IBaseFont::GetBlurValueForPixel(byte *src, Point srcPt, Size srcSz, byte *d
 	bool additive = IsAdditive();
 
 	// scan the positive x direction
-	int maxX = min( srcPt.x + m_iBlur, srcSz.w );
-	int minX = max( srcPt.x - m_iBlur, 0 );
+	int maxX = Q_min( srcPt.x + m_iBlur, srcSz.w );
+	int minX = Q_max( srcPt.x - m_iBlur, 0 );
 	for( int x = minX; x <= maxX; x++ )
 	{
-		int maxY = min( srcPt.y + m_iBlur, srcSz.h - 1);
-		int minY = max( srcPt.y - m_iBlur, 0);
+		int maxY = Q_min( srcPt.y + m_iBlur, srcSz.h - 1);
+		int minY = Q_max( srcPt.y - m_iBlur, 0);
 		for (int y = minY; y <= maxY; y++)
 		{
 			byte *srcPos = src + ((x + (y * srcSz.w)) * 4);
@@ -284,11 +284,11 @@ void IBaseFont::GetBlurValueForPixel(byte *src, Point srcPt, Size srcSz, byte *d
 	if( !additive )
 	{
 		dest[0] = dest[1] = dest[2] = 255;
-		dest[3] = min( (int)accum, 255);
+		dest[3] = Q_min( (int)accum, 255);
 	}
 	else
 	{
-		dest[0] = dest[1] = dest[2] = min( (int)accum, 255 );
+		dest[0] = dest[1] = dest[2] = Q_min( (int)accum, 255 );
 		dest[3] = 255;
 	}
 }

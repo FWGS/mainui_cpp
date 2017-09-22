@@ -372,7 +372,7 @@ void CMenuTable::Draw()
 		UI_FillRect( x, y, w, h, uiColorBlack );
 	}
 
-	int columns = min( m_pModel->GetColumns(), MAX_TABLE_COLUMNS );
+	int columns = Q_min( m_pModel->GetColumns(), MAX_TABLE_COLUMNS );
 
 	Point headerPos = m_scPos;
 	headerPos.y -= m_scChSize.h * 1.75 - UI_OUTLINE_WIDTH / 2;

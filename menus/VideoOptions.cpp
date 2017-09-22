@@ -102,7 +102,7 @@ void CMenuVidOptions::CMenuVidPreview::Draw( )
 		sb_lines = 24;	// no inventory
 	else sb_lines = 48;
 
-	size = min( viewsize, 100 );
+	size = Q_min( viewsize, 100 );
 
 	viewport[2] = m_scSize.w * size / 100;
 	viewport[3] = m_scSize.h * size / 100;
