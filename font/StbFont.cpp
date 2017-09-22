@@ -94,6 +94,35 @@ bool CStbFont::FindFontDataFile(const char *name, int tall, int weight, int flag
 	}
 
 	return true;
+#elif defined __linux__ // call fontconfig
+	char cmd[256];    
+	FILE *fp;
+
+	snprintf( cmd, sizeof( cmd ), "fc-match -f %%{file[0]} %s", name );
+	if( (fp = popen( cmd, "r") ) == NULL )
+	{
+		Con_DPrintf( "fontconfig: Error opening pipe!\n" );
+		return false;
+	}
+
+	fgets( dataFile, dataFileChars, fp );
+
+	if( pclose(fp) )
+	{
+		Con_DPrintf( "fontconfig: Command not found or exited with error status\n" );
+        return false;
+    }
+
+	// fallback with empty fontname if font not found
+	if( strlen( dataFile ) < 2 )
+	{
+		if( name[0] )
+			return FindFontDataFile( "", tall, weight, flags, dataFile, dataFileChars );
+		else
+			return false;
+	}
+
+	return true;
 #else
 
 	// strcpy( dataFile, "/usr/share/fonts/truetype/droid/DroidSans.ttf");
