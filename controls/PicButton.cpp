@@ -22,6 +22,11 @@ GNU General Public License for more details.
 #include "Scissor.h"
 #include <stdlib.h>
 
+// Button stack
+CMenuPicButton *ButtonStack[UI_MAX_MENUDEPTH] = { 0 };
+int		ButtonStackDepth = 0;
+
+
 CMenuPicButton::CMenuPicButton() : CMenuBaseItem()
 {
 	bEnableTransitions = true;
@@ -101,11 +106,18 @@ const char *CMenuPicButton::Key( int key, int down )
 			}
 
 			_Event( event );
+#if !defined(TA_ALT_MODE2)
+			if( event == QM_ACTIVATED )
+				SetTransPicForLast( hPic );
+#endif
 		}
 		else if( down )
 		{
 			temp = this;
 			_Event( QM_ACTIVATED );
+#if !defined(TA_ALT_MODE2)
+			SetTransPicForLast( hPic );
+#endif
 		}
 	}
 
@@ -172,6 +184,9 @@ void CMenuPicButton::Draw( )
 
 	if( hPic )
 	{
+		if( ButtonStackDepth && ButtonStack[ButtonStackDepth-1] == this )
+			return;
+
 		int r, g, b;
 
 		UnpackRGB( r, g, b, iFlags & QMF_GRAYED ? uiColorDkGrey : uiColorWhite );
@@ -313,12 +328,6 @@ void CMenuPicButton::SetPicture(const char *filename)
 
 // =========================== Animations ===========================
 
-// Title Transition Time period
-#define TTT_PERIOD		200.0f
-
-// Button stack
-CMenuPicButton *ButtonStack[UI_MAX_MENUDEPTH] = { 0 };
-int		ButtonStackDepth = 0;
 
 // Pressed cancel, done or ESC in menu
 void CMenuPicButton::PopPButtonStack()
@@ -347,8 +356,8 @@ int	CMenuPicButton::transition_state = CMenuPicButton::AS_TO_TITLE;
 int	CMenuPicButton::transition_initial_time;
 CMenuPicButton* CMenuPicButton::temp = NULL;
 HIMAGE CMenuPicButton::s_hCurrentTransPic = 0;
-wrect_t CMenuPicButton::s_pCurrentTransRect = { 0 };
-CMenuPicButton::Quad CMenuPicButton::s_CurrentLerpQuads[2] = { 0 };
+wrect_t CMenuPicButton::s_pCurrentTransRect = {};
+CMenuPicButton::Quad CMenuPicButton::s_CurrentLerpQuads[2] = {};
 
 float CMenuPicButton::GetTitleTransFraction( void )
 {
@@ -452,10 +461,10 @@ void CMenuPicButton::SetTransPicForLast( HIMAGE pic )
 // TODO: Find CMenuBannerBitmap in next menu page and correct
 void CMenuPicButton::SetupTitleQuad( int x, int y, int w, int h )
 {
-	TitleLerpQuads[1].x  = x * ScreenHeight / 768;
-	TitleLerpQuads[1].y  = y * ScreenHeight / 768;
-	TitleLerpQuads[1].lx = w * ScreenHeight / 768;
-	TitleLerpQuads[1].ly = h * ScreenHeight / 768;
+	TitleLerpQuads[1].x  = x * uiStatic.scaleX;
+	TitleLerpQuads[1].y  = y * uiStatic.scaleY;
+	TitleLerpQuads[1].lx = w * uiStatic.scaleX;
+	TitleLerpQuads[1].ly = h * uiStatic.scaleY;
 
 	s_CurrentLerpQuads[1] = TitleLerpQuads[1];
 }
@@ -469,6 +478,10 @@ void CMenuPicButton::SetTransPic(HIMAGE pic)
 
 bool CMenuPicButton::DrawTitleAnim( CMenuBaseWindow::EAnimation state )
 {
+	// don't draw it twice
+	if( state == CMenuBaseWindow::ANIM_OUT )
+		return false; // but request more frame for animation
+
 #if 1
 	float frac = GetTitleTransFraction();
 #else
@@ -493,7 +506,12 @@ bool CMenuPicButton::DrawTitleAnim( CMenuBaseWindow::EAnimation state )
 	//UI_FillRect( c.x, c.y, c.lx, c.ly, 0xFF0F00FF );
 
 	EngFuncs::PIC_Set( s_hCurrentTransPic, 255, 255, 255 );
+#if !defined(TA_ALT_MODE2)
+	wrect_t rect = { 0, uiStatic.buttons_width, 26, 52 };
+	EngFuncs::PIC_DrawAdditive( c.x, c.y, c.lx, c.ly, &rect );
+#else
 	EngFuncs::PIC_DrawAdditive( c.x, c.y, c.lx, c.ly );
+#endif
 
 	return false;
 

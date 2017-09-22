@@ -19,8 +19,6 @@ GNU General Public License for more details.
 #include "ItemsHolder.h"
 #include "BackgroundBitmap.h"
 
-#define TRANSITION_TIME 300.0f
-
 // Base class for windows.
 // Should be used for message boxes, dialogs, root menus(e.g. frameworks)
 class CMenuBaseWindow : public CMenuItemsHolder
@@ -50,6 +48,10 @@ public:
 	// Return false when animation is still going
 	// Otherwise return true, so window will be marked as "no animation"
 	// and this method will not be called anymore(until next menu transition)
+
+	// Window animation draw life during transition
+	// 1. ANIM_IN
+	// 2. ANIM_OUT
 	virtual bool DrawAnimation( EAnimation anim );
 
 	// Check current window is a root

@@ -196,11 +196,11 @@ bool CMenuBaseWindow::DrawAnimation(EAnimation anim)
 
 	if( anim == ANIM_IN )
 	{
-		alpha = ( uiStatic.realTime - m_iTransitionStartTime ) / TRANSITION_TIME;
+		alpha = ( uiStatic.realTime - m_iTransitionStartTime ) / TTT_PERIOD;
 	}
 	else if( anim == ANIM_OUT )
 	{
-		alpha = 1.0f - ( uiStatic.realTime - m_iTransitionStartTime ) / TRANSITION_TIME;
+		alpha = 1.0f - ( uiStatic.realTime - m_iTransitionStartTime ) / TTT_PERIOD;
 	}
 
 	if(	( anim == ANIM_IN  && alpha < 1.0f )
@@ -213,7 +213,7 @@ bool CMenuBaseWindow::DrawAnimation(EAnimation anim)
 		UI_DisableAlphaFactor();
 
 		if( IsRoot() )
-			return CMenuPicButton::DrawTitleAnim( anim );
+			CMenuPicButton::DrawTitleAnim( anim );
 		return false;
 	}
 
