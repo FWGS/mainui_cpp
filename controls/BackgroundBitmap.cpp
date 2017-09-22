@@ -185,55 +185,7 @@ void CMenuBackgroundBitmap::Draw()
 	DrawBackgroundLayout( p, xScale, yScale );
 }
 
-// fallback to old background loader, if new was failed(some game builds does not have this file)
-bool CMenuBackgroundBitmap::LoadBackgroundImageOld( bool gamedirOnly )
-{
-	const int backgroundRows    = 3;
-	const int backgroundColumns = 4;
-	char filename[512];
-
-	s_iBackgroundCount = 0;
-	s_bEnableLogoMovie = false; // no logos for Steam background
-
-	for( int y = 0; y < backgroundRows; y++ )
-	{
-		for( int x = 0; x < backgroundColumns; x++ )
-		{
-			sprintf(filename, "resource/background/800_%d_%c_loading.tga", y + 1, 'a' + x);
-			if( !EngFuncs::FileExists( filename, gamedirOnly ) )
-				return false;
-
-			bimage_t &bimage = s_Backgroudns[s_iBackgroundCount++];
-
-
-			bimage.hImage = EngFuncs::PIC_Load( filename, PIC_NOFLIP_TGA );
-
-			if( !bimage.hImage )
-				return false;
-
-			bimage.size.w = EngFuncs::PIC_Width( bimage.hImage );
-			bimage.size.h = EngFuncs::PIC_Height( bimage.hImage );
-
-			if( x > 0 )
-			{
-				bimage_t &prevbimage = s_Backgroudns[y * backgroundRows + x - 1];
-				bimage.coord.x = prevbimage.coord.x + prevbimage.size.w;
-			}
-			else bimage.coord.x = 0;
-
-			if( y > 0 )
-			{
-				bimage_t &prevbimage = s_Backgroudns[(y - 1) * backgroundRows + x];
-				bimage.coord.y = prevbimage.coord.y + prevbimage.size.h;
-			}
-			else bimage.coord.y = 0;
-		}
-	}
-
-	return true;
-}
-
-bool CMenuBackgroundBitmap::LoadBackgroundImageNew( bool gamedirOnly )
+bool CMenuBackgroundBitmap::LoadBackgroundImage( bool gamedirOnly )
 {
 	char *afile = NULL, *pfile;
 	char token[4096];
@@ -243,10 +195,12 @@ bool CMenuBackgroundBitmap::LoadBackgroundImageNew( bool gamedirOnly )
 	s_iBackgroundCount = 0;
 	s_bEnableLogoMovie = false; // no logos for Steam background
 
-	if( !EngFuncs::FileExists("resource/BackgroundLayout.txt", gamedirOnly ) )
-		return CMenuBackgroundBitmap::LoadBackgroundImageOld( gamedirOnly ); // fallback to hardcoded values
+	if( !EngFuncs::FileExists("resource/background", gamedirOnly ) )
+		return false;
 
 	afile = (char*)EngFuncs::COM_LoadFile( "resource/BackgroundLayout.txt" );
+
+	if( !afile ) return false;
 
 	pfile = afile;
 
@@ -325,17 +279,17 @@ bool CMenuBackgroundBitmap::CheckBackgroundSplash( bool gamedirOnly )
 
 		return true;
 	}
-
+	
 	return false;
 }
 
 void CMenuBackgroundBitmap::LoadBackground()
 {
 	// try to load backgrounds from mod
-	if( LoadBackgroundImageNew(  true ) ) return; // at first check new gameui backgrounds
-	if( CheckBackgroundSplash (  true ) ) return; // then check won-style
+	if( LoadBackgroundImage( true ) ) return; // at first check new gameui backgrounds
+	if( CheckBackgroundSplash( true ) ) return; // then check won-style
 
 	// try from base directory
 	if( LoadBackgroundImageNew( false ) ) return; // gameui bgs are allowed to be inherited
-	if( CheckBackgroundSplash ( false ) ) return;
+	if( CheckBackgroundSplash( false ) ) return;
 }
