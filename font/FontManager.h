@@ -60,7 +60,7 @@ public:
 
 	int   GetTextWide( HFont font, const char *text, int size = -1 );
 
-	int   CutText(HFont fontHandle, const char *text, int visibleSize );
+	int   CutText(HFont fontHandle, const char *text, int height, int visibleSize );
 
 	int GetTextWideScaled(HFont font, const char *text, const int height, int size = -1 );
 

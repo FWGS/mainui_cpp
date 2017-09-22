@@ -223,7 +223,7 @@ const char *CMenuField::Key( int key, int down )
 			{
 				x = m_scPos.x + (m_scSize.w - UI::Font::GetTextWide( font, text, m_scChSize )) / 2;
 			}
-			charpos = UI::Font::CutText(font, szBuffer + iScroll, (uiStatic.cursorX - x));
+			charpos = UI::Font::CutText(font, szBuffer + iScroll, m_scChSize, uiStatic.cursorX - x);
 			//text[charpos] = 0;
 			iCursor = charpos + iScroll;
 			if( iCursor > 0 )

@@ -256,7 +256,7 @@ void CFontManager::GetTextSize(HFont fontHandle, const char *text, int *wide, in
 	if( wide ) *wide = _wide;
 }
 
-int CFontManager::CutText(HFont fontHandle, const char *text, int visibleSize )
+int CFontManager::CutText(HFont fontHandle, const char *text, int height, int visibleSize )
 {
 	IBaseFont *font = GetIFontFromHandle( fontHandle );
 
@@ -270,7 +270,7 @@ int CFontManager::CutText(HFont fontHandle, const char *text, int visibleSize )
 	if( visibleSize <= 0 )
 		return 0;
 #ifdef SCALE_FONTS
-			visibleSize  = (float)visibleSize / (float)pFont->GetTall()
+			visibleSize  = (float)visibleSize / height * (float)font->GetTall();
 #endif
 	EngFuncs::UtfProcessChar( 0 );
 

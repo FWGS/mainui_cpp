@@ -432,10 +432,10 @@ int UI::Font::GetTextWide( HFont font, const char *szName, Size charSize, int si
 #endif
 }
 
-int UI::Font::CutText(HFont fontHandle, const char *text, int visibleSize )
+int UI::Font::CutText(HFont fontHandle, const char *text, Size charSize, int visibleSize )
 {
 #ifdef MAINUI_USE_CUSTOM_FONT_RENDER
-	return g_FontMgr.CutText( fontHandle, text, visibleSize );
+	return g_FontMgr.CutText( fontHandle, text, charSize.h, visibleSize );
 #else //todo
 	return 0;
 #endif
