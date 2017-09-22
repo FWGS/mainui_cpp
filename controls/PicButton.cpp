@@ -337,7 +337,7 @@ void CMenuPicButton::PopPButtonStack()
 // Opened new menu, awaiting Quad from Banner
 void CMenuPicButton::PushPButtonStack()
 {
-	if( ButtonStack[ButtonStackDepth-1] == this )
+	if( ButtonStackDepth && ButtonStack[ButtonStackDepth-1] == this )
 		return;
 
 	ButtonStack[ButtonStackDepth++] = this;
