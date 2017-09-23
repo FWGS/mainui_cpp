@@ -109,10 +109,17 @@ bool CStbFont::FindFontDataFile(const char *name, int tall, int weight, int flag
 
 	return true;
 #elif defined __linux__ // call fontconfig
-	char cmd[256];    
+	char cmd[256];
+	int len;
 	FILE *fp;
 
-	snprintf( cmd, sizeof( cmd ), "fc-match -f %%{file[0]} %s", name );
+	len = snprintf( cmd, 256 - len, "fc-match -f %%{file} %s", name );
+	if( flags & FONT_ITALIC )
+		len += snprintf( cmd + len, 256 - len, ":style=Italic" );
+	if( weight > 500 )
+		len += snprintf( cmd + len, 256 - len, ":weight=%d", weight );
+	cmd[len] = 0;
+
 	if( (fp = popen( cmd, "r") ) == NULL )
 	{
 		Con_DPrintf( "fontconfig: Error opening pipe!\n" );
