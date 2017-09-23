@@ -290,6 +290,6 @@ void CMenuBackgroundBitmap::LoadBackground()
 	if( CheckBackgroundSplash( true ) ) return; // then check won-style
 
 	// try from base directory
-	if( LoadBackgroundImageNew( false ) ) return; // gameui bgs are allowed to be inherited
+	if( LoadBackgroundImage( false ) ) return; // gameui bgs are allowed to be inherited
 	if( CheckBackgroundSplash( false ) ) return;
 }
