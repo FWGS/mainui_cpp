@@ -101,6 +101,7 @@ typedef struct
 	HFont hSmallFont;
 	HFont hBigFont;
 	HFont hConsoleFont;
+	HFont hBoldFont;
 #ifdef MAINUI_RENDER_PICBUTTON_TEXT
 	HFont hLightBlur;
 	HFont hHeavyBlur;

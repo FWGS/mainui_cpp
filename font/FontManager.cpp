@@ -85,6 +85,10 @@ void CFontManager::VidInit( void )
 			.SetHandleNum( QM_BIGFONT )
 			.Create();
 
+		uiStatic.hBoldFont = CFontBuilder( DEFAULT_MENUFONT, UI_MED_CHAR_HEIGHT * scale, 1000 )
+			.SetHandleNum( QM_BOLDFONT )
+			.Create();
+
 #ifdef MAINUI_RENDER_PICBUTTON_TEXT
 		uiStatic.hLightBlur = CFontBuilder( DEFAULT_MENUFONT, UI_MED_CHAR_HEIGHT * scale, 1000 )
 			.SetHandleNum( QM_LIGHTBLUR )

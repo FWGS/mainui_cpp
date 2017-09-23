@@ -73,6 +73,8 @@ void CMenuSwitch::VidInit()
 	m_scTextPos.x = m_scPos.x + (m_scSize.w * 1.5f );
 	m_scTextPos.y = m_scPos.y;
 
+	font = uiStatic.hBoldFont;
+
 	m_scTextSize.w = UI::Font::GetTextWide( font, szName, m_scChSize );
 	m_scTextSize.h = m_scChSize.h;
 }
