@@ -29,7 +29,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Field.h"
 #include "ItemsHolder.h"
 #include "Action.h"
-#include "dynamic/DynamicItemsHolder.h"
 
 #define ART_BANNER_SERVER "gfx/shell/head_advoptions"
 #define ART_BANNER_USER "gfx/shell/head_advoptions"
@@ -216,7 +215,6 @@ void CMenuScriptConfig::_Init( void )
 		CMenuEditable *editable;
 		CMenuEditable::cvarType_e cvarType;
 
-		// TODO: Maybe ignore here "hostname", "sv_password", "maxplayers" stuff?
 #if IGNORE_ALREADY_USED_CVARS
 		if( !stricmp( var->name, "hostname") ||
 			!stricmp( var->name, "sv_password" ) ||

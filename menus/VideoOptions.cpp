@@ -36,7 +36,8 @@ private:
 public:
 	CMenuVidOptions() : CMenuFramework( "CMenuVidOptions" ) { }
 	void SaveAndPopMenu();
-	void GetConfig();
+	static void GammaUpdate();
+	static void GammaGet();
 
 	int		outlineWidth;
 
@@ -52,6 +53,8 @@ public:
 	CMenuSlider	glareReduction;
 	CMenuCheckBox	fastSky;
 	CMenuCheckBox	hiTextures;
+	CMenuCheckBox   vbo;
+	CMenuCheckBox   bump;
 
 	HIMAGE		hTestImage;
 } uiVidOptions;
@@ -59,17 +62,38 @@ public:
 
 /*
 =================
-CMenuVidOptions::GetConfig
+CMenuVidOptions::GammaUpdate
 =================
 */
-void CMenuVidOptions::GetConfig( void )
+void CMenuVidOptions::GammaUpdate( void )
 {
 	if( EngFuncs::GetCvarFloat( "gl_ignorehwgamma" ))
 	{
-		gammaIntensity.SetCurrentValue( RemapVal( EngFuncs::GetCvarFloat( "gamma" ), 1.8f, 7.0f, 0.0f, 1.0f ) );
-		EngFuncs::ProcessImage(hTestImage, EngFuncs::GetCvarFloat( "gamma" ));
+		float val = RemapVal( uiVidOptions.gammaIntensity.GetCurrentValue(), 0.0, 1.0, 1.8, 7.0 );
+		EngFuncs::CvarSetValue( "gamma", val );
+		EngFuncs::ProcessImage( uiVidOptions.hTestImage, val );
 	}
-	else gammaIntensity.SetCurrentValue( RemapVal( EngFuncs::GetCvarFloat( "gamma" ), 0.5f, 2.3f, 0.0f, 1.0f ) );
+	else
+	{
+		EngFuncs::CvarSetValue( "gamma", RemapVal( uiVidOptions.gammaIntensity.GetCurrentValue(), 0.0, 1.0, 0.5, 2.3 ) );
+	}
+}
+
+void CMenuVidOptions::GammaGet( void )
+{
+	float val = EngFuncs::GetCvarFloat( "gamma" );
+
+	if( EngFuncs::GetCvarFloat( "gl_ignorehwgamma" ))
+	{
+		uiVidOptions.gammaIntensity.SetCurrentValue( RemapVal( val, 1.8f, 7.0f, 0.0f, 1.0f ) );
+		EngFuncs::ProcessImage( uiVidOptions.hTestImage, val );
+	}
+	else
+	{
+		uiVidOptions.gammaIntensity.SetCurrentValue( RemapVal( val, 0.5f, 2.3f, 0.0f, 1.0f ) );
+	}
+
+	uiVidOptions.gammaIntensity.SetOriginalValue( val );
 }
 
 void CMenuVidOptions::SaveAndPopMenu( void )
@@ -78,6 +102,8 @@ void CMenuVidOptions::SaveAndPopMenu( void )
 	glareReduction.WriteCvar();
 	fastSky.WriteCvar();
 	hiTextures.WriteCvar();
+	vbo.WriteCvar();
+	bump.WriteCvar();
 	// gamma is already written
 
 	CMenuFramework::SaveAndPopMenu();
@@ -155,19 +181,39 @@ void CMenuVidOptions::_Init( void )
 	gammaIntensity.SetNameAndStatus( "Gamma", "Set gamma value (0.5 - 2.3)" );
 	gammaIntensity.SetCoord( 72, 340 );
 	gammaIntensity.Setup( 0.0, 1.0, 0.05 );
-	SET_EVENT( gammaIntensity, onChanged )
-	{
-		CMenuSlider *self = (CMenuSlider*)pSelf;
-		if( EngFuncs::GetCvarFloat( "gl_ignorehwgamma" ))
-			EngFuncs::CvarSetValue( "gamma", RemapVal( self->GetCurrentValue(), 0.0f, 1.0f, 1.8f, 7.0f ));
-		else EngFuncs::CvarSetValue( "gamma", RemapVal( self->GetCurrentValue(), 0.0f, 1.0f, 0.5f, 2.3f ));
-	}
-	END_EVENT( gammaIntensity, onChanged )
+	gammaIntensity.onChanged = GammaUpdate;
+	gammaIntensity.onCvarGet = GammaGet;
+	gammaIntensity.LinkCvar( "gamma" );
 
 	glareReduction.SetNameAndStatus( "Glare reduction", "Set glare reduction level" );
 	glareReduction.SetCoord( 72, 400 );
 	glareReduction.Setup( 100, 300, 15 );
 	glareReduction.LinkCvar( "r_flaresize" );
+
+	bump.SetNameAndStatus( "Bump-mapping", "Enable bump mapping" );
+	bump.SetCoord( 72, 515 );
+	bump.LinkCvar( "r_bump" );
+	if( !EngFuncs::GetCvarFloat( "r_vbo" ) )
+		bump.iFlags |= QMF_GRAYED;
+
+	vbo.SetNameAndStatus( "Use VBO", "Use new world renderer. Faster, but rarely glitchy" );
+	vbo.SetCoord( 72, 565 );
+	vbo.LinkCvar( "r_vbo" );
+	SET_EVENT( vbo, onChanged )
+	{
+		CMenuCheckBox *self = (CMenuCheckBox*)pSelf;
+		CMenuVidOptions *parent = (CMenuVidOptions*)pSelf->Parent();
+		if( self->bChecked )
+		{
+			parent->bump.iFlags &= ~QMF_GRAYED;
+		}
+		else
+		{
+			parent->bump.iFlags |= QMF_GRAYED;
+			parent->bump.SetCvarValue( 0 );
+		}
+	}
+	END_EVENT( vbo, onChanged )
 
 	fastSky.SetNameAndStatus( "Draw simple sky", "enable/disable fast sky rendering (for old computers)" );
 	fastSky.SetCoord( 72, 615 );
@@ -177,14 +223,14 @@ void CMenuVidOptions::_Init( void )
 	hiTextures.SetCoord( 72, 665 );
 	hiTextures.LinkCvar( "host_allow_materials" );
 
-	GetConfig();
-
 	AddItem( background );
 	AddItem( banner );
 	AddItem( done );
 	AddItem( screenSize );
 	AddItem( gammaIntensity );
 	AddItem( glareReduction );
+	AddItem( bump );
+	AddItem( vbo );
 	AddItem( fastSky );
 	AddItem( hiTextures );
 	AddItem( testImage );
