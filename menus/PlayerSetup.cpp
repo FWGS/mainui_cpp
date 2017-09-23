@@ -203,6 +203,17 @@ void CMenuPlayerModelView::Draw()
 #endif
 		ent->curstate.body = 0;
 
+		if( uiStatic.enableAlphaFactor )
+		{
+			ent->curstate.rendermode = kRenderTransTexture;
+			ent->curstate.renderamt = uiStatic.alphaFactor * 255;
+		}
+		else
+		{
+			ent->curstate.rendermode = kRenderNormal;
+			ent->curstate.renderamt = 255;
+		}
+
 		if( mouseYawControl )
 		{
 			float diffX = uiStatic.cursorX - prevCursorX;
