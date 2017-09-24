@@ -51,6 +51,7 @@ public:
 	virtual void _Init();
 	virtual void _VidInit();
 	virtual void Draw();
+	virtual bool DrawAnimation(EAnimation anim);
 	virtual const char *Key( int key, int down );
 	void Disconnect();
 	void HandleDisconnect( void );
@@ -262,7 +263,7 @@ void CMenuConnectionProgress::_VidInit( void )
 	disconnectButton.SetRect( 338, cursor, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
 
 	if( gpGlobals->developer < 2 )
-		consoleButton.iFlags |= QMF_HIDDEN;
+		consoleButton.Hide();
 
 	cursor -= 30;
 	commonProgress.SetRect( 20, cursor, 600, 20 );
@@ -274,25 +275,31 @@ void CMenuConnectionProgress::_VidInit( void )
 	if( m_iState == STATE_DOWNLOAD )
 	{
 		cursor -= 30;
-		downloadProgress.iFlags &= ~QMF_HIDDEN;
+		downloadProgress.Show();
 		downloadProgress.SetRect( 20, cursor, 500, 20 );
 		skipButton.SetRect( 540, cursor, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
-		skipButton.iFlags &= ~QMF_HIDDEN;
+		skipButton.Show();
 
 		cursor -= 50;
-		downloadText.iFlags &= ~QMF_HIDDEN;
+		downloadText.Show();
 		downloadText.SetCharSize( QM_SMALLFONT );
 		downloadText.SetRect( 20, cursor, 500, 40 );
 	}
 	else
 	{
-		downloadProgress.iFlags |= QMF_HIDDEN;
-		skipButton.iFlags |= QMF_HIDDEN;
-		downloadText.iFlags |= QMF_HIDDEN;
+		downloadProgress.Hide();
+		skipButton.Hide();
+		downloadText.Hide();
 	}
 
 	CalcPosition();
 	CalcSizes();
+}
+
+bool CMenuConnectionProgress::DrawAnimation(EAnimation anim)
+{
+	// We don't have animation
+	return true;
 }
 
 void CMenuConnectionProgress::Draw( void )
@@ -317,7 +324,9 @@ void UI_ConnectionProgress_f( void )
 	}
 
 	if( uiConnectionProgress.m_iState == STATE_CONSOLE )
+	{
 		return;
+	}
 
 	else if( !strcmp( EngFuncs::CmdArgv(1), "dl" ) )
 	{
