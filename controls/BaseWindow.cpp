@@ -96,21 +96,31 @@ void CMenuBaseWindow::PushMenu()
 
 	EngFuncs::KEY_SetDest ( KEY_MENU );
 
+
+	m_iCursor = 0;
+
+	// Probably not a best way
+	// but we need to inform new window about cursor position,
+	// otherwise we will have an invalid cursor until first mouse move event
+#if 1
+	m_iCursorPrev = -1;
+	MouseMove( uiStatic.cursorX, uiStatic.cursorY );
+#else
 	m_iCursor = 0;
 	m_iCursorPrev = 0;
-
 	// force first available item to have focus
 	for( i = 0; i < m_numItems; i++ )
 	{
 		item = m_pItems[i];
 
 		if( !item->IsVisible() || item->iFlags & (QMF_GRAYED|QMF_INACTIVE|QMF_MOUSEONLY))
-			continue;
+		continue;
 
 		m_iCursorPrev = -1;
 		SetCursor( i );
 		break;
 	}
+#endif
 }
 
 void CMenuBaseWindow::PopMenu()
