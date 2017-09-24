@@ -189,8 +189,15 @@ void CMenuPlayerModelView::Draw()
 
 	if( !ui_showmodels->value )
 	{
-		EngFuncs::PIC_Set( hPlayerImage, 255, 255, 255, 255 );
-		EngFuncs::PIC_Draw( m_scPos, m_scSize );
+		if( hPlayerImage )
+		{
+			EngFuncs::PIC_Set( hPlayerImage, 255, 255, 255, 255 );
+			EngFuncs::PIC_DrawTrans( m_scPos, m_scSize );
+		}
+		else
+		{
+			UI_DrawString( font, m_scPos, m_scSize, "No preview", iColor, 0, m_scChSize, QM_CENTER, true );
+		}
 	}
 	else
 	{
@@ -282,9 +289,11 @@ public:
 	void FindModels();
 	void SetConfig();
 	void UpdateModel();
+	void ApplyColorToImagePreview();
 	void SaveAndPopMenu();
 
 	DECLARE_EVENT_TO_MENU_METHOD( CMenuPlayerSetup, UpdateModel );
+	DECLARE_EVENT_TO_MENU_METHOD( CMenuPlayerSetup, ApplyColorToImagePreview );
 
 	char	models[MAX_PLAYERMODELS][CS_SIZE];
 	char	*modelsPtr[MAX_PLAYERMODELS];
@@ -387,7 +396,11 @@ void CMenuPlayerSetup::UpdateModel()
 	}
 
 	snprintf( image, 256, "models/player/%s/%s.bmp", mdl, mdl );
-	view.hPlayerImage = EngFuncs::PIC_Load( image );
+#ifndef PIC_KEEP_SOURCE
+	view.hPlayerImage = EngFuncs::PIC_Load( image, PIC_KEEP_RGBDATA );
+#else
+	view.hPlayerImage = EngFuncs::PIC_Load( image, PIC_KEEP_SOURCE );
+#endif
 	EngFuncs::CvarSetString( "model", mdl );
 	if( !strcmp( mdl, "player" ) )
 		strcpy( image, "models/player.mdl" );
@@ -395,6 +408,12 @@ void CMenuPlayerSetup::UpdateModel()
 		snprintf( image, sizeof(image), "models/player/%s/%s.mdl", mdl, mdl );
 	if( view.ent )
 		EngFuncs::SetModel( view.ent, image );
+}
+
+void CMenuPlayerSetup::ApplyColorToImagePreview()
+{
+	EngFuncs::ProcessImage( view.hPlayerImage, EngFuncs::GetCvarFloat( "gamma" ),
+		topColor.GetCurrentValue(), bottomColor.GetCurrentValue() );
 }
 
 /*
@@ -447,12 +466,14 @@ void CMenuPlayerSetup::_Init( void )
 	topColor.Setup( 0.0, 255, 1 );
 	topColor.LinkCvar( "topcolor" );
 	topColor.onCvarChange = CMenuEditable::WriteCvarCb;
+	topColor.onChanged = ApplyColorToImagePreviewCb;
 
 	bottomColor.iFlags |= addFlags;
 	bottomColor.SetNameAndStatus( "Bottom color", "Set a player model bottom color" );
 	bottomColor.Setup( 0.0, 255.0, 1 );
 	bottomColor.LinkCvar( "bottomcolor" );
 	bottomColor.onCvarChange = CMenuEditable::WriteCvarCb;
+	bottomColor.onChanged = ApplyColorToImagePreviewCb;
 
 	clPredict.SetNameAndStatus( "Predict movement", "Enable player movement prediction" );
 	clPredict.LinkCvar( "cl_predict" );
