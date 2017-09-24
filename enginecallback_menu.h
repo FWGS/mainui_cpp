@@ -73,6 +73,8 @@ public:
 	{ PIC_DrawHoles( p.x, p.y, prc ); }
 	static inline void PIC_DrawAdditive( Point p, const wrect_t *prc = NULL )
 	{ PIC_DrawAdditive( p.x, p.y, prc ); }
+	static inline void PIC_DrawTrans( Point p, const wrect_t *prc = NULL )
+	{ PIC_DrawTrans( p.x, p.y, prc ); }
 
 	static inline void	PIC_EnableScissor( int x, int y, int width, int height )
 	{ engfuncs.pfnPIC_EnableScissor( x, y, width, height ); }
