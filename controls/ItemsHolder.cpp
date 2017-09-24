@@ -23,7 +23,7 @@ GNU General Public License for more details.
 CMenuItemsHolder::CMenuItemsHolder() :
 	CMenuBaseItem(), m_iCursor( 0 ), m_iCursorPrev( 0 ), m_pItems( ), m_numItems( 0 ),
 	m_events(), m_numEvents( 0 ), m_bInit( false ), m_bAllowEnterActivate( false ),
-	m_szResFile( 0 )
+	m_bWrapCursor( true ), m_szResFile( 0 )
 {
 	;
 }
@@ -74,17 +74,23 @@ const char *CMenuItemsHolder::Key( int key, int down )
 			cursorPrev = m_iCursorPrev = m_iCursor;
 
 			m_iCursor--;
-			AdjustCursor( -1 );
-			if( cursorPrev != m_iCursor )
+			if( AdjustCursor( -1 ) )
 			{
-				CursorMoved();
-				if( !( m_pItems[m_iCursor]->iFlags & QMF_SILENT ) )
-					sound = uiSoundMove;
+				if( cursorPrev != m_iCursor )
+				{
+					CursorMoved();
+					if( !( m_pItems[m_iCursor]->iFlags & QMF_SILENT ) )
+						sound = uiSoundMove;
 
-				m_pItems[m_iCursorPrev]->iFlags &= ~QMF_HASKEYBOARDFOCUS;
-				m_pItems[m_iCursor]->iFlags |= QMF_HASKEYBOARDFOCUS;
+					m_pItems[m_iCursorPrev]->iFlags &= ~QMF_HASKEYBOARDFOCUS;
+					m_pItems[m_iCursor]->iFlags |= QMF_HASKEYBOARDFOCUS;
+				}
+				m_bAllowEnterActivate = true;
 			}
-			m_bAllowEnterActivate = true;
+			else
+			{
+				sound = NULL;
+			}
 			break;
 		case K_DOWNARROW:
 		case K_KP_DOWNARROW:
@@ -93,18 +99,23 @@ const char *CMenuItemsHolder::Key( int key, int down )
 		case K_TAB:
 			cursorPrev = m_iCursorPrev = m_iCursor;
 			m_iCursor++;
-			AdjustCursor( 1 );
-
-			if( cursorPrev != m_iCursor )
+			if( AdjustCursor( 1 ) )
 			{
-				CursorMoved();
-				if( !(m_pItems[m_iCursor]->iFlags & QMF_SILENT ) )
-					sound = uiSoundMove;
+				if( cursorPrev != m_iCursor )
+				{
+					CursorMoved();
+					if( !(m_pItems[m_iCursor]->iFlags & QMF_SILENT ) )
+						sound = uiSoundMove;
 
-				m_pItems[m_iCursorPrev]->iFlags &= ~QMF_HASKEYBOARDFOCUS;
-				m_pItems[m_iCursor]->iFlags |= QMF_HASKEYBOARDFOCUS;
+					m_pItems[m_iCursorPrev]->iFlags &= ~QMF_HASKEYBOARDFOCUS;
+					m_pItems[m_iCursor]->iFlags |= QMF_HASKEYBOARDFOCUS;
+				}
+				m_bAllowEnterActivate = true;
 			}
-			m_bAllowEnterActivate = true;
+			else
+			{
+				sound = NULL;
+			}
 			break;
 		case K_MOUSE1:
 			if( item && (item->iFlags & QMF_HASMOUSEFOCUS) && item->IsVisible() && !(item->iFlags & (QMF_GRAYED|QMF_INACTIVE)))
@@ -306,7 +317,7 @@ This functiont takes the given menu, the direction, and attempts to
 adjust the menu's cursor so that it's at the next available slot
 =================
 */
-void CMenuItemsHolder::AdjustCursor( int dir )
+bool CMenuItemsHolder::AdjustCursor( int dir )
 {
 	CMenuBaseItem *item;
 	bool wrapped = false;
@@ -329,7 +340,7 @@ wrap:
 			if( wrapped )
 			{
 				m_iCursor = m_iCursorPrev;
-				return;
+				return false;
 			}
 			m_iCursor = 0;
 			wrapped = true;
@@ -343,13 +354,17 @@ wrap:
 			if( wrapped )
 			{
 				m_iCursor = m_iCursorPrev;
-				return;
+				return false;
 			}
 			m_iCursor = m_numItems - 1;
 			wrapped = true;
 			goto wrap;
 		}
 	}
+
+	if( wrapped )
+		return m_bWrapCursor;
+	return true;
 }
 
 CMenuBaseItem *CMenuItemsHolder::ItemAtCursor()

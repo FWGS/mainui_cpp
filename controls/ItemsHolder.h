@@ -40,7 +40,7 @@ public:
 	void CursorMoved( void );
 	void SetCursor( int newCursor, bool notify = true );
 	void SetCursorToItem( CMenuBaseItem &item, bool notify = true );
-	void AdjustCursor( int dir );
+	bool AdjustCursor( int dir );
 
 	void AddItem( CMenuBaseItem &item );
 	void RemoveItem( CMenuBaseItem &item );
@@ -85,6 +85,7 @@ protected:
 
 	bool m_bInit;
 	bool m_bAllowEnterActivate;
+	bool m_bWrapCursor;
 
 	const char *m_szResFile;
 };

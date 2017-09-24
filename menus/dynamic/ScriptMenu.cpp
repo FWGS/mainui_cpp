@@ -93,8 +93,9 @@ private:
 	int m_iCurrentPage;
 };
 
-CMenuScriptConfigPage::CMenuScriptConfigPage()
+CMenuScriptConfigPage::CMenuScriptConfigPage() : CMenuItemsHolder()
 {
+	m_bWrapCursor = false; // Don't cycle in page
 	m_iCurrentHeight = 0;
 	m_iPadding = 16;
 	SetRect( 360, 230, 660, 440 );
@@ -129,7 +130,7 @@ void CMenuScriptConfigPage::Save()
 	}
 }
 
-CMenuScriptConfig::CMenuScriptConfig() : CMenuFramework(),
+CMenuScriptConfig::CMenuScriptConfig() : CMenuFramework( "ScriptConfig" ),
 	m_pVars(), m_szConfig(), m_iVarsCount(), m_iPagesIndex(), m_iPagesCount(), m_iCurrentPage()
 {
 
