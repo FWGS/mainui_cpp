@@ -162,7 +162,8 @@ UI_DrawPic
 void UI_DrawPic( int x, int y, int width, int height, const int color, const char *pic )
 {
 	HIMAGE hPic = EngFuncs::PIC_Load( pic );
-	if (!hPic)
+
+	if( !hPic )
 		return;
 
 	int r, g, b, a;
@@ -170,7 +171,10 @@ void UI_DrawPic( int x, int y, int width, int height, const int color, const cha
 
 	EngFuncs::PIC_Set( hPic, r, g, b, a );
 	// a1ba: should be just PIC_Draw, but we need alpha here
-	EngFuncs::PIC_DrawTrans( x, y, width, height );
+	if( uiStatic.enableAlphaFactor )
+		EngFuncs::PIC_DrawTrans( x, y, width, height );
+	else
+		EngFuncs::PIC_Draw( x, y, width, height );
 }
 
 /*

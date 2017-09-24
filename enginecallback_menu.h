@@ -258,7 +258,7 @@ public:
 	{ engfuncs.pfnSetCursor( hCursor ); }
 	static inline int	IsMapValid( const char *filename )
 	{ return engfuncs.pfnIsMapValid( (char*)filename ); }
-	static inline void	ProcessImage( int texnum, float gamma, int topColor = 0, int bottomColor = 0 )
+	static inline void	ProcessImage( int texnum, float gamma, int topColor = -1, int bottomColor = -1 )
 	{ engfuncs.pfnProcessImage( texnum, gamma, topColor, bottomColor ); }
 	static inline int	CompareFileTime( char *filename1, char *filename2, int *iCompare )
 	{ return engfuncs.pfnCompareFileTime( filename1, filename2, iCompare ); }

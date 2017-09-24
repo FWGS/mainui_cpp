@@ -180,7 +180,7 @@ void CMenuVidOptions::_Init( void )
 
 	gammaIntensity.SetNameAndStatus( "Gamma", "Set gamma value (0.5 - 2.3)" );
 	gammaIntensity.SetCoord( 72, 340 );
-	gammaIntensity.Setup( 0.0, 1.0, 0.05 );
+	gammaIntensity.Setup( 0.0, 1.0, 0.025 );
 	gammaIntensity.onChanged = GammaUpdate;
 	gammaIntensity.onCvarGet = GammaGet;
 	gammaIntensity.LinkCvar( "gamma" );
@@ -250,7 +250,6 @@ CMenuVidOptions::Precache
 void UI_VidOptions_Precache( void )
 {
 	EngFuncs::PIC_Load( ART_BANNER );
-	EngFuncs::PIC_Load( ART_GAMMA );
 }
 
 /*
