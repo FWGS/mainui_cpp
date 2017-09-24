@@ -96,7 +96,7 @@ const char *CMenuSlider::Key( int key, int down )
 
 		dist = uiStatic.cursorX - (m_scPos.x + m_iSliderOutlineWidth + m_scCenterBox.w);
 		numSteps = floor(dist / m_flDrawStep);
-		m_flCurValue = bound( m_flMinValue, numSteps * m_flRange, m_flMaxValue );
+		m_flCurValue = bound( m_flMinValue, numSteps * m_flRange + m_flMinValue, m_flMaxValue );
 
 		// tell menu about changes
 		SetCvarValue( m_flCurValue );
@@ -178,7 +178,7 @@ void CMenuSlider::Draw( void )
 			// move slider follow the holded mouse button
 			dist = uiStatic.cursorX - m_scPos.x - m_iSliderOutlineWidth - (m_scCenterBox.w/2);
 			numSteps = floor(dist / m_flDrawStep);
-			m_flCurValue = bound( m_flMinValue, numSteps * m_flRange, m_flMaxValue );
+			m_flCurValue = bound( m_flMinValue, numSteps * m_flRange + m_flMinValue, m_flMaxValue );
 
 			// tell menu about changes
 			SetCvarValue( m_flCurValue );
