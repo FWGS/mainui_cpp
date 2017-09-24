@@ -396,11 +396,7 @@ void CMenuPlayerSetup::UpdateModel()
 	}
 
 	snprintf( image, 256, "models/player/%s/%s.bmp", mdl, mdl );
-#ifndef PIC_KEEP_SOURCE
-	view.hPlayerImage = EngFuncs::PIC_Load( image, PIC_KEEP_RGBDATA );
-#else
-	view.hPlayerImage = EngFuncs::PIC_Load( image, PIC_KEEP_SOURCE );
-#endif
+	view.hPlayerImage = EngFuncs::PIC_Load( image, PIC_KEEP_8BIT );
 	EngFuncs::CvarSetString( "model", mdl );
 	if( !strcmp( mdl, "player" ) )
 		strcpy( image, "models/player.mdl" );
@@ -412,7 +408,7 @@ void CMenuPlayerSetup::UpdateModel()
 
 void CMenuPlayerSetup::ApplyColorToImagePreview()
 {
-	EngFuncs::ProcessImage( view.hPlayerImage, EngFuncs::GetCvarFloat( "gamma" ),
+	EngFuncs::ProcessImage( view.hPlayerImage, -1,
 		topColor.GetCurrentValue(), bottomColor.GetCurrentValue() );
 }
 
