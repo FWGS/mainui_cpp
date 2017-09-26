@@ -38,6 +38,18 @@ void CMenuTable::VidInit()
 	CMenuBaseItem::VidInit();
 
 	iNumRows = ( m_scSize.h - UI_OUTLINE_WIDTH * 2 ) / m_scChSize.h - 1;
+
+	if( !iCurItem )
+	{
+		if( iCurItem < iTopItem )
+			iTopItem = iCurItem;
+		if( iCurItem > iTopItem + iNumRows - 1 )
+			iTopItem = iCurItem - iNumRows + 1;
+		if( iTopItem > m_pModel->GetRows() - iNumRows )
+			iTopItem = m_pModel->GetRows() - iNumRows;
+		if( iTopItem < 0 )
+			iTopItem = 0;
+	}
 }
 
 bool CMenuTable::MoveView(int delta )
@@ -84,12 +96,19 @@ void CMenuTable::SetCurrentIndex( int idx )
 
 	if( iCurItem < iTopItem )
 		iTopItem = iCurItem;
-	if( iCurItem > iTopItem + iNumRows - 1 )
-		iTopItem = iCurItem - iNumRows + 1;
-	if( iTopItem > m_pModel->GetRows() - iNumRows )
-		iTopItem = m_pModel->GetRows() - iNumRows;
-	if( iTopItem < 0 )
-		iTopItem = 0;
+	if( iNumRows ) // check if already vidinit
+	{
+		if( iCurItem > iTopItem + iNumRows - 1 )
+			iTopItem = iCurItem - iNumRows + 1;
+		if( iTopItem > m_pModel->GetRows() - iNumRows )
+			iTopItem = m_pModel->GetRows() - iNumRows;
+		if( iTopItem < 0 )
+			iTopItem = 0;
+	}
+	else
+	{
+		iTopItem = 0; // will be recalculated on vidinit
+	}
 }
 
 const char *CMenuTable::Key( int key, int down )
