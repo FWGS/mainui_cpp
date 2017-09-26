@@ -183,7 +183,7 @@ CMenuMain::Key
 */
 const char *CMenuMain::Key( int key, int down )
 {
-	if( down && key == K_ESCAPE )
+	if( down && UI::Key::IsEscape( key ) )
 	{
 		if ( CL_IsActive( ))
 		{

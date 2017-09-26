@@ -66,7 +66,7 @@ UI_GameOptions_KeyFunc
 */
 const char *CMenuGameOptions::Key( int key, int down )
 {
-	if( down && key == K_ESCAPE )
+	if( down && UI::Key::IsEscape( key ) )
 		Restore();
 	return CMenuFramework::Key( key, down );
 }

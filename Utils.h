@@ -207,6 +207,14 @@ namespace Font
 int GetTextWide(HFont font, const char *szName, Size charSize , int size = -1);
 int CutText(HFont fontHandle, const char *text, Size charSize, int visibleSize );
 }
+
+namespace Key
+{
+inline bool IsEscape( int key )
+{
+	return ( key == K_ESCAPE || key == K_B_BUTTON );
+}
+}
 }
 int Con_UtfProcessChar( int in );
 int Con_UtfMoveLeft( char *str, int pos );
