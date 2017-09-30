@@ -254,29 +254,35 @@ void CMenuGamePad::_Init( void )
 
 void CMenuGamePad::_VidInit()
 {
-	done.SetCoord( 72, 630 );
-	controls.SetCoord( 72, 580 );
+	controls.SetCoord( 72, 230 );
+	done.SetCoord( 72, 280 );
 
-	axisBind_label.SetRect( 52, 180, 200, 26 );
+	axisBind_label.SetCoord( 360, 230 );
 	axisBind_label.SetCharSize( QM_SMALLFONT );
 
-	for( int i = 0, y = 230; i < 6; i++, y += 50 )
+	for( int i = 0, y = 280; i < 6; i++, y += 50 )
 	{
-		axisBind[i].SetRect( 72, y, 256, 26 );
+		axisBind[i].SetRect( 360, y, 256, invSide.size.h );
 		axisBind[i].SetCharSize( QM_SMALLFONT );
 	}
 
-	side.SetCoord( 400, 250 );
-	invSide.SetCoord( 620, 230 );
+	int sliderAlign = invSide.size.h - side.size.h;
 
-	forward.SetCoord( 400, 300 );
-	invFwd.SetCoord( 620, 280 );
+	side.SetCoord( 630, 280 + sliderAlign );
+	side.SetCharSize( QM_SMALLFONT );
+	invSide.SetCoord( 850, 280 );
 
-	pitch.SetCoord( 400, 350 );
-	invPitch.SetCoord( 620, 330 );
+	forward.SetCoord( 630, 330 + sliderAlign );
+	forward.SetCharSize( QM_SMALLFONT );
+	invFwd.SetCoord( 850, 330 );
 
-	yaw.SetCoord( 400, 400 );
-	invYaw.SetCoord( 620, 380 );
+	pitch.SetCoord( 630, 380 + sliderAlign );
+	pitch.SetCharSize( QM_SMALLFONT );
+	invPitch.SetCoord( 850, 380 );
+
+	yaw.SetCoord( 630, 430 + sliderAlign );
+	yaw.SetCharSize( QM_SMALLFONT );
+	invYaw.SetCoord( 850, 430 );
 
 	GetConfig();
 }
