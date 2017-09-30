@@ -54,7 +54,7 @@ void CMenuTouch::_Init( void )
 	touchOptions.iFlags |= QMF_NOTIFY;
 	touchOptions.onActivated = UI_TouchOptions_Menu;
 
-	touchButtons.SetNameAndStatus( "Touch Buttons", "Add, remove, edit touch buttons" );
+	touchButtons.SetNameAndStatus( "Touch buttons", "Add, remove, edit touch buttons" );
 	touchButtons.SetPicture( "gfx/shell/btn_touch_buttons" );
 	touchButtons.iFlags |= QMF_NOTIFY;
 	touchButtons.onActivated = UI_TouchButtons_Menu;
