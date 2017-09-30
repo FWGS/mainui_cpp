@@ -1106,7 +1106,7 @@ void UI_ApplyCustomColors( void )
 	if( !afile )
 	{
 		// not error, not warning, just notify
-		Con_Printf( "UI_iColor = s: colors.lst not found\n" );
+		Con_Printf( "UI_ApplyCustomColors: colors.lst not found\n" );
 		return;
 	}
 

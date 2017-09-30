@@ -18,7 +18,7 @@ GNU General Public License for more details.
 
 #include "BaseFontBackend.h"
 
-#if defined(MAINUI_USE_FREETYPE)
+#  if defined(MAINUI_USE_FREETYPE)
 #include "FreeTypeFont.h"
 #elif defined(MAINUI_USE_STB)
 #include "StbFont.h"
@@ -30,8 +30,13 @@ GNU General Public License for more details.
 
 #include "BitmapFont.h"
 
+#ifndef __ANDROID__
+#define DEFAULT_MENUFONT "RobotoCondensed"
+#define DEFAULT_CONFONT  "DroidSans"
+#else
 #define DEFAULT_MENUFONT "Trebuchet MS"
 #define DEFAULT_CONFONT  "Tahoma"
+#endif
 
 // Probably isn't a good idea until I don't have implemented SDF
 #ifdef __ANDROID__ // don't rape poor Android devices' CPU & GPU
@@ -60,7 +65,6 @@ CFontManager::~CFontManager()
 
 void CFontManager::VidInit( void )
 {
-	static int prevConsoleFontHeight;
 	static float prevScale = 0;
 
 	bool updateConsoleFont = false; // a hint for re-render console font, because it was removed
@@ -102,12 +106,19 @@ void CFontManager::VidInit( void )
 			.SetFlags( FONT_ADDITIVE )
 			.Create();
 #endif
+#ifdef __ANDROID__
+		uiStatic.hConsoleFont = CFontBuilder( DEFAULT_CONFONT, UI_SMALL_CHAR_HEIGHT * scale, 500 )
+			.SetOutlineSize()
+			.Create();
+#endif
 		prevScale = scale;
 	}
 
-
+#ifndef __ANDROID__
+	static int prevConsoleFontHeight;
 	int consoleFontHeight;
 
+	// makefont rules
 	if( ScreenHeight < 320 ) consoleFontHeight = 11;
 	else if( ScreenHeight < 640 ) consoleFontHeight = 14;
 	else consoleFontHeight = 18;
@@ -119,11 +130,14 @@ void CFontManager::VidInit( void )
 			DeleteFont( uiStatic.hConsoleFont );
 			uiStatic.hConsoleFont = 0;
 		}
+
 		uiStatic.hConsoleFont = CFontBuilder( DEFAULT_CONFONT, consoleFontHeight, 500 )
 			.SetOutlineSize()
 			.Create();
+
 		prevConsoleFontHeight = consoleFontHeight;
 	}
+#endif
 }
 
 void CFontManager::DeleteAllFonts()

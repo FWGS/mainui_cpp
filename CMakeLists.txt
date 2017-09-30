@@ -140,6 +140,9 @@ if( MAINUI_CPP_ENABLE_FONT_RENDER )
 		endif()
 	endif( )
 	add_definitions( -DMAINUI_USE_CUSTOM_FONT_RENDER )
+	if( MAINUI_RENDER_PICBUTTON_TEXT )
+		add_definitions( -DMAINUI_RENDER_PICBUTTON_TEXT )
+	endif( )
 endif( )
 
 set_target_properties (${MAINUI_LIBRARY} PROPERTIES
