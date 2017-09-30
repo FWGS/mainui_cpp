@@ -229,6 +229,7 @@ void CMenuGamePad::_Init( void )
 	yaw.SetNameAndStatus( "Yaw", "Yaw rotating sensitivity" );
 	invYaw.SetNameAndStatus( "Invert", "Invert yaw axis" );
 
+	controls.SetNameAndStatus( "Controls", "Change keyboard and mouse settings" );
 	controls.SetPicture( PC_CONTROLS );
 	controls.onActivated = UI_Controls_Menu;
 
