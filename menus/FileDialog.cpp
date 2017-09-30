@@ -132,8 +132,6 @@ UI_FileDialog_Init
 */
 void CMenuFileDialog::_Init( void )
 {
-	// memset( &uiFileDialog, 0, sizeof( uiFileDialog_t ));
-
 	// banner.SetPicture( ART_BANNER );
 
 	done.SetNameAndStatus( "Done", "Use selected file" );
@@ -153,7 +151,7 @@ void CMenuFileDialog::_Init( void )
 	GetFileList();
 
 	AddItem( background );
-	//AddItem( banner );
+	// AddItem( banner );
 	AddItem( done );
 	AddItem( cancel );
 	AddItem( preview );
@@ -162,10 +160,10 @@ void CMenuFileDialog::_Init( void )
 
 void CMenuFileDialog::_VidInit()
 {
-	done.SetCoord( 72, 150 );
-	cancel.SetCoord( 72, 210 );
-	fileList.SetRect( 340, 150, 600, 500 );
-	preview.SetRect( 72, 300, 196, 196 );
+	done.SetCoord( 72, 230 );
+	cancel.SetCoord( 72, 280 );
+	fileList.SetRect( 340, 230, 600, 500 );
+	preview.SetRect( 72, 380, 196, 196 );
 
 	preview.SetVisibility( uiFileDialogGlobal.preview );
 }

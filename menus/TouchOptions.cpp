@@ -398,21 +398,21 @@ void CMenuTouchOptions::_Init( void )
 
 void CMenuTouchOptions::_VidInit()
 {
-	done.SetCoord( 72, 700 );
-	reset.SetCoord( 72, 640 );
+	reset.SetCoord( 72, 630 );
+	done.SetCoord ( 72, 680 );
 	lookX.SetCoord( 72, 280 );
 	lookY.SetCoord( 72, 340 );
 	moveX.SetCoord( 72, 400 );
 	moveY.SetCoord( 72, 460 );
 	grid.SetCoord( 72, 520 );
-	gridsize.SetRect( 72+30, 580, 150, 30 );
-	enable.SetCoord( 680, 650 );
-	nomouse.SetCoord( 680, 590 );
+	gridsize.SetRect( 72, 580, 210, 30 );
+	enable.SetCoord( 680, 630 );
+	nomouse.SetCoord( 680, 580 );
 	profiles.SetRect( 360, 255, 300, 340 );
-	remove.SetCoord( 560, 650 );
+	remove.SetCoord( 560, 630 );
 	remove.size.w = 100;
 
-	apply.SetCoord( 360, 650 );
+	apply.SetCoord( 360, 630 );
 	apply.size.w = 120;
 
 	profilename.SetRect( 680, 260, 205, 32 );
