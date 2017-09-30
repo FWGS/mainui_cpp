@@ -101,9 +101,13 @@ void CMenuYesNoMessageBox::_VidInit( void )
 
 	dlgMessage1.SetRect( 0, 24, 640, 256 );
 	if( m_bIsAlert )
-		yes.SetRect( 298, 204, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
+	{
+		yes.SetRect( 260, 204, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
+	}
 	else
+	{
 		yes.SetRect( 188, 204, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
+	}
 	no.SetRect( 338, 204, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
 
 	dlgMessage1.SetCharSize( QM_DEFAULTFONT );
