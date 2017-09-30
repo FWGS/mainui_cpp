@@ -490,11 +490,16 @@ bool CMenuPicButton::DrawTitleAnim( CMenuBaseWindow::EAnimation state )
 
 #ifdef TA_ALT_MODE
 	if( frac >= 1.0f && transition_state == AS_TO_BUTTON )
-		return true;
 #else
 	if( frac >= 1.0f )
-		return true;
 #endif
+	{
+		s_hCurrentTransPic = 0;
+		return true;
+	}
+
+	if( !s_hCurrentTransPic )
+		return false; // wait for transition pic
 
 	Quad c;
 

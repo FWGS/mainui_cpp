@@ -147,6 +147,8 @@ void CMenuBaseWindow::PopMenu()
 	}
 	else
 	{
+		// a1ba: not needed anymore?
+
 		// never trying the close menu when client isn't connected
 		EngFuncs::KEY_SetDest( KEY_MENU );
 		UI_Main_Menu();
