@@ -27,18 +27,20 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 static const char *uiCreditsDefault[] = 
 {
 	"",
-	"Copyright XashXT Group 2014 (C)",
+	"Copyright XashXT Group 2017 (C)",
+	"Copyright Flying With Gauss 2017 (C)",
 	0
 };
 
-class CMenuCredits : public CMenuFramework
+class CMenuCredits : public CMenuBaseWindow
 {
 public:
-	CMenuCredits() : CMenuFramework("CMenuCredits") { }
+	CMenuCredits() : CMenuBaseWindow() { }
 
 	void Draw();
 	const char *Key(int key, int down);
 	bool DrawAnimation(EAnimation anim) { return false; }
+	void Show();
 
 	friend void UI_DrawFinalCredits( void );
 	friend void UI_FinalCredits( void );
@@ -61,6 +63,12 @@ private:
 CMenuCredits		uiCredits;
 
 
+void CMenuCredits::Show()
+{
+	CMenuBaseWindow::Show();
+	EngFuncs::KEY_SetDest( KEY_GAME );
+}
+
 /*
 =================
 CMenuCredits::Draw
@@ -78,11 +86,9 @@ void CMenuCredits::Draw( void )
 	if( !uiCredits.finalCredits && !EngFuncs::GetCvarFloat( "cl_background" ) )
 	{
 		background.Draw();
-		
-		// otherwise running on cutscene
-		speed = 32.0f * ( 768.0f / ScreenHeight );
 	}
-	else speed = 45.0f;	// syncronize with final background track :-)
+
+	speed = 32.0f * ( 768.0f / ScreenHeight );	// syncronize with final background track :-)
 
 
 	// now draw the credits
@@ -101,9 +107,9 @@ void CMenuCredits::Draw( void )
 			if( !uiCredits.fadeTime ) uiCredits.fadeTime = (gpGlobals->time * 1000);
 			color = UI_FadeAlpha( uiCredits.fadeTime, uiCredits.showTime );
 			if( UnpackAlpha( color ))
-				UI_DrawString( font, 0, ( ScreenHeight - h ) / 2, ScreenWidth, h, uiCredits.credits[i], color, true, w, h, QM_CENTER, true );
+				UI_DrawString( uiStatic.hDefaultFont, 0, ( ScreenHeight - h ) / 2, ScreenWidth, h, uiCredits.credits[i], color, true, w, h, QM_CENTER, true );
 		}
-		else UI_DrawString( font, 0, y, ScreenWidth, h, uiCredits.credits[i], uiColorWhite, false, w, h, QM_CENTER, true );
+		else UI_DrawString( uiStatic.hDefaultFont, 0, y, ScreenWidth, h, uiCredits.credits[i], uiColorWhite, false, w, h, QM_CENTER, true );
 	}
 
 	if( y < 0 && UnpackAlpha( color ) == 0 )
