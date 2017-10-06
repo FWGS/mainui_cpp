@@ -30,7 +30,7 @@ GNU General Public License for more details.
 
 #include "BitmapFont.h"
 
-#ifndef __ANDROID__
+#ifdef __ANDROID__
 #define DEFAULT_MENUFONT "RobotoCondensed"
 #define DEFAULT_CONFONT  "DroidSans"
 #else
@@ -77,15 +77,21 @@ void CFontManager::VidInit( void )
 
 	if( !prevScale || abs( scale - prevScale ) > 0.1f )
 	{
+#ifndef __ANDROID__
+		const int defWeight = 1000;
+#else
+		const int defWeight = 500;
+#endif
+
 		DeleteAllFonts();
 		updateConsoleFont = true;
-		uiStatic.hDefaultFont = CFontBuilder( DEFAULT_MENUFONT, UI_MED_CHAR_HEIGHT * scale, 500 )
+		uiStatic.hDefaultFont = CFontBuilder( DEFAULT_MENUFONT, UI_MED_CHAR_HEIGHT * scale, defWeight )
 			.SetHandleNum( QM_DEFAULTFONT )
 			.Create();
-		uiStatic.hSmallFont   = CFontBuilder( DEFAULT_MENUFONT, UI_SMALL_CHAR_HEIGHT * scale, 500 )
+		uiStatic.hSmallFont   = CFontBuilder( DEFAULT_MENUFONT, UI_SMALL_CHAR_HEIGHT * scale, defWeight )
 			.SetHandleNum( QM_SMALLFONT )
 			.Create();
-		uiStatic.hBigFont     = CFontBuilder( DEFAULT_MENUFONT, UI_BIG_CHAR_HEIGHT * scale, 500 )
+		uiStatic.hBigFont     = CFontBuilder( DEFAULT_MENUFONT, UI_BIG_CHAR_HEIGHT * scale, defWeight )
 			.SetHandleNum( QM_BIGFONT )
 			.Create();
 
@@ -107,7 +113,7 @@ void CFontManager::VidInit( void )
 			.Create();
 #endif
 #ifdef __ANDROID__
-		uiStatic.hConsoleFont = CFontBuilder( DEFAULT_CONFONT, UI_SMALL_CHAR_HEIGHT * scale, 500 )
+		uiStatic.hConsoleFont = CFontBuilder( DEFAULT_CONFONT, UI_SMALL_CHAR_HEIGHT * scale, defWeight )
 			.SetOutlineSize()
 			.Create();
 #endif
@@ -481,21 +487,24 @@ HFont CFontBuilder::Create()
 	IBaseFont *font;
 
 	// check existing font at first
-	for( int i = 0; i < g_FontMgr.m_Fonts.Count(); i++ )
+	if( !m_hForceHandle )
 	{
-		font = g_FontMgr.m_Fonts[i];
+		for( int i = 0; i < g_FontMgr.m_Fonts.Count(); i++ )
+		{
+			font = g_FontMgr.m_Fonts[i];
 
-		if( font->IsEqualTo( m_szName, m_iTall, m_iWeight, m_iBlur, m_iFlags ) )
-			return i + 1;
+			if( font->IsEqualTo( m_szName, m_iTall, m_iWeight, m_iBlur, m_iFlags ) )
+				return i + 1;
+		}
 	}
 
-	#if defined(MAINUI_USE_FREETYPE)
+#if defined(MAINUI_USE_FREETYPE)
 		font = new CFreeTypeFont();
-	#elif defined(MAINUI_USE_STB)
+#elif defined(MAINUI_USE_STB)
 		font = new CStbFont();
-	#else
+#else
 		font = new CWinAPIFont();
-	#endif
+#endif
 
 	double starttime = Sys_DoubleTime();
 
