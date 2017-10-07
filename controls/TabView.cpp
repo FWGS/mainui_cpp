@@ -51,10 +51,11 @@ const char *CMenuTabView::Key(int key, int down)
 void CMenuTabView::DrawTab(Point pt, const char *name, bool isEnd, bool isSelected, bool isHighlighted)
 {
 	int textColor = uiInputTextColor;
+	int fillColor = uiColorBlack;
 
 	if( isSelected && !isHighlighted )
 	{
-		UI_FillRect( pt, m_szTab, uiInputBgColor );
+		fillColor = uiInputBgColor;
 		textColor = uiInputFgColor;
 	}
 	else if( isHighlighted )
@@ -62,6 +63,7 @@ void CMenuTabView::DrawTab(Point pt, const char *name, bool isEnd, bool isSelect
 		textColor = uiPromptFocusColor;
 	}
 
+	UI_FillRect( pt, m_szTab, fillColor );
 	UI_DrawString( font, pt, m_szTab, name, textColor, 0, m_scChSize, eTextAlignment, true );
 
 	if( !isEnd )
@@ -100,6 +102,10 @@ void CMenuTabView::Draw()
 	UI_FillRect( contentOffset.x, contentOffset.y,
 		m_scSize.w, UI_OUTLINE_WIDTH, uiColorHelp );
 
+	// fill background
+	UI_FillRect( contentOffset, contentSize, uiColorBlack );
+
+	// draw contents
 	if( m_iCursor >= 0 && m_iCursor < m_numItems )
 	{
 		UI::Scissor::PushScissor( contentOffset, contentSize );
