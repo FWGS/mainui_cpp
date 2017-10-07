@@ -441,24 +441,14 @@ int UI::Font::CutText(HFont fontHandle, const char *text, Size charSize, int vis
 #endif
 }
 
-// CP1251 table
-
-int table_cp1251[64] = {
-	0x0402, 0x0403, 0x201A, 0x0453, 0x201E, 0x2026, 0x2020, 0x2021,
-	0x20AC, 0x2030, 0x0409, 0x2039, 0x040A, 0x040C, 0x040B, 0x040F,
-	0x0452, 0x2018, 0x2019, 0x201C, 0x201D, 0x2022, 0x2013, 0x2014,
-	0x007F, 0x2122, 0x0459, 0x203A, 0x045A, 0x045C, 0x045B, 0x045F,
-	0x00A0, 0x040E, 0x045E, 0x0408, 0x00A4, 0x0490, 0x00A6, 0x00A7,
-	0x0401, 0x00A9, 0x0404, 0x00AB, 0x00AC, 0x00AD, 0x00AE, 0x0407,
-	0x00B0, 0x00B1, 0x0406, 0x0456, 0x0491, 0x00B5, 0x00B6, 0x00B7,
-	0x0451, 0x2116, 0x0454, 0x00BB, 0x0458, 0x0405, 0x0455, 0x0457
-};
-
 /*
 ============================
 Con_UtfProcessChar
 
-Convert utf char to current font's single-byte encoding
+Ripped from engine.
+
+Xash3D FWGS uses multibyte, converting it to current single-byte encoding
+Converting to single-byte not necessary anymore, as UI uses custom font render which works with 32-bit chars
 ============================
 */
 int Con_UtfProcessChar( int in )
@@ -488,7 +478,7 @@ int Con_UtfProcessChar( int in )
 		else if( in >= 0xC0 )
 			uc = in & 0x1F, m = 1;
 		else if( in <= 0x7F)
-			return in; //ascii
+			return in; // ascii
 		// return 0 if we need more chars to decode one
 		k=0;
 		return 0;
@@ -508,26 +498,6 @@ int Con_UtfProcessChar( int in )
 	if( k == m )
 	{
 		k = m = -1;
-		/*if( g_codepage == 1251 )
-		{
-			// cp1251 now
-			if( uc >= 0x0410 && uc <= 0x042F )
-				return uc - 0x410 + 0xC0;
-			if( uc >= 0x0430 && uc <= 0x044F )
-				return uc - 0x430 + 0xE0;
-			else
-			{
-				int i;
-				for( i = 0; i < 64; i++ )
-					if( table_cp1251[i] == uc )
-						return i + 0x80;
-			}
-		}
-		else if( g_codepage == 1252 )
-		{
-			if( uc < 255 )
-				return uc;
-		}*/
 
 		return uc;
 
