@@ -20,7 +20,13 @@ GNU General Public License for more details.
 #include "FontManager.h"
 #define STB_TRUETYPE_IMPLEMENTATION
 #define STBTT_STATIC
+
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-function"
 #include "StbFont.h"
+#pragma GCC diagnostic pop
+#endif
 #include "Utils.h"
 
 bool ABCCacheLessFunc( const abc_t &a, const abc_t &b )
@@ -110,7 +116,7 @@ bool CStbFont::FindFontDataFile(const char *name, int tall, int weight, int flag
 	return true;
 #elif defined __linux__ // call fontconfig
 	char cmd[256];
-	int len;
+	int len = 0;
 	FILE *fp;
 
 	len = snprintf( cmd, 256 - len, "fc-match -f %%{file} %s", name );
@@ -203,15 +209,15 @@ bool CStbFont::Create(const char *name, int tall, int weight, int blur, float br
 		m_szName[0] = 0;
 		return false;
 	}
-	scale = stbtt_ScaleForPixelHeight(&m_fontInfo, tall);
+
+	// HACKHACK: for some reason size scales between ft2 and stbtt are different
+	scale = stbtt_ScaleForPixelHeight(&m_fontInfo, tall + 5 * uiStatic.scaleY);
 	int x0, y0, x1, y1;
-	stbtt_GetFontBoundingBox( &m_fontInfo, &x0, &y0, &x1, &y1 );
 
 	stbtt_GetFontVMetrics(&m_fontInfo, &m_iAscent, NULL, NULL );
-
 	m_iAscent *= scale;
 
-
+	stbtt_GetFontBoundingBox( &m_fontInfo, &x0, &y0, &x1, &y1 );
 	m_iHeight = (( y1 - y0 ) * scale); // maybe wrong!
 	m_iMaxCharWidth = (( x1 - x0 ) * scale); // maybe wrong!
 

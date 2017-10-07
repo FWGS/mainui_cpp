@@ -250,10 +250,10 @@ void CMenuServerBrowser::_Init( void )
 	msgBox.Link( this );
 
 	gameList.SetCharSize( QM_SMALLFONT );
-	gameList.SetupColumn( 0, "Name", 0.50f );
-	gameList.SetupColumn( 1, "Map", 0.28f );
-	gameList.SetupColumn( 2, "Players", 0.12f );
-	gameList.SetupColumn( 3, "Ping", 0.10f );
+	gameList.SetupColumn( 0, "Name", 0.40f );
+	gameList.SetupColumn( 1, "Map", 0.30f );
+	gameList.SetupColumn( 2, "Players", 0.15f );
+	gameList.SetupColumn( 3, "Ping", 0.15f );
 	gameList.SetModel( &gameListModel );
 	gameList.bFramedHintText = true;
 

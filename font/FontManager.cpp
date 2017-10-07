@@ -33,15 +33,15 @@ GNU General Public License for more details.
 #ifdef __ANDROID__
 #define DEFAULT_MENUFONT "RobotoCondensed"
 #define DEFAULT_CONFONT  "DroidSans"
+#define SCALE_FONTS // Probably isn't a good idea until I don't have implemented SDF
+#define DEFAULT_WEIGHT 1000
 #else
 #define DEFAULT_MENUFONT "Trebuchet MS"
 #define DEFAULT_CONFONT  "Tahoma"
+#define DEFAULT_WEIGHT 500
+#define MIMIC_MAKEFONT_SCALES
 #endif
 
-// Probably isn't a good idea until I don't have implemented SDF
-#ifdef __ANDROID__ // don't rape poor Android devices' CPU & GPU
-#define SCALE_FONTS
-#endif
 // #define SCALE_FONTS
 
 CFontManager g_FontMgr;
@@ -69,29 +69,23 @@ void CFontManager::VidInit( void )
 
 	bool updateConsoleFont = false; // a hint for re-render console font, because it was removed
 
-#ifdef SCALE_FONTS
-	float scale = 1; // complete disables font re-rendering
-#else
 	float scale = uiStatic.scaleY;
-#endif
 
-	if( !prevScale || abs( scale - prevScale ) > 0.1f )
+	if( !prevScale
+#ifndef SCALE_FONTS // complete disables font re-rendering
+	|| abs( scale - prevScale ) > 0.1f
+#endif
+	)
 	{
-#ifndef __ANDROID__
-		const int defWeight = 1000;
-#else
-		const int defWeight = 500;
-#endif
-
 		DeleteAllFonts();
 		updateConsoleFont = true;
-		uiStatic.hDefaultFont = CFontBuilder( DEFAULT_MENUFONT, UI_MED_CHAR_HEIGHT * scale, defWeight )
+		uiStatic.hDefaultFont = CFontBuilder( DEFAULT_MENUFONT, UI_MED_CHAR_HEIGHT * scale, DEFAULT_WEIGHT )
 			.SetHandleNum( QM_DEFAULTFONT )
 			.Create();
-		uiStatic.hSmallFont   = CFontBuilder( DEFAULT_MENUFONT, UI_SMALL_CHAR_HEIGHT * scale, defWeight )
+		uiStatic.hSmallFont   = CFontBuilder( DEFAULT_MENUFONT, UI_SMALL_CHAR_HEIGHT * scale, DEFAULT_WEIGHT )
 			.SetHandleNum( QM_SMALLFONT )
 			.Create();
-		uiStatic.hBigFont     = CFontBuilder( DEFAULT_MENUFONT, UI_BIG_CHAR_HEIGHT * scale, defWeight )
+		uiStatic.hBigFont     = CFontBuilder( DEFAULT_MENUFONT, UI_BIG_CHAR_HEIGHT * scale, DEFAULT_WEIGHT )
 			.SetHandleNum( QM_BIGFONT )
 			.Create();
 
@@ -112,15 +106,15 @@ void CFontManager::VidInit( void )
 			.SetFlags( FONT_ADDITIVE )
 			.Create();
 #endif
-#ifdef __ANDROID__
-		uiStatic.hConsoleFont = CFontBuilder( DEFAULT_CONFONT, UI_SMALL_CHAR_HEIGHT * scale, defWeight )
+#ifndef MIMIC_MAKEFONT_SCALES
+		uiStatic.hConsoleFont = CFontBuilder( DEFAULT_CONFONT, UI_SMALL_CHAR_HEIGHT * scale, DEFAULT_WEIGHT )
 			.SetOutlineSize()
 			.Create();
 #endif
 		prevScale = scale;
 	}
 
-#ifndef __ANDROID__
+#ifdef MIMIC_MAKEFONT_SCALES
 	static int prevConsoleFontHeight;
 	int consoleFontHeight;
 
