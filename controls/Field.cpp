@@ -187,7 +187,7 @@ const char *CMenuField::Key( int key, int down )
 			memmove( szBuffer + pos, szBuffer + iCursor, len - iCursor + 1 );
 			iCursor = pos;
 			if( iScroll )
-				iScroll = iScroll = EngFuncs::UtfMoveLeft( szBuffer, iScroll );
+				iScroll = EngFuncs::UtfMoveLeft( szBuffer, iScroll );
 		}
 	}
 	if( key == K_DEL )
