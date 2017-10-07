@@ -642,3 +642,8 @@ bool CMenuItemsHolder::KeyValueData(const char *key, const char *data)
 {
 	return CMenuBaseItem::KeyValueData( key, data );
 }
+
+Point CMenuItemsHolder::GetPositionOffset() const
+{
+	return m_scPos;
+}

@@ -154,7 +154,10 @@ void CMenuBaseItem::CalcPosition()
 		m_scPos = pos.Scale();
 
 	if( !IsAbsolutePositioned() && m_pParent )
-		m_scPos += m_pParent->m_scPos;
+	{
+		Point offset = m_pParent->GetPositionOffset();
+		m_scPos += offset;
+	}
 }
 
 void CMenuBaseItem::CalcSizes()

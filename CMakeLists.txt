@@ -47,7 +47,8 @@ set (MAINUI_CONTROLS_SOURCES
 	controls/ProgressBar.cpp
 	controls/BackgroundBitmap.cpp
 	controls/Table.cpp
-	#controls/TabWidget.cpp
+	controls/TabView.cpp
+	#controls/VideoPlayer.cpp
 	#controls/ScrollView.cpp
 	)
 

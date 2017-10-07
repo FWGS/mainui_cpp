@@ -106,39 +106,6 @@ void CMenuMain::CMenuMainBanner::Draw()
 	logoPosY = 70 * scaleY;	// 70 it's empirically determined value (magic number)
 
 	EngFuncs::DrawLogo( "logo.avi", 0, logoPosY, logoWidth, logoHeight );
-
-#if 0
-	if( !pic )
-		return;
-	Size big, small;
-	//wrect_t meow = { 0, 0, EngFuncs::PIC_Width( pic ) / 2, EngFuncs::PIC_Height( pic ) };
-
-	big = small = m_scSize;
-	small.w *= 2 * uiStatic.scaleX;
-	small.h *= 2 * uiStatic.scaleY;
-	big.w *= 5 * uiStatic.scaleX;
-	big.h *= 5 * uiStatic.scaleY;
-
-	Point pos1, pos2;
-	float offset;
-	float x = (float)uiStatic.realTime / 1200;
-	offset = (1 + 0.5 * cos(x))  * sin( 5 * x / 2);
-
-	pos1.x = UI_BANNER_POSX*1.5 + 128 * offset;
-	pos1.y = UI_BANNER_POSY + big.h;
-
-	pos2.x = -(small.w / 3) + 300 * offset;
-	pos2.y = UI_BANNER_POSY - 20;
-
-	pos1 = pos1.Scale();
-	pos2 = pos2.Scale();
-
-	EngFuncs::PIC_Set( pic, 255, 255, 255 );
-	EngFuncs::PIC_DrawAdditive( pos1.x, pos2.y, small.w, small.h );
-
-	EngFuncs::PIC_Set( pic, 255, 255, 255 );
-	EngFuncs::PIC_DrawAdditive( pos2.x, pos2.y, big.w, big.h );
-#endif
 }
 
 void CMenuMain::QuitCb(CMenuBaseItem *, void *)

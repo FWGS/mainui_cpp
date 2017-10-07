@@ -23,6 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "PicButton.h"
 #include "YesNoMessageBox.h"
 #include "keydefs.h"
+#include "TabView.h"
 
 #define ART_BANNER	     	"gfx/shell/head_config"
 

@@ -34,7 +34,7 @@ public:
 	void Draw( void );
 	void SetInactive(bool) { }
 	void ToggleInactive() { }
-	bool ShouldDrawLogoMovie() { return s_bEnableLogoMovie; }
+	static bool ShouldDrawLogoMovie() { return s_bEnableLogoMovie; }
 
 	bool bForceWON; // if true, szPic will be drawn, instead of Steam-background
 	bool bForceColor; // dialogs should set this

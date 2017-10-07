@@ -23,8 +23,10 @@ class CMenuItemsHolder : public CMenuBaseItem
 public:
 	CMenuItemsHolder();
 
+	// Overload _Init, _VidInit instead of these methods
 	void Init();
 	void VidInit();
+
 	virtual const char *Key( int key, int down );
 	virtual void Char( int key );
 	virtual const char *Activate( void );
@@ -37,6 +39,9 @@ public:
 
 	virtual bool KeyValueData(const char *key, const char *data);
 
+	// returns a position where actual items holder is located
+	virtual Point GetPositionOffset() const;
+
 	void CursorMoved( void );
 	void SetCursor( int newCursor, bool notify = true );
 	void SetCursorToItem( CMenuBaseItem &item, bool notify = true );
@@ -47,6 +52,13 @@ public:
 	CMenuBaseItem *ItemAtCursor( void );
 	CMenuBaseItem *ItemAtCursorPrev( void );
 	CMenuBaseItem *FindItemByTag( const char *tag );
+	inline CMenuBaseItem *GetItemByIndex( int idx )
+	{
+		if( idx >= 0 && idx < UI_MAX_MENUITEMS )
+			return m_pItems[idx];
+		return NULL;
+	}
+	inline int GetItemCount() { return m_numItems; }
 
 	void CalcItemsPositions();
 	void CalcItemsSizes();
