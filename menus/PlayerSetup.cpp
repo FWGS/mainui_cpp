@@ -397,6 +397,7 @@ void CMenuPlayerSetup::UpdateModel()
 
 	snprintf( image, 256, "models/player/%s/%s.bmp", mdl, mdl );
 	view.hPlayerImage = EngFuncs::PIC_Load( image, PIC_KEEP_8BIT );
+	ApplyColorToImagePreview();
 	EngFuncs::CvarSetString( "model", mdl );
 	if( !strcmp( mdl, "player" ) )
 		strcpy( image, "models/player.mdl" );
