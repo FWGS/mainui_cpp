@@ -1,3 +1,4 @@
+#include "BaseMenu.h"
 #include "Scissor.h"
 
 #define MAX_SCISSORS 16
@@ -5,7 +6,7 @@
 static class CScissorState
 {
 public:
-	CScissorState() : iDepth(0), coordStack(), sizeStack() { }
+	CScissorState() : iDepth( 0 ), coordStack(), sizeStack() { }
 
 	int iDepth;
 	Point coordStack[MAX_SCISSORS];
@@ -73,14 +74,15 @@ void UI::Scissor::PopScissor()
 	}
 
 	EngFuncs::PIC_DisableScissor();
+	scissor.iDepth--;
 
-	if( --scissor.iDepth > 0 )
+	if( scissor.iDepth > 0 )
 	{
 		EngFuncs::PIC_EnableScissor(
-			scissor.coordStack[scissor.iDepth].x,
-			scissor.coordStack[scissor.iDepth].y,
-			scissor.sizeStack[scissor.iDepth].w,
-			scissor.sizeStack[scissor.iDepth].h );
+			scissor.coordStack[scissor.iDepth - 1].x,
+			scissor.coordStack[scissor.iDepth - 1].y,
+			scissor.sizeStack[scissor.iDepth - 1].w,
+			scissor.sizeStack[scissor.iDepth - 1].h );
 	}
 }
 
