@@ -23,11 +23,11 @@
 cmake_minimum_required(VERSION 2.6.0)
 project (MAINUI)
 
-set (CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 11)
 
-set (MAINUI_LIBRARY xashmenu)
+set(MAINUI_LIBRARY xashmenu)
 
-set (MAINUI_CONTROLS_SOURCES
+set(MAINUI_CONTROLS_SOURCES
 	controls/Framework.cpp
 	controls/BaseItem.cpp
 	controls/Action.cpp
@@ -50,9 +50,9 @@ set (MAINUI_CONTROLS_SOURCES
 	controls/TabView.cpp
 	#controls/VideoPlayer.cpp
 	#controls/ScrollView.cpp
-	)
+)
 
-set (MAINUI_MENUS_SOURCES
+set(MAINUI_MENUS_SOURCES
 	menus/AdvancedControls.cpp
 	menus/Audio.cpp
 	menus/Configuration.cpp
@@ -80,18 +80,18 @@ set (MAINUI_MENUS_SOURCES
 	menus/Zoo.cpp
 	menus/ConnectionProgress.cpp
 	menus/dynamic/ScriptMenu.cpp
-	)
+)
 
-set( MAINUI_FONT_RENDER_SOURCES
+set(MAINUI_FONT_RENDER_SOURCES
 	font/WinAPIFont.cpp
 	font/BitmapFont.cpp
 	font/FontManager.cpp
 	font/FreeTypeFont.cpp
 	font/StbFont.cpp
 	font/BaseFontBackend.cpp
-	)
+)
 
-set (MAINUI_SOURCES
+set(MAINUI_SOURCES
 	EventSystem.cpp
 	EventSystem.h
 	EngineCallback.cpp
@@ -102,72 +102,76 @@ set (MAINUI_SOURCES
 	Utils.cpp
 	Scissor.cpp
 	udll_int.cpp
-	)
+)
 
 list(APPEND MAINUI_SOURCES ${MAINUI_CONTROLS_SOURCES})
 list(APPEND MAINUI_SOURCES ${MAINUI_MENUS_SOURCES})
-if( MAINUI_CPP_ENABLE_FONT_RENDER )
+if(MAINUI_CPP_ENABLE_FONT_RENDER)
 	list(APPEND MAINUI_SOURCES ${MAINUI_FONT_RENDER_SOURCES})
 endif()
 add_library (${MAINUI_LIBRARY} SHARED ${MAINUI_SOURCES})
 
-if( NOT WIN32 AND NOT MINGW )
-	add_compile_options( -Wall -Wextra -Wpedantic -Wno-unused-parameter -Wno-unused-variable )
+if(NOT WIN32 AND NOT MINGW)
+	add_compile_options(-Wall -Wextra -Wpedantic -Wno-unused-parameter -Wno-unused-variable)
 endif()
 
-if( NOT XASH_SDK )
-	set( XASH_SDK "../" )
-endif( )
+if(NOT XASH_SDK)
+	set(XASH_SDK "../")
+endif()
 
-include_directories (${XASH_SDK}/common ${XASH_SDK}/engine ${XASH_SDK}/pm_shared . controls/ menus/ utl/ font/)
+include_directories(${XASH_SDK}/common ${XASH_SDK}/engine ${XASH_SDK}/pm_shared . controls/ menus/ utl/ font/)
 
-
-if( MSVC )
+if(MSVC)
 	add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-endif( )
+endif()
 
 # Font Rendering(FreeType or WinAPI)
-if( MAINUI_CPP_ENABLE_FONT_RENDER )
+if(MAINUI_CPP_ENABLE_FONT_RENDER)
 	# Win32 will always use GDI font renderer
-	if( NOT WIN32 )
-		if( MAINUI_USE_STB )
-			add_definitions( -DMAINUI_USE_STB )
+	if(NOT WIN32)
+		if(MAINUI_USE_STB)
+			# Use stbtt
+			add_definitions(-DMAINUI_USE_STB)
 		else()
+			# Use freetype2
 			find_package(PkgConfig)
 			pkg_check_modules(FC REQUIRED fontconfig)
-			include_directories( ${FC_INCLUDE_DIRS} )
-			target_link_libraries( ${MAINUI_LIBRARY} ${FC_LIBRARIES} )
-			add_definitions( -DMAINUI_USE_FREETYPE )
+			include_directories(${FC_INCLUDE_DIRS})
+			target_link_libraries(${MAINUI_LIBRARY} ${FC_LIBRARIES})
+			add_definitions(-DMAINUI_USE_FREETYPE)
 		endif()
-	endif( )
-	add_definitions( -DMAINUI_USE_CUSTOM_FONT_RENDER )
-	if( MAINUI_RENDER_PICBUTTON_TEXT )
-		add_definitions( -DMAINUI_RENDER_PICBUTTON_TEXT )
-	endif( )
-endif( )
+	endif()
 
-set_target_properties (${MAINUI_LIBRARY} PROPERTIES
-	POSITION_INDEPENDENT_CODE 1 )
-
-# Name library as it named in Unkle Mike's Xash3D
-if( WIN32 )
-	set_target_properties(${MAINUI_LIBRARY} PROPERTIES
-		OUTPUT_NAME menu )
+	add_definitions(-DMAINUI_USE_CUSTOM_FONT_RENDER)
+	if(MAINUI_RENDER_PICBUTTON_TEXT)
+		add_definitions(-DMAINUI_RENDER_PICBUTTON_TEXT)
+	endif()
 endif()
 
-if( NOT WIN32 )
-	install( TARGETS ${MAINUI_LIBRARY} DESTINATION ${LIB_INSTALL_DIR}/xash3d 
-        PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ)
+set_target_properties(${MAINUI_LIBRARY} PROPERTIES
+	POSITION_INDEPENDENT_CODE 1)
+
+# Name library as it named in Unkle Mike's Xash3D
+if(WIN32)
+	set_target_properties(${MAINUI_LIBRARY} PROPERTIES
+		OUTPUT_NAME menu)
+endif()
+
+if(NOT WIN32)
+	install(TARGETS ${MAINUI_LIBRARY} DESTINATION ${LIB_INSTALL_DIR}/xash3d
+		PERMISSIONS OWNER_READ OWNER_WRITE
+		            GROUP_READ
+					WORLD_READ)
 else()
-	install( TARGETS ${MAINUI_LIBRARY}
+	install(TARGETS ${MAINUI_LIBRARY}
 		CONFIGURATIONS Debug 
 		RUNTIME DESTINATION ${LIB_INSTALL_DIR}/Debug/
-		LIBRARY DESTINATION ${LIB_INSTALL_DIR}/Debug/ )
-	install( FILES $<TARGET_FILE_DIR:${MAINUI_LIBRARY}>/$<TARGET_PROPERTY:${MAINUI_LIBRARY},OUTPUT_NAME>.pdb
+		LIBRARY DESTINATION ${LIB_INSTALL_DIR}/Debug/)
+	install(FILES $<TARGET_FILE_DIR:${MAINUI_LIBRARY}>/$<TARGET_PROPERTY:${MAINUI_LIBRARY},OUTPUT_NAME>.pdb
 		CONFIGURATIONS Debug 
-		DESTINATION ${LIB_INSTALL_DIR}/Debug/ )
-	install( TARGETS ${MAINUI_LIBRARY}
+		DESTINATION ${LIB_INSTALL_DIR}/Debug/)
+	install(TARGETS ${MAINUI_LIBRARY}
 		CONFIGURATIONS Release 
 		RUNTIME DESTINATION ${LIB_INSTALL_DIR}/Release/
-		LIBRARY DESTINATION ${LIB_INSTALL_DIR}/Release/ )
+		LIBRARY DESTINATION ${LIB_INSTALL_DIR}/Release/)
 endif()
