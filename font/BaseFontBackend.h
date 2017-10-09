@@ -49,7 +49,7 @@ public:
 
 	bool IsEqualTo( const char *name, int tall, int weight, int blur, int flags ) const;
 
-	void DebugDraw() const;
+	void DebugDraw();
 
 	struct charRange_t
 	{

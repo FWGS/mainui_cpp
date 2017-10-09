@@ -229,7 +229,7 @@ bool IBaseFont::IsEqualTo(const char *name, int tall, int weight, int blur, int 
 	return true;
 }
 
-void IBaseFont::DebugDraw() const
+void IBaseFont::DebugDraw()
 {
 	HIMAGE hImage;
 	char name[256];
@@ -246,7 +246,40 @@ void IBaseFont::DebugDraw() const
 			EngFuncs::PIC_DrawAdditive(  Point(x, 0), Size( MAX_PAGE_SIZE, MAX_PAGE_SIZE ) );
 		else
 			EngFuncs::PIC_DrawTrans( Point(x, 0), Size( MAX_PAGE_SIZE, MAX_PAGE_SIZE ) );
+
+		for( int i = m_glyphs.FirstInorder();; i = m_glyphs.NextInorder( i ) )
+		{
+			if( m_glyphs[i].texture == hImage )
+			{
+				Point pt;
+				Size sz;
+				pt.x = x + m_glyphs[i].rect.left;
+				pt.y = m_glyphs[i].rect.top;
+
+				sz.w = m_glyphs[i].rect.right - m_glyphs[i].rect.left;
+				sz.h = m_glyphs[i].rect.bottom - pt.y;
+
+				UI_DrawRectangleExt( pt, sz, PackRGBA( 255, 0, 0, 255 ), 1 );
+
+				int a, b, c;
+				GetCharABCWidths( m_glyphs[i].ch, a, b, c );
+
+				pt.x -= a;
+				sz.w += c + a;
+
+				UI_DrawRectangleExt( pt, sz, PackRGBA( 0, 255, 0, 255 ), 1, QM_LEFT | QM_RIGHT );
+
+				int ascender = GetAscent();
+
+				pt.y += ascender;
+				UI_DrawRectangleExt( pt, sz, PackRGBA( 0, 0, 255, 255 ), 1, QM_TOP );
+			}
+
+			if( i == m_glyphs.LastInorder() )
+				break;
+		}
 	}
+
 }
 
 void IBaseFont::ApplyBlur(Size rgbaSz, byte *rgba)
@@ -279,17 +312,17 @@ void IBaseFont::GetBlurValueForPixel(byte *src, Point srcPt, Size srcSz, byte *d
 	// scan the positive x direction
 	int maxX = Q_min( srcPt.x + m_iBlur, srcSz.w );
 	int minX = Q_max( srcPt.x - m_iBlur, 0 );
-	for( int x = minX; x <= maxX; x++ )
+	for( int x = minX; x < maxX; x++ )
 	{
-		int maxY = Q_min( srcPt.y + m_iBlur, srcSz.h - 1);
+		int maxY = Q_min( srcPt.y + m_iBlur, srcSz.h );
 		int minY = Q_max( srcPt.y - m_iBlur, 0);
-		for (int y = minY; y <= maxY; y++)
+		for (int y = minY; y < maxY; y++)
 		{
 			byte *srcPos = src + ((x + (y * srcSz.w)) * 4);
 
 			// muliply by the value matrix
-			float weight = m_pGaussianDistribution[x - srcPt.x + m_iBlur];
-			float weight2 = m_pGaussianDistribution[y - srcPt.y + m_iBlur];
+			float weight = m_pGaussianDistribution[(x - srcPt.x) + m_iBlur];
+			float weight2 = m_pGaussianDistribution[(y - srcPt.y) + m_iBlur];
 			accum += ( additive ? srcPos[0] : srcPos[3] ) * (weight * weight2);
 		}
 	}
@@ -298,11 +331,11 @@ void IBaseFont::GetBlurValueForPixel(byte *src, Point srcPt, Size srcSz, byte *d
 	if( !additive )
 	{
 		dest[0] = dest[1] = dest[2] = 255;
-		dest[3] = Q_min( (int)accum, 255);
+		dest[3] = Q_min( (int)(accum + 0.5f), 255);
 	}
 	else
 	{
-		dest[0] = dest[1] = dest[2] = Q_min( (int)accum, 255 );
+		dest[0] = dest[1] = dest[2] = Q_min( (int)(accum + 0.5f), 255 );
 		dest[3] = 255;
 	}
 }
@@ -313,13 +346,13 @@ void IBaseFont::CreateGaussianDistribution()
 	if( m_iBlur < 1 )
 		return;
 
-	sigma2 = 0.683 * m_iBlur;
+	sigma2 = 0.5 * m_iBlur;
 	sigma2 *= sigma2;
 	m_pGaussianDistribution = new float[m_iBlur * 2 + 1];
 	for( int x = 0; x <= m_iBlur * 2; x++ )
 	{
 		int val = x - m_iBlur;
-		m_pGaussianDistribution[x] = (float)(1.0f / sqrt(2 * M_PI * sigma2)) * pow(M_E, -1 * (val * val) / (2 * sigma2));
+		m_pGaussianDistribution[x] = (float)(1.0f / sqrt(2 * 3.14 * sigma2)) * pow(2.7, -1 * (val * val) / (2 * sigma2));
 
 		// brightening factor
 		m_pGaussianDistribution[x] *= m_fBrighten;
