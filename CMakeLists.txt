@@ -27,6 +27,10 @@ set(CMAKE_CXX_STANDARD 11)
 
 set(MAINUI_LIBRARY xashmenu)
 
+option(MAINUI_USE_CUSTOM_FONT_RENDER "Use custom font rendering" ON)
+option(MAINUI_USE_STB "Use stb_truetype.h for rendering(*nix-only)" OFF)
+option(MAINUI_RENDER_PICBUTTON_TEXT "Use custom font render to render picbuttons(experimental)" OFF)
+
 set(MAINUI_CONTROLS_SOURCES
 	controls/Framework.cpp
 	controls/BaseItem.cpp

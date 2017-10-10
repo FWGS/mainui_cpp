@@ -286,10 +286,26 @@ bool CMenuBackgroundBitmap::CheckBackgroundSplash( bool gamedirOnly )
 void CMenuBackgroundBitmap::LoadBackground()
 {
 	// try to load backgrounds from mod
-	if( LoadBackgroundImage( true ) ) return; // at first check new gameui backgrounds
-	if( CheckBackgroundSplash( true ) ) return; // then check won-style
+	if( LoadBackgroundImage( true ) )
+	{
+		Con_DPrintf( "Loading new-style background from game succeded\n" );
+		return; // at first check new gameui backgrounds
+	}
+	if( CheckBackgroundSplash( true ) )
+	{
+		Con_DPrintf( "Loading old-style background from game succeded\n" );
+		return; // then check won-style
+	}
 
 	// try from base directory
-	if( LoadBackgroundImage( false ) ) return; // gameui bgs are allowed to be inherited
-	if( CheckBackgroundSplash( false ) ) return;
+	if( LoadBackgroundImage( false ) )
+	{
+		Con_DPrintf( "Loading new-style background from base succeded\n" );
+		return; // gameui bgs are allowed to be inherited
+	}
+	if( CheckBackgroundSplash( false ) )
+	{
+		Con_DPrintf( "Loading old-style background from base succeded\n" );
+		return;
+	}
 }
