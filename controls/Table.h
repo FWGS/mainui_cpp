@@ -41,6 +41,17 @@ GNU General Public License for more details.
  * 6. Column widths are constant(at this moment). You should don't exceed 1.0 in total columns width
  *
  */
+
+enum ECellType
+{
+	CELL_TEXT = 0,
+	CELL_IMAGE_DEFAULT,
+	CELL_IMAGE_ADDITIVE,
+	CELL_IMAGE_TRANS,
+	CELL_IMAGE_HOLES,
+	// CELL_ITEM,
+};
+
 class CMenuBaseModel
 {
 public:
@@ -53,13 +64,15 @@ public:
 	virtual int GetColumns() const = 0;
 	virtual int GetRows() const = 0;
 	virtual const char *GetCellText( int line, int column ) = 0;
-
+	virtual ECellType GetCellType( int line, int column ) { return CELL_TEXT; }
+	// virtual CMenuBaseItem *GetCellItem( int line, int column ) { return NULL; }
 };
 
 class CMenuTable : public CMenuBaseItem
 {
 public:
 	CMenuTable();
+
 
 	virtual const char *Key( int key, int down );
 	virtual void Draw();

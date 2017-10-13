@@ -330,18 +330,72 @@ void CMenuTable::DrawLine( Point p, int line, int textColor, bool forceCol, int 
 		sz.w = width * flColumnWidths[i];
 
 		const char *str = m_pModel->GetCellText( line, i );
+		const ECellType type = m_pModel->GetCellType( line, i );
 
-		if( !str ) // headers may be null, cells too
+		if( !str /* && type != CELL_ITEM  */) // headers may be null, cells too
 			continue;
 
-		UI_DrawString( font,
-			ix, p.y,
-			sz.w, sz.h,
-			str,
-			textColor, forceCol,
-			m_scChSize.w, m_scChSize.h,
-			m_pModel->GetAlignmentForColumn( i ),
-			shadow );
+		switch( type )
+		{
+		case CELL_TEXT:
+			UI_DrawString( font,
+				ix, p.y,
+				sz.w, sz.h,
+				str,
+				textColor, forceCol,
+				m_scChSize.w, m_scChSize.h,
+				m_pModel->GetAlignmentForColumn( i ),
+				shadow );
+			break;
+		case CELL_IMAGE_ADDITIVE:
+		case CELL_IMAGE_DEFAULT:
+		case CELL_IMAGE_HOLES:
+		case CELL_IMAGE_TRANS:
+		{
+			HIMAGE pic = EngFuncs::PIC_Load( str );
+
+			if( !pic )
+				continue;
+
+			int height = EngFuncs::PIC_Height( pic );
+			int width = EngFuncs::PIC_Width( pic );
+			float scale = (float)m_scChSize.h/(float)height;
+
+			width = width * scale;
+			height = height * scale;
+
+			int x;
+
+			switch( m_pModel->GetAlignmentForColumn( i ) )
+			{
+			case QM_LEFT: x = ix; break;
+			case QM_RIGHT: x = ix + ( sz.w - width ); break;
+			case QM_CENTER: x = ix + ( sz.w - width ) / 2; break;
+			default: break;
+			}
+
+			EngFuncs::PIC_Set( pic, 255, 255, 255 );
+
+			switch( type )
+			{
+			case CELL_IMAGE_ADDITIVE:
+				EngFuncs::PIC_DrawAdditive( x, p.y, width, height );
+				break;
+			case CELL_IMAGE_DEFAULT:
+				EngFuncs::PIC_Draw( x, p.y, width, height );
+				break;
+			case CELL_IMAGE_HOLES:
+				EngFuncs::PIC_DrawHoles( x, p.y, width, height );
+				break;
+			case CELL_IMAGE_TRANS:
+				EngFuncs::PIC_DrawTrans( x, p.y, width, height );
+				break;
+			default: break; // shouldn't happen
+			}
+
+			break;
+		}
+		}
 	}
 }
 
