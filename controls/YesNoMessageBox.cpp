@@ -37,18 +37,16 @@ CMenuYesNoMessageBox::CMenuYesNoMessageBox( bool alert )
 	{
 		CMenuYesNoMessageBox *msgBox = (CMenuYesNoMessageBox*)pExtra;
 
-		msgBox->Hide();
 		msgBox->onPositive( msgBox );
-
+		msgBox->Hide();
 	}
 	END_EVENT( yes, onActivated )
 
 	SET_EVENT( no, onActivated )
 	{
 		CMenuYesNoMessageBox *msgBox = (CMenuYesNoMessageBox*)pExtra;
-		msgBox->Hide();
 		msgBox->onNegative( msgBox );
-
+		msgBox->Hide();
 	}
 	END_EVENT( no, onActivated )
 
