@@ -115,6 +115,7 @@ void CMenuCreateGame::Begin( CMenuBaseItem *pSelf, void *pExtra )
 	EngFuncs::CvarSetValue( "deathmatch", 1.0f );	// start deathmatch as default
 	EngFuncs::CvarSetString( "defaultmap", mapName );
 	EngFuncs::CvarSetValue( "sv_nat", EngFuncs::GetCvarFloat( "public" ) ? menu->nat.bChecked : 0 );
+	menu->password.WriteCvar();
 	menu->hostName.WriteCvar();
 	menu->hltv.WriteCvar();
 	menu->maxClients.WriteCvar();
@@ -244,6 +245,7 @@ void CMenuCreateGame::_Init( void )
 	password.iMaxLength = 16;
 	password.eTextAlignment = QM_CENTER;
 	password.bHideInput = true;
+	password.LinkCvar( "sv_password" );
 	// TODO: This field is completely ignored. Add password option to the engine!
 
 	msgBox.onPositive = Begin;
