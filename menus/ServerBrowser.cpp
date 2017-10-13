@@ -23,9 +23,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Table.h"
 #include "keydefs.h"
 #include "Switch.h"
+#include "Field.h"
 
 #define ART_BANNER_INET		"gfx/shell/head_inetgames"
 #define ART_BANNER_LAN		"gfx/shell/head_lan"
+#define ART_BANNER_LOCK		"gfx/shell/lock"
 
 // Server browser
 #define QMSB_GAME_LENGTH	25
@@ -39,21 +41,52 @@ public:
 	void Update();
 	int GetColumns() const
 	{
-		return 4; // game, mapname, maxcl, ping
+		return 5; // havePassword, game, mapname, maxcl, ping
 	}
 	int GetRows() const
 	{
 		return m_iNumItems;
 	}
+	ECellType GetCellType( int line, int column )
+	{
+		if( column == 0 )
+			return CELL_IMAGE_ADDITIVE;
+		return CELL_TEXT;
+	}
 	const char *GetCellText( int line, int column )
 	{
-		return m_szCells[line][column];
+		if( column == 0 )
+		{
+			if( m_bHavePassword[line] )
+				return ART_BANNER_LOCK;
+			else
+				return NULL;
+		}
+
+		return m_szCells[line][column - 1];
 	}
 	void OnActivateEntry(int line);
 
+	void Flush()
+	{
+		m_iNumItems = 0;
+	}
+
+	bool IsHavePassword( int line )
+	{
+		return m_bHavePassword[line];
+	}
+
 private:
-	char	m_szCells[UI_MAX_SERVERS][4][64];
+	char m_szCells[UI_MAX_SERVERS][4][64];
+	bool m_bHavePassword[UI_MAX_SERVERS];
 	int m_iNumItems;
+};
+
+struct serverSelect_t
+{
+	netadr_t adr;
+	bool havePassword;
 };
 
 class CMenuServerBrowser: public CMenuFramework
@@ -61,6 +94,7 @@ class CMenuServerBrowser: public CMenuFramework
 public:
 	CMenuServerBrowser() : CMenuFramework( "CMenuServerBrowser" ) { }
 	virtual void Draw();
+	virtual void Show();
 
 	void SetLANOnly( bool lanOnly )
 	{
@@ -73,7 +107,8 @@ public:
 	DECLARE_EVENT_TO_MENU_METHOD( CMenuServerBrowser, RefreshList )
 
 	static void JoinGame( CMenuBaseItem *pSelf, void *pExtra );
-	static void Connect( netadr_t adr );
+	static void Connect( netadr_t server, bool havePassword );
+	static void Connect( serverSelect_t server );
 
 	CMenuPicButton joinGame;
 	CMenuPicButton createGame;
@@ -86,6 +121,9 @@ public:
 	CMenuTable	gameList;
 	CMenuGameListModel gameListModel;
 
+	CMenuYesNoMessageBox askPassword;
+	CMenuField password;
+
 	int	  refreshTime;
 	int   refreshTime2;
 
@@ -94,6 +132,8 @@ private:
 	virtual void _Init();
 	virtual void _VidInit();
 };
+
+static serverSelect_t staticServerSelect;
 
 static CMenuServerBrowser	uiServerBrowser;
 
@@ -117,6 +157,17 @@ void CMenuGameListModel::Update( void )
 		Q_strncpy( m_szCells[i][1], Info_ValueForKey( info, "map" ), 64 );
 		snprintf( m_szCells[i][2], 64, "%s\\%s", Info_ValueForKey( info, "numcl" ), Info_ValueForKey( info, "maxcl" ) );
 		snprintf( m_szCells[i][3], 64, "%.f ms", uiStatic.serverPings[i] * 1000 );
+
+
+		const char *passwd = Info_ValueForKey( info, "password" );
+		if( passwd[0] && !stricmp( passwd, "1") )
+		{
+			m_bHavePassword[i] = true;
+		}
+		else
+		{
+			m_bHavePassword[i] = false;
+		}
 	}
 
 	m_iNumItems = i;
@@ -127,16 +178,46 @@ void CMenuGameListModel::Update( void )
 
 void CMenuGameListModel::OnActivateEntry( int line )
 {
-	CMenuServerBrowser::Connect( uiStatic.serverAddresses[line] );
+	CMenuServerBrowser::Connect( uiStatic.serverAddresses[line], m_bHavePassword[line] );
 }
 
-void CMenuServerBrowser::Connect( netadr_t adr )
+void CMenuServerBrowser::Connect( netadr_t server, bool havePassword )
+{
+	serverSelect_t select;
+	select.adr = server;
+	select.havePassword = havePassword;
+
+	Connect( select );
+}
+
+void CMenuServerBrowser::Connect( serverSelect_t server )
 {
 	// prevent refresh during connect
 	uiServerBrowser.refreshTime = uiStatic.realTime + 999999;
+
+	// ask user for password
+	if( server.havePassword )
+	{
+		// if dialog window is still open, then user have entered the password
+		if( !uiServerBrowser.askPassword.IsVisible() )
+		{
+			// save current select
+			staticServerSelect = server;
+
+			// show password request window
+			uiServerBrowser.askPassword.Show();
+			return;
+		}
+	}
+	else
+	{
+		// remove password, as server don't require it
+		EngFuncs::CvarSetString( "password", "" );
+	}
+
 	//BUGBUG: ClientJoin not guaranted to return, need use ClientCmd instead!!!
 	//BUGBUG: But server addres is known only as netadr_t here!!!
-	EngFuncs::ClientJoin( adr );
+	EngFuncs::ClientJoin( server.adr );
 	EngFuncs::ClientCmd( false, "menu_connectionprogress menu server\n" );
 }
 
@@ -148,14 +229,15 @@ CMenuServerBrowser::JoinGame
 void CMenuServerBrowser::JoinGame( CMenuBaseItem *pSelf, void *pExtra )
 {
 	CMenuServerBrowser *parent = (CMenuServerBrowser *)pSelf->Parent();
+	int select = parent->gameList.GetCurrentIndex();
 
-	Connect( uiStatic.serverAddresses[parent->gameList.GetCurrentIndex()] );
+	Connect( uiStatic.serverAddresses[select], parent->gameListModel.IsHavePassword( select ) );
 }
 
 void CMenuServerBrowser::ClearList()
 {
 	uiStatic.numServers = 0;
-	gameListModel.Update();
+	gameListModel.Flush();
 }
 
 void CMenuServerBrowser::RefreshList()
@@ -175,6 +257,7 @@ void CMenuServerBrowser::RefreshList()
 				refreshTime = uiStatic.realTime + 20000;
 		}
 	}
+	gameListModel.Flush();
 }
 
 /*
@@ -250,10 +333,11 @@ void CMenuServerBrowser::_Init( void )
 	msgBox.Link( this );
 
 	gameList.SetCharSize( QM_SMALLFONT );
-	gameList.SetupColumn( 0, "Name", 0.40f );
-	gameList.SetupColumn( 1, "Map", 0.30f );
-	gameList.SetupColumn( 2, "Players", 0.15f );
-	gameList.SetupColumn( 3, "Ping", 0.15f );
+	gameList.SetupColumn( 0, NULL, 0.05f );
+	gameList.SetupColumn( 1, "Name", 0.40f );
+	gameList.SetupColumn( 2, "Map", 0.25f );
+	gameList.SetupColumn( 3, "Players", 0.15f );
+	gameList.SetupColumn( 4, "Ping", 0.15f );
 	gameList.SetModel( &gameListModel );
 	gameList.bFramedHintText = true;
 
@@ -280,6 +364,29 @@ void CMenuServerBrowser::_Init( void )
 	if( !EngFuncs::CheckGameDll( ))
 		createGame.iFlags |= QMF_GRAYED;	// server.dll is missed - remote servers only
 
+	password.bHideInput = true;
+	password.bAllowColorstrings = false;
+	password.bNumbersOnly = false;
+	password.SetRect( 188, 160, 270, 32 );
+
+	SET_EVENT( askPassword, onPositive )
+	{
+		CMenuServerBrowser *parent = (CMenuServerBrowser*)pSelf->Parent();
+
+		EngFuncs::CvarSetString( "password", parent->password.GetBuffer() );
+		CMenuServerBrowser::Connect( staticServerSelect );
+	}
+	END_EVENT( askPassword, onPositive )
+
+	SET_EVENT( askPassword, onNegative )
+	{
+		EngFuncs::CvarSetString( "password", "" );
+	}
+	END_EVENT( askPassword, onNegative )
+	askPassword.SetMessage( "Enter server password to continue:" );
+	askPassword.Link( this );
+	askPassword.Init();
+	askPassword.AddItem( password );
 
 	AddItem( background );
 	AddItem( banner );
@@ -323,6 +430,13 @@ void CMenuServerBrowser::_VidInit()
 
 	refreshTime = uiStatic.realTime + 500; // delay before update 0.5 sec
 	refreshTime2 = uiStatic.realTime + 500;
+}
+
+void CMenuServerBrowser::Show()
+{
+	CMenuFramework::Show();
+	// clear out server table
+	gameListModel.Flush();
 }
 
 /*
