@@ -151,7 +151,7 @@ bool CStbFont::FindFontDataFile(const char *name, int tall, int weight, int flag
 	}
 
 	return true;
-#elif defined __APPLE__
+#elif defined(__APPLE__)
 	const char *fontFileName, *fontFileNamePost = NULL;
 
 	// Silly code to load fonts on OSX.
@@ -211,7 +211,7 @@ bool CStbFont::FindFontDataFile(const char *name, int tall, int weight, int flag
 	}
 
 	return true;
-#endif
+#else
 	// strcpy( dataFile, "/usr/share/fonts/truetype/droid/DroidSans.ttf");
 	// return true;
 #error "Can't find fonts!"
