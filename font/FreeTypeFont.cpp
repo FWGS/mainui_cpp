@@ -287,6 +287,16 @@ void CFreeTypeFont::GetCharABCWidths(int ch, int &a, int &b, int &c)
 		find.c = PIXEL(face->glyph->metrics.horiAdvance -
 			 face->glyph->metrics.horiBearingX -
 			 face->glyph->metrics.width) - m_iBlur - m_iOutlineSize;
+
+		// on't allow extra thicc glyphs with outline effect
+		if( m_iOutlineSize )
+		{
+			if( find.a < 0 )
+				find.a += m_iOutlineSize;
+
+			if( find.c < 0 )
+				find.c += m_iOutlineSize;
+		}
 	#else
 		find.a = PIXEL(face->glyph->metrics.horiBearingX);/* - m_iBlur;*/
 		find.b = PIXEL(face->glyph->metrics.width) + m_iBlur;
