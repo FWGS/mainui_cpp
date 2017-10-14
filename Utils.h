@@ -146,6 +146,10 @@ extern int COM_CompareSaves( const void **a, const void **b );
 extern void UI_LoadCustomStrings( void );
 extern void UI_EnableTextInput( bool enable );
 
+#ifdef __APPLE__
+#define register
+#endif // __APPLE__
+
 inline size_t Q_strncpy( char *dst, const char *src, size_t size )
 {
 	register char	*d = dst;
@@ -174,6 +178,10 @@ inline size_t Q_strncpy( char *dst, const char *src, size_t size )
 	}
 	return ( s - src - 1 ); // count does not include NULL
 }
+
+#ifdef register
+#undef register
+#endif // register
 
 #define CS_SIZE			64	// size of one config string
 #define CS_TIME			16	// size of time string
