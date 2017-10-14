@@ -46,7 +46,7 @@ CStbFont::~CStbFont()
 
 bool CStbFont::FindFontDataFile(const char *name, int tall, int weight, int flags, char *dataFile, int dataFileChars)
 {
-#ifdef __ANDROID__
+#if defined(__ANDROID__)
 	const char *fontFileName, *fontFileNamePost = NULL;
 
 	// Silly code to load fonts on Android.
@@ -90,8 +90,9 @@ bool CStbFont::FindFontDataFile(const char *name, int tall, int weight, int flag
 
 	if( access( dataFile, R_OK ) != 0 )
 	{
+		fontFileNamePost = NULL;
 		// fallback to droid sans, if requested font is not droid sans
-		if( strcmp( fontFileName, "DroidSans" ) )
+		if( strcmp( name, "DroidSans" ) )
 		{
 			fontFileName = "DroidSans";
 			if( weight > 500 )
@@ -150,8 +151,67 @@ bool CStbFont::FindFontDataFile(const char *name, int tall, int weight, int flag
 	}
 
 	return true;
-#else
+#elif defined __APPLE__
+	const char *fontFileName, *fontFileNamePost = NULL;
 
+	// Silly code to load fonts on OSX.
+	// TODO: Find a way to find fonts on OSX
+	if( !strcmp( name, "Trebuchet MS" ) )
+	{
+		fontFileName = name;
+		if( weight > 500 )
+		{
+			if( flags & FONT_ITALIC )
+				fontFileNamePost = "Bold Italic";
+			else
+				fontFileNamePost = "Bold";
+		}
+		else
+		{
+			if( flags & FONT_ITALIC )
+				fontFileNamePost = "Italic";
+		}
+	}
+	else // DroidSans
+	{
+		fontFileName = "Tahoma";
+		if( weight > 500 )
+			fontFileNamePost = "Bold";
+	}
+
+	if( fontFileNamePost )
+		snprintf( dataFile, dataFileChars, "/Library/Fonts/%s %s.ttf", fontFileName, fontFileNamePost );
+	else
+		snprintf( dataFile, dataFileChars, "/Library/Fonts/%s.ttf", fontFileName );
+
+	if( access( dataFile, R_OK ) != 0 )
+	{
+		fontFileNamePost = NULL;
+		// fallback to Tahoma, if requested font is not droid sans
+		if( strcmp( name, "Tahoma" ) )
+		{
+			fontFileName = "Tahoma";
+			if( weight > 500 )
+				fontFileNamePost = "Bold";
+
+			if( fontFileNamePost )
+				snprintf( dataFile, dataFileChars, "/Library/Fonts/%s %s.ttf", fontFileName, fontFileNamePost );
+			else
+				snprintf( dataFile, dataFileChars, "/Library/Fonts/%s.ttf", fontFileName );
+
+			if( access( dataFile, R_OK ) != 0 )
+			{
+				return false; // can't even fallback to Tahoma
+			}
+		}
+		else
+		{
+			return false; // can't even fallback to Tahoma
+		}
+	}
+
+	return true;
+#endif
 	// strcpy( dataFile, "/usr/share/fonts/truetype/droid/DroidSans.ttf");
 	// return true;
 #error "Can't find fonts!"
