@@ -281,7 +281,6 @@ void CFreeTypeFont::GetCharABCWidths(int ch, int &a, int &b, int &c)
 	}
 	else
 	{
-	#if 1
 		find.a = PIXEL(face->glyph->metrics.horiBearingX) - m_iBlur - m_iOutlineSize;
 		find.b = PIXEL(face->glyph->metrics.width) + (m_iBlur + m_iOutlineSize) * 2;
 		find.c = PIXEL(face->glyph->metrics.horiAdvance -
@@ -297,13 +296,6 @@ void CFreeTypeFont::GetCharABCWidths(int ch, int &a, int &b, int &c)
 			if( find.c < 0 )
 				find.c += m_iOutlineSize;
 		}
-	#else
-		find.a = PIXEL(face->glyph->metrics.horiBearingX);/* - m_iBlur;*/
-		find.b = PIXEL(face->glyph->metrics.width) + m_iBlur;
-		find.c = PIXEL(face->glyph->metrics.horiAdvance -
-		 face->glyph->metrics.horiBearingX -
-		 face->glyph->metrics.width) - m_iBlur;
-	#endif
 	}
 
 	a = find.a;
