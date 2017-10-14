@@ -158,7 +158,7 @@ set_target_properties(${MAINUI_LIBRARY} PROPERTIES
 # Name library as it named in Unkle Mike's Xash3D
 if(WIN32)
 	set_target_properties(${MAINUI_LIBRARY} PROPERTIES
-		OUTPUT_NAME menu)
+		OUTPUT_NAME menu PREFIX "")
 endif()
 
 if(NOT WIN32)

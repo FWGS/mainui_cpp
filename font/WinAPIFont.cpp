@@ -320,27 +320,31 @@ void CWinAPIFont::GetCharABCWidths( int ch, int &a, int &b, int &c )
 	ABC abc;
 	if( ::GetCharABCWidthsW( m_hDC, ch, ch, &abc ) || ::GetCharABCWidthsA( m_hDC, ch, ch, &abc ) )
 	{
-		finder.a = a = abc.abcA - m_iBlur - m_iOutlineSize;
-		finder.b = b = abc.abcB + ( ( m_iBlur + m_iOutlineSize ) * 2 );
-		finder.c = c = abc.abcC - m_iBlur - m_iOutlineSize;
+		finder.a = abc.abcA - m_iBlur - m_iOutlineSize;
+		finder.b = abc.abcB + ( ( m_iBlur + m_iOutlineSize ) * 2 );
+		finder.c = abc.abcC - m_iBlur - m_iOutlineSize;
 	}
 	else
 	{
 		// failed to get width, just use the max width
-		finder.a = a = 0 - m_iBlur - m_iOutlineSize;
-		finder.b = b = m_iMaxCharWidth + ( ( m_iBlur + m_iOutlineSize ) * 2 );;
-		finder.c = c = 0 - m_iBlur - m_iOutlineSize;
+		finder.a = 0 - m_iBlur - m_iOutlineSize;
+		finder.b = m_iMaxCharWidth + ( ( m_iBlur + m_iOutlineSize ) * 2 );;
+		finder.c = 0 - m_iBlur - m_iOutlineSize;
 	}
 
 	// don't allow extra thicc glyphs with outline effect
 	if( m_iOutlineSize )
 	{
-		if( find.a < 0 )
-			find.a += m_iOutlineSize;
+		if( finder.a < 0 )
+			finder.a += m_iOutlineSize;
 
-		if( find.c < 0 )
-			find.c += m_iOutlineSize;
+		if( finder.c < 0 )
+			finder.c += m_iOutlineSize;
 	}
+
+	a = finder.a;
+	b = finder.b;
+	c = finder.c;
 
 
 	// add to the cache
