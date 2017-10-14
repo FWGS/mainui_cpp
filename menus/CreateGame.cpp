@@ -99,7 +99,16 @@ void CMenuCreateGame::Begin( CMenuBaseItem *pSelf, void *pExtra )
 	if( item < 0 || item > UI_MAXGAMES )
 		return;
 
-	const char *mapName = menu->mapsListModel.mapName[menu->mapsList.GetCurrentIndex()];
+	const char *mapName;
+	if( menu->mapsList.GetCurrentIndex() == 0 )
+	{
+		int idx = EngFuncs::RandomLong( 1, menu->mapsListModel.GetRows() );
+		mapName = menu->mapsListModel.mapName[idx];
+	}
+	else
+	{
+		mapName = menu->mapsListModel.mapName[menu->mapsList.GetCurrentIndex()];
+	}
 
 	if( !EngFuncs::IsMapValid( mapName ))
 		return;	// bad map
@@ -172,20 +181,26 @@ void CMenuMapListModel::Update( void )
 
 	char *pfile = afile;
 	char token[1024];
-	int numMaps = 0;
+	int numMaps = 1;
+
+	strcpy( mapName[0], "<Random Map>" );
+	mapsDescription[0][0] = 0;
 	
 	while(( pfile = EngFuncs::COM_ParseFile( pfile, token )) != NULL )
 	{
 		if( numMaps >= UI_MAXGAMES ) break;
 
 		Q_strncpy( mapName[numMaps], token, 64 );
-		Q_strncpy( mapsDescription[numMaps], token, 64 );
-		if(( pfile = EngFuncs::COM_ParseFile( pfile, token )) == NULL ) break; // unexpected end of file
+		if(( pfile = EngFuncs::COM_ParseFile( pfile, token )) == NULL )
+		{
+			Q_strncpy( mapsDescription[numMaps], mapName[numMaps], 64 );
+			break; // unexpected end of file
+		}
 		Q_strncpy( mapsDescription[numMaps], token, 64 );
 		numMaps++;
 	}
 
-	if( !numMaps ) uiCreateGame.done.iFlags |= QMF_GRAYED;
+	if( !( numMaps - 1) ) uiCreateGame.done.iFlags |= QMF_GRAYED;
 	m_iNumItems = numMaps;
 	EngFuncs::COM_FreeFile( afile );
 }
