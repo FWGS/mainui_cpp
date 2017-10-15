@@ -237,7 +237,7 @@ void CMenuCreateGame::_Init( void )
 
 	mapsList.SetCharSize( QM_SMALLFONT );
 	mapsList.SetupColumn( 0, "Map", 0.5f );
-	mapsList.SetupColumn( 0, "Title", 0.5f );
+	mapsList.SetupColumn( 1, "Title", 0.5f );
 	mapsList.SetModel( &mapsListModel );
 
 	hostName.szName = "Server Name:";
