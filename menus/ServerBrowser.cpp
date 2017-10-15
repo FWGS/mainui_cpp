@@ -367,7 +367,9 @@ void CMenuServerBrowser::_Init( void )
 	password.bHideInput = true;
 	password.bAllowColorstrings = false;
 	password.bNumbersOnly = false;
-	password.SetRect( 188, 160, 270, 32 );
+	password.szName = "Password:";
+	password.iMaxLength = 16;
+	password.SetRect( 188, 140, 270, 32 );
 
 	SET_EVENT( askPassword, onPositive )
 	{

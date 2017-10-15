@@ -261,7 +261,6 @@ void CMenuCreateGame::_Init( void )
 	password.eTextAlignment = QM_CENTER;
 	password.bHideInput = true;
 	password.LinkCvar( "sv_password" );
-	// TODO: This field is completely ignored. Add password option to the engine!
 
 	msgBox.onPositive = Begin;
 	msgBox.SetMessage( "Starting a new game will exit\nany current game, OK to exit?" );

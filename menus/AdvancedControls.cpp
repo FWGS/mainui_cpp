@@ -54,7 +54,7 @@ public:
 
 };
 
-CAdvancedControls	uiAdvControls;
+static CAdvancedControls	uiAdvControls;
 
 /*
 =================
