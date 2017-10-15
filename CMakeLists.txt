@@ -23,7 +23,9 @@
 cmake_minimum_required(VERSION 2.6.0)
 project (MAINUI)
 
-set(CMAKE_CXX_STANDARD 11)
+if(NOT MSVC AND NOT MINGW)
+	set(CMAKE_CXX_STANDARD 11)
+endif()
 
 set(MAINUI_LIBRARY xashmenu)
 
@@ -117,6 +119,8 @@ add_library (${MAINUI_LIBRARY} SHARED ${MAINUI_SOURCES})
 
 if(NOT WIN32 AND NOT MINGW)
 	add_compile_options(-Wall -Wextra -Wpedantic -Wno-unused-parameter -Wno-unused-variable)
+else()
+	add_definitions(-DMY_COMPILER_SUCKS) # Disable C++11 requirement
 endif()
 
 if(NOT XASH_SDK)
