@@ -24,7 +24,6 @@ CMenuAction::CMenuAction() : CMenuBaseItem()
 {
 	m_szBackground = NULL;
 	m_bfillBackground = false;
-	m_iBackcolor = 0;
 }
 
 /*
@@ -34,6 +33,8 @@ CMenuAction::Init
 */
 void CMenuAction::VidInit( )
 {
+	m_iBackcolor.SetDefault( 0 );
+
 	if( size.w < 1 || size.h < 1 )
 	{
 		if( m_szBackground )
@@ -52,8 +53,7 @@ void CMenuAction::VidInit( )
 		}
 	}
 
-	CalcPosition();
-	CalcSizes();
+	CMenuBaseItem::VidInit();
 }
 
 /*

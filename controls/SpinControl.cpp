@@ -35,7 +35,6 @@ CMenuSpinControl::CMenuSpinControl()  : CMenuEditable(), m_szBackground(),
 	eFocusAnimation = QM_HIGHLIGHTIFFOCUS;
 	iFlags |= QMF_DROPSHADOW;
 
-	iColor = uiColorHelp;
 }
 
 /*
@@ -45,8 +44,9 @@ CMenuSpinControl::Init
 */
 void CMenuSpinControl::VidInit( void )
 {
-	CalcPosition();
-	CalcSizes();
+	iColor.SetDefault( uiColorHelp );
+
+	CMenuBaseItem::VidInit();
 }
 
 /*

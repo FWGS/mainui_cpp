@@ -31,7 +31,6 @@ CMenuBackgroundBitmap::CMenuBackgroundBitmap() : CMenuBitmap()
 	iFlags = QMF_INACTIVE|QMF_DISABLESCAILING;
 	bForceWON = false;
 	bForceColor = false;
-	iColor = 0xFF505050;
 }
 
 void CMenuBackgroundBitmap::VidInit()
@@ -49,6 +48,8 @@ void CMenuBackgroundBitmap::VidInit()
 			size = m_pParent->size.Scale();
 		}
 	}
+
+	iColor.SetDefault( 0xFF505050 );
 
 	CMenuBaseItem::VidInit();
 }

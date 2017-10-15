@@ -22,8 +22,6 @@ GNU General Public License for more details.
 CMenuSlider::CMenuSlider() : CMenuEditable(), m_flMinValue(), m_flMaxValue(), m_flCurValue(),
 	m_flDrawStep(), m_iNumSteps(), m_flRange(), m_iKeepSlider()
 {
-	iColor = uiColorWhite;
-	iFocusColor = uiColorWhite;
 	m_iSliderOutlineWidth = 6;
 
 	size.w = 200;
@@ -48,8 +46,10 @@ void CMenuSlider::VidInit(  )
 	if( m_flRange < 0.05f )
 		m_flRange = 0.05f;
 
-	CalcPosition();
-	CalcSizes();
+	iColor.SetDefault( uiColorWhite );
+	iFocusColor.SetDefault( uiColorWhite );
+
+	CMenuBaseItem::VidInit();
 
 	// scale the center box
 	m_scCenterBox.w = m_scSize.w / 5.0f;

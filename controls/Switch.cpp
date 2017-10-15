@@ -29,11 +29,6 @@ CMenuSwitch::CMenuSwitch( ) : CMenuEditable( )
 	SetSize( 220, 35 );
 	SetCharSize( QM_BOLDFONT );
 
-	iSelectColor = uiPromptTextColor;
-	iBackgroundColor = uiColorBlack;
-	iFgTextColor = uiInputFgColor;
-	iBgTextColor = uiPromptTextColor;
-
 	// text offsets are not needed anymore,
 	// they are useless now
 	fTextOffsetX = 0.0f;
@@ -45,6 +40,11 @@ CMenuSwitch::CMenuSwitch( ) : CMenuEditable( )
 
 void CMenuSwitch::VidInit()
 {
+	iSelectColor.SetDefault( uiPromptTextColor );
+	iBackgroundColor.SetDefault( uiColorBlack );
+	iFgTextColor.SetDefault( uiInputFgColor );
+	iBgTextColor.SetDefault( uiPromptTextColor );
+
 	CMenuBaseItem::VidInit();
 
 	int leftSize, rightSize;

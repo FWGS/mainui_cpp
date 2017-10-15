@@ -33,7 +33,7 @@ public:
 
 private:
 	bool m_bfillBackground;
-	unsigned int m_iBackcolor;
+	CColor m_iBackcolor;
 	const char *m_szBackground;
 };
 

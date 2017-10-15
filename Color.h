@@ -24,26 +24,46 @@ public:
 	CColor( unsigned int rgba ) : rgba( rgba ), init( false ) { }
 	CColor( int rgba ) : rgba( (unsigned int)rgba ), init( false ) { }
 
-	unsigned int operator =( unsigned int color )
+	inline unsigned int operator =( unsigned int color )
 	{
-		rgba = color;
-		init = true;
-		return rgba;
+		Set( color );
+		return color;
 	}
-	int operator =( int color )
+	inline int operator =( int color )
 	{
-		rgba = (unsigned int)color;
-		init = true;
+		Set( color );
 		return color;
 	}
 
-	operator unsigned int() { return rgba; }
-	operator int() { return (int)rgba; }
+	inline operator unsigned int() { return rgba; }
+	inline operator int() { return (int)rgba; }
 
-	unsigned int rgba;
+	inline void Set( unsigned int color )
+	{
+		rgba = color;
+		init = true;
+	}
+
+	inline void Set( int color )
+	{
+		rgba = (unsigned int)color;
+		init = true;
+	}
+
+	inline void SetDefault( unsigned int color )
+	{
+		if( !IsOk() ) Set( color );
+	}
+
+	inline void SetDefault( int color )
+	{
+		if( !IsOk() ) Set( color );
+	}
 
 	// get rid of this someday
-	bool IsOk() { return init; }
+	inline bool IsOk() { return init; }
+
+	unsigned int rgba;
 private:
 	bool init;
 };

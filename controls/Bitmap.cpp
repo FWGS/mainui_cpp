@@ -25,8 +25,6 @@ CMenuBitmap::CMenuBitmap() : CMenuBaseItem()
 {
 	SetPicture( NULL, NULL, NULL );
 	bDrawAdditive = false;
-	iColor = uiColorWhite;
-	iFocusColor = uiColorWhite;
 }
 
 /*
@@ -36,6 +34,9 @@ CMenuBitmap::Init
 */
 void CMenuBitmap::VidInit( )
 {
+	iColor.SetDefault( uiColorWhite );
+	iFocusColor.SetDefault( uiColorWhite );
+
 	CMenuBaseItem::VidInit();
 	if( !szFocusPic )
 		szFocusPic = szPic;

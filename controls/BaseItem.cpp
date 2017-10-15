@@ -29,9 +29,6 @@ CMenuBaseItem::CMenuBaseItem()
 
 	iFlags = 0;
 
-	iColor = uiPromptTextColor;
-	iFocusColor = uiPromptFocusColor;
-
 	eTextAlignment = QM_TOPLEFT;
 	eFocusAnimation = QM_NOFOCUSANIMATION;
 	eLetterCase = QM_NOLETTERCASE;
@@ -61,6 +58,9 @@ void CMenuBaseItem::VidInit()
 {
 	CalcPosition();
 	CalcSizes();
+
+	iColor.SetDefault( uiPromptTextColor );
+	iFocusColor.SetDefault( uiPromptFocusColor );
 }
 
 void CMenuBaseItem::Draw()

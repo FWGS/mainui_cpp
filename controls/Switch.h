@@ -42,10 +42,10 @@ public:
 	bool bState;
 	bool bMouseToggle;
 
-	int iSelectColor;
-	int iBackgroundColor;
-	int iFgTextColor;
-	int iBgTextColor;
+	CColor iSelectColor;
+	CColor iBackgroundColor;
+	CColor iFgTextColor;
+	CColor iBgTextColor;
 
 	float fTextOffsetX;
 	float fTextOffsetY;
