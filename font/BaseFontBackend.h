@@ -61,6 +61,8 @@ public:
 
 	void GetTextureName( char *dst, size_t len, int pageNum ) const;
 
+	inline int GetEllipsisWide( ) { return m_iEllipsisWide; }
+
 protected:
 	void ApplyBlur( Size rgbaSz, byte *rgba );
 	void ApplyOutline(Point pt, Size rgbaSz, byte *rgba );
@@ -103,6 +105,8 @@ private:
 	int m_iPages;
 	static bool GlyphLessFunc( const glyph_t &a, const glyph_t &b );
 	friend class CFontManager;
+
+	int m_iEllipsisWide;
 };
 
 

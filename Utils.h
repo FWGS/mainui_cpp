@@ -213,7 +213,9 @@ byte *MakeBMP( unsigned int w, unsigned int h, byte **ptr, int *size, int *texOf
 namespace Font
 {
 int GetTextWide(HFont font, const char *szName, Size charSize , int size = -1);
-int CutText(HFont fontHandle, const char *text, Size charSize, int visibleSize );
+int CutText(HFont fontHandle, const char *text, Size charSize, int visibleSize , int &width);
+int GetEllipsisWide( HFont font, int charW );
+int GetCharacterWidth( HFont font, int uch, int charW );
 }
 
 namespace Key
@@ -224,7 +226,7 @@ inline bool IsEscape( int key )
 }
 }
 }
-int Con_UtfProcessChar( int in );
+int Con_UtfProcessChar(int in );
 int Con_UtfMoveLeft( char *str, int pos );
 int Con_UtfMoveRight( char *str, int pos, int length );
 

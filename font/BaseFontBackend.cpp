@@ -34,7 +34,7 @@ CBaseFont::CBaseFont()
 	: m_szName(), m_iTall(), m_iWeight(), m_iFlags(),
 	m_iHeight(), m_iMaxCharWidth(), m_iAscent(),
 	m_iGLTexture(), m_iBlur(), m_pGaussianDistribution(), m_fBrighten(),
-	m_glyphs(0, 0, GlyphLessFunc), m_iPages()
+	m_glyphs(0, 0, GlyphLessFunc), m_iPages(), m_iEllipsisWide( 0 )
 {
 }
 
@@ -193,6 +193,10 @@ void CBaseFont::UploadGlyphsForRanges(CBaseFont::charRange_t *range, int rangeSi
 	}
 	// m_Pages.AddToTail(hImage);
 	m_iPages++;
+
+	int dotWideA, dotWideB, dotWideC;
+	GetCharABCWidths( '.', dotWideA, dotWideB, dotWideC );
+	m_iEllipsisWide = ( dotWideA + dotWideB + dotWideC ) * 3;
 }
 
 

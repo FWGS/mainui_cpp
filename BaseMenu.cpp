@@ -305,21 +305,15 @@ void UI_DrawRectangleExt( int in_x, int in_y, int in_w, int in_h, const int colo
 UI_DrawString
 =================
 */
-void UI_DrawString( HFont font, int x, int y, int w, int h, const char *string, const int color, int forceColor, int charW, int charH, ETextAlignment justify, bool shadow )
+void UI_DrawString( HFont font, int x, int y, int w, int h,
+		const char *string, const int color, int forceColor,
+		int charW, int charH, ETextAlignment justify, bool shadow, bool limitBySize )
 {
 	int	modulate, shadowModulate;
-	char	line[1024], *l;
-	int	xx = 0, yy, ofsX = 0, ofsY = 0, len, ch;
+	int	xx = 0, yy, ofsX = 0, ofsY = 0, ch;
 
 	if( !string || !string[0] )
 		return;
-
-#if 0	// g-cont. disabled 29/06/2011
-	// this code do a bad things with prompt dialogues
-	// vertically centered
-	if( !strchr( string, '\n' ))
-		y = y + (( h - charH ) / 2 );
-#endif
 
 	if( shadow )
 	{
@@ -343,22 +337,118 @@ void UI_DrawString( HFont font, int x, int y, int w, int h, const char *string, 
 	{
 		yy = y + (h - charH)/2;
 	}
-	EngFuncs::UtfProcessChar( 0 );
-	while( *string )
+
+	int i = 0;
+	int ellipsisWide = UI::Font::GetEllipsisWide( font, charW );
+	bool giveup = false;
+
+	while( string[i] && !giveup )
 	{
-		// get a line of text
-		len = 0;
-		while( *string )
+		char line[1024], *l;
+		int j = i, len = 0;
+		int pixelWide = 0;
+
+		EngFuncs::UtfProcessChar( 0 );
+		while( string[j] )
 		{
-			if( *string == '\n' )
+			if( string[j] == '\n' )
 			{
-				string++;
+				j++;
 				break;
 			}
 
-			line[len++] = *string++;
 			if( len == sizeof( line ) - 1 )
 				break;
+
+			line[len] = string[j];
+
+			int uch = EngFuncs::UtfProcessChar( ( unsigned char )string[j] );
+
+			if( IsColorString( string + j )) // don't calc wides for colorstrings
+			{
+				line[len+1] = string[j+1];
+				len += 2;
+				j += 2;
+			}
+			else if( !uch ) // don't calc wides for invalid codepoints
+			{
+				len++;
+				j++;
+			}
+			else
+			{
+				pixelWide += UI::Font::GetCharacterWidth( font, uch, charW );
+				if( limitBySize && pixelWide >= w )
+				{
+					// does we have free space for new line?
+					if( yy < (yy + h) - charH )
+					{
+						// try to word wrap
+						int newJ = j;
+						int diffPixelWide = 0;
+
+						while( string[newJ] != ' ' && newJ > 0 )
+						{
+							// TODO: unicode codepoint checks
+
+							if( IsColorString( string + newJ - 1 ) )
+							{
+								newJ -= 2;
+							}
+							else
+							{
+								newJ--;
+								diffPixelWide += g_FontMgr.GetCharacterWidth( font, string[newJ] );
+							}
+						}
+
+						if( newJ != 0 )
+						{
+							len -= j - newJ; // skip whitespace
+							pixelWide -= diffPixelWide;
+							j = newJ + 1;
+						}
+
+						break;
+					}
+					else
+					{
+						// try to replace last characters by ellipsis
+						while( pixelWide + ellipsisWide >= w && j > 0 )
+						{
+							// TODO: unicode codepoint checks
+
+							if( IsColorString( string + j - 1 ) )
+							{
+								j -= 2;
+								len -= 2;
+							}
+							else
+							{
+								pixelWide -= UI::Font::GetCharacterWidth( font, string[j], charW );
+								j--;
+								len--;
+							}
+						}
+
+						if( len > 0 )
+						{
+							line[len] = '.';
+							line[len+1] = '.';
+							line[len+2] = '.';
+							len += 3;
+						}
+
+						// we don't have free space anymore, so just stop drawing
+						giveup = true;
+
+						break;
+					}
+				}
+
+				j++;
+				len++;
+			}
 		}
 		line[len] = 0;
 
@@ -369,15 +459,16 @@ void UI_DrawString( HFont font, int x, int y, int w, int h, const char *string, 
 		}
 		else if( justify & QM_RIGHT )
 		{
-			xx = x + (w - UI::Font::GetTextWide( font, line, Size( charW, charH ) ));
+			xx = x + (w - pixelWide);
 		}
 		else // QM_LEFT
 		{
-			xx = x + (w - UI::Font::GetTextWide( font, line, Size( charW, charH ) )) / 2;
+			xx = x + (w - pixelWide) / 2;
 		}
 
 		// draw it
 		l = line;
+		EngFuncs::UtfProcessChar( 0 );
 		while( *l )
 		{
 			if( IsColorString( l ))
@@ -404,6 +495,8 @@ void UI_DrawString( HFont font, int x, int y, int w, int h, const char *string, 
 			ch = EngFuncs::UtfProcessChar( (unsigned char) ch );
 			if( !ch )
 				continue;
+
+
 			if( shadow )
 			{
 #ifdef MAINUI_USE_CUSTOM_FONT_RENDER
@@ -413,6 +506,16 @@ void UI_DrawString( HFont font, int x, int y, int w, int h, const char *string, 
 #endif
 			}
 
+//#define DEBUG_WHITESPACE
+#ifdef DEBUG_WHITESPACE
+			if( ch == ' ' )
+			{
+				g_FontMgr.DrawCharacter( font, '_', Point( xx, yy ), Size( charW, charH ), modulate );
+				xx += g_FontMgr.GetCharacterWidth( font, ch );
+				continue;
+			}
+#endif
+
 #ifdef MAINUI_USE_CUSTOM_FONT_RENDER
 			xx += g_FontMgr.DrawCharacter( font, ch, Point( xx, yy ), Size( charW, charH ), modulate );
 #else
@@ -421,7 +524,10 @@ void UI_DrawString( HFont font, int x, int y, int w, int h, const char *string, 
 #endif
 		}
 		yy += charH;
+
+		i = j;
 	}
+
 	EngFuncs::UtfProcessChar( 0 );
 }
 

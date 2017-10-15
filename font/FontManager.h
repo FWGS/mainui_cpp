@@ -60,7 +60,7 @@ public:
 
 	int   GetTextWide( HFont font, const char *text, int size = -1 );
 
-	int   CutText(HFont fontHandle, const char *text, int height, int visibleSize );
+	int   CutText(HFont fontHandle, const char *text, int height, int visibleSize , int &width);
 
 	int GetTextWideScaled(HFont font, const char *text, const int height, int size = -1 );
 
@@ -68,6 +68,8 @@ public:
 
 	void DebugDraw( HFont font );
 	CBaseFont *GetIFontFromHandle( HFont font );
+
+	int GetEllipsisWide( HFont font ); // cached wide of "..."
 
 private:
 	void UploadTextureForFont(CBaseFont *font );

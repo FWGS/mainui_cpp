@@ -168,6 +168,13 @@ CBaseFont *CFontManager::GetIFontFromHandle(HFont font)
 	return NULL;
 }
 
+int CFontManager::GetEllipsisWide(HFont font)
+{
+	if( m_Fonts.IsValidIndex( font - 1 ) )
+		return m_Fonts[font-1]->GetEllipsisWide();
+	return 0;
+}
+
 void CFontManager::GetCharABCWide(HFont font, int ch, int &a, int &b, int &c)
 {
 	CBaseFont *pFont = GetIFontFromHandle( font );
@@ -274,30 +281,32 @@ void CFontManager::GetTextSize(HFont fontHandle, const char *text, int *wide, in
 	if( wide ) *wide = _wide;
 }
 
-int CFontManager::CutText(HFont fontHandle, const char *text, int height, int visibleSize )
+int CFontManager::CutText(HFont fontHandle, const char *text, int height, int visibleSize, int &_wide )
 {
 	CBaseFont *font = GetIFontFromHandle( fontHandle );
 
 	if( !font || !text || !text[0] )
-
 		return 0;
 
-	int _wide = 0;
+	_wide = 0;
 	const char *ch = text;
 	int i = 0, x = 0, len = 0, lastlen = 0;
 	if( visibleSize <= 0 )
 		return 0;
+
 #ifdef SCALE_FONTS
-			visibleSize  = (float)visibleSize / height * (float)font->GetTall();
+	visibleSize  = (float)visibleSize / (float)height * (float)font->GetTall();
 #endif
+
 	EngFuncs::UtfProcessChar( 0 );
 
-	while( *ch && _wide < visibleSize )
+	while( *ch && _wide < ( visibleSize ) )
 	{
 		// Skip colorcodes
 		if( IsColorString( ch ) )
 		{
 			ch += 2;
+			len += 2;
 			continue;
 		}
 
@@ -326,7 +335,7 @@ int CFontManager::CutText(HFont fontHandle, const char *text, int height, int vi
 	}
 	EngFuncs::UtfProcessChar( 0 );
 
-	if( !*ch && _wide < visibleSize )
+	if( !*ch && _wide < ( visibleSize ) )
 		return len;
 
 	return lastlen;
@@ -493,11 +502,11 @@ HFont CFontBuilder::Create()
 	}
 
 #if defined(MAINUI_USE_FREETYPE)
-		font = new CFreeTypeFont();
+	font = new CFreeTypeFont();
 #elif defined(MAINUI_USE_STB)
-		font = new CStbFont();
+	font = new CStbFont();
 #else
-		font = new CWinAPIFont();
+	font = new CWinAPIFont();
 #endif
 
 	double starttime = Sys_DoubleTime();

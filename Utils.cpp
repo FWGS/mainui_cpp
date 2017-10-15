@@ -432,13 +432,32 @@ int UI::Font::GetTextWide( HFont font, const char *szName, Size charSize, int si
 #endif
 }
 
-int UI::Font::CutText(HFont fontHandle, const char *text, Size charSize, int visibleSize )
+int UI::Font::CutText(HFont fontHandle, const char *text, Size charSize, int visibleSize, int &width )
 {
 #ifdef MAINUI_USE_CUSTOM_FONT_RENDER
-	return g_FontMgr.CutText( fontHandle, text, charSize.h, visibleSize );
+	return g_FontMgr.CutText( fontHandle, text, charSize.h, visibleSize, width );
 #else //todo
 	return 0;
 #endif
+}
+
+int UI::Font::GetEllipsisWide( HFont font, int charW )
+{
+#ifdef MAINUI_USE_CUSTOM_FONT_RENDER
+	return g_FontMgr.GetEllipsisWide( font );
+#else
+	return charW * 3;
+#endif
+}
+
+int UI::Font::GetCharacterWidth(HFont font, int uch, int charW)
+{
+#ifdef MAINUI_USE_CUSTOM_FONT_RENDER
+	return g_FontMgr.GetCharacterWidth( font, uch );
+#else
+	return charW * 3;
+#endif
+
 }
 
 /*
