@@ -47,7 +47,7 @@ void CMenuCheckBox::VidInit( void )
 	m_scTextPos.x = m_scPos.x + (m_scSize.w * 1.5f );
 	m_scTextPos.y = m_scPos.y;
 
-	m_scTextSize.w = UI::Font::GetTextWide( font, szName, m_scChSize );;
+	m_scTextSize.w = UI::Font::GetTextWide( font, szName, m_scChSize );
 	m_scTextSize.h = m_scChSize.h;
 }
 
@@ -123,7 +123,7 @@ void CMenuCheckBox::Draw( void )
 {
 	bool shadow = (iFlags & QMF_DROPSHADOW);
 
-	UI_DrawString( font, m_scTextPos, m_scTextSize, szName, uiColorHelp, true, m_scChSize, eTextAlignment, shadow );
+	UI_DrawString( font, m_scTextPos, m_scTextSize, szName, uiColorHelp, true, m_scChSize, eTextAlignment, shadow, false );
 
 	if( szStatusText && iFlags & QMF_NOTIFY )
 	{

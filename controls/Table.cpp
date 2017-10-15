@@ -328,7 +328,7 @@ void CMenuTable::DrawLine( Point p, int line, int textColor, bool forceCol, int 
 		i < m_pModel->GetColumns();
 		i++, ix += sz.w )
 	{
-		sz.w = width * flColumnWidths[i];
+		sz.w = (float)width * flColumnWidths[i];
 
 		const char *str = m_pModel->GetCellText( line, i );
 		const ECellType type = m_pModel->GetCellType( line, i );

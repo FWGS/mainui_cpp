@@ -97,10 +97,10 @@ void CMenuYesNoMessageBox::_VidInit( void )
 	CalcPosition();
 	CalcSizes();
 
-	dlgMessage1.SetRect( 0, 24, 640, 256 );
+	dlgMessage1.SetRect( 0, 24, 640, 256 - 24 );
 	if( m_bIsAlert )
 	{
-		yes.SetRect( 260, 204, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
+		yes.SetRect( 298, 204, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
 	}
 	else
 	{

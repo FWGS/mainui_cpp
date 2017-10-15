@@ -46,12 +46,15 @@ void CMenuAction::VidInit( )
 		else
 		{
 			if( size.w < 1 )
-				size.w = UI::Font::GetTextWide( font, szName, charSize );
+				size.w = UI::Font::GetTextWide( font, szName, charSize ) / uiStatic.scaleX;
 
 			if( size.h < 1 )
 				size.h = charSize.h * 1.5;
 		}
+
+		m_bLimitBySize = false;
 	}
+	else m_bLimitBySize = true;
 
 	CMenuBaseItem::VidInit();
 }
@@ -139,19 +142,19 @@ void CMenuAction::Draw( )
 
 	if( iFlags & QMF_GRAYED )
 	{
-		UI_DrawString( font, m_scPos, m_scSize, szName, uiColorDkGrey, true, m_scChSize, eTextAlignment, shadow );
+		UI_DrawString( font, m_scPos, m_scSize, szName, uiColorDkGrey, true, m_scChSize, eTextAlignment, shadow, m_bLimitBySize );
 		return; // grayed
 	}
 
 	if( this != m_pParent->ItemAtCursor() )
 	{
-		UI_DrawString( font, m_scPos, m_scSize, szName, iColor, false, m_scChSize, eTextAlignment, shadow );
+		UI_DrawString( font, m_scPos, m_scSize, szName, iColor, false, m_scChSize, eTextAlignment, shadow, m_bLimitBySize );
 		return; // no focus
 	}
 
 	if( eFocusAnimation == QM_HIGHLIGHTIFFOCUS )
 	{
-		UI_DrawString( font, m_scPos, m_scSize, szName, iFocusColor, false, m_scChSize, eTextAlignment, shadow );
+		UI_DrawString( font, m_scPos, m_scSize, szName, iFocusColor, false, m_scChSize, eTextAlignment, shadow, m_bLimitBySize );
 	}
 	else if( eFocusAnimation == QM_PULSEIFFOCUS )
 	{
@@ -159,7 +162,7 @@ void CMenuAction::Draw( )
 
 		color = PackAlpha( iColor, 255 * (0.5 + 0.5 * sin( (float)uiStatic.realTime / UI_PULSE_DIVISOR )));
 
-		UI_DrawString( font, m_scPos, m_scSize, szName, color, false, m_scChSize, eTextAlignment, shadow );
+		UI_DrawString( font, m_scPos, m_scSize, szName, color, false, m_scChSize, eTextAlignment, shadow, m_bLimitBySize );
 	}
 }
 

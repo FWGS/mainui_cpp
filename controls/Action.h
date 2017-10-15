@@ -35,6 +35,7 @@ private:
 	bool m_bfillBackground;
 	CColor m_iBackcolor;
 	const char *m_szBackground;
+	bool m_bLimitBySize;
 };
 
 #endif // MENU_ACTION_H
