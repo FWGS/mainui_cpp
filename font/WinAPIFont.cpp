@@ -26,7 +26,7 @@ bool ABCCacheLessFunc( const abc_t &a, const abc_t &b )
 	return a.ch < b.ch;
 }
 
-CWinAPIFont::CWinAPIFont( ) : IBaseFont( ), m_ABCCache( 0, 0, ABCCacheLessFunc )
+CWinAPIFont::CWinAPIFont( ) : CBaseFont( ), m_ABCCache( 0, 0, ABCCacheLessFunc )
 {
 }
 

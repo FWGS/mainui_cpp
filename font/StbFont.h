@@ -29,7 +29,7 @@ struct abc_t
 	int a, b, c;
 };
 
-class CStbFont : public IBaseFont
+class CStbFont : public CBaseFont
 {
 public:
 	CStbFont();
@@ -47,6 +47,8 @@ public:
 	bool HasChar( int ch ) const;
 
 private:
+	CUtlRBTree<abc_t, int> m_ABCCache;
+
 	char m_szRealFontFile[4096];
 	bool FindFontDataFile(const char *name, int tall, int weight, int flags, char *dataFile, int dataFileChars);
 
@@ -55,7 +57,6 @@ private:
 
 	float scale;
 
-	CUtlRBTree<abc_t, int> m_ABCCache;
 
 	friend class CFontManager;
 };

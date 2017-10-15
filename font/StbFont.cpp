@@ -34,7 +34,7 @@ bool ABCCacheLessFunc( const abc_t &a, const abc_t &b )
 	return a.ch < b.ch;
 }
 
-CStbFont::CStbFont() : IBaseFont(),
+CStbFont::CStbFont() : CBaseFont(),
 	m_ABCCache(0, 0, ABCCacheLessFunc), m_szRealFontFile(), m_pFontData( NULL )
 {
 }
@@ -120,11 +120,13 @@ bool CStbFont::FindFontDataFile(const char *name, int tall, int weight, int flag
 	int len = 0;
 	FILE *fp;
 
-	len = snprintf( cmd, 256 - len, "fc-match -f %%{file} %s", name );
+	len = snprintf( cmd, sizeof( cmd ) - len, "fc-match -f %%{file} \"%s\"", name );
 	if( flags & FONT_ITALIC )
-		len += snprintf( cmd + len, 256 - len, ":style=Italic" );
+		len += snprintf( cmd + len, sizeof( cmd ) - len, ":style=Italic" );
+
 	if( weight > 500 )
-		len += snprintf( cmd + len, 256 - len, ":weight=%d", weight );
+		len += snprintf( cmd + len, sizeof( cmd ) - len, ":weight=%d", weight );
+
 	cmd[len] = 0;
 
 	if( (fp = popen( cmd, "r") ) == NULL )

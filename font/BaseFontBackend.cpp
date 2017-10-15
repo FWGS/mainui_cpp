@@ -25,12 +25,12 @@ GNU General Public License for more details.
 # define M_E		2.7182818284590452354	/* e */
 #endif
 
-bool IBaseFont::GlyphLessFunc( const glyph_t &a, const glyph_t &b )
+bool CBaseFont::GlyphLessFunc( const glyph_t &a, const glyph_t &b )
 {
 	return a.ch < b.ch;
 }
 
-IBaseFont::IBaseFont()
+CBaseFont::CBaseFont()
 	: m_szName(), m_iTall(), m_iWeight(), m_iFlags(),
 	m_iHeight(), m_iMaxCharWidth(), m_iAscent(),
 	m_iGLTexture(), m_iBlur(), m_pGaussianDistribution(), m_fBrighten(),
@@ -41,12 +41,12 @@ IBaseFont::IBaseFont()
 
 /*
 =========================
-IBaseFont::GetTextureName
+CBaseFont::GetTextureName
 
 Mangle texture name, so using same font names with different attributes will not confuse engine or font renderer
 =========================
 +*/
-void IBaseFont::GetTextureName(char *dst, size_t len, int pageNum) const
+void CBaseFont::GetTextureName(char *dst, size_t len, int pageNum) const
 {
 	char attribs[256];
 	int i = 0;
@@ -85,7 +85,7 @@ void IBaseFont::GetTextureName(char *dst, size_t len, int pageNum) const
 
 #define MAX_PAGE_SIZE 256
 
-void IBaseFont::UploadGlyphsForRanges(IBaseFont::charRange_t *range, int rangeSize)
+void CBaseFont::UploadGlyphsForRanges(CBaseFont::charRange_t *range, int rangeSize)
 {
 	char name[256];
 	const int maxWidth = GetMaxCharWidth();
@@ -196,7 +196,7 @@ void IBaseFont::UploadGlyphsForRanges(IBaseFont::charRange_t *range, int rangeSi
 }
 
 
-IBaseFont::~IBaseFont()
+CBaseFont::~CBaseFont()
 {
 	char name[256];
 	for( int i = 0; i < m_iPages; i++ )
@@ -209,7 +209,7 @@ IBaseFont::~IBaseFont()
 	delete[] m_pGaussianDistribution;
 }
 
-bool IBaseFont::IsEqualTo(const char *name, int tall, int weight, int blur, int flags)  const
+bool CBaseFont::IsEqualTo(const char *name, int tall, int weight, int blur, int flags)  const
 {
 	if( stricmp( name, m_szName ))
 		return false;
@@ -229,7 +229,7 @@ bool IBaseFont::IsEqualTo(const char *name, int tall, int weight, int blur, int 
 	return true;
 }
 
-void IBaseFont::DebugDraw()
+void CBaseFont::DebugDraw()
 {
 	HIMAGE hImage;
 	char name[256];
@@ -282,7 +282,7 @@ void IBaseFont::DebugDraw()
 
 }
 
-void IBaseFont::ApplyBlur(Size rgbaSz, byte *rgba)
+void CBaseFont::ApplyBlur(Size rgbaSz, byte *rgba)
 {
 	if( !m_pGaussianDistribution )
 		return;
@@ -304,7 +304,7 @@ void IBaseFont::ApplyBlur(Size rgbaSz, byte *rgba)
 	delete[] src;
 }
 
-void IBaseFont::GetBlurValueForPixel(byte *src, Point srcPt, Size srcSz, byte *dest)
+void CBaseFont::GetBlurValueForPixel(byte *src, Point srcPt, Size srcSz, byte *dest)
 {
 	float accum = 0.0f;
 	bool additive = IsAdditive();
@@ -340,7 +340,7 @@ void IBaseFont::GetBlurValueForPixel(byte *src, Point srcPt, Size srcSz, byte *d
 	}
 }
 
-void IBaseFont::CreateGaussianDistribution()
+void CBaseFont::CreateGaussianDistribution()
 {
 	double sigma2;
 	if( m_iBlur < 1 )
@@ -359,7 +359,7 @@ void IBaseFont::CreateGaussianDistribution()
 	}
 }
 
-void IBaseFont::ApplyOutline(Point pt, Size rgbaSz, byte *rgba)
+void CBaseFont::ApplyOutline(Point pt, Size rgbaSz, byte *rgba)
 {
 	if( !m_iOutlineSize )
 		return;
@@ -401,7 +401,7 @@ void IBaseFont::ApplyOutline(Point pt, Size rgbaSz, byte *rgba)
 	}
 }
 
-void IBaseFont::ApplyScanline(Size rgbaSz, byte *rgba)
+void CBaseFont::ApplyScanline(Size rgbaSz, byte *rgba)
 {
 	if( m_iScanlineOffset < 2 )
 		return;
@@ -421,7 +421,7 @@ void IBaseFont::ApplyScanline(Size rgbaSz, byte *rgba)
 	}
 }
 
-void IBaseFont::ApplyStrikeout(Size rgbaSz, byte *rgba)
+void CBaseFont::ApplyStrikeout(Size rgbaSz, byte *rgba)
 {
 	if( !(m_iFlags & FONT_STRIKEOUT) )
 		return;

@@ -151,7 +151,7 @@ void CFontManager::DeleteAllFonts()
 
 void CFontManager::DeleteFont(HFont hFont)
 {
-	IBaseFont *font = GetIFontFromHandle(hFont);
+	CBaseFont *font = GetIFontFromHandle(hFont);
 	if( font )
 	{
 		delete font;
@@ -160,7 +160,7 @@ void CFontManager::DeleteFont(HFont hFont)
 	}
 }
 
-IBaseFont *CFontManager::GetIFontFromHandle(HFont font)
+CBaseFont *CFontManager::GetIFontFromHandle(HFont font)
 {
 	if( m_Fonts.IsValidIndex( font - 1 ) )
 		return m_Fonts[font-1];
@@ -170,7 +170,7 @@ IBaseFont *CFontManager::GetIFontFromHandle(HFont font)
 
 void CFontManager::GetCharABCWide(HFont font, int ch, int &a, int &b, int &c)
 {
-	IBaseFont *pFont = GetIFontFromHandle( font );
+	CBaseFont *pFont = GetIFontFromHandle( font );
 	if( pFont )
 		pFont->GetCharABCWidths( ch, a, b, c );
 	else
@@ -196,7 +196,7 @@ HFont CFontManager::GetFontByName(const char *name)
 
 int CFontManager::GetFontTall(HFont font)
 {
-	IBaseFont *pFont = GetIFontFromHandle( font );
+	CBaseFont *pFont = GetIFontFromHandle( font );
 	if( pFont )
 		return pFont->GetTall();
 	return 0;
@@ -204,7 +204,7 @@ int CFontManager::GetFontTall(HFont font)
 
 int CFontManager::GetFontAscent(HFont font)
 {
-	IBaseFont *pFont = GetIFontFromHandle( font );
+	CBaseFont *pFont = GetIFontFromHandle( font );
 	if( pFont )
 		return pFont->GetAscent();
 	return 0;
@@ -212,7 +212,7 @@ int CFontManager::GetFontAscent(HFont font)
 
 bool CFontManager::GetFontUnderlined(HFont font)
 {
-	IBaseFont *pFont = GetIFontFromHandle( font );
+	CBaseFont *pFont = GetIFontFromHandle( font );
 	if( pFont )
 		return pFont->GetFlags() & FONT_UNDERLINE;
 	return false;
@@ -220,7 +220,7 @@ bool CFontManager::GetFontUnderlined(HFont font)
 
 void CFontManager::GetTextSize(HFont fontHandle, const char *text, int *wide, int *tall, int size )
 {
-	IBaseFont *font = GetIFontFromHandle( fontHandle );
+	CBaseFont *font = GetIFontFromHandle( fontHandle );
 
 	if( !font || !text || !text[0] )
 	{
@@ -276,7 +276,7 @@ void CFontManager::GetTextSize(HFont fontHandle, const char *text, int *wide, in
 
 int CFontManager::CutText(HFont fontHandle, const char *text, int height, int visibleSize )
 {
-	IBaseFont *font = GetIFontFromHandle( fontHandle );
+	CBaseFont *font = GetIFontFromHandle( fontHandle );
 
 	if( !font || !text || !text[0] )
 
@@ -344,7 +344,7 @@ int CFontManager::GetTextWide(HFont font, const char *text, int size)
 
 int CFontManager::GetTextHeight(HFont fontHandle, const char *text, int size )
 {
-	IBaseFont *font = GetIFontFromHandle( fontHandle );
+	CBaseFont *font = GetIFontFromHandle( fontHandle );
 	if( !font || !text || !text[0] )
 	{
 		return 0;
@@ -367,7 +367,7 @@ int CFontManager::GetTextHeight(HFont fontHandle, const char *text, int size )
 
 int CFontManager::GetTextWideScaled(HFont font, const char *text, const int height, int size)
 {
-	IBaseFont *pFont = GetIFontFromHandle( font );
+	CBaseFont *pFont = GetIFontFromHandle( font );
 	if( pFont )
 	{
 		return GetTextWide( font, text, size )
@@ -380,23 +380,23 @@ int CFontManager::GetTextWideScaled(HFont font, const char *text, const int heig
 	return 0;
 }
 
-void CFontManager::UploadTextureForFont(IBaseFont *font)
+void CFontManager::UploadTextureForFont(CBaseFont *font)
 {
 	// upload only latin needed for english and cyrillic needed for russian
 	// maybe it would be extended someday...
 
-	IBaseFont::charRange_t range[] =
+	CBaseFont::charRange_t range[] =
 	{
 	{ 33, 126 },			// ascii printable range
 	{ 0x0400, 0x045F },		// cyrillic range
 	};
 
-	font->UploadGlyphsForRanges( range, sizeof( range ) / sizeof( IBaseFont::charRange_t ) );
+	font->UploadGlyphsForRanges( range, sizeof( range ) / sizeof( CBaseFont::charRange_t ) );
 }
 
 int CFontManager::DrawCharacter(HFont fontHandle, int ch, Point pt, Size sz, const int color )
 {
-	IBaseFont *font = GetIFontFromHandle( fontHandle );
+	CBaseFont *font = GetIFontFromHandle( fontHandle );
 
 	if( !font )
 		return 0;
@@ -426,12 +426,12 @@ int CFontManager::DrawCharacter(HFont fontHandle, int ch, Point pt, Size sz, con
 		}
 	}
 
-	IBaseFont::glyph_t find( ch );
+	CBaseFont::glyph_t find( ch );
 	int idx = font->m_glyphs.Find( find );
 
 	if( font->m_glyphs.IsValidIndex( idx ) )
 	{
-		IBaseFont::glyph_t &glyph = font->m_glyphs[idx];
+		CBaseFont::glyph_t &glyph = font->m_glyphs[idx];
 
 		int r, g, b, alpha;
 
@@ -470,7 +470,7 @@ int CFontManager::DrawCharacter(HFont fontHandle, int ch, Point pt, Size sz, con
 
 void CFontManager::DebugDraw(HFont fontHandle)
 {
-	IBaseFont *font = GetIFontFromHandle(fontHandle);
+	CBaseFont *font = GetIFontFromHandle(fontHandle);
 
 	font->DebugDraw();
 }
@@ -478,7 +478,7 @@ void CFontManager::DebugDraw(HFont fontHandle)
 
 HFont CFontBuilder::Create()
 {
-	IBaseFont *font;
+	CBaseFont *font;
 
 	// check existing font at first
 	if( !m_hForceHandle )

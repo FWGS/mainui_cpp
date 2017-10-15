@@ -33,7 +33,7 @@ struct abc_t
 	int a, b, c;
 };
 
-class CWinAPIFont : public IBaseFont
+class CWinAPIFont : public CBaseFont
 {
 public:
 	CWinAPIFont( );

@@ -31,7 +31,7 @@ bool ABCCacheLessFunc( const abc_t &a, const abc_t &b )
 	return a.ch < b.ch;
 }
 
-CFreeTypeFont::CFreeTypeFont() : IBaseFont(),
+CFreeTypeFont::CFreeTypeFont() : CBaseFont(),
 	m_ABCCache(0, 0, ABCCacheLessFunc), face(), m_szRealFontFile()
 {
 }

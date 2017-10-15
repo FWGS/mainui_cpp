@@ -36,7 +36,7 @@ struct abc_t
 	int a, b, c;
 };
 
-class CFreeTypeFont : public IBaseFont
+class CFreeTypeFont : public CBaseFont
 {
 public:
 	CFreeTypeFont();
