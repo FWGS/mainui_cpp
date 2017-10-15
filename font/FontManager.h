@@ -21,7 +21,7 @@ GNU General Public License for more details.
 #include "BaseMenu.h"
 #include "utl/utlvector.h"
 
-class IBaseFont;
+class CBaseFont;
 
 enum EFontFlags
 {
@@ -67,12 +67,12 @@ public:
 	int DrawCharacter(HFont font, int ch, Point pt, Size sz, const int color );
 
 	void DebugDraw( HFont font );
-	IBaseFont *GetIFontFromHandle( HFont font );
+	CBaseFont *GetIFontFromHandle( HFont font );
 
 private:
-	void UploadTextureForFont(IBaseFont *font );
+	void UploadTextureForFont(CBaseFont *font );
 
-	CUtlVector<IBaseFont*> m_Fonts;
+	CUtlVector<CBaseFont*> m_Fonts;
 
 	friend class CFontBuilder;
 };

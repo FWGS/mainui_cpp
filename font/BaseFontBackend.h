@@ -19,11 +19,11 @@ GNU General Public License for more details.
 #include "BaseMenu.h"
 #include "utlrbtree.h"
 
-class IBaseFont
+class CBaseFont
 {
 public:
-	IBaseFont();
-	virtual ~IBaseFont( );
+	CBaseFont();
+	virtual ~CBaseFont( );
 
 	virtual bool Create(
 		const char *name,
