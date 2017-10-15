@@ -218,8 +218,8 @@ void CMenuSpinControl::Draw( void )
 		UI::Scissor::PushScissor( scCenterPos, scCenterBox );
 		UI_DrawString( font, scCenterPos, scCenterBox, m_szDisplay, color, false, m_scChSize, eTextAlignment, shadow );
 		UI::Scissor::PopScissor();
-		UI_DrawPic( left, arrow, (leftFocus) ? color : iColor, (leftFocus) ? m_szLeftArrowFocus : m_szLeftArrow );
-		UI_DrawPic( right, arrow, (rightFocus) ? color : iColor, (rightFocus) ? m_szRightArrowFocus : m_szRightArrow );
+		UI_DrawPic( left, arrow, (leftFocus) ? color : (int)iColor, (leftFocus) ? m_szLeftArrowFocus : m_szLeftArrow );
+		UI_DrawPic( right, arrow, (rightFocus) ? color : (int)iColor, (rightFocus) ? m_szRightArrowFocus : m_szRightArrow );
 	}
 }
 

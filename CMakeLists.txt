@@ -97,10 +97,10 @@ set(MAINUI_FONT_RENDER_SOURCES
 
 set(MAINUI_SOURCES
 	EventSystem.cpp
-	EventSystem.h
 	EngineCallback.cpp
 	BaseMenu.cpp
 	Btns.cpp
+	Color.cpp
 	MenuStrings.cpp
 	CFGScript.cpp
 	Utils.cpp

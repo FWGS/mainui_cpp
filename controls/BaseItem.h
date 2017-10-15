@@ -17,6 +17,7 @@ GNU General Public License for more details.
 #define BASEITEM_H
 
 #include "BaseMenu.h"
+#include "Color.h"
 
 class CMenuItemsHolder;
 class CMenuBaseItem
@@ -154,8 +155,8 @@ public:
 	const char *szStatusText;
 	const char *szTag; // tag for searching in res file
 
-	unsigned int iColor;
-	unsigned int iFocusColor;
+	CColor iColor;
+	CColor iFocusColor;
 
 	ETextAlignment eTextAlignment;
 	EFocusAnimation eFocusAnimation;

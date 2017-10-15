@@ -465,8 +465,8 @@ void CMenuScrollList::Draw( )
 
 				color = PackAlpha( iColor, 255 * (0.5 + 0.5 * sin( (float)uiStatic.realTime / UI_PULSE_DIVISOR )));
 
-				UI_DrawPic( up.x, up.y, arrow.w, arrow.h, (upFocus) ? color : iColor, (upFocus) ? szUpArrowFocus : szUpArrow );
-				UI_DrawPic( down.x, down.y, arrow.w, arrow.h, (downFocus) ? color : iColor, (downFocus) ? szDownArrowFocus : szDownArrow );
+				UI_DrawPic( up.x, up.y, arrow.w, arrow.h, (upFocus) ? color : (int)iColor, (upFocus) ? szUpArrowFocus : szUpArrow );
+				UI_DrawPic( down.x, down.y, arrow.w, arrow.h, (downFocus) ? color : (int)iColor, (downFocus) ? szDownArrowFocus : szDownArrow );
 			}
 		}
 	}

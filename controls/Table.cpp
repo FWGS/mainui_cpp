@@ -21,12 +21,13 @@ GNU General Public License for more details.
 #include "Scissor.h"
 
 CMenuTable::CMenuTable() : CMenuBaseItem(),
-	iCurItem( 0 ),
+	bFramedHintText( false ),
 	szHeaderTexts(), szBackground(),
 	szUpArrow( UI_UPARROW ), szUpArrowFocus( UI_UPARROWFOCUS ), szUpArrowPressed( UI_UPARROWPRESSED ),
 	szDownArrow( UI_DOWNARROW ), szDownArrowFocus( UI_DOWNARROWFOCUS ), szDownArrowPressed( UI_DOWNARROWPRESSED ),
 	iTopItem( 0 ),
-	iScrollBarSliding( false ), iHighlight( -1 ), bFramedHintText( false ),
+	iScrollBarSliding( false ),
+	iHighlight( -1 ), iCurItem( 0 ),
 	m_iLastItemMouseChange( 0 ), m_pModel( NULL )
 {
 	eFocusAnimation = QM_HIGHLIGHTIFFOCUS;
@@ -611,8 +612,8 @@ void CMenuTable::Draw()
 
 				color = PackAlpha( iColor, 255 * (0.5 + 0.5 * sin( (float)uiStatic.realTime / UI_PULSE_DIVISOR )));
 
-				UI_DrawPic( up.x, up.y, arrow.w, arrow.h, (upFocus) ? color : iColor, (upFocus) ? szUpArrowFocus : szUpArrow );
-				UI_DrawPic( down.x, down.y, arrow.w, arrow.h, (downFocus) ? color : iColor, (downFocus) ? szDownArrowFocus : szDownArrow );
+				UI_DrawPic( up.x, up.y, arrow.w, arrow.h, (upFocus) ? color : (int)iColor, (upFocus) ? szUpArrowFocus : szUpArrow );
+				UI_DrawPic( down.x, down.y, arrow.w, arrow.h, (downFocus) ? color : (int)iColor, (downFocus) ? szDownArrowFocus : szDownArrow );
 			}
 		}
 	}
