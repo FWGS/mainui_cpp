@@ -101,9 +101,10 @@ void CMenuMain::CMenuMainBanner::Draw()
 	scaleX = ScreenWidth / 640.0f;
 	scaleY = ScreenHeight / 480.0f;
 
+	// a1ba: multiply by height scale to look better on widescreens
 	logoWidth = EngFuncs::GetLogoWidth() * scaleX;
-	logoHeight = EngFuncs::GetLogoHeight() * scaleY;
-	logoPosY = 70 * scaleY;	// 70 it's empirically determined value (magic number)
+	logoHeight = EngFuncs::GetLogoHeight() * scaleY * uiStatic.scaleY;
+	logoPosY = 70 * scaleY * uiStatic.scaleY;	// 70 it's empirically determined value (magic number)
 
 	EngFuncs::DrawLogo( "logo.avi", 0, logoPosY, logoWidth, logoHeight );
 }
