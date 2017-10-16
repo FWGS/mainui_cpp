@@ -196,9 +196,6 @@ bool CMenuBackgroundBitmap::LoadBackgroundImage( bool gamedirOnly )
 	s_iBackgroundCount = 0;
 	s_bEnableLogoMovie = false; // no logos for Steam background
 
-	if( !EngFuncs::FileExists("resource/background", gamedirOnly ) )
-		return false;
-
 	afile = (char*)EngFuncs::COM_LoadFile( "resource/BackgroundLayout.txt" );
 
 	if( !afile ) return false;
@@ -223,6 +220,9 @@ bool CMenuBackgroundBitmap::LoadBackgroundImage( bool gamedirOnly )
 	while(( pfile = EngFuncs::COM_ParseFile( pfile, token )))
 	{
 		bimage_t img;
+
+		if( !EngFuncs::FileExists( token, gamedirOnly ))
+			goto freefile;
 
 		img.hImage = EngFuncs::PIC_Load( token, PIC_NOFLIP_TGA );
 
