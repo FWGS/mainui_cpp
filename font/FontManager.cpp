@@ -73,7 +73,7 @@ void CFontManager::VidInit( void )
 
 	if( !prevScale
 #ifndef SCALE_FONTS // complete disables font re-rendering
-	|| abs( scale - prevScale ) > 0.1f
+	|| fabs( scale - prevScale ) > 0.1f
 #endif
 	)
 	{
