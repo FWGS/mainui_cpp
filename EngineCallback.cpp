@@ -94,6 +94,11 @@ void EngFuncs::ConsoleStringLen(const char *string, int *length, int *height)
 	g_FontMgr.GetTextSize( uiStatic.hConsoleFont, string, length, height );
 }
 
+int EngFuncs::ConsoleCharacterHeight()
+{
+	return g_FontMgr.GetFontTall( uiStatic.hConsoleFont );
+}
+
 #endif
 
 int EngFuncs::UtfProcessChar(int ch)

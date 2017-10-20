@@ -14,6 +14,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 
+#pragma once
 #ifndef ENGINECALLBACKS_H
 #define ENGINECALLBACKS_H
 
@@ -136,24 +137,28 @@ public:
 	static void	DrawSetTextColor( int r, int g, int b, int alpha = 255 );
 	static inline void	ConsoleStringLen(  const char *string, int *length, int *height )
 	{ engfuncs.pfnDrawConsoleStringLen( string, length, height ); }
-#else
-	static int DrawConsoleString( int x, int y, const char *string );
-	static void	DrawSetTextColor( int r, int g, int b, int alpha = 255 );
-	static void	ConsoleStringLen(  const char *string, int *length, int *height );
-#endif
-
-	static inline int   DrawConsoleString( Point coord, const char *string )
-	{ return DrawConsoleString( coord.x, coord.y, string ); }
-
-	// TODO: Move into UI class
 	static inline int   ConsoleCharacterHeight()
 	{
 		int height;
 		engfuncs.pfnDrawConsoleStringLen( "", 0, &height );
 		return height;
 	}
+#else
+	static int DrawConsoleString( int x, int y, const char *string );
+	static void	DrawSetTextColor( int r, int g, int b, int alpha = 255 );
+	static void	ConsoleStringLen(  const char *string, int *length, int *height );
+	static int   ConsoleCharacterHeight();
+#endif
+
+	static inline int   DrawConsoleString( Point coord, const char *string )
+	{ return DrawConsoleString( coord.x, coord.y, string ); }
+
 	static inline void	SetConsoleDefaultColor( int r, int g, int b ) // color must came from colors.lst
-	{ engfuncs.pfnSetConsoleDefaultColor( r, g, b ); }
+	{
+		engfuncs.pfnSetConsoleDefaultColor( r, g, b );
+	}
+
+	// TODO: Move into UI class
 
 	// custom rendering (for playermodel preview)
 	static inline struct cl_entity_s* GetPlayerModel( void )	// for drawing playermodel previews
@@ -292,4 +297,4 @@ public:
 #define Con_NXPrintf (*EngFuncs::engfuncs.Con_NXPrintf)
 #define Con_Printf (*EngFuncs::engfuncs.Con_Printf)
 
-#endif//ENGINECALLBACKS_H
+#endif // ENGINECALLBACKS_H
