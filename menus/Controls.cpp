@@ -52,7 +52,7 @@ public:
 	{
 		switch( column )
 		{
-		case 0: return keysBind[line];
+		case 0: return name[line];
 		case 1: return firstKey[line];
 		case 2: return secondKey[line];
 		}
@@ -60,6 +60,7 @@ public:
 		return NULL;
 	}
 
+	char name[MAX_KEYS][CMD_LENGTH];
 	char keysBind[MAX_KEYS][CMD_LENGTH];
 	char firstKey[MAX_KEYS][20];
 	char secondKey[MAX_KEYS][20];
@@ -192,8 +193,8 @@ void CMenuKeysModel::Update( void )
 			pfile = EngFuncs::COM_ParseFile( pfile, token );
 			if( !pfile ) break;	// technically an error
 
-			snprintf( keysBind[i], CMD_LENGTH, "^6%s^7", token );
-			firstKey[i][0] = secondKey[i][0] = 0;
+			snprintf( name[i], CMD_LENGTH, "^6%s^7", token );
+			keysBind[i][0] = firstKey[i][0] = secondKey[i][0] = 0;
 			i++;
 		}
 		else
@@ -207,7 +208,7 @@ void CMenuKeysModel::Update( void )
 			pfile = EngFuncs::COM_ParseFile( pfile, token );
 			if( !pfile ) break; // technically an error
 
-			snprintf( keysBind[i], CMD_LENGTH, "^6%s^7", token );
+			snprintf( name[i], CMD_LENGTH, "^6%s^7", token );
 
 			const char *firstKeyStr = NULL, *secondKeyStr = NULL;
 
