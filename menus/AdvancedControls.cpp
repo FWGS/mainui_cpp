@@ -77,7 +77,7 @@ void CAdvancedControls::GetConfig( void )
 	crosshair.LinkCvar( "crosshair" );
 	lookSpring.LinkCvar( "lookspring" );
 	lookStrafe.LinkCvar( "lookstrafe" );
-	mouseFilter.LinkCvar( "m_filter" );
+	mouseFilter.LinkCvar( "look_filter" ); // was m_filter
 	autoaim.LinkCvar( "sv_aim" );
 	sensitivity.LinkCvar( "sensitivity" );
 
@@ -165,7 +165,7 @@ void CAdvancedControls::_Init( void )
 	lookStrafe.SetNameAndStatus( "Look strafe", "In combination with your mouse look modifier, causes left-right movements\nto strafe instead of turn");
 	lookStrafe.iFlags |= QMF_NOTIFY;
 
-	mouseFilter.SetNameAndStatus( "Mouse filter", "Average mouse inputs over the last two frames to smooth out movements" );
+	mouseFilter.SetNameAndStatus( "Input filter", "Average mouse inputs over the last two frames to smooth out movements" );
 	mouseFilter.iFlags |= QMF_NOTIFY;
 
 	autoaim.SetNameAndStatus( "Autoaim", "Let game to help you aim at enemies" );
