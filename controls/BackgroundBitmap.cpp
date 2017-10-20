@@ -286,6 +286,9 @@ bool CMenuBackgroundBitmap::CheckBackgroundSplash( bool gamedirOnly )
 
 void CMenuBackgroundBitmap::LoadBackground()
 {
+	if( s_iBackgroundCount != 0 )
+		return;
+
 	// try to load backgrounds from mod
 	if( LoadBackgroundImage( true ) )
 	{
