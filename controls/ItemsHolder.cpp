@@ -271,6 +271,9 @@ void CMenuItemsHolder::Draw( )
 	{
 		item = m_pItems[i];
 
+		if( item->iFlags & QMF_HIDDENBYPARENT )
+			continue;
+
 		if( !item->IsVisible() )
 			continue;
 
@@ -292,6 +295,7 @@ void CMenuItemsHolder::Draw( )
 		lastItem = item;
 	}
 
+	// todo: move to framework?
 	// draw status text
 	if( item && item == lastItem && ( ( statusText = item->szStatusText ) != NULL ) )
 	{
@@ -483,7 +487,7 @@ void CMenuItemsHolder::AddItem(CMenuBaseItem &item)
 
 	m_pItems[m_numItems] = &item;
 	item.m_pParent = this; // U OWNED
-	item.iFlags &= ~QMF_HASMOUSEFOCUS;
+	item.iFlags &= ~(QMF_HASMOUSEFOCUS|QMF_HIDDENBYPARENT);
 
 	m_numItems++;
 

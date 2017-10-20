@@ -17,13 +17,16 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
-#include "BaseWindow.h"
+#include "Framework.h"
 #include "Action.h"
 #include "Field.h"
+#include "ScrollView.h"
 
-class CMenuZoo : public CMenuBaseWindow
+static class CMenuZoo : public CMenuFramework
 {
 public:
+	CMenuZoo() : CMenuFramework( "Example" ) { }
+
 	virtual void _Init();
 	virtual void _VidInit();
 
@@ -49,6 +52,9 @@ private:
 	CMenuField Entry3;
 	CMenuField Entry4;
 	CMenuField Entry5;
+
+	CMenuAction bmp[35];
+	CMenuScrollView scrollView;
 } g_Zoo;
 
 #define SET_TAG_BY_MEMBER_NAME( member ) \
@@ -57,6 +63,7 @@ private:
 
 void CMenuZoo::_Init()
 {
+	/*
 	szTag = "CDKeyEntryDialog";
 	iFlags = QMF_DIALOG;
 
@@ -77,6 +84,68 @@ void CMenuZoo::_Init()
 	SET_TAG_BY_MEMBER_NAME( Entry3 );
 	//SET_TAG_BY_MEMBER_NAME( Entry4 );
 	//SET_TAG_BY_MEMBER_NAME( Entry5 );
+	*/
+
+	const char *pics[] =
+	{
+"gfx/shell/head_advanced.tga",
+"gfx/shell/head_advoptions.tga",
+"gfx/shell/head_audio.tga",
+"gfx/shell/head_config.tga",
+"gfx/shell/head_controls.tga",
+"gfx/shell/head_creategame.tga",
+"gfx/shell/head_createroom.tga",
+"gfx/shell/head_customize.tga",
+"gfx/shell/head_custom.tga",
+"gfx/shell/head_filter.tga",
+"gfx/shell/head_gameopts.tga",
+"gfx/shell/head_gamepad.tga",
+"gfx/shell/head_gore.tga",
+"gfx/shell/head_inetgames.tga",
+"gfx/shell/head_keyboard.tga",
+"gfx/shell/head_lan.tga",
+"gfx/shell/head_load.tga",
+"gfx/shell/head_multi.tga",
+"gfx/shell/head_newgame.tga",
+"gfx/shell/head_playrec.tga",
+"gfx/shell/head_play.tga",
+"gfx/shell/head_readme.tga",
+"gfx/shell/head_record.tga",
+"gfx/shell/head_rooms.tga",
+"gfx/shell/head_room.tga",
+"gfx/shell/head_saveload.tga",
+"gfx/shell/head_save.tga",
+"gfx/shell/head_single.tga",
+"gfx/shell/head_specgames.tga",
+"gfx/shell/head_touch_buttons.tga",
+"gfx/shell/head_touch_options.tga",
+"gfx/shell/head_touch.tga",
+"gfx/shell/head_video.tga",
+"gfx/shell/head_vidmodes.tga",
+"gfx/shell/head_vidoptions.tga"
+	};
+
+	for( int i = 0; i < 35; i++ )
+	{
+		HIMAGE pic = EngFuncs::PIC_Load( pics[i] );
+
+		bmp[i].SetBackground( pics[i] );
+		bmp[i].iFlags |= QMF_DISABLESCAILING;
+		bmp[i].szName = pics[i];
+		bmp[i].eFocusAnimation = QM_HIGHLIGHTIFFOCUS;
+		bmp[i].iFocusColor = PackRGBA( 255, 255, 255, 255 );
+		bmp[i].iColor = PackRGBA( 128, 128, 128, 255 );
+		if( i == 0 )
+			bmp[i].SetCoord( 0, 0 );
+		else
+			bmp[i].SetCoord( bmp[i-1].pos.x, bmp[i-1].pos.y + EngFuncs::PIC_Height( pic ) );
+		scrollView.AddItem( bmp[i] );
+	}
+
+	scrollView.SetRect( 0, 0, 1024, 768 );
+
+	AddItem( background );
+	AddItem( scrollView );
 }
 
 void CMenuZoo::_VidInit()
@@ -86,7 +155,7 @@ void CMenuZoo::_VidInit()
 
 void UI_Zoo_Precache()
 {
-	g_Zoo.SetResourceFilename("resource/CDKeyEntryDialog.res");
+	// g_Zoo.SetResourceFilename("resource/CDKeyEntryDialog.res");
 }
 
 void UI_Zoo_Menu()

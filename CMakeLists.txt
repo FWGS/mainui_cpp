@@ -55,7 +55,7 @@ set(MAINUI_CONTROLS_SOURCES
 	controls/Table.cpp
 	controls/TabView.cpp
 	#controls/VideoPlayer.cpp
-	#controls/ScrollView.cpp
+	# controls/ScrollView.cpp
 )
 
 set(MAINUI_MENUS_SOURCES
@@ -83,7 +83,7 @@ set(MAINUI_MENUS_SOURCES
 	menus/Video.cpp
 	menus/VideoModes.cpp
 	menus/VideoOptions.cpp
-	menus/Zoo.cpp
+	# menus/Zoo.cpp
 	menus/ConnectionProgress.cpp
 	menus/dynamic/ScriptMenu.cpp
 )

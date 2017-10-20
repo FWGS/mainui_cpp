@@ -47,7 +47,8 @@ enum
 	QMF_DIALOG             = BIT( 12 ), // modal windows. Will grab key, char and mousemove events
 	QMF_DISABLESCAILING    = BIT( 13 ), // disables CalcPosition and CalcSizes
 
-	QMF_HIDDEN             = BIT( 31 ), // DEPREACTED: Use Show/Hide/SetVisibility/ToggleVisibility
+	QMF_HIDDENBYPARENT     = BIT( 30 ), // parent set this flag and don't want to draw this control
+	QMF_HIDDEN             = BIT( 31 ), // INTERNAL USE ONLY: Use Show/Hide/SetVisibility/ToggleVisibility
 };
 
 

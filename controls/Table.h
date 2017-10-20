@@ -32,13 +32,13 @@ GNU General Public License for more details.
  *
  * 2. CMenuTable will call Update() only when you will pass a model pointer to table.
  *
- * 3. Don't try to add table on your items holder, before you have passed a model pointer.
+ * 3. Adding table on items holder before you have passed a model pointer is PROHIBITED and will lead to crash.
  *
  * 4. You can't use columns more than MAX_TABLE_COLUMNS
  *
  * 5. Header text is set per Table instance.
  *
- * 6. Column widths are constant(at this moment). You should don't exceed 1.0 in total columns width
+ * 6. Column widths are constant(at this moment). You should not exceed 1.0 in total columns width
  *
  */
 
