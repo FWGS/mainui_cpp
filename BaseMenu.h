@@ -25,7 +25,7 @@ GNU General Public License for more details.
 #define UI_MAX_MENUDEPTH		64
 #define UI_MAX_MENUITEMS		64
 
-#define UI_PULSE_DIVISOR		75
+#define UI_PULSE_DIVISOR		75.0f
 #define UI_BLINK_TIME		250
 #define UI_BLINK_MASK		499
 

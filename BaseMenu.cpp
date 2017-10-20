@@ -347,6 +347,8 @@ void UI_DrawString( HFont font, int x, int y, int w, int h,
 		char line[1024], *l;
 		int j = i, len = 0;
 		int pixelWide = 0;
+		int save_pixelWide = 0;
+		int save_j = 0;
 
 		EngFuncs::UtfProcessChar( 0 );
 		while( string[j] )
@@ -377,66 +379,61 @@ void UI_DrawString( HFont font, int x, int y, int w, int h,
 			}
 			else
 			{
-				pixelWide += UI::Font::GetCharacterWidth( font, uch, charW );
-				if( limitBySize && pixelWide >= w )
+				int charWide;
+
+				// does we have free space for new line?
+				if( yy < (yy + h ) - charH )
+				{
+					if( uch == ' ' && pixelWide < w ) // remember last whitespace
+					{
+						save_pixelWide = pixelWide;
+						save_j = j;
+					}
+				}
+				else
+				{
+					// remember last position, when we still fit
+					if( pixelWide + ellipsisWide < w && j > 0 )
+					{
+						save_pixelWide = pixelWide;
+						save_j = j;
+					}
+				}
+
+				charWide = UI::Font::GetCharacterWidth( font, uch, charW );
+
+				if( limitBySize && pixelWide + charWide >= w )
 				{
 					// does we have free space for new line?
 					if( yy < (yy + h) - charH )
 					{
 						// try to word wrap
-						int newJ = j;
-						int diffPixelWide = 0;
-
-						while( string[newJ] != ' ' && newJ > 0 )
+						if( save_j != 0 && save_pixelWide != 0 )
 						{
-							// TODO: unicode codepoint checks
-
-							if( IsColorString( string + newJ - 1 ) )
-							{
-								newJ -= 2;
-							}
-							else
-							{
-								newJ--;
-								diffPixelWide += g_FontMgr.GetCharacterWidth( font, string[newJ] );
-							}
-						}
-
-						if( newJ != 0 )
-						{
-							len -= j - newJ; // skip whitespace
-							pixelWide -= diffPixelWide;
-							j = newJ + 1;
+							pixelWide = save_pixelWide;
+							len -= j - save_j; // skip whitespace
+							j = save_j + 1; // skip whitespace
 						}
 
 						break;
 					}
 					else
 					{
-						// try to replace last characters by ellipsis
-						while( pixelWide + ellipsisWide >= w && j > 0 )
-						{
-							// TODO: unicode codepoint checks
 
-							if( IsColorString( string + j - 1 ) )
-							{
-								j -= 2;
-								len -= 2;
-							}
-							else
-							{
-								pixelWide -= UI::Font::GetCharacterWidth( font, string[j], charW );
-								j--;
-								len--;
-							}
-						}
-
-						if( len > 0 )
+						if( save_j != 0 && save_pixelWide != 0 )
 						{
-							line[len] = '.';
-							line[len+1] = '.';
-							line[len+2] = '.';
-							len += 3;
+							pixelWide = save_pixelWide;
+							len -= j - save_j;
+							j = save_j;
+
+
+							if( len > 0 )
+							{
+								line[len] = '.';
+								line[len+1] = '.';
+								line[len+2] = '.';
+								len += 3;
+							}
 						}
 
 						// we don't have free space anymore, so just stop drawing
@@ -445,9 +442,12 @@ void UI_DrawString( HFont font, int x, int y, int w, int h,
 						break;
 					}
 				}
-
-				j++;
-				len++;
+				else
+				{
+					pixelWide += charWide;
+					j++;
+					len++;
+				}
 			}
 		}
 		line[len] = 0;
@@ -463,7 +463,7 @@ void UI_DrawString( HFont font, int x, int y, int w, int h,
 		}
 		else // QM_LEFT
 		{
-			xx = x + (w - pixelWide) / 2;
+			xx = x + (w - pixelWide) / 2.0f;
 		}
 
 		// draw it
@@ -506,7 +506,7 @@ void UI_DrawString( HFont font, int x, int y, int w, int h,
 #endif
 			}
 
-//#define DEBUG_WHITESPACE
+// #define DEBUG_WHITESPACE
 #ifdef DEBUG_WHITESPACE
 			if( ch == ' ' )
 			{
@@ -1459,6 +1459,7 @@ void UI_Init( void )
 	EngFuncs::Cmd_AddCommand( "menu_resetping", UI_MenuResetPing_f );
 	EngFuncs::Cmd_AddCommand( "menu_showmessagebox", UI_ShowMessageBox );
 	EngFuncs::Cmd_AddCommand( "menu_connectionprogress", UI_ConnectionProgress_f );
+	EngFuncs::Cmd_AddCommand( "menu_zoo", UI_Zoo_Menu );
 	EngFuncs::CreateMapsList( TRUE );
 
 	uiStatic.initialized = true;
