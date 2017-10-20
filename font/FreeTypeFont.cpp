@@ -124,6 +124,8 @@ bool CFreeTypeFont::FindFontDataFile( const char *name, int tall, int weight, in
 	}
 	else bRet = false;
 
+	Con_DPrintf( "fontconfig: %s -> %s\n", name, dataFile );
+
 	FcPatternDestroy( pattern );
 	return bRet;
 }
@@ -157,7 +159,7 @@ bool CFreeTypeFont::Create(const char *name, int tall, int weight, int blur, flo
 		return false;
 	}
 
-	FT_Set_Pixel_Sizes( face, 0, tall - 1 );
+	FT_Set_Pixel_Sizes( face, 0, tall );
 	m_iAscent = PIXEL(face->size->metrics.ascender );
 	m_iHeight = PIXEL( face->size->metrics.height );
 	m_iMaxCharWidth = PIXEL(face->size->metrics.max_advance );

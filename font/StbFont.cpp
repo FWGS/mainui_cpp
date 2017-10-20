@@ -143,6 +143,8 @@ bool CStbFont::FindFontDataFile(const char *name, int tall, int weight, int flag
         return false;
     }
 
+	Con_DPrintf( "fontconfig: %s -> %s\n", name, dataFile );
+
 	// fallback with empty fontname if font not found
 	if( strlen( dataFile ) < 2 )
 	{
@@ -273,7 +275,7 @@ bool CStbFont::Create(const char *name, int tall, int weight, int blur, float br
 	}
 
 	// HACKHACK: for some reason size scales between ft2 and stbtt are different
-	scale = stbtt_ScaleForPixelHeight(&m_fontInfo, tall + 5 * uiStatic.scaleY);
+	scale = stbtt_ScaleForPixelHeight(&m_fontInfo, tall + 2);
 	int x0, y0, x1, y1;
 
 	stbtt_GetFontVMetrics(&m_fontInfo, &m_iAscent, NULL, NULL );
