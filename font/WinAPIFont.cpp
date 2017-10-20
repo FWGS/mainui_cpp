@@ -48,7 +48,7 @@ bool CWinAPIFont::Create( const char *name, int tall, int weight, int blur, floa
 	strncpy( m_szName, name, sizeof( m_szName ) - 1 );
 	m_szName[sizeof( m_szName ) - 1] = 0;
 
-	m_iTall = tall;
+	m_iTall = tall + 6;
 	m_iWeight = weight;
 	m_iFlags = flags;
 
@@ -77,7 +77,7 @@ bool CWinAPIFont::Create( const char *name, int tall, int weight, int blur, floa
 		return false;
 	}
 
-	m_hFont = ::CreateFont( tall, 0, 0, 0, m_iWeight,
+	m_hFont = ::CreateFont( m_iTall, 0, 0, 0, m_iWeight,
 		m_iFlags & FONT_ITALIC,
 		m_iFlags & FONT_UNDERLINE,
 		m_iFlags & FONT_STRIKEOUT,
