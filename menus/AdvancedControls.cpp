@@ -49,6 +49,7 @@ public:
 	CMenuCheckBox	lookSpring;
 	CMenuCheckBox	lookStrafe;
 	CMenuCheckBox	mouseFilter;
+	CMenuCheckBox	lookFilter;
 	CMenuCheckBox	autoaim;
 	CMenuSlider	sensitivity;
 
@@ -77,7 +78,8 @@ void CAdvancedControls::GetConfig( void )
 	crosshair.LinkCvar( "crosshair" );
 	lookSpring.LinkCvar( "lookspring" );
 	lookStrafe.LinkCvar( "lookstrafe" );
-	mouseFilter.LinkCvar( "look_filter" ); // was m_filter
+	mouseFilter.LinkCvar( "m_filter" );
+	lookFilter.LinkCvar( "look_filter" );
 	autoaim.LinkCvar( "sv_aim" );
 	sensitivity.LinkCvar( "sensitivity" );
 
@@ -98,6 +100,7 @@ void CAdvancedControls::SaveAndPopMenu()
 	crosshair.WriteCvar();
 	lookSpring.WriteCvar();
 	lookStrafe.WriteCvar();
+	lookFilter.WriteCvar();
 	mouseFilter.WriteCvar();
 	autoaim.WriteCvar();
 	sensitivity.WriteCvar();
@@ -165,8 +168,11 @@ void CAdvancedControls::_Init( void )
 	lookStrafe.SetNameAndStatus( "Look strafe", "In combination with your mouse look modifier, causes left-right movements\nto strafe instead of turn");
 	lookStrafe.iFlags |= QMF_NOTIFY;
 
-	mouseFilter.SetNameAndStatus( "Input filter", "Average mouse inputs over the last two frames to smooth out movements" );
+	mouseFilter.SetNameAndStatus( "Mouse filter", "Average mouse inputs over the last two frames to smooth out movements(mouse-only)" );
 	mouseFilter.iFlags |= QMF_NOTIFY;
+
+	lookFilter.SetNameAndStatus( "Look filter", "Average look inputs over the last two frames to smooth out movements(generic)" );
+	lookFilter.iFlags |= QMF_NOTIFY;
 
 	autoaim.SetNameAndStatus( "Autoaim", "Let game to help you aim at enemies" );
 	autoaim.iFlags |= QMF_NOTIFY;
@@ -183,6 +189,7 @@ void CAdvancedControls::_Init( void )
 	AddItem( lookSpring );
 	AddItem( lookStrafe );
 	AddItem( mouseFilter );
+	AddItem( lookFilter );
 	AddItem( autoaim );
 	AddItem( sensitivity );
 }
@@ -197,8 +204,9 @@ void CAdvancedControls::_VidInit()
 	lookSpring.SetCoord( 72, 380 );
 	lookStrafe.SetCoord( 72, 430 );
 	mouseFilter.SetCoord( 72, 480 );
-	autoaim.SetCoord( 72, 530 );
-	sensitivity.SetCoord( 72, 625 );
+	lookFilter.SetCoord( 72, 530 );
+	autoaim.SetCoord( 72, 580 );
+	sensitivity.SetCoord( 72, 660 );
 
 	GetConfig();
 }

@@ -67,7 +67,7 @@ public:
 	int m_iNumItems;
 };
 
-class CMenuControls : public CMenuFramework
+static class CMenuControls : public CMenuFramework
 {
 public:
 	CMenuControls() : CMenuFramework("CMenuControls") { }
