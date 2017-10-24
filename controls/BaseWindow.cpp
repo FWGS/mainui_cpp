@@ -91,7 +91,7 @@ void CMenuBaseWindow::PushMenu()
 	uiStatic.menuActive = this;
 
 	uiStatic.firstDraw = true;
-	uiStatic.enterSound = gpGlobals->time + 0.15;	// make some delay
+	uiStatic.enterSound = gpGlobals->time + 0.15f;	// make some delay
 	uiStatic.visible = true;
 
 	EngFuncs::KEY_SetDest ( KEY_MENU );

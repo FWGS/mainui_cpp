@@ -179,12 +179,16 @@ inline size_t Q_strncpy( char *dst, const char *src, size_t size )
 	return ( s - src - 1 ); // count does not include NULL
 }
 
+#define ARRAYSIZE( x ) ( sizeof( x ) / sizeof( x[0] ) )
+
 #ifdef register
 #undef register
 #endif // register
 
 #define CS_SIZE			64	// size of one config string
 #define CS_TIME			16	// size of time string
+
+#define MAX_SCOREBOARDNAME	32 // engine and dlls allows only 32 chars
 
 // color strings
 #define ColorIndex( c )		((( c ) - '0' ) & 7 )
@@ -224,6 +228,11 @@ inline bool IsEscape( int key )
 {
 	return ( key == K_ESCAPE || key == K_B_BUTTON );
 }
+}
+
+namespace Names
+{
+bool CheckIsNameValid( const char *name );
 }
 }
 int Con_UtfProcessChar(int in );

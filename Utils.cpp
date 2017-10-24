@@ -489,17 +489,30 @@ int Con_UtfProcessChar( int in )
 	{
 		uc = 0;
 		if( in >= 0xF8 )
+		{
 			return 0;
+		}
 		else if( in >= 0xF0 )
-			uc = in & 0x07, m = 3;
+		{
+			uc = in & 0x07;
+			m = 3;
+		}
 		else if( in >= 0xE0 )
-			uc = in & 0x0F, m = 2;
+		{
+			uc = in & 0x0F;
+			m = 2;
+		}
 		else if( in >= 0xC0 )
-			uc = in & 0x1F, m = 1;
-		else if( in <= 0x7F)
+		{
+			uc = in & 0x1F;
+			m = 1;
+		}
+		else if( in <= 0x7F )
+		{
 			return in; // ascii
+		}
 		// return 0 if we need more chars to decode one
-		k=0;
+		k = 0;
 		return 0;
 	}
 	// get more chars
@@ -575,3 +588,41 @@ int Con_UtfMoveRight( char *str, int pos, int length )
 	return pos + 1;
 }
 
+
+// exclude some default names, that may be set from engine or just come with config files
+static struct
+{
+	const char *name;
+	bool substring;
+} prohibitedNames[] =
+{
+{ "default", false, },
+{ "unnamed", false, },
+{ "Player", false, },
+{ "<Warrior> Player", false, },
+{ "Shinji", false, },
+{ "CSDuragiCOM", true },
+};
+
+bool UI::Names::CheckIsNameValid(const char *name)
+{
+	for( size_t i = 0; i < ARRAYSIZE( prohibitedNames ); i++ )
+	{
+		if( prohibitedNames[i].substring )
+		{
+			if( strstr( name, prohibitedNames[i].name ) )
+			{
+				return false;
+			}
+		}
+		else
+		{
+			if( !stricmp( name, prohibitedNames[i].name ) )
+			{
+				return false;
+			}
+		}
+	}
+
+	return true;
+}

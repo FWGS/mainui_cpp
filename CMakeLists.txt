@@ -83,6 +83,7 @@ set(MAINUI_MENUS_SOURCES
 	menus/Video.cpp
 	menus/VideoModes.cpp
 	menus/VideoOptions.cpp
+	menus/PlayerIntroduceDialog.cpp
 	# menus/Zoo.cpp
 	menus/ConnectionProgress.cpp
 	menus/dynamic/ScriptMenu.cpp

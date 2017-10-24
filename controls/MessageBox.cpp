@@ -19,7 +19,7 @@ GNU General Public License for more details.
 #include "ItemsHolder.h"
 #include "MessageBox.h"
 
-CMenuMessageBox::CMenuMessageBox() : CMenuBaseWindow()
+CMenuMessageBox::CMenuMessageBox(const char *name) : CMenuBaseWindow( name )
 {
 	iFlags |= QMF_INACTIVE;
 }

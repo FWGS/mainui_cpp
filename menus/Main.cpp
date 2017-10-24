@@ -26,6 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "YesNoMessageBox.h"
 #include "keydefs.h"
 #include "MenuStrings.h"
+#include "PlayerIntroduceDialog.h"
 
 #define ART_MINIMIZE_N	"gfx/shell/min_n"
 #define ART_MINIMIZE_F	"gfx/shell/min_f"
@@ -428,4 +429,9 @@ void UI_Main_Menu( void )
 {
 	UI_Main_Precache();
 	uiMain.Show();
+
+	if( !UI::Names::CheckIsNameValid( EngFuncs::GetCvarString( "name" ) ) )
+	{
+		UI_PlayerIntroduceDialog_Show();
+	}
 }
