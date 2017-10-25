@@ -429,9 +429,4 @@ void UI_Main_Menu( void )
 {
 	UI_Main_Precache();
 	uiMain.Show();
-
-	if( !UI::Names::CheckIsNameValid( EngFuncs::GetCvarString( "name" ) ) )
-	{
-		UI_PlayerIntroduceDialog_Show();
-	}
 }

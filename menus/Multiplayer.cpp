@@ -22,6 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Bitmap.h"
 #include "YesNoMessageBox.h"
 #include "keydefs.h"
+#include "PlayerIntroduceDialog.h"
 
 #define ART_BANNER			"gfx/shell/head_multi"
 
@@ -92,17 +93,20 @@ void CMenuMultiplayer::_Init( void )
 	msgBox.SetMessage( "It is recomended to enable\nclient movement prediction\nPress OK to enable it now\nOr enable it later in\n^5(Multiplayer/Customize)");
 	msgBox.SetPositiveButton( "Ok", PC_OK );
 	msgBox.SetNegativeButton( "Cancel", PC_CANCEL );
-	msgBox.HighlightChoice( 1 );
+	msgBox.HighlightChoice( CMenuYesNoMessageBox::HIGHLIGHT_YES );
 	SET_EVENT( msgBox, onPositive )
 	{
 		EngFuncs::CvarSetValue( "cl_predict", 1.0f );
 		EngFuncs::CvarSetValue( "menu_mp_firsttime", 0.0f );
+
+		UI_PlayerIntroduceDialog_Show();
 	}
 	END_EVENT( msgBox, onPositive )
-
 	SET_EVENT( msgBox, onNegative )
 	{
 		EngFuncs::CvarSetValue( "menu_mp_firsttime", 0.0f );
+
+		UI_PlayerIntroduceDialog_Show();
 	}
 	END_EVENT( msgBox, onNegative )
 	msgBox.Link( this );
@@ -151,5 +155,11 @@ void UI_MultiPlayer_Menu( void )
 	uiMultiPlayer.Show();
 
 	if( EngFuncs::GetCvarFloat( "menu_mp_firsttime" ) && !EngFuncs::GetCvarFloat( "cl_predict" ) )
+	{
 		uiMultiPlayer.msgBox.Show();
+	}
+	else if( !UI::Names::CheckIsNameValid( EngFuncs::GetCvarString( "name" ) ) )
+	{
+		UI_PlayerIntroduceDialog_Show();
+	}
 }

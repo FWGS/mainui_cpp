@@ -35,13 +35,13 @@ public:
 	void SetPositiveButton( const char *msg, int buttonPic );
 	void SetNegativeButton( const char *msg, int buttonPic );
 	void Link( CMenuItemsHolder *h );
-	enum
+	enum EHighlight
 	{
 		NO_HIGHLIGHT = 0,
 		HIGHLIGHT_YES,
 		HIGHLIGHT_NO
 	};
-	void HighlightChoice( int ch ); // 0 - not hightlight, 1 - yes, 2 - no
+	void HighlightChoice( EHighlight ch ); // 0 - not hightlight, 1 - yes, 2 - no
 
 	// Pass pointer to messagebox to extra of calling object
 	static void OpenCb( CMenuBaseItem *, void *pExtra );
