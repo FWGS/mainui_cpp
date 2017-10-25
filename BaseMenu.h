@@ -88,7 +88,7 @@ typedef struct
 	netadr_t serverAddresses[UI_MAX_SERVERS];
 	char	serverNames[UI_MAX_SERVERS][256];
 	float	serverPings[UI_MAX_SERVERS];
-	int		serversRefreshTime;
+	float		serversRefreshTime;
 	int		numServers;
 	int		updateServers;	// true is receive new info about servers
 

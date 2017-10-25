@@ -61,6 +61,7 @@ LOCAL_SRC_FILES := \
 	menus/Main.cpp                                  \
 	menus/Multiplayer.cpp                           \
 	menus/NewGame.cpp                               \
+	menus/PlayerIntroduceDialog.cpp                 \
 	menus/PlayerSetup.cpp                           \
 	menus/SaveLoad.cpp                              \
 	menus/ServerBrowser.cpp                         \
