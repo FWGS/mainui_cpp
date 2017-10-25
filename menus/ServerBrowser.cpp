@@ -381,13 +381,17 @@ void CMenuServerBrowser::_Init( void )
 		CMenuServerBrowser *parent = (CMenuServerBrowser*)pSelf->Parent();
 
 		EngFuncs::CvarSetString( "password", parent->password.GetBuffer() );
+		parent->password.Clear(); // we don't need entered password anymore
 		CMenuServerBrowser::Connect( staticServerSelect );
 	}
 	END_EVENT( askPassword, onPositive )
 
 	SET_EVENT( askPassword, onNegative )
 	{
+		CMenuServerBrowser *parent = (CMenuServerBrowser*)pSelf->Parent();
+
 		EngFuncs::CvarSetString( "password", "" );
+		parent->password.Clear(); // we don't need entered password anymore
 		staticWaitingPassword = false;
 	}
 	END_EVENT( askPassword, onNegative )
