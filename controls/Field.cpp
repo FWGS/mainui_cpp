@@ -78,10 +78,22 @@ void CMenuField::_Event( int ev )
 		UI_EnableTextInput( true );
 		break;
 	case QM_IMRESIZED:
-		if( pos.Scale().y > gpGlobals->scrHeight - 100 * uiStatic.scaleY )
+	{
+		int originalY = 0;
+
+		if( iFlags & QMF_DISABLESCAILING )
+			originalY = pos.y;
+		else
+			originalY = pos.Scale().y;
+
+		if( m_pParent && !IsAbsolutePositioned() )
+			originalY += m_pParent->GetRenderPosition().y;
+
+		if( originalY > gpGlobals->scrHeight - 100 * uiStatic.scaleY )
 			m_scPos.y = gpGlobals->scrHeight - 100 * uiStatic.scaleY;
 		else
 			VidInit();
+	}
 		break;
 	}
 
