@@ -60,6 +60,16 @@ public:
 		return NULL;
 	}
 
+	bool IsCellTextWrapped( int line, int column )
+	{
+		return IsLineUsable( line );
+	}
+
+	bool IsLineUsable( int line )
+	{
+		return keysBind[line][0] != 0;
+	}
+
 	char name[MAX_KEYS][CMD_LENGTH];
 	char keysBind[MAX_KEYS][CMD_LENGTH];
 	char firstKey[MAX_KEYS][20];
@@ -323,10 +333,13 @@ const char *CMenuControls::Key( int key, int down )
 
 void CMenuControls::UnbindEntry()
 {
-	const char *bindName = keysListModel.keysBind[keysList.GetCurrentIndex()];
-
-	if( !bindName[0] )
+	if( !keysListModel.IsLineUsable( keysList.GetCurrentIndex() ) )
+	{
 		EngFuncs::PlayLocalSound( uiSoundBuzz );
+		return; // not a key
+	}
+
+	const char *bindName = keysListModel.keysBind[keysList.GetCurrentIndex()];
 
 	UnbindCommand( bindName );
 	EngFuncs::PlayLocalSound( uiSoundRemoveKey );
@@ -337,14 +350,14 @@ void CMenuControls::UnbindEntry()
 
 void CMenuControls::EnterGrabMode()
 {
-	// entering to grab-mode
-	const char *bindName = keysListModel.keysBind[keysList.GetCurrentIndex()];
-
-	if( !bindName[0] )
+	if( !keysListModel.IsLineUsable( keysList.GetCurrentIndex() ) )
 	{
 		EngFuncs::PlayLocalSound( uiSoundBuzz );
-		return; // not a key
+		return;
 	}
+
+	// entering to grab-mode
+	const char *bindName = keysListModel.keysBind[keysList.GetCurrentIndex()];
 
 	int keys[2];
 
