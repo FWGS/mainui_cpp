@@ -134,6 +134,7 @@ private:
 };
 
 static serverSelect_t staticServerSelect;
+static bool staticWaitingPassword = false;
 
 static CMenuServerBrowser	uiServerBrowser;
 
@@ -199,13 +200,15 @@ void CMenuServerBrowser::Connect( serverSelect_t server )
 	if( server.havePassword )
 	{
 		// if dialog window is still open, then user have entered the password
-		if( !uiServerBrowser.askPassword.IsVisible() )
+		if( !staticWaitingPassword )
 		{
 			// save current select
 			staticServerSelect = server;
+			staticWaitingPassword = true;
 
 			// show password request window
 			uiServerBrowser.askPassword.Show();
+
 			return;
 		}
 	}
@@ -214,6 +217,8 @@ void CMenuServerBrowser::Connect( serverSelect_t server )
 		// remove password, as server don't require it
 		EngFuncs::CvarSetString( "password", "" );
 	}
+
+	staticWaitingPassword = false;
 
 	//BUGBUG: ClientJoin not guaranted to return, need use ClientCmd instead!!!
 	//BUGBUG: But server addres is known only as netadr_t here!!!
@@ -326,9 +331,9 @@ void CMenuServerBrowser::_Init( void )
 	done.onActivated = HideCb;
 	done.SetPicture( PC_DONE );
 
-	msgBox.SetMessage( "Join a network game will exit\nany current game, OK to exit?" );
+	msgBox.SetMessage( "Join a network game will exit any current game, OK to exit?" );
 	msgBox.SetPositiveButton( "Ok", PC_OK );
-	msgBox.HighlightChoice( 1 );
+	msgBox.HighlightChoice( CMenuYesNoMessageBox::HIGHLIGHT_YES );
 	msgBox.onPositive = JoinGame;
 	msgBox.Link( this );
 
@@ -383,6 +388,7 @@ void CMenuServerBrowser::_Init( void )
 	SET_EVENT( askPassword, onNegative )
 	{
 		EngFuncs::CvarSetString( "password", "" );
+		staticWaitingPassword = false;
 	}
 	END_EVENT( askPassword, onNegative )
 	askPassword.SetMessage( "Enter server password to continue:" );

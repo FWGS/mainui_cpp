@@ -37,16 +37,18 @@ CMenuYesNoMessageBox::CMenuYesNoMessageBox( bool alert )
 	{
 		CMenuYesNoMessageBox *msgBox = (CMenuYesNoMessageBox*)pExtra;
 
-		msgBox->onPositive( msgBox );
 		msgBox->Hide();
+		msgBox->onPositive( msgBox );
+
 	}
 	END_EVENT( yes, onActivated )
 
 	SET_EVENT( no, onActivated )
 	{
 		CMenuYesNoMessageBox *msgBox = (CMenuYesNoMessageBox*)pExtra;
-		msgBox->onNegative( msgBox );
 		msgBox->Hide();
+		msgBox->onNegative( msgBox );
+
 	}
 	END_EVENT( no, onActivated )
 
@@ -183,21 +185,16 @@ void CMenuYesNoMessageBox::SetNegativeButton( const char *msg, int buttonPic )
 CMenuYesNoMessageBox::HighlightChoice
 ==============
 */
-void CMenuYesNoMessageBox::HighlightChoice( int yesno )
+void CMenuYesNoMessageBox::HighlightChoice( EHighlight yesno )
 {
-	if( yesno == 1 )
+	if( yesno == NO_HIGHLIGHT )
 	{
-		yes.bPulse = true;
-		no.bPulse = false;
-	}
-	else if( yesno == 2 )
-	{
-		yes.bPulse = false;
-		no.bPulse = true;
+		yes.bPulse = no.bPulse = false;
 	}
 	else
 	{
-		yes.bPulse = no.bPulse = 0;
+		yes.bPulse = yesno == HIGHLIGHT_YES ? true : false;
+		no.bPulse = yesno == HIGHLIGHT_NO ? true : false;
 	}
 }
 
