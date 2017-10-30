@@ -107,7 +107,7 @@ void CFontManager::VidInit( void )
 			.Create();
 #endif
 #ifndef MIMIC_MAKEFONT_SCALES
-		uiStatic.hConsoleFont = CFontBuilder( DEFAULT_CONFONT, UI_SMALL_CHAR_HEIGHT * scale, DEFAULT_WEIGHT )
+		uiStatic.hConsoleFont = CFontBuilder( DEFAULT_CONFONT, UI_SMALL_CHAR_HEIGHT * scale, 500 )
 			.SetOutlineSize()
 			.Create();
 #endif
