@@ -173,14 +173,31 @@ void CMenuBackgroundBitmap::Draw()
 	p.y = (uiStatic.cursorY - ScreenHeight) * flParallaxScale;
 
 	// work out scaling factors
-	xScale = ScreenWidth / s_BackgroundImageSize.w * (1 + flParallaxScale);
-	yScale = xScale;
+	// work out scaling factors
+	if( ScreenWidth * s_BackgroundImageSize.h > ScreenHeight * s_BackgroundImageSize.w )
+	{
+		xScale = ScreenWidth / s_BackgroundImageSize.w * (1 + flParallaxScale);
+		yScale = xScale;
+	}
+	else
+	{
+		yScale = ScreenHeight / s_BackgroundImageSize.h * (1 + flParallaxScale);
+		xScale = yScale;
+	}
 #else
 	p.x = p.y = 0;
 
 	// work out scaling factors
-	xScale = ScreenWidth / s_BackgroundImageSize.w;
-	yScale = xScale;
+	if( ScreenWidth * s_BackgroundImageSize.h > ScreenHeight * s_BackgroundImageSize.w )
+	{
+		xScale = ScreenWidth / s_BackgroundImageSize.w;
+		yScale = xScale;
+	}
+	else
+	{
+		yScale = ScreenHeight / s_BackgroundImageSize.h;
+		xScale = yScale;
+	}
 #endif
 
 	DrawBackgroundLayout( p, xScale, yScale );
