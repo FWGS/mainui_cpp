@@ -61,10 +61,10 @@ void CMenuFramework::Init()
 
 void CMenuFramework::VidInit()
 {
-	CMenuBaseWindow::VidInit();
 	m_scPos.x = m_scPos.y = pos.x = pos.y = 0;
 	m_scSize.w = size.w = ScreenWidth;
 	m_scSize.h = size.h = ScreenHeight;
+	CMenuBaseWindow::VidInit();
 }
 
 bool CMenuFramework::DrawAnimation(EAnimation anim)

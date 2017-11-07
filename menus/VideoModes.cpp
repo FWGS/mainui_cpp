@@ -25,6 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Table.h"
 #include "CheckBox.h"
 #include "Action.h"
+#include "YesNoMessageBox.h"
 
 #define ART_BANNER		"gfx/shell/head_vidmodes"
 
@@ -45,10 +46,16 @@ class CMenuVidModes : public CMenuFramework
 private:
 	void _Init();
 	void _VidInit();
+	void Draw(); // put test mode timer here
 public:
-	CMenuVidModes() : CMenuFramework( "CMenuVidModes" ) { }
+	CMenuVidModes() : CMenuFramework( "CMenuVidModes" ) { testModeTimer = 0; }
 	void SetConfig();
+	void RevertChanges();
+	void ApplyChanges();
 
+	DECLARE_EVENT_TO_MENU_METHOD( CMenuVidModes, SetConfig );
+	DECLARE_EVENT_TO_MENU_METHOD( CMenuVidModes, RevertChanges );
+	DECLARE_EVENT_TO_MENU_METHOD( CMenuVidModes, ApplyChanges );
 
 	CMenuPicButton	ok;
 	CMenuPicButton	cancel;
@@ -57,6 +64,13 @@ public:
 
 	CMenuTable	vidList;
 	CMenuVidModesModel vidListModel;
+
+	CMenuYesNoMessageBox testModeMsgBox;
+
+	int prevMode;
+	bool prevFullscreen;
+	float testModeTimer;
+	char testModeMsg[256];
 } uiVidModes;
 
 
@@ -85,11 +99,62 @@ UI_VidModes_SetConfig
 */
 void CMenuVidModes::SetConfig( void )
 {
-	EngFuncs::CvarSetValue( "vid_mode", vidList.GetCurrentIndex() );
-	EngFuncs::CvarSetValue( "fullscreen", !windowed.bChecked );
+	bool testMode = false;
+	if( prevMode != vidList.GetCurrentIndex() )
+	{
+		EngFuncs::CvarSetValue( "vid_mode", vidList.GetCurrentIndex() );
+		testMode = true;
+	}
+
+	if( prevFullscreen == windowed.bChecked )
+	{
+		EngFuncs::CvarSetValue( "fullscreen", !windowed.bChecked );
+		testMode = true;
+	}
+
 	vsync.WriteCvar();
+
+	if( testMode )
+	{
+		testModeMsgBox.Show();
+		testModeTimer = gpGlobals->time + 10.0f; // ten seconds should be enough
+	}
+	else
+	{
+		// We're done now, just close
+		Hide();
+	}
 }
 
+void CMenuVidModes::ApplyChanges()
+{
+	prevMode = EngFuncs::GetCvarFloat( "vid_mode" );
+	prevFullscreen = EngFuncs::GetCvarFloat( "fullscreen" );
+}
+
+void CMenuVidModes::RevertChanges()
+{
+	EngFuncs::CvarSetValue( "vid_mode", prevMode );
+	EngFuncs::CvarSetValue( "fullscreen", prevFullscreen );
+}
+
+void CMenuVidModes::Draw()
+{
+	if( testModeMsgBox.IsVisible() )
+	{
+		if( testModeTimer - gpGlobals->time > 0 )
+		{
+			snprintf( testModeMsg, sizeof( testModeMsg ) - 1, "Keep this resolution? %i seconds remaining", (int)(testModeTimer - gpGlobals->time) );
+			testModeMsg[sizeof(testModeMsg)-1] = 0;
+		}
+		else
+		{
+			RevertChanges();
+			testModeMsgBox.Hide();
+		}
+	}
+	CMenuFramework::Draw();
+}
 
 /*
 =================
@@ -103,28 +168,28 @@ void CMenuVidModes::_Init( void )
 	ok.SetCoord( 72, 230 );
 	ok.SetNameAndStatus( "Apply", "Apply changes" );
 	ok.SetPicture( PC_OK );
-	SET_EVENT( ok, onActivated )
-	{
-		((CMenuVidModes*)pSelf->Parent())->SetConfig();
-		pSelf->Parent()->Hide();
-	}
-	END_EVENT( ok, onActivated )
+	ok.onActivated = SetConfigCb;
 
 	cancel.SetCoord( 72, 280 );
 	cancel.SetNameAndStatus( "Cancel", "Return back to previous menu" );
 	cancel.SetPicture( PC_CANCEL );
 	cancel.onActivated = HideCb;
 
-	vidList.SetRect( 360, 255, -20, 440 );
+	vidList.SetRect( 360, 255, -20, 340 );
 	vidList.SetupColumn( 0, MenuStrings[IDS_VIDEO_MODECOL], 1.0f );
 	vidList.SetModel( &vidListModel );
 
 	windowed.SetNameAndStatus( "Run in a window", "Run game in window mode" );
-	windowed.SetCoord( 400, 620 );
+	windowed.SetCoord( 360, 620 );
 
 	vsync.SetNameAndStatus( "Vertical sync", "Enable vertical synchronization" );
-	vsync.SetCoord( 400, 670 );
+	vsync.SetCoord( 360, 670 );
 	vsync.LinkCvar( "gl_swapInterval" );
+
+	testModeMsgBox.SetMessage( testModeMsg );
+	testModeMsgBox.onPositive = ApplyChangesCb;
+	testModeMsgBox.onNegative = RevertChangesCb;
+	testModeMsgBox.Link( this );
 
 	AddItem( background );
 	AddItem( banner );
@@ -137,9 +202,15 @@ void CMenuVidModes::_Init( void )
 
 void CMenuVidModes::_VidInit()
 {
-	vidList.SetCurrentIndex(EngFuncs::GetCvarFloat( "vid_mode" ));
+	// don't overwrite prev values
+	if( !testModeMsgBox.IsVisible() )
+	{
+		prevMode = EngFuncs::GetCvarFloat( "vid_mode" );
+		vidList.SetCurrentIndex( prevMode );
 
-	windowed.bChecked = !EngFuncs::GetCvarFloat( "fullscreen" );
+		prevFullscreen = EngFuncs::GetCvarFloat( "fullscreen" );
+		windowed.bChecked = !prevFullscreen;
+	}
 }
 
 /*
