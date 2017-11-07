@@ -62,15 +62,12 @@ private:
 	void GetConfig();
 	void SaveAndPopMenu();
 
-	CMenuPicButton	done;
 	CMenuSlider side, forward, pitch, yaw;
 	CMenuCheckBox invSide, invFwd, invPitch, invYaw;
 
 	CMenuSpinControl axisBind[6];
 
 	CMenuAction axisBind_label;
-
-	CMenuPicButton controls;
 } uiGamePad;
 
 
@@ -198,10 +195,6 @@ void CMenuGamePad::_Init( void )
 
 	banner.SetPicture( ART_BANNER );
 
-	done.SetNameAndStatus( "Done", "Go back to the Configuration Menu" );
-	done.SetPicture( PC_DONE );
-	done.onActivated = SaveAndPopMenuCb;
-
 	axisBind_label.eTextAlignment = QM_CENTER;
 	axisBind_label.iFlags = QMF_INACTIVE|QMF_DROPSHADOW;
 	axisBind_label.iColor = uiColorHelp;
@@ -229,14 +222,10 @@ void CMenuGamePad::_Init( void )
 	yaw.SetNameAndStatus( "Yaw", "Yaw rotating sensitivity" );
 	invYaw.SetNameAndStatus( "Invert", "Invert yaw axis" );
 
-	controls.SetNameAndStatus( "Controls", "Change keyboard and mouse settings" );
-	controls.SetPicture( PC_CONTROLS );
-	controls.onActivated = UI_Controls_Menu;
-
 	AddItem( background );
 	AddItem( banner );
-	AddItem( controls );
-	AddItem( done );
+	AddButton( "Controls", "Change keyboard and mouse settings", PC_CONTROLS, UI_Controls_Menu );
+	AddButton( "Done", "Go back to the Configuration Menu", PC_DONE, SaveAndPopMenuCb );
 	for( i = 0; i < 6; i++ )
 	{
 		AddItem( axisBind[i] );
@@ -254,9 +243,6 @@ void CMenuGamePad::_Init( void )
 
 void CMenuGamePad::_VidInit()
 {
-	controls.SetCoord( 72, 230 );
-	done.SetCoord( 72, 280 );
-
 	axisBind_label.SetCoord( 360, 230 );
 	axisBind_label.SetCharSize( QM_SMALLFONT );
 

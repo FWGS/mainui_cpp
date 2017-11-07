@@ -42,9 +42,6 @@ private:
 	void Restore();
 	void GetConfig();
 
-	CMenuPicButton	done;
-	CMenuPicButton	cancel;
-
 	CMenuSpinControl	maxFPS;
 	CMenuAction	maxFPSmessage;
 	CMenuCheckBox	hand;
@@ -111,14 +108,6 @@ void CMenuGameOptions::_Init( void )
 {
 	banner.SetPicture( ART_BANNER );
 
-	done.SetNameAndStatus( "Done", "Save changes and go back to the Customize Menu" );
-	done.SetPicture( PC_DONE );
-	done.onActivated = SaveCb;
-
-	cancel.SetNameAndStatus( "Cancel", "Go back to the Customize Menu" );
-	cancel.SetPicture( PC_CANCEL );
-	cancel.onActivated = RestoreCb;
-
 	maxFPS.szStatusText = "Cap your game frame rate";
 	maxFPS.Setup( 20, 500, 20 );
 	maxFPS.LinkCvar( "fps_max", CMenuEditable::CVAR_VALUE );
@@ -171,14 +160,13 @@ void CMenuGameOptions::_Init( void )
 	AddItem( maxPacket );
 	AddItem( maxPacketmessage1 );
 	AddItem( maxPacketmessage2 );
-	AddItem( done );
-	AddItem( cancel );
+	AddButton( "Done", "Save changes and go back to the Customize Menu", PC_DONE, SaveCb );
+	AddButton( "Cancel", "Go back to the Customize Menu", PC_CANCEL, RestoreCb );
+
 }
 
 void CMenuGameOptions::_VidInit()
 {
-	done.SetCoord( 72, 230 );
-	cancel.SetCoord( 72, 280 );
 	maxFPS.SetRect( 360, 270, 200, 32 );
 	maxFPSmessage.SetCoord( 360, 230 );
 	hand.SetCoord( 360, 330 );

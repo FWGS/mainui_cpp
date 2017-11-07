@@ -37,15 +37,15 @@ public:
 private:
 	virtual void _Init( void );
 	virtual void _VidInit( void );
-	static void SaveAndPopCb( CMenuBaseItem *pSelf, void *pExtra );
+	virtual void SaveAndPopMenu();
+	void RejectChanges();
+	void ApplyChanges( const char *fileName );
+	DECLARE_EVENT_TO_MENU_METHOD( CMenuFileDialog, RejectChanges );
 	static void UpdateExtra( CMenuBaseItem *pSelf, void *pExtra );
 	void GetFileList( void );
 	char		filePath[UI_MAXGAMES][95];
 	char		*filePathPtr[UI_MAXGAMES];
 	
-	CMenuPicButton	done;
-	CMenuPicButton	cancel;
-
 	CMenuScrollList fileList;
 
 public:
@@ -101,26 +101,31 @@ void CMenuFileDialog::GetFileList( void )
 	preview.image = EngFuncs::PIC_Load( filePath[ fileList.iCurItem ] );
 }
 
-void CMenuFileDialog::SaveAndPopCb(CMenuBaseItem *pSelf, void *pExtra)
+void CMenuFileDialog::ApplyChanges(const char *fileName)
 {
-	CMenuFileDialog *parent = (CMenuFileDialog*)pSelf->Parent();
-	const char *fileName = (const char *)pExtra;
-
 	strncpy( uiFileDialogGlobal.result, fileName, 256 );
 	uiFileDialogGlobal.result[255] = 0;
 	uiFileDialogGlobal.valid = false;
 	uiFileDialogGlobal.callback( fileName[0] != 0 );
+}
 
-	parent->Hide();
+void CMenuFileDialog::RejectChanges()
+{
+	ApplyChanges( "" );
+	Hide();
+}
+
+void CMenuFileDialog::SaveAndPopMenu()
+{
+	const char *fileName = filePath[fileList.iCurItem];
+	ApplyChanges( fileName );
+	Hide();
 }
 
 void CMenuFileDialog::UpdateExtra(CMenuBaseItem *pSelf, void *pExtra)
 {
 	CMenuFileDialog *parent = (CMenuFileDialog*)pSelf->Parent();
 	const char *fileName = parent->filePath[parent->fileList.iCurItem];
-
-	parent->done.onActivated.pExtra = (void*)fileName;
-
 	if( uiFileDialogGlobal.preview )
 		parent->preview.image = EngFuncs::PIC_Load( fileName );
 }
@@ -134,34 +139,21 @@ void CMenuFileDialog::_Init( void )
 {
 	// banner.SetPicture( ART_BANNER );
 
-	done.SetNameAndStatus( "Done", "Use selected file" );
-	done.SetPicture( PC_DONE );
-	done.onActivated = SaveAndPopCb;
-
-	cancel.SetNameAndStatus( "Cancel", "Cancel file selection" );
-	cancel.SetPicture( PC_CANCEL );
-	cancel.onActivated = SaveAndPopCb;
-	cancel.onActivated.pExtra = (void*)"";
-
 	fileList.iFlags |= QMF_DROPSHADOW;
 	fileList.onChanged = UpdateExtra;
-
-	//preview.iFlags |= QMF_INACTIVE;
 
 	GetFileList();
 
 	AddItem( background );
 	// AddItem( banner );
-	AddItem( done );
-	AddItem( cancel );
+	AddButton( "Done", "Use selected file", PC_DONE, SaveAndPopMenuCb );
+	AddButton( "Cancel", "Cancel file selection", PC_CANCEL, RejectChangesCb );
 	AddItem( preview );
 	AddItem( fileList );
 }
 
 void CMenuFileDialog::_VidInit()
 {
-	done.SetCoord( 72, 230 );
-	cancel.SetCoord( 72, 280 );
 	fileList.SetRect( 360, 255, -20, 440 );
 	preview.SetRect( 72, 380, 196, 196 );
 

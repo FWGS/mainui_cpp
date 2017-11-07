@@ -83,6 +83,7 @@ public:
 	CMenuControls() : CMenuFramework("CMenuControls") { }
 
 	void _Init();
+	void _VidInit();
 	const char *Key( int key, int down );
 	void EnterGrabMode( void );
 	void UnbindEntry( void );
@@ -92,19 +93,22 @@ private:
 	void UnbindCommand( const char *command );
 	void PromptDialog( void );
 	void ResetKeysList( void );
+	void Cancel( void )
+	{
+		EngFuncs::ClientCmd( TRUE, "exec keyboard\n" );
+		Hide();
+	}
+
 
 	DECLARE_EVENT_TO_MENU_METHOD( CMenuControls, ResetKeysList )
 	DECLARE_EVENT_TO_MENU_METHOD( CMenuControls, EnterGrabMode )
 	DECLARE_EVENT_TO_MENU_METHOD( CMenuControls, UnbindEntry )
+	DECLARE_EVENT_TO_MENU_METHOD( CMenuControls, Cancel )
 
 	
 	CMenuBannerBitmap banner;
 
 	// state toggle by
-	CMenuPicButton defaults;
-	CMenuPicButton advanced;
-	CMenuPicButton done;
-	CMenuPicButton cancel;
 	CMenuTable keysList;
 	CMenuKeysModel keysListModel;
 
@@ -381,31 +385,6 @@ void CMenuControls::_Init( void )
 {
 	banner.SetPicture( ART_BANNER );
 
-	defaults.SetNameAndStatus( "Use defaults", "Reset all buttons binding to their default values" );
-	defaults.SetCoord( 72, 230 );
-	defaults.SetPicture( PC_USE_DEFAULTS );
-	defaults.onActivated = msgBox2.MakeOpenEvent();
-
-	advanced.SetNameAndStatus( "Adv controls", "Change mouse sensitivity, enable autoaim, mouselook and crosshair" );
-	advanced.SetCoord( 72, 280 );
-	advanced.SetPicture( PC_ADV_CONTROLS );
-	advanced.onActivated = UI_AdvControls_Menu;
-
-	done.SetNameAndStatus( "Ok", "Save changed and return to configuration menu" );
-	done.SetCoord( 72, 330 );
-	done.SetPicture( PC_DONE );
-	done.onActivated = SaveAndPopMenuCb;
-
-	cancel.SetNameAndStatus( "Cancel", "Discard changes and return to configuration menu" );
-	cancel.SetCoord( 72, 380 );
-	cancel.SetPicture( PC_CANCEL );
-	SET_EVENT( cancel, onActivated )
-	{
-		EngFuncs::ClientCmd( TRUE, "exec keyboard\n");
-		pSelf->Parent()->Hide();
-	}
-	END_EVENT( cancel, onActivated )
-
 	keysList.SetRect( 360, 255, -20, 440 );
 	keysList.SetModel( &keysListModel );
 	keysList.SetupColumn( 0, "Action", 0.50f );
@@ -421,11 +400,16 @@ void CMenuControls::_Init( void )
 
 	AddItem( background );
 	AddItem( banner );
-	AddItem( defaults );
-	AddItem( advanced );
-	AddItem( done );
-	AddItem( cancel );
+	AddButton( "Use defaults", "Reset all buttons binding to their default values", PC_USE_DEFAULTS, msgBox2.MakeOpenEvent() );
+	AddButton( "Adv controls", "Change mouse sensitivity, enable autoaim, mouselook and crosshair", PC_ADV_CONTROLS, UI_AdvControls_Menu );
+	AddButton( "Ok", "Save changed and return to configuration menu", PC_DONE, SaveAndPopMenuCb );
+	AddButton( "Cancel", "Discard changes and return to configuration menu", PC_CANCEL, CancelCb );
 	AddItem( keysList );
+}
+
+void CMenuControls::_VidInit()
+{
+	keysListModel.Update();
 }
 
 /*

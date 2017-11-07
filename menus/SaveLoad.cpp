@@ -31,11 +31,6 @@ public:
 	CMenuSaveLoad() : CMenuFramework( "CMenuSaveLoad" ) { }
 private:
 	void _Init();
-	void _VidInit();
-
-	CMenuPicButton	save;
-	CMenuPicButton	load;
-	CMenuPicButton	done;
 
 	CMenuAction	hintMessage;
 	char		hintText[MAX_HINT_TEXT];
@@ -59,40 +54,18 @@ void CMenuSaveLoad::_Init( void )
 
 	banner.SetPicture(ART_BANNER );
 
-	load.SetNameAndStatus( "Load game", "Load a previously saved game" );
-	load.SetPicture( PC_LOAD_GAME );
-	load.iFlags |= QMF_NOTIFY;
-	load.onActivated = UI_LoadGame_Menu;
-
-	save.SetNameAndStatus( "Save game", "Save current game" );
-	save.SetPicture( PC_SAVE_GAME );
-	save.iFlags |= QMF_NOTIFY;
-	save.onActivated = UI_SaveGame_Menu;
-
-	done.SetNameAndStatus( "Done", "Go back to the Main Menu" );
-	done.SetPicture( PC_DONE );
-	done.iFlags |= QMF_NOTIFY;
-	done.onActivated = HideCb;
-
 	hintMessage.iFlags = QMF_INACTIVE;
 	hintMessage.iColor = uiColorHelp;
 	hintMessage.SetCharSize( QM_SMALLFONT );
 	hintMessage.szName = hintText;
+	hintMessage.SetCoord( 360, 480 );
 
 	AddItem( background );
 	AddItem( banner );
-	AddItem( load );
-	AddItem( save );
-	AddItem( done );
+	AddButton( "Load game", "Load a previously saved game", PC_LOAD_GAME, UI_LoadGame_Menu, QMF_NOTIFY );
+	AddButton( "Save game", "Save current game", PC_SAVE_GAME, UI_SaveGame_Menu, QMF_NOTIFY );
+	AddButton( "Done", "Go back to the Main menu", PC_DONE, HideCb, QMF_NOTIFY );
 	AddItem( hintMessage );
-}
-
-void CMenuSaveLoad::_VidInit()
-{
-	load.SetCoord( 72, 230 );
-	save.SetCoord( 72, 280 );
-	done.SetCoord( 72, 330 );
-	hintMessage.SetCoord( 360, 480 );
 }
 
 /*

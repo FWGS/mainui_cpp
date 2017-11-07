@@ -34,13 +34,6 @@ private:
 public:
 	CMenuMultiplayer() : CMenuFramework( "CMenuMultiplayer" ) { }
 
-	CMenuPicButton	internetGames;
-	CMenuPicButton	spectateGames;
-	CMenuPicButton	LANGame;
-	CMenuPicButton	Customize;	// playersetup
-	CMenuPicButton	Controls;
-	CMenuPicButton	done;
-
 	// prompt dialog
 	CMenuYesNoMessageBox msgBox;
 };
@@ -56,39 +49,17 @@ CMenuMultiplayer::Init
 void CMenuMultiplayer::_Init( void )
 {
 	// memset( &uiMultiPlayer, 0, sizeof( CMenuMultiplayer ));
+	AddItem( background );
 
 	banner.SetPicture( ART_BANNER );
+	AddItem( banner );
 
-	internetGames.SetNameAndStatus( "Internet game", "View list of a game internet servers and join the one of your choice" );
-	internetGames.SetPicture( PC_INET_GAME );
-	internetGames.iFlags |= QMF_NOTIFY;
-	internetGames.onActivated = UI_InternetGames_Menu;
-
-	spectateGames.iFlags |= QMF_GRAYED | QMF_NOTIFY;
-	spectateGames.SetNameAndStatus( "Spectate game", "Spectate internet games" );
-	spectateGames.SetPicture( PC_SPECTATE_GAMES );
-	// TODO: implement
-	// SET_EVENT_VOID( spectateGames, onActivated, UI_SpectateGames_Menu );
-
-	LANGame.SetNameAndStatus( "LAN game", "Set up the game on the local area network" );
-	LANGame.SetPicture( PC_LAN_GAME );
-	LANGame.iFlags |= QMF_NOTIFY;
-	LANGame.onActivated = UI_LanGame_Menu;
-
-	Customize.SetNameAndStatus( "Customize", "Choose your player name, and select visual options for your character" );
-	Customize.SetPicture( PC_CUSTOMIZE );
-	Customize.iFlags |= QMF_NOTIFY;
-	Customize.onActivated = UI_PlayerSetup_Menu;
-
-	Controls.SetNameAndStatus( "Controls", "Change keyboard and mouse settings" );
-	Controls.SetPicture( PC_CONTROLS );
-	Controls.iFlags |= QMF_NOTIFY;
-	Controls.onActivated = UI_Controls_Menu;
-
-	done.SetNameAndStatus( "Done", "Go back to the Main menu" );
-	done.SetPicture( PC_DONE );
-	done.iFlags |= QMF_NOTIFY;
-	done.onActivated = HideCb;
+	AddButton( "Internet game", "View list of a game internet servers and join the one of your choice", PC_INET_GAME, UI_InternetGames_Menu, QMF_NOTIFY );
+	// AddButton( "Spectate game", "Spectate internet games", PC_SPECTATE_GAMES, NoopCb, QMF_GRAYED | QMF_NOTIFY );
+	AddButton( "LAN game", "Set up the game on the local area network", PC_LAN_GAME, UI_LanGame_Menu, QMF_NOTIFY );
+	AddButton( "Customize", "Choose your player name, and select visual options for your character", PC_CUSTOMIZE, UI_PlayerSetup_Menu, QMF_NOTIFY );
+	AddButton( "Controls", "Change keyboard and mouse settings", PC_CONTROLS, UI_Controls_Menu, QMF_NOTIFY );
+	AddButton( "Done", "Go back to the Main menu", PC_DONE, HideCb, QMF_NOTIFY );
 
 	msgBox.SetMessage( "It is recomended to enable\nclient movement prediction\nPress OK to enable it now\nOr enable it later in\n^5(Multiplayer/Customize)");
 	msgBox.SetPositiveButton( "Ok", PC_OK );
@@ -111,24 +82,10 @@ void CMenuMultiplayer::_Init( void )
 	END_EVENT( msgBox, onNegative )
 	msgBox.Link( this );
 
-	AddItem( background );
-	AddItem( banner );
-	AddItem( internetGames );
-	AddItem( spectateGames );
-	AddItem( LANGame );
-	AddItem( Customize );
-	AddItem( Controls );
-	AddItem( done );
 }
 
 void CMenuMultiplayer::_VidInit()
 {
-	internetGames.SetCoord( 72, 230 );
-	spectateGames.SetCoord( 72, 280 );
-	LANGame.SetCoord( 72, 330 );
-	Customize.SetCoord( 72, 380 );
-	Controls.SetCoord( 72, 430 );
-	done.SetCoord( 72, 480 );
 }
 
 /*

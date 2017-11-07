@@ -57,8 +57,6 @@ public:
 	DECLARE_EVENT_TO_MENU_METHOD( CMenuVidModes, RevertChanges );
 	DECLARE_EVENT_TO_MENU_METHOD( CMenuVidModes, ApplyChanges );
 
-	CMenuPicButton	ok;
-	CMenuPicButton	cancel;
 	CMenuCheckBox	windowed;
 	CMenuCheckBox	vsync;
 
@@ -165,16 +163,6 @@ void CMenuVidModes::_Init( void )
 {
 	banner.SetPicture(ART_BANNER);
 
-	ok.SetCoord( 72, 230 );
-	ok.SetNameAndStatus( "Apply", "Apply changes" );
-	ok.SetPicture( PC_OK );
-	ok.onActivated = SetConfigCb;
-
-	cancel.SetCoord( 72, 280 );
-	cancel.SetNameAndStatus( "Cancel", "Return back to previous menu" );
-	cancel.SetPicture( PC_CANCEL );
-	cancel.onActivated = HideCb;
-
 	vidList.SetRect( 360, 255, -20, 340 );
 	vidList.SetupColumn( 0, MenuStrings[IDS_VIDEO_MODECOL], 1.0f );
 	vidList.SetModel( &vidListModel );
@@ -193,8 +181,8 @@ void CMenuVidModes::_Init( void )
 
 	AddItem( background );
 	AddItem( banner );
-	AddItem( ok );
-	AddItem( cancel );
+	AddButton( "Apply", "Apply changes", PC_OK, SetConfigCb );
+	AddButton( "Cancel", "Return back to previous menu", PC_CANCEL, HideCb );
 	AddItem( windowed );
 	AddItem( vsync );
 	AddItem( vidList );

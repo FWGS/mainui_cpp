@@ -34,8 +34,6 @@ private:
 	void GetConfig();
 	void SaveAndPopMenu();
 
-	CMenuPicButton	done;
-
 public:
 	CMenuAudio() : CMenuFramework("CMenuAudio") { }
 
@@ -100,10 +98,6 @@ void CMenuAudio::_Init( void )
 {
 	banner.SetPicture(ART_BANNER);
 
-	done.SetNameAndStatus( "Done", "Go back to the Configuration Menu");
-	done.SetPicture( PC_DONE );
-	done.onActivated = SaveAndPopMenuCb;
-
 	soundVolume.SetNameAndStatus( "Game sound volume", "Set master volume level" );
 	soundVolume.Setup( 0.0, 1.0, 0.05f );
 	soundVolume.onChanged = CMenuEditable::WriteCvarCb;
@@ -165,7 +159,7 @@ void CMenuAudio::_Init( void )
 
 	AddItem( background );
 	AddItem( banner );
-	AddItem( done );
+	AddButton( "Done", "Go back to the Configuration Menu", PC_DONE, SaveAndPopMenuCb );
 	AddItem( soundVolume );
 	AddItem( musicVolume );
 	AddItem( suitVolume );
@@ -179,8 +173,6 @@ void CMenuAudio::_Init( void )
 
 void CMenuAudio::_VidInit( )
 {
-	done.SetCoord( 72, 230 );
-
 	soundVolume.SetCoord( 320, 280 );
 	musicVolume.SetCoord( 320, 340 );
 	suitVolume.SetCoord( 320, 400 );

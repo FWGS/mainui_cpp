@@ -77,8 +77,6 @@ public:
 	scrvardef_t *m_pVars;
 
 private:
-	CMenuPicButton done;
-	CMenuPicButton cancel;
 	CMenuSpinControl pageSelector;
 	// CMenuAction unavailable;
 
@@ -179,20 +177,10 @@ void CMenuScriptConfig::ListItemCvarGetCb(CMenuBaseItem *pSelf, void *pExtra)
 
 void CMenuScriptConfig::_Init( void )
 {
-	done.SetNameAndStatus( "Done", "Save and Go back to previous menu" );
-	done.SetPicture( PC_DONE );
-	done.SetCoord( 72, 230 );
-	done.onActivated = SaveAndPopMenuCb;
-
-	cancel.SetPicture( PC_CANCEL );
-	cancel.SetNameAndStatus( "Cancel", "Go back to previous menu" );
-	cancel.SetCoord( 72, 280 );
-	cancel.onActivated = HideCb;
-
 	AddItem( background );
 	AddItem( banner );
-	AddItem( done );
-	AddItem( cancel );
+	AddButton( "Done", "Save and Go back to previous menu", PC_DONE, SaveAndPopMenuCb );
+	AddButton( "Cancel", "Go back to previous menu", PC_CANCEL, HideCb );
 
 	if( !m_pVars )
 		return;

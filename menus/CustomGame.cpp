@@ -67,9 +67,8 @@ private:
 	virtual void _Init( );
 	virtual void _VidInit( );
 
-	CMenuPicButton	load;
-	CMenuPicButton	go2url;
-	CMenuPicButton	done;
+	CMenuPicButton	*load;
+	CMenuPicButton	*go2url;
 
 	// prompt dialog
 	CMenuYesNoMessageBox msgBox;
@@ -101,11 +100,11 @@ void CMenuCustomGame::UpdateExtras( CMenuBaseItem *pSelf, void *pExtra )
 
 	int i = self->GetCurrentIndex();
 
-	parent->load.onActivated.pExtra = parent->modListModel.modsDir[i];
-	parent->load.SetGrayed( !stricmp( parent->modListModel.modsDir[i], gMenu.m_gameinfo.gamefolder ) );
+	parent->load->onActivated.pExtra = parent->modListModel.modsDir[i];
+	parent->load->SetGrayed( !stricmp( parent->modListModel.modsDir[i], gMenu.m_gameinfo.gamefolder ) );
 
-	parent->go2url.onActivated.pExtra = parent->modListModel.modsWebSites[i];
-	parent->go2url.SetGrayed( parent->modListModel.modsWebSites[i][0] == 0 );
+	parent->go2url->onActivated.pExtra = parent->modListModel.modsWebSites[i];
+	parent->go2url->SetGrayed( parent->modListModel.modsWebSites[i][0] == 0 );
 
 	parent->msgBox.onPositive.pExtra = parent->modListModel.modsDir[i];
 }
@@ -157,18 +156,13 @@ void CMenuCustomGame::_Init( void )
 {
 	banner.SetPicture( ART_BANNER );
 
-	load.SetNameAndStatus("Activate", "Activate selected custom game" );
-	load.SetPicture( PC_ACTIVATE );
-	load.onActivatedClActive = msgBox.MakeOpenEvent();
-	load.onActivated = ChangeGame;
+	AddItem( background );
+	AddItem( banner );
+	load = AddButton( "Activate", "Activate selected custom game", PC_ACTIVATE, ChangeGame );
+	load->onActivatedClActive = msgBox.MakeOpenEvent();
 
-	go2url.SetNameAndStatus( "Visit web site", "Visit the web site of game developers" );
-	go2url.SetPicture( PC_VISIT_WEB_SITE );
-	go2url.onActivated = Go2Site;
-
-	done.SetNameAndStatus( "Done", "Return to main menu" );
-	done.SetPicture( PC_DONE );
-	done.onActivated = HideCb;
+	go2url = AddButton( "Visit web site", "Visit the web site of game developers", PC_VISIT_WEB_SITE, Go2Site );
+	AddButton( "Done", "Return to main menu", PC_DONE, HideCb );
 
 	modList.onChanged = UpdateExtras;
 	modList.SetupColumn( 0, "Type", 0.20f );
@@ -181,11 +175,6 @@ void CMenuCustomGame::_Init( void )
 	msgBox.onPositive = ChangeGame;
 	msgBox.Link( this );
 
-	AddItem( background );
-	AddItem( banner );
-	AddItem( load );
-	AddItem( go2url );
-	AddItem( done );
 	AddItem( modList );
 
 	for( int i = 0; i < modListModel.GetRows(); i++ )
@@ -201,9 +190,6 @@ void CMenuCustomGame::_Init( void )
 
 void CMenuCustomGame::_VidInit()
 {
-	load.SetCoord( 72, 230 );
-	go2url.SetCoord( 72, 280 );
-	done.SetCoord( 72, 330 );
 	modList.SetRect( 360, 255, -20, 440 );
 }
 

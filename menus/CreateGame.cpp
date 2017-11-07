@@ -64,10 +64,6 @@ public:
 
 	char		*mapsDescriptionPtr[UI_MAXGAMES];
 
-	CMenuPicButton	advOptions;
-	CMenuPicButton	done;
-	CMenuPicButton	cancel;
-
 	CMenuField	maxClients;
 	CMenuField	hostName;
 	CMenuField	password;
@@ -80,6 +76,8 @@ public:
 
 	CMenuTable        mapsList;
 	CMenuMapListModel mapsListModel;
+
+	CMenuPicButton *done;
 private:
 	virtual void _Init();
 	virtual void _VidInit();
@@ -173,7 +171,7 @@ void CMenuMapListModel::Update( void )
 
 	if( !EngFuncs::CreateMapsList( FALSE ) || (afile = (char *)EngFuncs::COM_LoadFile( "maps.lst", NULL )) == NULL )
 	{
-		uiCreateGame.done.iFlags |= QMF_GRAYED;
+		uiCreateGame.done->iFlags |= QMF_GRAYED;
 		m_iNumItems = 0;
 		Con_Printf( "Cmd_GetMapsList: can't open maps.lst\n" );
 		return;
@@ -200,7 +198,7 @@ void CMenuMapListModel::Update( void )
 		numMaps++;
 	}
 
-	if( !( numMaps - 1) ) uiCreateGame.done.iFlags |= QMF_GRAYED;
+	if( !( numMaps - 1) ) uiCreateGame.done->iFlags |= QMF_GRAYED;
 	m_iNumItems = numMaps;
 	EngFuncs::COM_FreeFile( afile );
 }
@@ -214,19 +212,6 @@ void CMenuCreateGame::_Init( void )
 {
 	banner.SetPicture( ART_BANNER );
 
-	advOptions.SetNameAndStatus( "Adv. Options", "Open the game advanced options menu" );
-	advOptions.SetPicture( PC_ADV_OPT );
-	advOptions.onActivated = UI_AdvServerOptions_Menu;
-
-	done.SetNameAndStatus( "Ok", "Start the multiplayer game" );
-	done.SetPicture( PC_OK );
-	done.onActivated = Begin;
-	done.onActivatedClActive = msgBox.MakeOpenEvent();
-
-	cancel.SetNameAndStatus( "Cancel", "Return to the previous menu" );
-	cancel.SetPicture( PC_CANCEL );
-	cancel.onActivated = HideCb;
-
 	nat.SetNameAndStatus( "NAT", "Use NAT Bypass instead of direct mode" );
 	nat.bChecked = true;
 
@@ -234,6 +219,15 @@ void CMenuCreateGame::_Init( void )
 
 	hltv.SetNameAndStatus( "HLTV", "Enable HLTV mode in Multiplayer" );
 	hltv.LinkCvar( "hltv" );
+
+	// add them here, so "done" button can be used by mapsListModel::Update
+	AddItem( background );
+	AddItem( banner );
+	CMenuPicButton *advOpt = AddButton( "Adv. Options", "Open the game advanced options menu", PC_ADV_OPT, UI_AdvServerOptions_Menu );
+	advOpt->SetGrayed( !UI_AdvServerOptions_IsAvailable() );
+
+	done = AddButton( "Ok", "Start the multiplayer game", PC_DONE, Begin );
+	done->onActivatedClActive = msgBox.MakeOpenEvent();
 
 	mapsList.SetCharSize( QM_SMALLFONT );
 	mapsList.SetupColumn( 0, "Map", 0.5f );
@@ -266,11 +260,7 @@ void CMenuCreateGame::_Init( void )
 	msgBox.SetMessage( "Starting a new game will exit\nany current game, OK to exit?" );
 	msgBox.Link( this );
 
-	AddItem( background );
-	AddItem( banner );
-	AddItem( advOptions );
-	AddItem( done );
-	AddItem( cancel );
+	AddButton( "Cancel", "Return to the previous menu", PC_CANCEL, HideCb );
 	AddItem( maxClients );
 	AddItem( hostName );
 	AddItem( password );
@@ -282,10 +272,6 @@ void CMenuCreateGame::_Init( void )
 
 void CMenuCreateGame::_VidInit()
 {
-	advOptions.SetCoord( 72, 230 );
-	done.SetCoord( 72, 280 );
-	cancel.SetCoord( 72, 330 );
-
 	nat.SetCoord( 72, 585 );
 	if( !EngFuncs::GetCvarFloat("public") )
 		nat.Hide();
@@ -299,8 +285,6 @@ void CMenuCreateGame::_VidInit()
 	hostName.SetRect( 350, 260, 205, 32 );
 	maxClients.SetRect( 350, 360, 205, 32 );
 	password.SetRect( 350, 460, 205, 32 );
-
-	advOptions.SetGrayed( !UI_AdvServerOptions_IsAvailable() );
 }
 
 /*

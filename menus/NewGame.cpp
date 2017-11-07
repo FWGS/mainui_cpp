@@ -37,11 +37,6 @@ private:
 	static void StartGameCb( CMenuBaseItem *pSelf, void *pExtra );
 	static void ShowDialogCb( CMenuBaseItem *pSelf, void *pExtra );
 
-	CMenuPicButton        easy;
-	CMenuPicButton        medium;
-	CMenuPicButton        hard;
-	CMenuPicButton        cancel;
-
 	CMenuYesNoMessageBox  msgBox;
 };
 
@@ -84,45 +79,28 @@ CMenuNewGame::Init
 */
 void CMenuNewGame::_Init( void )
 {
+	AddItem( background );
+	AddItem( banner );
+
 	banner.SetPicture( ART_BANNER );
 	
-	easy.SetNameAndStatus( "Easy", MenuStrings[IDS_NEWGAME_EASYHELP] );
-	easy.SetPicture( PC_EASY );
-	easy.SetCoord( 72, 230 );
-	easy.iFlags |= QMF_NOTIFY;
-	easy.onActivatedClActive.pExtra = easy.onActivated.pExtra = (void*)1;
+	CMenuPicButton *easy = AddButton( "Easy", MenuStrings[IDS_NEWGAME_EASYHELP], PC_EASY, StartGameCb, QMF_NOTIFY );
+	easy->onActivatedClActive.pExtra = easy->onActivated.pExtra = (void*)1;
 
-	medium.SetNameAndStatus( "Medium", MenuStrings[IDS_NEWGAME_MEDIUMHELP] );
-	medium.SetPicture( PC_MEDIUM );
-	medium.SetCoord( 72, 280 );
-	medium.iFlags |= QMF_NOTIFY;
-	medium.onActivatedClActive.pExtra = medium.onActivated.pExtra = (void*)2;
+	CMenuPicButton *medium = AddButton( "Medium", MenuStrings[IDS_NEWGAME_MEDIUMHELP], PC_MEDIUM, StartGameCb, QMF_NOTIFY );
+	medium->onActivatedClActive.pExtra = medium->onActivated.pExtra = (void*)2;
 
-	hard.SetNameAndStatus( "Difficult", MenuStrings[IDS_NEWGAME_DIFFICULTHELP] );
-	hard.SetPicture( PC_DIFFICULT );
-	hard.SetCoord( 72, 330 );
-	hard.iFlags |= QMF_NOTIFY;
-	hard.onActivatedClActive.pExtra = hard.onActivated.pExtra = (void*)3;
+	CMenuPicButton *hard = AddButton( "Difficult", MenuStrings[IDS_NEWGAME_DIFFICULTHELP], PC_DIFFICULT, StartGameCb, QMF_NOTIFY );
+	hard->onActivatedClActive.pExtra = hard->onActivated.pExtra = (void*)3;
 
-	easy.onActivatedClActive = medium.onActivatedClActive = hard.onActivatedClActive = ShowDialogCb;
-	msgBox.onPositive = easy.onActivated = medium.onActivated = hard.onActivated = StartGameCb;
+	easy->onActivatedClActive = medium->onActivatedClActive = hard->onActivatedClActive = ShowDialogCb;
 
-	cancel.SetNameAndStatus("Cancel", "Go back to the main menu");
-	cancel.SetPicture( PC_CANCEL );
-	cancel.SetCoord( 72, 380 );
-	cancel.iFlags |= QMF_NOTIFY;
-	cancel.onActivated = HideCb;
+	AddButton( "Cancel", "Go back to the main menu", PC_CANCEL, HideCb, QMF_NOTIFY );
 
 	msgBox.SetMessage( MenuStrings[IDS_NEWGAME_NEWPROMPT] );
 	msgBox.HighlightChoice( CMenuYesNoMessageBox::HIGHLIGHT_NO );
 	msgBox.Link( this );
 
-	AddItem( background );
-	AddItem( banner );
-	AddItem( easy );
-	AddItem( medium );
-	AddItem( hard );
-	AddItem( cancel );
 }
 
 /*

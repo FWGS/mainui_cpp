@@ -31,11 +31,6 @@ public:
 
 private:
 	void _Init();
-	void _VidInit();
-
-	CMenuPicButton	touchOptions;
-	CMenuPicButton	touchButtons;
-	CMenuPicButton	done;
 };
 
 static CMenuTouch	uiTouch;
@@ -48,34 +43,19 @@ UI_Touch_Init
 void CMenuTouch::_Init( void )
 {
 	banner.SetPicture(ART_BANNER );
-
-	touchOptions.SetNameAndStatus( "Touch options", "Touch sensitivity and profile options" );
-	touchOptions.SetPicture( "gfx/shell/btn_touch_options" );
-	touchOptions.iFlags |= QMF_NOTIFY;
-	touchOptions.onActivated = UI_TouchOptions_Menu;
-
-	touchButtons.SetNameAndStatus( "Touch buttons", "Add, remove, edit touch buttons" );
-	touchButtons.SetPicture( "gfx/shell/btn_touch_buttons" );
-	touchButtons.iFlags |= QMF_NOTIFY;
-	touchButtons.onActivated = UI_TouchButtons_Menu;
-
-	done.SetNameAndStatus( "Done",  "Go back to the previous menu" );
-	done.SetPicture( PC_DONE );
-	done.onActivated = HideCb;
-
 	AddItem( background );
 	AddItem( banner );
-	AddItem( touchOptions );
-	AddItem( touchButtons );
-	AddItem( done );
+
+	AddButton( "Touch options", "Touch sensitivity and profile options", "gfx/shell/btn_touch_options",
+		UI_TouchOptions_Menu, QMF_NOTIFY );
+
+	AddButton( "Touch buttons", "Add, remove, edit touch buttons", "gfx/shell/btn_touch_buttons",
+		UI_TouchButtons_Menu, QMF_NOTIFY );
+
+	AddButton( "Done",  "Go back to the previous menu", PC_DONE, HideCb, QMF_NOTIFY );
+
 }
 
-void CMenuTouch::_VidInit()
-{
-	touchOptions.SetCoord( 72, 230 );
-	touchButtons.SetCoord( 72, 280 );
-	done.SetCoord( 72, 330 );
-}
 
 /*
 =================

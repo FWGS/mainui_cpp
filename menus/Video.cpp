@@ -31,10 +31,6 @@ public:
 
 private:
 	void _Init();
-
-	CMenuPicButton	vidOptions;
-	CMenuPicButton	vidModes;
-	CMenuPicButton	done;
 } uiVideo;
 
 /*
@@ -46,28 +42,11 @@ void CMenuVideo::_Init( void )
 {
 	banner.SetPicture(ART_BANNER);
 
-	vidOptions.SetNameAndStatus( "Video options", "Set video options such as screen size, gamma and image quality." );
-	vidOptions.SetCoord( 72, 230 );
-	vidOptions.SetPicture( PC_VID_OPT );
-	vidOptions.iFlags |= QMF_NOTIFY;
-	vidOptions.onActivated = UI_VidOptions_Menu;
-
-	vidModes.SetNameAndStatus( "Video modes", "Set video modes and configure 3D accelerators." );
-	vidModes.SetCoord( 72, 280 );
-	vidModes.SetPicture( PC_VID_MODES);
-	vidModes.iFlags |= QMF_NOTIFY;
-	vidModes.onActivated = UI_VidModes_Menu;
-
-	done.SetNameAndStatus( "Done", "Go back to the previous menu" );
-	done.SetCoord( 72, 330 );
-	done.SetPicture( PC_DONE );
-	done.onActivated = HideCb;
-
 	AddItem( background );
 	AddItem( banner );
-	AddItem( vidOptions );
-	AddItem( vidModes );
-	AddItem( done );
+	AddButton( "Video options", "Set video options such as screen size, gamma and image quality.", PC_VID_OPT, UI_VidOptions_Menu, QMF_NOTIFY );
+	AddButton( "Video modes", "Set video modes and configure 3D accelerators.", PC_VID_MODES, UI_VidModes_Menu, QMF_NOTIFY );
+	AddButton( "Done", "Go back to the previous menu", PC_DONE, HideCb, QMF_NOTIFY );
 }
 
 /*

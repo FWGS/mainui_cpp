@@ -110,11 +110,9 @@ public:
 	static void Connect( netadr_t server, bool havePassword );
 	static void Connect( serverSelect_t server );
 
-	CMenuPicButton joinGame;
-	CMenuPicButton createGame;
-	CMenuPicButton gameInfo;
-	CMenuPicButton refresh;
-	CMenuPicButton done;
+	CMenuPicButton *joinGame;
+	CMenuPicButton *createGame;
+	CMenuPicButton *refresh;
 	CMenuSwitch natOrDirect;
 
 	CMenuYesNoMessageBox msgBox;
@@ -174,7 +172,7 @@ void CMenuGameListModel::Update( void )
 	m_iNumItems = i;
 
 	if( uiStatic.numServers )
-		uiServerBrowser.joinGame.SetGrayed( false );
+		uiServerBrowser.joinGame->SetGrayed( false );
 }
 
 void CMenuGameListModel::OnActivateEntry( int line )
@@ -257,7 +255,7 @@ void CMenuServerBrowser::RefreshList()
 		{
 			UI_RefreshInternetServerList();
 			refreshTime2 = uiStatic.realTime + (EngFuncs::GetCvarFloat("cl_nat") ? 4000:1000);
-			refresh.iFlags |= QMF_GRAYED;
+			refresh->iFlags |= QMF_GRAYED;
 			if( uiStatic.realTime + 20000 < refreshTime )
 				refreshTime = uiStatic.realTime + 20000;
 		}
@@ -282,7 +280,7 @@ void CMenuServerBrowser::Draw( void )
 
 	if( uiStatic.realTime > refreshTime2 )
 	{
-		refresh.iFlags &= ~QMF_GRAYED;
+		refresh->iFlags &= ~QMF_GRAYED;
 	}
 
 	// serverinfo has been changed update display
@@ -300,15 +298,14 @@ CMenuServerBrowser::Init
 */
 void CMenuServerBrowser::_Init( void )
 {
-	joinGame.iFlags |= QMF_GRAYED;
-	joinGame.SetNameAndStatus( "Join game", "Join to selected game" );
-	joinGame.SetPicture( PC_JOIN_GAME );
-	joinGame.onActivatedClActive = msgBox.MakeOpenEvent();
-	joinGame.onActivated = JoinGame;
+	AddItem( background );
+	AddItem( banner );
 
-	createGame.SetNameAndStatus( "Create game", "Create new Internet game" );
-	createGame.SetPicture( PC_CREATE_GAME );
-	SET_EVENT( createGame, onActivated )
+	joinGame = AddButton( "Join game", "Join to selected game", PC_JOIN_GAME, JoinGame, QMF_GRAYED );
+	joinGame->onActivatedClActive = msgBox.MakeOpenEvent();
+
+	createGame = AddButton( "Create game", NULL, PC_CREATE_GAME );
+	SET_EVENT_PTR( createGame, onActivated )
 	{
 		if( ((CMenuServerBrowser*)pSelf->Parent())->m_bLanOnly )
 			EngFuncs::CvarSetValue( "public", 0.0f );
@@ -316,20 +313,14 @@ void CMenuServerBrowser::_Init( void )
 
 		UI_CreateGame_Menu();
 	}
-	END_EVENT( createGame, onActivated )
+	END_EVENT_PTR( createGame, onActivated )
 
-	gameInfo.iFlags |= QMF_GRAYED;
-	gameInfo.SetNameAndStatus( "View game info", "Get detail game info" );
-	gameInfo.SetPicture( PC_VIEW_GAME_INFO );
 	// TODO: implement!
+	AddButton( "View game info", "Get detail game info", PC_VIEW_GAME_INFO, CEventCallback::NoopCb, QMF_GRAYED );
 
-	refresh.SetNameAndStatus( "Refresh", "Refresh servers list" );
-	refresh.SetPicture( PC_REFRESH );
-	refresh.onActivated = RefreshListCb;
+	refresh = AddButton( "Refresh", "Refresh servers list", PC_REFRESH, RefreshListCb );
 
-	done.SetNameAndStatus( "Done", "Return to main menu" );
-	done.onActivated = HideCb;
-	done.SetPicture( PC_DONE );
+	AddButton( "Done", "Return to main menu", PC_DONE, HideCb );
 
 	msgBox.SetMessage( "Join a network game will exit any current game, OK to exit?" );
 	msgBox.SetPositiveButton( "Ok", PC_OK );
@@ -367,7 +358,7 @@ void CMenuServerBrowser::_Init( void )
 
 	// server.dll needs for reading savefiles or startup newgame
 	if( !EngFuncs::CheckGameDll( ))
-		createGame.iFlags |= QMF_GRAYED;	// server.dll is missed - remote servers only
+		createGame->iFlags |= QMF_GRAYED;	// server.dll is missed - remote servers only
 
 	password.bHideInput = true;
 	password.bAllowColorstrings = false;
@@ -400,13 +391,6 @@ void CMenuServerBrowser::_Init( void )
 	askPassword.Init();
 	askPassword.AddItem( password );
 
-	AddItem( background );
-	AddItem( banner );
-	AddItem( joinGame );
-	AddItem( createGame );
-	AddItem( gameInfo );
-	AddItem( refresh );
-	AddItem( done );
 	AddItem( gameList );
 	AddItem( natOrDirect );
 }
@@ -421,21 +405,15 @@ void CMenuServerBrowser::_VidInit()
 	if( m_bLanOnly )
 	{
 		banner.SetPicture( ART_BANNER_LAN );
-		createGame.szStatusText = ( "Create new LAN game" );
+		createGame->szStatusText = ( "Create new LAN game" );
 		natOrDirect.Hide();
 	}
 	else
 	{
 		banner.SetPicture( ART_BANNER_INET );
-		createGame.szStatusText = ( "Create new Internet game" );
+		createGame->szStatusText = ( "Create new Internet game" );
 		natOrDirect.Show();
 	}
-
-	joinGame.SetCoord( 72, 230 );
-	createGame.SetCoord( 72, 280 );
-	gameInfo.SetCoord( 72, 330 );
-	refresh.SetCoord( 72, 380 );
-	done.SetCoord( 72, 430 );
 
 	gameList.SetRect( 360, 255, -20, 440 );
 	natOrDirect.SetCoord( -20 - natOrDirect.size.w, 255 - gameList.charSize.h * 1.5 - UI_OUTLINE_WIDTH * 2 - natOrDirect.size.h );
@@ -447,8 +425,10 @@ void CMenuServerBrowser::_VidInit()
 void CMenuServerBrowser::Show()
 {
 	CMenuFramework::Show();
+
 	// clear out server table
 	gameListModel.Flush();
+	joinGame->SetGrayed( true );
 }
 
 /*

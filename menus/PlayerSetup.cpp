@@ -300,9 +300,6 @@ public:
 	int		num_models;
 	char	currentModel[CS_SIZE];
 
-	CMenuPicButton	done;
-	CMenuPicButton	gameOptions;
-	CMenuPicButton	advOptions;
 	CMenuPlayerModelView	view;
 
 	CMenuCheckBox	showModels;
@@ -432,23 +429,6 @@ void CMenuPlayerSetup::_Init( void )
 
 	banner.SetPicture(ART_BANNER);
 
-	done.SetNameAndStatus( "Done", "Go back to the Multiplayer Menu" );
-	done.SetPicture( PC_DONE );\
-	done.onActivated = SaveAndPopMenuCb;
-
-	gameOptions.SetNameAndStatus( "Game options", "Configure handness, fov and other advanced options" );
-	gameOptions.SetPicture( PC_GAME_OPTIONS );
-	SET_EVENT( gameOptions, onActivated )
-	{
-		((CMenuPlayerSetup*)pSelf->Parent())->SetConfig();
-		UI_GameOptions_Menu();
-	}
-	END_EVENT( gameOptions, onActivated )
-
-	advOptions.SetNameAndStatus( "Adv options", "" );
-	advOptions.SetPicture( PC_ADV_OPT );
-	advOptions.onActivated = UI_AdvUserOptions_Menu;
-
 	name.szStatusText = "Enter your multiplayer display name";
 	name.iMaxLength = 32;
 	name.LinkCvar( "name" );
@@ -494,9 +474,20 @@ void CMenuPlayerSetup::_Init( void )
 
 	AddItem( background );
 	AddItem( banner );
-	AddItem( done );
-	AddItem( gameOptions );
-	AddItem( advOptions );
+
+	AddButton( "Done", "Go back to the Multiplayer Menu", PC_DONE, SaveAndPopMenuCb );
+	CMenuPicButton *gameOpt = AddButton( "Game options", "Configure handness, fov and other advanced options", PC_GAME_OPTIONS );
+	SET_EVENT_PTR( gameOpt, onActivated )
+	{
+		((CMenuPlayerSetup*)pSelf->Parent())->SetConfig();
+		UI_GameOptions_Menu();
+	}
+	END_EVENT_PTR( gameOpt, onActivated )
+
+	CMenuPicButton *advOpt = AddButton( "Adv options", "", PC_ADV_OPT, UI_AdvUserOptions_Menu );
+	advOpt->SetGrayed( !UI_AdvUserOptions_IsAvailable );
+
+
 	AddItem( name );
 	AddItem( clPredict);
 	AddItem( clLW);
@@ -515,10 +506,6 @@ void CMenuPlayerSetup::_Init( void )
 
 void CMenuPlayerSetup::_VidInit()
 {
-	done.SetCoord( 72, 230 );
-	gameOptions.SetCoord( 72, 280 );
-	advOptions.SetCoord( 72, 330 );
-
 	view.SetRect( 660, 260, 260, 320 );
 	name.SetRect( 320, 260, 256, 36 );
 	model.SetRect( 660, 580 + UI_OUTLINE_WIDTH, 260, 32 );
@@ -532,8 +519,6 @@ void CMenuPlayerSetup::_VidInit()
 	clLW.SetCoord( 72, 430 );
 	showModels.SetCoord( 340, 380 );
 	hiModels.SetCoord( 340, 430 );
-
-	advOptions.SetGrayed( !UI_AdvUserOptions_IsAvailable() );
 }
 
 /*
