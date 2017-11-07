@@ -153,6 +153,26 @@ void CMenuBaseItem::CalcPosition()
 	else
 		m_scPos = pos.Scale();
 
+	if( m_scPos.x < 0 )
+	{
+		int pos;
+		if( m_pParent && !IsAbsolutePositioned() )
+			pos = m_pParent->GetRenderSize().w;
+		else pos = ScreenWidth;
+
+		m_scPos.x = pos + m_scPos.x;
+	}
+
+	if( m_scPos.y < 0 )
+	{
+		int pos;
+		if( m_pParent && !IsAbsolutePositioned() )
+			pos = m_pParent->GetRenderSize().h;
+		else pos = ScreenHeight;
+
+		m_scPos.y = pos + m_scPos.y;
+	}
+
 	if( !IsAbsolutePositioned() && m_pParent )
 	{
 		Point offset = m_pParent->GetPositionOffset();
@@ -171,6 +191,26 @@ void CMenuBaseItem::CalcSizes()
 	{
 		m_scSize = size.Scale();
 		m_scChSize = charSize.Scale();
+	}
+
+	if( m_scSize.w < 0 )
+	{
+		int size;
+		if( m_pParent && !IsAbsolutePositioned() )
+			size = m_pParent->GetRenderSize().w;
+		else size = ScreenWidth;
+
+		m_scSize.w = size + m_scSize.w - m_scPos.x;
+	}
+
+	if( m_scSize.h < 0 )
+	{
+		int size;
+		if( m_pParent && !IsAbsolutePositioned() )
+			size = m_pParent->GetRenderSize().h;
+		else size = ScreenHeight;
+
+		m_scSize.h = size + m_scSize.h - m_scPos.y;
 	}
 }
 

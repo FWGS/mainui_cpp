@@ -173,7 +173,7 @@ protected:
 
 	// Determine, is this item is absolute positioned
 	// If false, it will be positiond relative to it's parent
-	virtual bool IsAbsolutePositioned( void ) { return false; }
+	virtual bool IsAbsolutePositioned( void ) const { return false; }
 
 	friend int UI_VidInit( void );
 
