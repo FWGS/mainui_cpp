@@ -437,8 +437,8 @@ void CMenuServerBrowser::_VidInit()
 	refresh.SetCoord( 72, 380 );
 	done.SetCoord( 72, 430 );
 
-	gameList.SetRect( 340, 255, 660, 440 );
-	natOrDirect.SetCoord( 780, 255 - gameList.charSize.h * 1.5 - UI_OUTLINE_WIDTH * 2 - natOrDirect.size.h );
+	gameList.SetRect( 360, 255, -20, 440 );
+	natOrDirect.SetCoord( -20 - natOrDirect.size.w, 255 - gameList.charSize.h * 1.5 - UI_OUTLINE_WIDTH * 2 - natOrDirect.size.h );
 
 	refreshTime = uiStatic.realTime + 500; // delay before update 0.5 sec
 	refreshTime2 = uiStatic.realTime + 500;

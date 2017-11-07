@@ -338,7 +338,7 @@ void CMenuLoadGame::_VidInit()
 	remove.SetCoord( 72, 280 );
 	cancel.SetCoord( 72, 330 );
 	levelShot.SetRect( LEVELSHOT_X, LEVELSHOT_Y, LEVELSHOT_W, LEVELSHOT_H );
-	savesList.SetRect( 360, 255, 640, 440 );
+	savesList.SetRect( 360, 255, -20, 440 );
 }
 
 void CMenuLoadGame::SetSaveMode(bool saveMode)

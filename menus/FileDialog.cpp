@@ -162,7 +162,7 @@ void CMenuFileDialog::_VidInit()
 {
 	done.SetCoord( 72, 230 );
 	cancel.SetCoord( 72, 280 );
-	fileList.SetRect( 340, 230, 600, 500 );
+	fileList.SetRect( 360, 255, -20, 440 );
 	preview.SetRect( 72, 380, 196, 196 );
 
 	preview.SetVisibility( uiFileDialogGlobal.preview );

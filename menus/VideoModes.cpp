@@ -115,7 +115,7 @@ void CMenuVidModes::_Init( void )
 	cancel.SetPicture( PC_CANCEL );
 	cancel.onActivated = HideCb;
 
-	vidList.SetRect( 400, 300, 560, 300 );
+	vidList.SetRect( 360, 255, -20, 440 );
 	vidList.SetupColumn( 0, MenuStrings[IDS_VIDEO_MODECOL], 1.0f );
 	vidList.SetModel( &vidListModel );
 

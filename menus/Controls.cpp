@@ -406,7 +406,7 @@ void CMenuControls::_Init( void )
 	}
 	END_EVENT( cancel, onActivated )
 
-	keysList.SetRect( 360, 255, 640, 440 );
+	keysList.SetRect( 360, 255, -20, 440 );
 	keysList.SetModel( &keysListModel );
 	keysList.SetupColumn( 0, "Action", 0.50f );
 	keysList.SetupColumn( 1, "Key/Button", 0.25f );

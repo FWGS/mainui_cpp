@@ -204,7 +204,7 @@ void CMenuCustomGame::_VidInit()
 	load.SetCoord( 72, 230 );
 	go2url.SetCoord( 72, 280 );
 	done.SetCoord( 72, 330 );
-	modList.SetRect( 360, 255, 640, 440 );
+	modList.SetRect( 360, 255, -20, 440 );
 }
 
 /*

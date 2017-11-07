@@ -42,7 +42,6 @@ public:
 
 	CMenuPicButton done;
 
-//public:
 	CMenuCheckBox	crosshair;
 	CMenuCheckBox	invertMouse;
 	CMenuCheckBox	mouseLook;
@@ -52,7 +51,6 @@ public:
 	CMenuCheckBox	lookFilter;
 	CMenuCheckBox	autoaim;
 	CMenuSlider	sensitivity;
-
 };
 
 static CAdvancedControls	uiAdvControls;
@@ -136,7 +134,7 @@ void CAdvancedControls::_Init( void )
 		CMenuCheckBox *self = (CMenuCheckBox*)pSelf;
 		float m_pitch = EngFuncs::GetCvarFloat( "m_pitch" );
 		if( (self->bChecked  && m_pitch > 0) ||
-			(!self->bChecked && m_pitch < 0))
+			(!self->bChecked && m_pitch < 0) )
 			EngFuncs::CvarSetValue( "m_pitch", -m_pitch );
 	}
 	END_EVENT( invertMouse, onChanged )
