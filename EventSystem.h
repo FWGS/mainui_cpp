@@ -16,6 +16,8 @@ GNU General Public License for more details.
 #ifndef EVENTSYSTEM_H
 #define EVENTSYSTEM_H
 
+#include "Utils.h"
+
 // Use these macros to set EventCallback, if no function pointer is available
 // SET_EVENT must be followed by event code and closed by END_EVENT
 // SET_EVENT_THIS can be used for setting event member inside it's class
@@ -31,13 +33,19 @@ GNU General Public License for more details.
 #define SET_EVENT( item, callback ) typedef struct { static void callback( CMenuBaseItem *pSelf, void *pExtra )
 #define END_EVENT( item, callback ) } EVNAME(callback); (item).callback = EVNAME(callback)::callback;
 
-#define SET_EVENT_THIS( callback ) SET_EVENT( this, callback )
-#define END_EVENT_THIS( callback ) } EVNAME(callback);; this->callback = EVNAME(callback)::callback;
+#define SET_EVENT_PTR( ptr, callback ) SET_EVENT( (*ptr), callback )
+#define END_EVENT_PTR( ptr, callback ) END_EVENT( (*ptr), callback )
+
+#define SET_EVENT_THIS( callback ) SET_EVENT( (*this), callback )
+#define END_EVENT_THIS( callback ) END_EVENT( (*this), callback )
 
 #else
 
 #define SET_EVENT( item, callback ) (item).callback = [](CMenuBaseItem *pSelf, void *pExtra)
 #define END_EVENT( item, callback ) ;
+
+#define SET_EVENT_PTR( ptr, callback ) SET_EVENT( (*ptr), callback )
+#define END_EVENT_PTR( ptr, callback ) END_EVENT( (*ptr), callback )
 
 #define SET_EVENT_THIS( callback ) SET_EVENT( (*this), callback )
 #define END_EVENT_THIS( callback ) END_EVENT( (*this), callback )
@@ -76,13 +84,15 @@ enum menuEvent_e
 
 typedef void (*EventCallback)(CMenuBaseItem *, void *);
 typedef void (*VoidCallback)(void);
+#define CmdCallback (VoidCallback)0x1
 
 class CEventCallback
 {
 public:
 	CEventCallback();
 	CEventCallback( EventCallback cb, void *ex = 0 );
-	~CEventCallback();
+	CEventCallback( VoidCallback cb );
+	CEventCallback( int execute_now, const char *sz );
 
 	void *pExtra;
 
@@ -103,12 +113,8 @@ public:
 
 	void SetCommand( int execute_now, const char *sz )
 	{
-		FreeCommand();
-
-		cmd = new struct CmdCallback(execute_now, sz);
-
-		pExtra = cmd;
-		callback = CmdCallbackWrapperCb;
+		callback = execute_now ? CmdExecuteNowCb : CmdExecuteNextFrameCb;
+		pExtra = (void*)sz;
 	}
 
 	static void NoopCb( CMenuBaseItem *, void * ) {}
@@ -116,33 +122,23 @@ public:
 private:
 	EventCallback callback;
 
-	struct CmdCallback
-	{
-		CmdCallback( int _execute_now, const char *sz );
-
-		int execute_now;
-		char cmd[128];
-	} *cmd;
-
-	void FreeCommand()
-	{
-		delete cmd;
-		cmd = 0;
-	}
+	// to find event command by name(for items holder)
+	const char *szName;
 
 	static void VoidCallbackWrapperCb( CMenuBaseItem *pSelf, void *pExtra )
 	{
 		((VoidCallback)pExtra)();
 	}
 
-	static void CmdCallbackWrapperCb( CMenuBaseItem *pSelf, void *pExtra )
+	static void CmdExecuteNextFrameCb( CMenuBaseItem *pSelf, void *pExtra )
 	{
-		CmdCallback *cmd = (CmdCallback*)pExtra;
-		EngFuncs::ClientCmd( cmd->execute_now, cmd->cmd );
+		EngFuncs::ClientCmd( FALSE, (char *)pExtra );
 	}
 
-	// to find event command by name(for items holder)
-	const char *szName;
+	static void CmdExecuteNowCb( CMenuBaseItem *pSelf, void *pExtra )
+	{
+		EngFuncs::ClientCmd( TRUE, (char *)pExtra );
+	}
 
 	friend class CMenuItemsHolder;
 };

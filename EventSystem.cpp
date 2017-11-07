@@ -15,25 +15,24 @@ GNU General Public License for more details.
 #include "BaseMenu.h"
 
 CEventCallback::CEventCallback() :
-	pExtra(), callback(), cmd(), szName()
+	pExtra(), callback(), szName( 0 )
 {
 
 }
 
 CEventCallback::CEventCallback( EventCallback cb, void *ex ) :
-	pExtra( ex ), callback( cb ), cmd(), szName()
+	pExtra( ex ), callback( cb ), szName( 0 )
 {
 
 }
 
-CEventCallback::~CEventCallback()
+CEventCallback::CEventCallback( VoidCallback cb ) :
+	pExtra( (void *)cb ), callback( VoidCallbackWrapperCb ), szName( 0 )
 {
-	FreeCommand();
+
 }
 
-CEventCallback::CmdCallback::CmdCallback(int _execute_now, const char *sz)
+CEventCallback::CEventCallback(int execute_now, const char *sz)
 {
-	execute_now = _execute_now;
-	strncpy( cmd, sz, sizeof( cmd ) - 1 );
-	cmd[sizeof(cmd)-1] = 0;
+	SetCommand( execute_now, sz );
 }
