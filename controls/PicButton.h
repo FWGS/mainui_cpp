@@ -38,7 +38,7 @@ public:
 	virtual const char * Key( int key, int down );
 	virtual void Draw( void );
 
-	void SetPicture( int ID );
+	void SetPicture( EDefaultBtns ID );
 	void SetPicture( const char *filename );
 
 	bool bEnableTransitions;

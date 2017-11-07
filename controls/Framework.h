@@ -17,11 +17,18 @@ GNU General Public License for more details.
 #define FRAMEWORK_H
 
 #include "BaseWindow.h"
+#include "PicButton.h"
 
+#define MAX_FRAMEWORK_PICBUTTONS 16
+
+/*
+ * WON-style menu framework
+ */
 class CMenuFramework : public CMenuBaseWindow
 {
 public:
 	CMenuFramework( const char *name = "Unnamed Framework" );
+	virtual ~CMenuFramework();
 
 	void Show();
 	void Init() FINAL;
@@ -29,9 +36,19 @@ public:
 	void Hide();
 	bool IsRoot() { return true; }
 
+	CMenuPicButton *AddButton( const char *szName, const char *szStatus,
+		EDefaultBtns iButton, CEventCallback onActivated = CEventCallback(), int iFlags = 0 );
+
+	CMenuPicButton *AddButton( const char *szName, const char *szStatus,
+		const char *szButtonPath, CEventCallback onActivated = CEventCallback(), int iFlags = 0 );
+
 	bool DrawAnimation(EAnimation anim);
 
 	CMenuBannerBitmap banner;
+
+private:
+	CMenuPicButton *m_apBtns[MAX_FRAMEWORK_PICBUTTONS];
+	int m_iBtnsNum;
 };
 
 #endif // FRAMEWORK_H

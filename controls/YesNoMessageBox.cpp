@@ -161,7 +161,7 @@ void CMenuYesNoMessageBox::SetMessage( const char *msg )
 CMenuYesNoMessageBox::SetPositiveButton
 ==============
 */
-void CMenuYesNoMessageBox::SetPositiveButton( const char *msg, int buttonPic )
+void CMenuYesNoMessageBox::SetPositiveButton( const char *msg, EDefaultBtns buttonPic )
 {
 	m_bSetYes = true;
 	yes.szName = msg;
@@ -173,7 +173,7 @@ void CMenuYesNoMessageBox::SetPositiveButton( const char *msg, int buttonPic )
 CMenuYesNoMessageBox::SetNegativeButton
 ==============
 */
-void CMenuYesNoMessageBox::SetNegativeButton( const char *msg, int buttonPic )
+void CMenuYesNoMessageBox::SetNegativeButton( const char *msg, EDefaultBtns buttonPic )
 {
 	m_bSetNo = true;
 	no.szName = msg;

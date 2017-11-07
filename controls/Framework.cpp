@@ -18,6 +18,18 @@ GNU General Public License for more details.
 CMenuFramework::CMenuFramework( const char *name ) : CMenuBaseWindow( name )
 {
 	iFlags = QMF_DISABLESCAILING;
+	memset( m_apBtns, 0, sizeof( m_apBtns ) );
+	m_iBtnsNum = 0;
+}
+
+CMenuFramework::~CMenuFramework()
+{
+	for( int i = 0; i < m_iBtnsNum; i++ )
+	{
+		RemoveItem( *( m_apBtns[i] ) );
+		delete m_apBtns[i];
+		m_apBtns[i] = NULL;
+	}
 }
 
 void CMenuFramework::Show()
@@ -66,6 +78,51 @@ void CMenuFramework::VidInit()
 	m_scSize.h = size.h = ScreenHeight;
 	CMenuBaseWindow::VidInit();
 }
+
+CMenuPicButton * CMenuFramework::AddButton(const char *szName, const char *szStatus, EDefaultBtns buttonPicId, CEventCallback onActivated, int iFlags)
+{
+	if( m_iBtnsNum >= MAX_FRAMEWORK_PICBUTTONS )
+	{
+		Host_Error( "Too many pic buttons in framework!" );
+		return NULL;
+	}
+
+	CMenuPicButton *btn = new CMenuPicButton();
+
+	btn->SetNameAndStatus( szName, szStatus );
+	btn->SetPicture( buttonPicId );
+	btn->iFlags |= iFlags;
+	btn->onActivated = onActivated;
+	btn->SetCoord( 72, 230 + m_iBtnsNum * 50 );
+	AddItem( btn );
+
+	m_apBtns[m_iBtnsNum++] = btn;
+
+	return btn;
+}
+
+CMenuPicButton * CMenuFramework::AddButton(const char *szName, const char *szStatus, const char *szButtonPath, CEventCallback onActivated, int iFlags)
+{
+	if( m_iBtnsNum >= MAX_FRAMEWORK_PICBUTTONS )
+	{
+		Host_Error( "Too many pic buttons in framework!" );
+		return NULL;
+	}
+
+	CMenuPicButton *btn = new CMenuPicButton();
+
+	btn->SetNameAndStatus( szName, szStatus );
+	btn->SetPicture( szButtonPath );
+	btn->iFlags |= iFlags;
+	btn->onActivated = onActivated;
+	btn->SetCoord( 72, 230 + m_iBtnsNum * 50 );
+	AddItem( btn );
+
+	m_apBtns[m_iBtnsNum++] = btn;
+
+	return btn;
+}
+
 
 bool CMenuFramework::DrawAnimation(EAnimation anim)
 {

@@ -16,7 +16,7 @@ GNU General Public License for more details.
 #ifndef MENU_BTNSBMP_TABLE_H
 #define MENU_BTNSBMP_TABLE_H
 	
-enum
+enum EDefaultBtns
 {
 	PC_NEW_GAME = 0,
 	PC_RESUME_GAME,

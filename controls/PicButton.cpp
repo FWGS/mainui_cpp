@@ -292,7 +292,7 @@ void CMenuPicButton::Draw( )
 	iOldState = state;
 }
 
-void CMenuPicButton::SetPicture( int ID )
+void CMenuPicButton::SetPicture(EDefaultBtns ID )
 {
 #ifndef MAINUI_RENDER_PICBUTTON_TEXT
 	if( ID < 0 || ID > PC_BUTTONCOUNT )
