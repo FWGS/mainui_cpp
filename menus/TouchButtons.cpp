@@ -200,8 +200,8 @@ void CMenuTouchButtons::CMenuButtonPreview::Draw()
 
 void CMenuTouchButtons::DeleteButton()
 {
-	char command[256];
-	snprintf(command, 256, "touch_removebutton \"%s\"\n", selectedName );
+	char command[512];
+	snprintf(command, 512, "touch_removebutton \"%s\"\n", selectedName );
 	EngFuncs::ClientCmd(1, command);
 	GetButtonList();
 }
@@ -356,12 +356,12 @@ void CMenuTouchButtons::_Init( void )
 	save.SetPicture("gfx/shell/btn_touch_save");
 	SET_EVENT( save, onActivated )
 	{
-		char command[256];
+		char command[512];
 		CMenuTouchButtons *parent = (CMenuTouchButtons*)pSelf->Parent();
 
 		if( parent->name.GetBuffer()[0] )
 		{
-			snprintf( command, 256, "touch_addbutton \"%s\" \"%s\" \"%s\"\n",
+			snprintf( command, 512, "touch_addbutton \"%s\" \"%s\" \"%s\"\n",
 				parent->name.GetBuffer(),
 				parent->texture.GetBuffer(),
 				parent->command.GetBuffer() );
@@ -370,16 +370,16 @@ void CMenuTouchButtons::_Init( void )
 		}
 		else
 		{
-			snprintf( command, 256, "touch_settexture \"%s\" \"%s\"\n", parent->selectedName, parent->texture.GetBuffer() );
+			snprintf( command, 512, "touch_settexture \"%s\" \"%s\"\n", parent->selectedName, parent->texture.GetBuffer() );
 			EngFuncs::ClientCmd(0, command);
-			snprintf( command, 256, "touch_setcommand \"%s\" \"%s\"\n", parent->selectedName, parent->command.GetBuffer() );
+			snprintf( command, 512, "touch_setcommand \"%s\" \"%s\"\n", parent->selectedName, parent->command.GetBuffer() );
 			EngFuncs::ClientCmd(0, command);
 		}
 
-		snprintf( command, 256, "touch_setflags \"%s\" %i\n", parent->name.GetBuffer(), parent->curflags );
+		snprintf( command, 512, "touch_setflags \"%s\" %i\n", parent->name.GetBuffer(), parent->curflags );
 		EngFuncs::ClientCmd(0, command);
 
-		snprintf( command, 256, "touch_setcolor \"%s\" %u %u %u %u\n", parent->name.GetBuffer(),
+		snprintf( command, 512, "touch_setcolor \"%s\" %u %u %u %u\n", parent->name.GetBuffer(),
 			(uint)parent->red.GetCurrentValue(),
 			(uint)parent->green.GetCurrentValue(),
 			(uint)parent->blue.GetCurrentValue(),
