@@ -81,9 +81,12 @@ void CMenuVidModesModel::Update( void )
 {
 	unsigned int i;
 
-	for( i = 0; i < 64; i++ )
+	m_szModes[0] = "<Current window size>";
+	m_szModes[1] = "<Desktop size>";
+
+	for( i = 2; i < 64; i++ )
 	{
-		const char *mode = EngFuncs::GetModeString( i );
+		const char *mode = EngFuncs::GetModeString( i - 2 );
 		if( !mode ) break;
 		m_szModes[i] = mode;
 	}
@@ -98,16 +101,16 @@ UI_VidModes_SetConfig
 void CMenuVidModes::SetConfig( void )
 {
 	bool testMode = false;
-	if( prevMode != vidList.GetCurrentIndex() )
+	if( prevMode != vidList.GetCurrentIndex() - 2 )
 	{
-		EngFuncs::CvarSetValue( "vid_mode", vidList.GetCurrentIndex() );
-		testMode = true;
+		EngFuncs::CvarSetValue( "vid_mode", vidList.GetCurrentIndex() - 2 );
+		testMode |= vidList.GetCurrentIndex() >= 2;
 	}
 
 	if( prevFullscreen == windowed.bChecked )
 	{
 		EngFuncs::CvarSetValue( "fullscreen", !windowed.bChecked );
-		testMode = true;
+		testMode = !windowed.bChecked;
 	}
 
 	vsync.WriteCvar();
@@ -169,6 +172,19 @@ void CMenuVidModes::_Init( void )
 
 	windowed.SetNameAndStatus( "Run in a window", "Run game in window mode" );
 	windowed.SetCoord( 360, 620 );
+	SET_EVENT( windowed, onChanged )
+	{
+		if( !uiVidModes.windowed.bChecked && uiVidModes.vidList.GetCurrentIndex() < 1 )
+			uiVidModes.vidList.SetCurrentIndex(2);
+	}
+	END_EVENT( windowed, onChanged )
+
+	SET_EVENT( vidList, onChanged )
+	{
+		if( !uiVidModes.windowed.bChecked && uiVidModes.vidList.GetCurrentIndex() < 1 )
+			uiVidModes.vidList.SetCurrentIndex(2);
+	}
+	END_EVENT( vidList, onChanged )
 
 	vsync.SetNameAndStatus( "Vertical sync", "Enable vertical synchronization" );
 	vsync.SetCoord( 360, 670 );
@@ -194,7 +210,7 @@ void CMenuVidModes::_VidInit()
 	if( !testModeMsgBox.IsVisible() )
 	{
 		prevMode = EngFuncs::GetCvarFloat( "vid_mode" );
-		vidList.SetCurrentIndex( prevMode );
+		vidList.SetCurrentIndex( prevMode + 2 );
 
 		prevFullscreen = EngFuncs::GetCvarFloat( "fullscreen" );
 		windowed.bChecked = !prevFullscreen;
