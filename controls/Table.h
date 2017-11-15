@@ -117,12 +117,13 @@ public:
 	void SetColumnWidth( int num, float width )
 	{
 		if( num < MAX_TABLE_COLUMNS && num >= 0 )
-			flColumnWidths[num] = width;
+			columns[num].flWidth = width;
 	}
 
 	// shortcut for SetHeaderText && SetColumnWidth
-	inline void SetupColumn( int num, const char *text, float width )
+	inline void SetupColumn( int num, const char *text, float width, bool fixed = false )
 	{
+		columns[num].fStaticWidth = fixed;
 		SetHeaderText( num, text );
 		SetColumnWidth( num, width );
 	}
@@ -137,7 +138,13 @@ private:
 	void DrawLine(Point p, int line, int textColor, bool forceCol, int fillColor = 0);
 
 	const char	*szHeaderTexts[MAX_TABLE_COLUMNS];
-	float       flColumnWidths[MAX_TABLE_COLUMNS];
+	struct column
+	{
+		float flWidth;
+		bool fStaticWidth;
+	} columns[MAX_TABLE_COLUMNS];
+
+	float flFixedSumm, flDynamicSumm;
 
 	const char	*szBackground;
 	const char	*szUpArrow;
