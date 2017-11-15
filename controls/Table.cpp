@@ -51,6 +51,19 @@ void CMenuTable::VidInit()
 		if( iTopItem < 0 )
 			iTopItem = 0;
 	}
+
+
+	flFixedSumm = 0.0f;
+	flDynamicSumm = 0.0f;
+
+	for( int i = 0; i < m_pModel->GetColumns(); i++ )
+	{
+		if( columns[i].fStaticWidth )
+			flFixedSumm += columns[i].flWidth;
+		else
+			flDynamicSumm += columns[i].flWidth;
+	}
+	flFixedSumm *= uiStatic.scaleX;
 }
 
 bool CMenuTable::MoveView(int delta )
@@ -293,7 +306,10 @@ void CMenuTable::DrawLine( Point p, const char **psz, size_t size, int textColor
 		i < size;
 		i++, ix += sz.w )
 	{
-		sz.w = width * flColumnWidths[i];
+		if( columns[i].fStaticWidth )
+			sz.w = columns[i].flWidth * uiStatic.scaleX;
+		else
+			sz.w = ((float)width - flFixedSumm) * columns[i].flWidth / flDynamicSumm;
 
 		if( !psz[i] ) // headers may be null, cells too
 			continue;
@@ -328,7 +344,10 @@ void CMenuTable::DrawLine( Point p, int line, int textColor, bool forceCol, int 
 		i < m_pModel->GetColumns();
 		i++, ix += sz.w )
 	{
-		sz.w = (float)width * flColumnWidths[i];
+		if( columns[i].fStaticWidth )
+			sz.w = columns[i].flWidth * uiStatic.scaleX;
+		else
+			sz.w = ((float)width - flFixedSumm) * columns[i].flWidth / flDynamicSumm;
 
 		const char *str = m_pModel->GetCellText( line, i );
 		const ECellType type = m_pModel->GetCellType( line, i );
