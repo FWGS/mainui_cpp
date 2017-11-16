@@ -231,14 +231,15 @@ void CMenuTouchButtons::UpdateFields( )
 	additive.bChecked = !!( curflags & TOUCH_FL_DRAW_ADDITIVE );
 	precision.bChecked = !!( curflags & TOUCH_FL_PRECISION );
 
+	name.Clear();
+	texture.SetBuffer( bTextures[i] );
+
 	const char *buf = texture.GetBuffer();
 	if( buf[0] && buf[0] != '#' )
 		preview.textureId = EngFuncs::PIC_Load(buf);
 	else
 		preview.textureId = 0;
 
-	name.Clear();
-	texture.SetBuffer( bTextures[i] );
 	command.SetBuffer( bCommands[i] );
 }
 
