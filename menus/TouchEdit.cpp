@@ -33,6 +33,7 @@ public:
 	void Show();
 	void Hide();
 	void Draw();
+	bool DrawAnimation(EAnimation anim);
 	const char *Key(int key, int down);
 private:
 	float saveTouchEnable;
@@ -58,6 +59,11 @@ void CMenuTouchEdit::Hide()
 	EngFuncs::ClientCmd(FALSE, "touch_disableedit");
 
 	CMenuFramework::Hide();
+}
+
+bool CMenuTouchEdit::DrawAnimation(EAnimation anim)
+{
+	return true;
 }
 
 /*
