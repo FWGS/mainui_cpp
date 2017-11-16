@@ -29,6 +29,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define ART_BANNER		"gfx/shell/head_vidmodes"
 
+enum
+{
+	VID_NOMODE = -2, // engine values
+	VID_AUTOMODE = -1,
+	VID_NOMODE_POS = 0, // values in array
+	VID_AUTOMODE_POS = 1,
+	VID_MODES_POS = 2, // there starts engine modes
+};
+
 class CMenuVidModesModel : public CMenuBaseModel
 {
 public:
@@ -84,9 +93,9 @@ void CMenuVidModesModel::Update( void )
 	m_szModes[0] = "<Current window size>";
 	m_szModes[1] = "<Desktop size>";
 
-	for( i = 2; i < 64; i++ )
+	for( i = VID_MODES_POS; i < 64; i++ )
 	{
-		const char *mode = EngFuncs::GetModeString( i - 2 );
+		const char *mode = EngFuncs::GetModeString( i - VID_MODES_POS );
 		if( !mode ) break;
 		m_szModes[i] = mode;
 	}
@@ -101,16 +110,20 @@ UI_VidModes_SetConfig
 void CMenuVidModes::SetConfig( void )
 {
 	bool testMode = false;
-	if( prevMode != vidList.GetCurrentIndex() - 2 )
+	if( prevMode != vidList.GetCurrentIndex() - VID_MODES_POS )
 	{
-		EngFuncs::CvarSetValue( "vid_mode", vidList.GetCurrentIndex() - 2 );
-		testMode |= vidList.GetCurrentIndex() >= 2;
+		EngFuncs::CvarSetValue( "vid_mode", vidList.GetCurrentIndex() - VID_MODES_POS );
+
+		// have changed resolution, but enable test mode only in fullscreen
+		testMode |= !windowed.bChecked;
 	}
 
 	if( prevFullscreen == windowed.bChecked )
 	{
 		EngFuncs::CvarSetValue( "fullscreen", !windowed.bChecked );
-		testMode = !windowed.bChecked;
+
+		// moved to fullscreen, enable test mode
+		testMode |= !windowed.bChecked;
 	}
 
 	vsync.WriteCvar();
@@ -174,15 +187,15 @@ void CMenuVidModes::_Init( void )
 	windowed.SetCoord( 360, 620 );
 	SET_EVENT( windowed, onChanged )
 	{
-		if( !uiVidModes.windowed.bChecked && uiVidModes.vidList.GetCurrentIndex() < 1 )
-			uiVidModes.vidList.SetCurrentIndex(2);
+		if( !uiVidModes.windowed.bChecked && uiVidModes.vidList.GetCurrentIndex() < VID_AUTOMODE_POS )
+			uiVidModes.vidList.SetCurrentIndex( VID_AUTOMODE_POS );
 	}
 	END_EVENT( windowed, onChanged )
 
 	SET_EVENT( vidList, onChanged )
 	{
-		if( !uiVidModes.windowed.bChecked && uiVidModes.vidList.GetCurrentIndex() < 1 )
-			uiVidModes.vidList.SetCurrentIndex(2);
+		if( !uiVidModes.windowed.bChecked && uiVidModes.vidList.GetCurrentIndex() < VID_AUTOMODE_POS )
+			uiVidModes.vidList.SetCurrentIndex( VID_AUTOMODE_POS );
 	}
 	END_EVENT( vidList, onChanged )
 
@@ -210,7 +223,7 @@ void CMenuVidModes::_VidInit()
 	if( !testModeMsgBox.IsVisible() )
 	{
 		prevMode = EngFuncs::GetCvarFloat( "vid_mode" );
-		vidList.SetCurrentIndex( prevMode + 2 );
+		vidList.SetCurrentIndex( prevMode + VID_MODES_POS );
 
 		prevFullscreen = EngFuncs::GetCvarFloat( "fullscreen" );
 		windowed.bChecked = !prevFullscreen;
