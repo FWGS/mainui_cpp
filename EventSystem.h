@@ -84,7 +84,6 @@ enum menuEvent_e
 
 typedef void (*EventCallback)(CMenuBaseItem *, void *);
 typedef void (*VoidCallback)(void);
-#define CmdCallback (VoidCallback)0x1
 
 class CEventCallback
 {

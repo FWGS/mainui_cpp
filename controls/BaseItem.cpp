@@ -307,7 +307,7 @@ bool CMenuBaseItem::KeyValueData(const char *key, const char *data)
 			Con_DPrintf( "KeyValueData: unknown textAlignment %s\n", data );
 		}
 	}
-	else if( !strcmp( key, "command" ) )
+	/*else if( !strcmp( key, "command" ) )
 	{
 		CEventCallback ev;
 
@@ -325,7 +325,7 @@ bool CMenuBaseItem::KeyValueData(const char *key, const char *data)
 			// if this happens, there is a bug
 			Con_DPrintf( "KeyValueData: cannot set command '%s' on '%s'\n", data, szName );
 		}
-	}
+	}*/
 	// TODO: nomulti, nosingle, nosteam
 
 	return true;
