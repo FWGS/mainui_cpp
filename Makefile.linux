@@ -27,11 +27,12 @@ SRCS = \
 	controls/ProgressBar.cpp                        \
 	controls/BaseWindow.cpp                         \
 	controls/BackgroundBitmap.cpp                   \
-	controls/Table.cpp				\
+	controls/Table.cpp                              \
 	menus/AdvancedControls.cpp                      \
 	menus/Audio.cpp                                 \
 	menus/Configuration.cpp                         \
 	menus/ConnectionProgress.cpp                    \
+	menus/ConnectionWarning.cpp                     \
 	menus/Controls.cpp                              \
 	menus/CreateGame.cpp                            \
 	menus/Credits.cpp                               \

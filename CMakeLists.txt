@@ -86,6 +86,7 @@ set(MAINUI_MENUS_SOURCES
 	menus/PlayerIntroduceDialog.cpp
 	# menus/Zoo.cpp
 	menus/ConnectionProgress.cpp
+	menus/ConnectionWarning.cpp
 	menus/dynamic/ScriptMenu.cpp
 )
 
