@@ -50,8 +50,6 @@ private:
 
 	CMenuSpinControl	maxPacket;
 	CMenuAction	maxPacketmessage1;
-	CMenuAction	maxPacketmessage2;
-
 };
 
 static CMenuGameOptions	uiGameOptions;
@@ -126,7 +124,7 @@ void CMenuGameOptions::_Init( void )
 	alwaysRun.SetNameAndStatus( "Always run", "Switch between run/step models when pressed 'run' button" );
 	alwaysRun.LinkCvar( "cl_run" );
 
-	maxPacket.szStatusText = "Limit packet size during connection";
+	maxPacket.szStatusText = "Limit packet size";
 	maxPacket.Setup( 200, 1500, 50 );
 	maxPacket.LinkCvar( "cl_maxpacket", CMenuEditable::CVAR_VALUE );
 	SET_EVENT( maxPacket, onChanged )
@@ -145,13 +143,11 @@ void CMenuGameOptions::_Init( void )
 	maxPacketmessage1.iColor = uiColorHelp;
 	maxPacketmessage1.SetCharSize( QM_SMALLFONT );
 
-	maxPacketmessage2.iFlags = QMF_INACTIVE|QMF_DROPSHADOW;
-	maxPacketmessage2.szName = "^3Use 700 or less if connection hangs\nafter \"^6Spooling demo header^3\" message";
-	maxPacketmessage2.iColor = uiColorWhite;
-	maxPacketmessage2.SetCharSize( QM_SMALLFONT );
-
 	AddItem( background );
 	AddItem( banner );
+	AddButton( "Done", "Save changes and go back to the Customize Menu", PC_DONE, SaveCb );
+	AddButton( "Cancel", "Go back to the Customize Menu", PC_CANCEL, RestoreCb );
+
 	AddItem( maxFPS );
 	AddItem( maxFPSmessage );
 	AddItem( hand );
@@ -159,22 +155,18 @@ void CMenuGameOptions::_Init( void )
 	AddItem( alwaysRun );
 	AddItem( maxPacket );
 	AddItem( maxPacketmessage1 );
-	AddItem( maxPacketmessage2 );
-	AddButton( "Done", "Save changes and go back to the Customize Menu", PC_DONE, SaveCb );
-	AddButton( "Cancel", "Go back to the Customize Menu", PC_CANCEL, RestoreCb );
 
 }
 
 void CMenuGameOptions::_VidInit()
 {
-	maxFPS.SetRect( 360, 270, 200, 32 );
-	maxFPSmessage.SetCoord( 360, 230 );
-	hand.SetCoord( 360, 330 );
-	allowDownload.SetCoord( 360, 390 );
-	alwaysRun.SetCoord( 360, 450 );
-	maxPacket.SetRect( 360, 560, 200, 32 );
-	maxPacketmessage1.SetCoord( 360, 520 );
-	maxPacketmessage2.SetCoord( 360, 600 );
+	maxFPS.SetRect( 240, 270, 220, 32 );
+	maxFPSmessage.SetCoord( 240, 230 );
+	hand.SetCoord( 240, 330 );
+	allowDownload.SetCoord( 240, 390 );
+	alwaysRun.SetCoord( 240, 450 );
+	maxPacket.SetRect( 240, 560, 200, 32 );
+	maxPacketmessage1.SetCoord( 240, 520 );
 }
 
 /*
