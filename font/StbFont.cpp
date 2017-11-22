@@ -12,7 +12,7 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
-#if !defined(_WIN32) && defined(MAINUI_USE_STB)
+#if defined(MAINUI_USE_STB)
 #include <stdarg.h>
 #include <stdint.h>
 #include <unistd.h>
@@ -215,6 +215,12 @@ bool CStbFont::FindFontDataFile(const char *name, int tall, int weight, int flag
 	}
 
 	return true;
+#elif defined _WIN32
+		if( !strcmp( name, "Arial" ) )
+			snprintf( dataFile, dataFileChars, "C:\\Windows\\Fonts\\arial.ttf" );
+		else
+			snprintf( dataFile, dataFileChars, "C:/Windows/Fonts/trebucbd.ttf" );
+		return true;
 #else
 	// strcpy( dataFile, "/usr/share/fonts/truetype/droid/DroidSans.ttf");
 	// return true;

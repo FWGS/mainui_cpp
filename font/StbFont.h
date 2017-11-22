@@ -13,8 +13,6 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 #pragma once
-#if !defined( _WIN32 ) && !defined( FREETYPEFONT_H )
-#define FREETYPEFONT_H
 
 #if defined(MAINUI_USE_CUSTOM_FONT_RENDER) && defined(MAINUI_USE_STB)
 
@@ -62,5 +60,3 @@ private:
 };
 
 #endif // defined(MAINUI_USE_CUSTOM_FONT_RENDER) && defined(MAINUI_USE_FREETYPE)
-
-#endif // FREETYPEFONT_H
