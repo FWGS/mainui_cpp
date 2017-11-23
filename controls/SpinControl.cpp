@@ -148,6 +148,9 @@ void CMenuSpinControl::Draw( void )
 		EngFuncs::DrawConsoleString( coord, szStatusText );
 	}
 
+	int textHeight = m_scPos.y - (m_scChSize.h * 1.5f);
+	UI_DrawString( font, m_scPos.x - UI_OUTLINE_WIDTH, textHeight, m_scSize.w + UI_OUTLINE_WIDTH * 2, m_scChSize.h, szName, uiColorHelp, true, m_scChSize.w, m_scChSize.h, QM_LEFT, shadow, false );
+
 	// calculate size and position for the arrows
 	arrow.w = m_scSize.h + UI_OUTLINE_WIDTH * 2;
 	arrow.h = m_scSize.h + UI_OUTLINE_WIDTH * 2;

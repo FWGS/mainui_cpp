@@ -480,12 +480,12 @@ void CMenuPlayerSetup::_Init( void )
 	SET_EVENT_PTR( gameOpt, onActivated )
 	{
 		((CMenuPlayerSetup*)pSelf->Parent())->SetConfig();
-		UI_GameOptions_Menu();
+		UI_AdvUserOptions_Menu();
 	}
 	END_EVENT_PTR( gameOpt, onActivated )
 
-	CMenuPicButton *advOpt = AddButton( "Adv options", "", PC_ADV_OPT, UI_AdvUserOptions_Menu );
-	advOpt->SetGrayed( !UI_AdvUserOptions_IsAvailable() );
+	AddButton( "Adv options", "", PC_ADV_OPT, UI_GameOptions_Menu );
+	gameOpt->SetGrayed( !UI_AdvUserOptions_IsAvailable() );
 
 
 	AddItem( name );

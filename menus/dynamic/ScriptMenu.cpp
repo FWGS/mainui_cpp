@@ -31,7 +31,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Action.h"
 
 #define ART_BANNER_SERVER "gfx/shell/head_advoptions"
-#define ART_BANNER_USER "gfx/shell/head_advoptions"
+#define ART_BANNER_USER "gfx/shell/head_gameopts"
 #define IGNORE_ALREADY_USED_CVARS 1
 
 class CMenuScriptConfigPage : public CMenuItemsHolder

@@ -130,5 +130,7 @@ void CMenuConnectionWarning::ClearCheckboxes()
 
 void UI_ConnectionWarning_f()
 {
+	if( !UI_IsVisible() )
+		UI_Main_Menu();
 	uiConnectionWarning.Show();
 }
