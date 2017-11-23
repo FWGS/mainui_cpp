@@ -227,9 +227,9 @@ void CMenuItemsHolder::Init()
 
 void CMenuItemsHolder::VidInit()
 {
+	_VidInit();
 	CalcPosition();
 	CalcSizes();
-	_VidInit();
 	VidInitItems();
 	// m_pLayout->VidInit();
 }
