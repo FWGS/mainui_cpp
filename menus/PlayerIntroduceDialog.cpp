@@ -40,6 +40,7 @@ public:
 	}
 	void WriteOrDiscard();
 	virtual void _Init();
+	virtual void _VidInit();
 	virtual const char *Key( int key, int down );
 
 	DECLARE_EVENT_TO_MENU_METHOD( CMenuPlayerIntroduceDialog, WriteOrDiscard )
@@ -77,8 +78,6 @@ void CMenuPlayerIntroduceDialog::_Init()
 {
 	iFlags |= QMF_DIALOG;
 
-	SetRect( DLG_X + 192, 256, 640, 256 );
-
 	background.bForceColor = true;
 	background.iColor = uiPromptBgColor;
 
@@ -105,6 +104,11 @@ void CMenuPlayerIntroduceDialog::_Init()
 	AddItem( dlgMessage );
 	AddItem( name );
 	AddItem( ok );
+}
+
+void CMenuPlayerIntroduceDialog::_VidInit( void )
+{
+	SetRect( DLG_X + 192, 256, 640, 256 );
 }
 
 void UI_PlayerIntroduceDialog_Precache()
