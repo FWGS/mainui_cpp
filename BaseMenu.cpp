@@ -1348,9 +1348,6 @@ int UI_VidInit( void )
 	UI_ScaleCoords( NULL, NULL, &uiStatic.outlineWidth, NULL );
 	UI_ScaleCoords( NULL, NULL, &uiStatic.buttons_draw_width, &uiStatic.buttons_draw_height );
 
-	// trying to load colors.lst
-	UI_ApplyCustomColors ();
-
 	// trying to load chapterbackgrounds.txt
 	UI_LoadBackgroundMapList ();
 
@@ -1475,6 +1472,9 @@ void UI_Init( void )
 
 	// load scr
 	UI_LoadScriptConfig();
+
+	// trying to load colors.lst
+	UI_ApplyCustomColors ();
 
 	//CR
 	CMenuPicButton::ClearButtonStack();
