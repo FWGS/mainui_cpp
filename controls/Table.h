@@ -114,18 +114,21 @@ public:
 	// widths are in [0.0; 1.0]
 	// Total of all widths should be 1.0f, but not necessary.
 	// to keep everything simple, if first few columns exceeds 1.0, the other will not be shown
-	void SetColumnWidth( int num, float width )
+	// if you have set fixed == true, then column size is set in logical units
+	void SetColumnWidth( int num, float width, bool fixed = false )
 	{
 		if( num < MAX_TABLE_COLUMNS && num >= 0 )
+		{
 			columns[num].flWidth = width;
+			columns[num].fStaticWidth = fixed;
+		}
 	}
 
 	// shortcut for SetHeaderText && SetColumnWidth
 	inline void SetupColumn( int num, const char *text, float width, bool fixed = false )
 	{
-		columns[num].fStaticWidth = fixed;
 		SetHeaderText( num, text );
-		SetColumnWidth( num, width );
+		SetColumnWidth( num, width, fixed );
 	}
 
 	int GetCurrentIndex() { return iCurItem; }
