@@ -35,9 +35,7 @@ const char *CMenuConnectionWarning::Key( int key, int down )
 
 void CMenuConnectionWarning::_Init()
 {
-	SetRect( DLG_X + 192, 192, 640, 384 );
 	iFlags |= QMF_DIALOG;
-
 
 	background.bForceColor = true;
 	background.iColor = uiPromptBgColor;
@@ -54,6 +52,7 @@ void CMenuConnectionWarning::_Init()
 		((CMenuCheckBox*)pSelf)->bChecked = true;
 	}
 	END_EVENT( normal, onChanged )
+	normal.SetCoord( 20, 140 );
 
 	dsl.szName = "DSL or PPTP with limited packet size";
 	SET_EVENT( dsl, onChanged )
@@ -67,6 +66,8 @@ void CMenuConnectionWarning::_Init()
 		((CMenuCheckBox*)pSelf)->bChecked = true;
 	}
 	END_EVENT( dsl, onChanged )
+	dsl.SetCoord( 20, 200 );
+
 	slowest.szName = "Slow connection mode (64kbps)";
 	SET_EVENT( slowest, onChanged )
 	{
@@ -79,10 +80,14 @@ void CMenuConnectionWarning::_Init()
 		((CMenuCheckBox*)pSelf)->bChecked = true;
 	}
 	END_EVENT( slowest, onChanged )
+	slowest.SetCoord( 20, 260 );
 
 	done.SetPicture( PC_DONE );
 	done.szName = "Done";
 	done.iFlags |= QMF_GRAYED;
+	done.SetRect( 380, 320, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
+	done.onActivated = HideCb;
+
 	options.SetPicture( PC_GAME_OPTIONS );
 	options.szName = "Game Options";
 	SET_EVENT( options, onActivated )
@@ -91,12 +96,16 @@ void CMenuConnectionWarning::_Init()
 		uiConnectionWarning.done.iFlags &= ~QMF_GRAYED;
 	}
 	END_EVENT( options, onActivated )
-	done.onActivated = HideCb;
+	options.SetRect( 184, 320, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
+
 	title.iFlags = QMF_INACTIVE|QMF_DROPSHADOW;
 	title.eTextAlignment = QM_CENTER;
 	title.szName = "Connection problem";
+	title.SetRect( 0, 16, 640, 20 );
+
 	message.iFlags = QMF_INACTIVE;
 	message.szName = "Too many lost packets while connecting!\nPlease select network settings";
+	message.SetRect( 20, 60, 600, 32 );
 
 	AddItem( background );
 	AddItem( done );
@@ -111,13 +120,6 @@ void CMenuConnectionWarning::_Init()
 void CMenuConnectionWarning::_VidInit()
 {
 	SetRect( DLG_X + 192, 192, 640, 384 );
-	normal.SetCoord( 20, 140 );
-	dsl.SetCoord( 20, 200 );
-	slowest.SetCoord( 20, 260 );
-	done.SetRect( 380, 320, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
-	options.SetRect( 184, 320, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
-	title.SetRect( 0, 16, 640, 20 );
-	message.SetRect( 20, 60, 600, 32 );
 }
 
 void CMenuConnectionWarning::ClearCheckboxes()
