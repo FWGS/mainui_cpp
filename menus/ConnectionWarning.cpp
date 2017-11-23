@@ -85,18 +85,18 @@ void CMenuConnectionWarning::_Init()
 	done.SetPicture( PC_DONE );
 	done.szName = "Done";
 	done.iFlags |= QMF_GRAYED;
-	done.SetRect( 380, 320, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
+	done.SetRect( 410, 320, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
 	done.onActivated = HideCb;
 
-	options.SetPicture( PC_GAME_OPTIONS );
-	options.szName = "Game Options";
+	options.SetPicture( PC_ADV_OPT );
+	options.szName = "Adv Options";
 	SET_EVENT( options, onActivated )
 	{
 		UI_GameOptions_Menu();
 		uiConnectionWarning.done.iFlags &= ~QMF_GRAYED;
 	}
 	END_EVENT( options, onActivated )
-	options.SetRect( 184, 320, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
+	options.SetRect( 154, 320, UI_BUTTONS_WIDTH, UI_BUTTONS_HEIGHT );
 
 	title.iFlags = QMF_INACTIVE|QMF_DROPSHADOW;
 	title.eTextAlignment = QM_CENTER;
