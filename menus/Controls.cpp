@@ -391,7 +391,6 @@ void CMenuControls::_Init( void )
 	keysList.SetupColumn( 1, "Key/Button", 0.25f );
 	keysList.SetupColumn( 2, "Alternate", 0.25f );
 
-	msgBox1.SetRect( DLG_X + 192, 256, 640, 128 );
 	msgBox1.SetMessage( "Press a key or button" );
 
 	msgBox2.SetMessage( "Reset buttons to default?" );
@@ -409,6 +408,8 @@ void CMenuControls::_Init( void )
 
 void CMenuControls::_VidInit()
 {
+	msgBox1.SetRect( DLG_X + 192, 256, 640, 128 );
+
 	keysListModel.Update();
 }
 
