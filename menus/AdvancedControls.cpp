@@ -40,14 +40,13 @@ private:
 public:
 	CAdvancedControls() : CMenuFramework("CAdvancedControls") { }
 
-	CMenuPicButton done;
+	CMenuPicButton done, inputDev;
 
 	CMenuCheckBox	crosshair;
 	CMenuCheckBox	invertMouse;
 	CMenuCheckBox	mouseLook;
 	CMenuCheckBox	lookSpring;
 	CMenuCheckBox	lookStrafe;
-	CMenuCheckBox	mouseFilter;
 	CMenuCheckBox	lookFilter;
 	CMenuCheckBox	autoaim;
 	CMenuSlider	sensitivity;
@@ -68,16 +67,24 @@ void CAdvancedControls::GetConfig( void )
 		invertMouse.bChecked = true;
 
 	mlook = (kbutton_s *)EngFuncs::KEY_GetState( "in_mlook" );
-	if( mlook && mlook->state & 1 )
-		mouseLook.bChecked = true;
+	if( mlook )
+	{
+		if( mlook && mlook->state & 1 )
+			mouseLook.bChecked = true;
+		else
+			mouseLook.bChecked = false;
+	}
 	else
-		mouseLook.bChecked = false;
+	{
+		mouseLook.iFlags |= QMF_GRAYED;
+		mouseLook.bChecked = true;
+	}
 
 	crosshair.LinkCvar( "crosshair" );
 	lookSpring.LinkCvar( "lookspring" );
 	lookStrafe.LinkCvar( "lookstrafe" );
-	mouseFilter.LinkCvar( "m_filter" );
 	lookFilter.LinkCvar( "look_filter" );
+
 	autoaim.LinkCvar( "sv_aim" );
 	sensitivity.LinkCvar( "sensitivity" );
 
@@ -99,14 +106,15 @@ void CAdvancedControls::SaveAndPopMenu()
 	lookSpring.WriteCvar();
 	lookStrafe.WriteCvar();
 	lookFilter.WriteCvar();
-	mouseFilter.WriteCvar();
+	if( EngFuncs::GetCvarString("m_filter")[0] )
+		EngFuncs::CvarSetValue( "m_filter", lookFilter.bChecked );
 	autoaim.WriteCvar();
 	sensitivity.WriteCvar();
 
 	if( mouseLook.bChecked )
-		EngFuncs::ClientCmd( TRUE, "+mlook\n" );
+		EngFuncs::ClientCmd( FALSE, "+mlook\nbind _force_write\n" );
 	else
-		EngFuncs::ClientCmd( TRUE, "-mlook\n" );
+		EngFuncs::ClientCmd( FALSE, "-mlook\nbind _force_write\n" );
 
 	CMenuFramework::SaveAndPopMenu();
 }
@@ -149,13 +157,13 @@ void CAdvancedControls::_Init( void )
 		{
 			parent->lookSpring.iFlags |= QMF_GRAYED;
 			parent->lookStrafe.iFlags |= QMF_GRAYED;
-			EngFuncs::ClientCmd( TRUE, "+mlook\n" );
+			EngFuncs::ClientCmd( FALSE, "+mlook\nbind _force_write\n" );
 		}
 		else
 		{
 			parent->lookSpring.iFlags &= ~QMF_GRAYED;
 			parent->lookStrafe.iFlags &= ~QMF_GRAYED;
-			EngFuncs::ClientCmd( TRUE, "-mlook\n" );
+			EngFuncs::ClientCmd( FALSE, "-mlook\nbind _force_write\n" );
 		}
 	}
 	END_EVENT( mouseLook, onChanged )
@@ -166,9 +174,6 @@ void CAdvancedControls::_Init( void )
 	lookStrafe.SetNameAndStatus( "Look strafe", "In combination with your mouse look modifier, causes left-right movements\nto strafe instead of turn");
 	lookStrafe.iFlags |= QMF_NOTIFY;
 
-	mouseFilter.SetNameAndStatus( "Mouse filter", "Average mouse inputs over the last two frames to smooth out movements(mouse-only)" );
-	mouseFilter.iFlags |= QMF_NOTIFY;
-
 	lookFilter.SetNameAndStatus( "Look filter", "Average look inputs over the last two frames to smooth out movements(generic)" );
 	lookFilter.iFlags |= QMF_NOTIFY;
 
@@ -178,15 +183,21 @@ void CAdvancedControls::_Init( void )
 	sensitivity.SetNameAndStatus( "Senitivity", "Set in-game mouse sensitivity" );
 	sensitivity.Setup( 0.0, 20.0f, 0.1 );
 
+	inputDev.SetNameAndStatus( "Input devices", "Toggle mouse, touch controls" );
+	inputDev.onActivated = UI_InputDevices_Menu;
+	inputDev.iFlags |= QMF_NOTIFY;
+	if( CL_IsActive() && !EngFuncs::GetCvarFloat( "host_serverstate" ))
+		inputDev.iFlags |= QMF_GRAYED;
+
 	AddItem( background );
 	AddItem( banner );
 	AddItem( done );
+	AddItem( inputDev );
 	AddItem( crosshair );
 	AddItem( invertMouse );
 	AddItem( mouseLook );
 	AddItem( lookSpring );
 	AddItem( lookStrafe );
-	AddItem( mouseFilter );
 	AddItem( lookFilter );
 	AddItem( autoaim );
 	AddItem( sensitivity );
@@ -196,12 +207,13 @@ void CAdvancedControls::_Init( void )
 void CAdvancedControls::_VidInit()
 {
 	done.SetCoord( 72, 680 );
-	crosshair.SetCoord( 72, 230 );
-	invertMouse.SetCoord( 72, 280 );
-	mouseLook.SetCoord( 72, 330 );
-	lookSpring.SetCoord( 72, 380 );
-	lookStrafe.SetCoord( 72, 430 );
-	mouseFilter.SetCoord( 72, 480 );
+	//inputDev.SetRect( 72, 230, UI_BUTTONS_WIDTH, UI_BUTTONS_HEIGHT );
+	inputDev.SetCoord( 72, 230 );
+	crosshair.SetCoord( 72, 280 );
+	invertMouse.SetCoord( 72, 330 );
+	mouseLook.SetCoord( 72, 380 );
+	lookSpring.SetCoord( 72, 430 );
+	lookStrafe.SetCoord( 72, 480 );
 	lookFilter.SetCoord( 72, 530 );
 	autoaim.SetCoord( 72, 580 );
 	sensitivity.SetCoord( 72, 660 );

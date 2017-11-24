@@ -72,6 +72,7 @@ public:
 	EAnimation eTransitionType; // valid only when in transition
 	CMenuBackgroundBitmap background;
 protected:
+	int m_iTransitionStartTime;
 
 private:
 	friend void UI_DrawMouseCursor( void ); // HACKHACK: Cursor should be set by menu item
@@ -79,7 +80,7 @@ private:
 
 	virtual bool IsAbsolutePositioned( void ) const { return true; }
 
-	int m_iTransitionStartTime;
+
 
 	bool m_bHolding;
 	Point m_bHoldOffset;
