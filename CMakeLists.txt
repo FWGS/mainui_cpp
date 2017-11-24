@@ -69,6 +69,7 @@ set(MAINUI_MENUS_SOURCES
 	menus/FileDialog.cpp
 	menus/GameOptions.cpp
 	menus/Gamepad.cpp
+	menus/InputDevices.cpp
 	menus/LoadGame.cpp
 	menus/Main.cpp
 	menus/Multiplayer.cpp

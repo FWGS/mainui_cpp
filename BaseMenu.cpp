@@ -1304,6 +1304,28 @@ static void UI_ShowMessageBox( void )
 		UI_Main_Menu();
 		UI_SetActiveMenu( TRUE );
 	}
+
+	if( strstr( msg, "m_ignore") || strstr( msg, "touch_enable" ) || strstr( msg, "joy_enable" ) )
+	{
+		static CMenuYesNoMessageBox msgBoxInputDev( false );
+		static bool init;
+
+		if( !init )
+		{
+			msgBoxInputDev.SetPositiveButton("Ok", PC_OK, 100 );
+			msgBoxInputDev.SetNegativeButton("Config", PC_CONFIG, -20 );
+			msgBoxInputDev.onNegative = UI_InputDevices_Menu;
+			msgBoxInputDev.yes.SetCoord( 200, 204 );
+
+			init = true;
+		}
+
+		msgBoxInputDev.SetMessage( msg );
+		msgBoxInputDev.Show();
+		msgBoxInputDev.yes.SetCoord( 200, 204 );
+		return;
+	}
+
 	msgBox.SetMessage( msg );
 	msgBox.Show();
 }

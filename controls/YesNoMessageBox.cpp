@@ -28,6 +28,17 @@ CMenuYesNoMessageBox::CMenuYesNoMessageBox( bool alert )
 	dlgMessage1.iFlags = QMF_INACTIVE|QMF_DROPSHADOW;
 	dlgMessage1.eTextAlignment = QM_TOP;
 
+	if( m_bIsAlert )
+	{
+		yes.SetRect( 298, 204, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
+	}
+	else
+	{
+		yes.SetRect( 188, 204, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
+	}
+	no.SetRect( 338, 204, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
+
+
 	yes.iFlags = no.iFlags = QMF_DROPSHADOW;
 	yes.eTextAlignment = no.eTextAlignment = QM_CENTER;
 	yes.onActivated.pExtra = no.onActivated.pExtra = this;
@@ -100,16 +111,6 @@ void CMenuYesNoMessageBox::_VidInit( void )
 	CalcSizes();
 
 	dlgMessage1.SetRect( 0, 24, 640, 256 - 24 );
-	if( m_bIsAlert )
-	{
-		yes.SetRect( 298, 204, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
-	}
-	else
-	{
-		yes.SetRect( 188, 204, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
-	}
-	no.SetRect( 338, 204, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
-
 	dlgMessage1.SetCharSize( QM_DEFAULTFONT );
 
 }
@@ -161,11 +162,12 @@ void CMenuYesNoMessageBox::SetMessage( const char *msg )
 CMenuYesNoMessageBox::SetPositiveButton
 ==============
 */
-void CMenuYesNoMessageBox::SetPositiveButton( const char *msg, EDefaultBtns buttonPic )
+void CMenuYesNoMessageBox::SetPositiveButton( const char *msg, EDefaultBtns buttonPic, int extrawidth )
 {
 	m_bSetYes = true;
 	yes.szName = msg;
 	yes.SetPicture( buttonPic );
+	yes.SetRect(  (m_bIsAlert?298:188) - extrawidth / 2, 204, UI_BUTTONS_WIDTH / 2 + extrawidth, UI_BUTTONS_HEIGHT );
 }
 
 /*
@@ -173,11 +175,12 @@ void CMenuYesNoMessageBox::SetPositiveButton( const char *msg, EDefaultBtns butt
 CMenuYesNoMessageBox::SetNegativeButton
 ==============
 */
-void CMenuYesNoMessageBox::SetNegativeButton( const char *msg, EDefaultBtns buttonPic )
+void CMenuYesNoMessageBox::SetNegativeButton( const char *msg, EDefaultBtns buttonPic, int extrawidth )
 {
 	m_bSetNo = true;
 	no.szName = msg;
 	no.SetPicture( buttonPic );
+	no.SetRect( 338 + extrawidth / 2, 204, UI_BUTTONS_WIDTH / 2 + extrawidth, UI_BUTTONS_HEIGHT );
 }
 
 /*

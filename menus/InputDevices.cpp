@@ -25,6 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "PicButton.h"
 #include "CheckBox.h"
 #include "Slider.h"
+#include "YesNoMessageBox.h"
 
 #define ART_BANNER			"gfx/shell/head_advanced"
 
@@ -85,6 +86,24 @@ void CMenuInputDevices::_Init( void )
 	mouse.szName = "Ignore mouse";
 	mouse.szStatusText = "Need for some servers. Will disable mouse in menu too";
 	mouse.iFlags |= QMF_NOTIFY;
+#ifndef __ANDROID
+	SET_EVENT( mouse, onChanged )
+	{
+		if( ((CMenuCheckBox*)pSelf)->bChecked )
+		{
+			static CMenuYesNoMessageBox msgbox(false);
+			msgbox.SetMessage("If you do not have touchscreen, or joystick, you will not be able to play withot mouse. Are you sure to disable mouse?");
+			SET_EVENT( msgbox, onNegative )
+			{
+				uiInputDevices.mouse.bChecked = false;
+			}
+			END_EVENT( msgbox, onNegative )
+
+			msgbox.Show();
+		}
+	}
+	END_EVENT( mouse, onChanged )
+#endif
 	touch.szName = "Enable touch";
 	touch.szStatusText = "On-screen controls for touchscreen";
 	touch.iFlags |= QMF_NOTIFY;
@@ -106,14 +125,15 @@ void CMenuInputDevices::_Init( void )
 	AddItem( mouse );
 	AddItem( touch );
 	AddItem( joystick );
+#ifdef __ANDROID__
 	AddItem( evdev );
+#endif
 }
 
 
 void CMenuInputDevices::_VidInit()
 {
 	done.SetCoord( 72, 680 );
-	//inputDev.SetRect( 72, 230, UI_BUTTONS_WIDTH, UI_BUTTONS_HEIGHT );
 	mouse.SetCoord( 72, 230 );
 	touch.SetCoord( 72, 280 );
 	joystick.SetCoord( 72, 330 );

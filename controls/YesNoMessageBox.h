@@ -21,7 +21,7 @@ GNU General Public License for more details.
 #include "Action.h"
 #include "ItemsHolder.h"
 #include "BaseWindow.h"
-
+static void UI_ShowMessageBox( void );
 class CMenuYesNoMessageBox : public CMenuBaseWindow
 {
 public:
@@ -32,8 +32,8 @@ public:
 	virtual void Draw();
 	virtual const char *Key( int key, int down );
 	void SetMessage( const char *msg );
-	void SetPositiveButton( const char *msg, EDefaultBtns buttonPic );
-	void SetNegativeButton( const char *msg, EDefaultBtns buttonPic );
+	void SetPositiveButton( const char *msg, EDefaultBtns buttonPic, int extrawidth = 0 );
+	void SetNegativeButton( const char *msg, EDefaultBtns buttonPic, int extrawidth = 0 );
 	void Link( CMenuItemsHolder *h );
 	enum EHighlight
 	{
@@ -55,6 +55,7 @@ private:
 	CMenuPicButton	no;
 	bool m_bSetYes, m_bSetNo;
 	bool m_bIsAlert;
+	friend void UI_ShowMessageBox( void );
 };
 
 #endif // MENU_GENERICMSGBOX_H
