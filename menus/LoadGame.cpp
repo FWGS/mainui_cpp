@@ -65,7 +65,7 @@ public:
 				UI_DrawPicAdditive( m_scPos, m_scSize, uiColorWhite, fallback );
 		}
 		else
-			UI_DrawPic( m_scPos, m_scSize, uiColorWhite, fallback );
+			UI_DrawPicAdditive( m_scPos, m_scSize, uiColorWhite, fallback );
 
 		// draw the rectangle
 		UI_DrawRectangle( m_scPos, m_scSize, uiInputFgColor );
@@ -153,7 +153,8 @@ void CMenuSavesListModel::Update( void )
 	if ( uiLoadGame.IsSaveMode() && CL_IsActive() )
 	{
 		// create new entry for current save game
-		strncpy( saveName[i], "new", CS_SIZE );
+		Q_strncpy( saveName[i], "new", CS_SIZE );
+		Q_strncpy( delName[i], "", CS_SIZE );
 		strcpy( m_szCells[i][0], "Current" );
 		strcpy( m_szCells[i][1], "New Saved Game" );
 		strcpy( m_szCells[i][2], "New" );
@@ -387,8 +388,9 @@ void UI_LoadGame_Menu( void )
 	if( !EngFuncs::CheckGameDll( )) return;
 
 	UI_LoadGame_Precache();
-	uiLoadGame.SetSaveMode(false);
 	uiLoadGame.Show();
+	uiLoadGame.SetSaveMode(false);
+	uiLoadGame.savesListModel.Update();
 }
 
 void UI_SaveGame_Menu( void )
@@ -402,6 +404,7 @@ void UI_SaveGame_Menu( void )
 	if( !EngFuncs::CheckGameDll( )) return;
 
 	UI_LoadGame_Precache();
-	uiLoadGame.SetSaveMode(true);
 	uiLoadGame.Show();
+	uiLoadGame.SetSaveMode(true);
+	uiLoadGame.savesListModel.Update();
 }
