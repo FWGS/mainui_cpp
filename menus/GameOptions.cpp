@@ -199,7 +199,7 @@ void CMenuGameOptions::_Init( void )
 	rate.SetNameAndStatus( "Network speed (rate)", "Limit traffic (bytes per second)");
 
 	networkMode.iFlags = QMF_INACTIVE|QMF_DROPSHADOW;
-	networkMode.szName = "Select network mode:\n";
+	networkMode.szName = "Select network mode:";
 	networkMode.iColor = uiColorHelp;
 	networkMode.SetCharSize( QM_BIGFONT );
 	
@@ -268,7 +268,7 @@ void CMenuGameOptions::_VidInit()
 	rate.SetRect( 650, 670, 200, 32 );
 	
 	//maxPacketmessage1.SetCoord( 240, 520 );
-	networkMode.SetRect( 240, 450, 300, 32 );
+	networkMode.SetRect( 240, 450, 400, 32 );
 	normal.SetRect( 240, 510, 24, 24 );
 	dsl.SetRect( 240, 560, 24, 24 );
 	slowest.SetRect( 240, 610, 24, 24 );

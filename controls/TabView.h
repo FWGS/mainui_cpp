@@ -36,7 +36,7 @@ public:
 
 	inline void AddTabItem( CMenuBaseItem &item, const char *name )
 	{
-		CMenuItemsHolder::AddItem( item );
+		AddItem( item );
 		SetTabName( m_numItems - 1, name );
 	}
 
