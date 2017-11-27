@@ -32,6 +32,7 @@ LOCAL_SRC_FILES := \
 	controls/BaseItem.cpp                           \
 	controls/Action.cpp                             \
 	controls/Bitmap.cpp                             \
+	controls/Editable.cpp                           \
 	controls/CheckBox.cpp                           \
 	controls/ItemsHolder.cpp                        \
 	controls/Field.cpp                              \

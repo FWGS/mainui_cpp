@@ -47,7 +47,7 @@ set(MAINUI_CONTROLS_SOURCES
 	controls/SpinControl.cpp
 	controls/YesNoMessageBox.cpp
 	controls/MessageBox.cpp
-	controls/Editable.h
+	controls/Editable.cpp
 	controls/Switch.cpp
 	controls/BaseWindow.cpp
 	controls/ProgressBar.cpp
