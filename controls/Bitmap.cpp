@@ -21,7 +21,7 @@ GNU General Public License for more details.
 #include "Utils.h"
 #include "BaseWindow.h"
 
-CMenuBitmap::CMenuBitmap() : CMenuBaseItem()
+CMenuBitmap::CMenuBitmap() : BaseClass()
 {
 	SetPicture( NULL, NULL, NULL );
 	bDrawAdditive = false;
@@ -37,7 +37,7 @@ void CMenuBitmap::VidInit( )
 	iColor.SetDefault( uiColorWhite );
 	iFocusColor.SetDefault( uiColorWhite );
 
-	CMenuBaseItem::VidInit();
+	BaseClass::VidInit();
 	if( !szFocusPic )
 		szFocusPic = szPic;
 }
@@ -165,12 +165,12 @@ void CMenuBannerBitmap::Draw()
 		window->eTransitionType == CMenuBaseWindow::ANIM_OUT )
 		return;
 
-	CMenuBitmap::Draw();
+	BaseClass::Draw();
 }
 
 void CMenuBannerBitmap::VidInit()
 {
-	CMenuBitmap::VidInit();
+	BaseClass::VidInit();
 	if( !szPic )
 		return;
 	// CMenuPicButton::SetTitleAnim( CMenuPicButton::AS_TO_TITLE );

@@ -27,6 +27,8 @@ GNU General Public License for more details.
 class CMenuFramework : public CMenuBaseWindow
 {
 public:
+	typedef CMenuBaseWindow BaseClass;
+
 	CMenuFramework( const char *name = "Unnamed Framework" );
 	virtual ~CMenuFramework();
 

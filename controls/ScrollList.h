@@ -27,6 +27,8 @@ GNU General Public License for more details.
 class CMenuScrollList : public CMenuBaseItem
 {
 public:
+	typedef CMenuBaseItem BaseClass;
+
 	CMenuScrollList();
 
 	virtual void VidInit( void );

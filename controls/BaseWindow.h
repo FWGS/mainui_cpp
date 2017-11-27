@@ -24,6 +24,7 @@ GNU General Public License for more details.
 class CMenuBaseWindow : public CMenuItemsHolder
 {
 public:
+	typedef CMenuItemsHolder BaseClass;
 	CMenuBaseWindow( const char *name = "Unnamed Window" );
 
 	// Overloaded functions
@@ -75,6 +76,8 @@ protected:
 	int m_iTransitionStartTime;
 
 private:
+	CMenuBaseWindow(); // remove
+
 	friend void UI_DrawMouseCursor( void ); // HACKHACK: Cursor should be set by menu item
 	friend void UI_UpdateMenu( float flTime );
 

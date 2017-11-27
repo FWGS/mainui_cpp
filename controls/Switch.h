@@ -26,6 +26,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 class CMenuSwitch : public CMenuEditable
 {
 public:
+	typedef CMenuEditable BaseClass;
+
 	CMenuSwitch();
 
 	const char *Key(int key, int down);

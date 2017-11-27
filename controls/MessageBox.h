@@ -20,6 +20,8 @@ GNU General Public License for more details.
 class CMenuMessageBox : public CMenuBaseWindow
 {
 public:
+	typedef CMenuBaseWindow BaseClass;
+
 	CMenuMessageBox( const char *name = "Unnamed MessageBox" );
 
 	void SetMessage( const char *sz );

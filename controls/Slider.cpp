@@ -19,7 +19,7 @@ GNU General Public License for more details.
 #include "Slider.h"
 #include "Utils.h"
 
-CMenuSlider::CMenuSlider() : CMenuEditable(), m_flMinValue(), m_flMaxValue(), m_flCurValue(),
+CMenuSlider::CMenuSlider() : BaseClass(), m_flMinValue(), m_flMaxValue(), m_flCurValue(),
 	m_flDrawStep(), m_iNumSteps(), m_flRange(), m_iKeepSlider()
 {
 	m_iSliderOutlineWidth = 6;
@@ -49,7 +49,7 @@ void CMenuSlider::VidInit(  )
 	iColor.SetDefault( uiColorWhite );
 	iFocusColor.SetDefault( uiColorWhite );
 
-	CMenuBaseItem::VidInit();
+	BaseClass::VidInit();
 
 	// scale the center box
 	m_scCenterBox.w = m_scSize.w / 5.0f;

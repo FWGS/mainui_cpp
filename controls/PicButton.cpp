@@ -27,7 +27,7 @@ CMenuPicButton *ButtonStack[UI_MAX_MENUDEPTH] = { 0 };
 int		ButtonStackDepth = 0;
 
 
-CMenuPicButton::CMenuPicButton() : CMenuBaseItem()
+CMenuPicButton::CMenuPicButton() : BaseClass()
 {
 	bEnableTransitions = true;
 	eFocusAnimation = QM_HIGHLIGHTIFFOCUS;
@@ -60,7 +60,7 @@ CMenuPicButton::Init
 */
 void CMenuPicButton::VidInit( void )
 {
-	CMenuBaseItem::VidInit();
+	BaseClass::VidInit();
 }
 
 /*

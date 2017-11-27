@@ -75,6 +75,8 @@ public:
 class CMenuTable : public CMenuBaseItem
 {
 public:
+	typedef CMenuBaseItem BaseClass;
+
 	CMenuTable();
 
 

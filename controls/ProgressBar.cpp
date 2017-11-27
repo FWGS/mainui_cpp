@@ -17,7 +17,7 @@ GNU General Public License for more details.
 #include "BaseMenu.h"
 #include "ProgressBar.h"
 
-CMenuProgressBar::CMenuProgressBar() : CMenuBaseItem()
+CMenuProgressBar::CMenuProgressBar() : BaseClass()
 {
 	m_flMin = 0.0f;
 	m_flMax = 100.0f;

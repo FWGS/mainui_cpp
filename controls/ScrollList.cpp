@@ -21,7 +21,7 @@ GNU General Public License for more details.
 #include "Scissor.h"
 
 
-CMenuScrollList::CMenuScrollList() : CMenuBaseItem()
+CMenuScrollList::CMenuScrollList() : BaseClass()
 {
 	// iCurItem = 0;
 	iTopItem = 0;
@@ -46,7 +46,7 @@ menuScrollList_t::Init
 */
 void CMenuScrollList::VidInit( )
 {
-	CMenuBaseItem::VidInit();
+	BaseClass::VidInit();
 
 	for( iNumItems = 0; pszItemNames && pszItemNames[iNumItems]; iNumItems++ );
 

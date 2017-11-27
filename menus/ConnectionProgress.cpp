@@ -115,7 +115,7 @@ private:
 
 static CMenuConnectionProgress uiConnectionProgress;
 
-CMenuConnectionProgress::CMenuConnectionProgress() : CMenuBaseWindow()
+CMenuConnectionProgress::CMenuConnectionProgress() : CMenuBaseWindow( "ConnectionProgress" )
 {
 	sDownloadString[0] = sCommonString[0] = sTitleString[0] = '\0';
 	m_iSource = SOURCE_CONSOLE;

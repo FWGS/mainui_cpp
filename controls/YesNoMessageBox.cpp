@@ -22,7 +22,7 @@ GNU General Public License for more details.
 
 static void ToggleInactiveInternalCb( CMenuBaseItem *pSelf, void *pExtra );
 
-CMenuYesNoMessageBox::CMenuYesNoMessageBox( bool alert )
+CMenuYesNoMessageBox::CMenuYesNoMessageBox( bool alert ) : BaseClass( "YesNoMessageBox")
 {
 	iFlags |= QMF_DIALOG;
 	dlgMessage1.iFlags = QMF_INACTIVE|QMF_DROPSHADOW;

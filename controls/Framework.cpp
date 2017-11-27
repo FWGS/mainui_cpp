@@ -15,7 +15,7 @@ GNU General Public License for more details.
 #include "Framework.h"
 #include "PicButton.h"
 
-CMenuFramework::CMenuFramework( const char *name ) : CMenuBaseWindow( name )
+CMenuFramework::CMenuFramework( const char *name ) : BaseClass( name )
 {
 	iFlags = QMF_DISABLESCAILING;
 	memset( m_apBtns, 0, sizeof( m_apBtns ) );
@@ -35,7 +35,7 @@ CMenuFramework::~CMenuFramework()
 void CMenuFramework::Show()
 {
 	CMenuPicButton::RootChanged( true );
-	CMenuBaseWindow::Show();
+	BaseClass::Show();
 
 	uiStatic.rootActive = this;
 	uiStatic.rootPosition = uiStatic.menuDepth-1;
@@ -44,7 +44,7 @@ void CMenuFramework::Show()
 void CMenuFramework::Hide()
 {
 	int i;
-	CMenuBaseWindow::Hide();
+	BaseClass::Hide();
 
 	for( i = uiStatic.menuDepth-1; i >= 0; i-- )
 	{
@@ -65,7 +65,7 @@ void CMenuFramework::Hide()
 
 void CMenuFramework::Init()
 {
-	CMenuBaseWindow::Init();
+	BaseClass::Init();
 	m_scPos.x = m_scPos.y = pos.x = pos.y = 0;
 	m_scSize.w = size.w = ScreenWidth;
 	m_scSize.h = size.h = ScreenHeight;
@@ -76,7 +76,7 @@ void CMenuFramework::VidInit()
 	m_scPos.x = m_scPos.y = pos.x = pos.y = 0;
 	m_scSize.w = size.w = ScreenWidth;
 	m_scSize.h = size.h = ScreenHeight;
-	CMenuBaseWindow::VidInit();
+	BaseClass::VidInit();
 }
 
 CMenuPicButton * CMenuFramework::AddButton(const char *szName, const char *szStatus, EDefaultBtns buttonPicId, CEventCallback onActivated, int iFlags)

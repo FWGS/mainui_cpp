@@ -25,6 +25,8 @@ GNU General Public License for more details.
 class CMenuField : public CMenuEditable
 {
 public:
+	typedef CMenuEditable BaseClass;
+
 	CMenuField();
 	virtual void Init( void );
 	virtual void VidInit( void );

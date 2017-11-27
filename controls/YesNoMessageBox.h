@@ -25,6 +25,7 @@ static void UI_ShowMessageBox( void );
 class CMenuYesNoMessageBox : public CMenuBaseWindow
 {
 public:
+	typedef CMenuBaseWindow BaseClass;
 	CMenuYesNoMessageBox( bool alert = false );
 
 	virtual void _Init();

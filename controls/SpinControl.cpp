@@ -20,7 +20,7 @@ GNU General Public License for more details.
 #include "Utils.h"
 #include "Scissor.h"
 
-CMenuSpinControl::CMenuSpinControl()  : CMenuEditable(), m_szBackground(),
+CMenuSpinControl::CMenuSpinControl()  : BaseClass(), m_szBackground(),
 		m_szLeftArrow(), m_szRightArrow(), m_szLeftArrowFocus(), m_szRightArrowFocus(),
 		m_flMinValue(0), m_flMaxValue(1), m_flCurValue(0), m_flRange(0.1), m_stringValues(0),
 		m_iFloatPrecision(0), m_szDisplay()
@@ -46,7 +46,7 @@ void CMenuSpinControl::VidInit( void )
 {
 	iColor.SetDefault( uiColorHelp );
 
-	CMenuBaseItem::VidInit();
+	BaseClass::VidInit();
 }
 
 /*

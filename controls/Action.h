@@ -22,6 +22,8 @@ GNU General Public License for more details.
 class CMenuAction : public CMenuBaseItem
 {
 public:
+	typedef CMenuBaseItem BaseClass;
+
 	CMenuAction();
 
 	virtual void VidInit( void );

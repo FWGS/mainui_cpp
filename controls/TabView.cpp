@@ -15,7 +15,7 @@ GNU General Public License for more details.
 #include "TabView.h"
 #include "Scissor.h"
 
-CMenuTabView::CMenuTabView() : CMenuItemsHolder(),
+CMenuTabView::CMenuTabView() : BaseClass(),
 	m_szTabNames()
 {
 	m_bWrapCursor = true;

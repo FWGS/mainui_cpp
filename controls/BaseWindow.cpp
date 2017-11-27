@@ -19,7 +19,7 @@ GNU General Public License for more details.
 #include "ItemsHolder.h"
 #include "BaseWindow.h"
 
-CMenuBaseWindow::CMenuBaseWindow(const char *name) : CMenuItemsHolder()
+CMenuBaseWindow::CMenuBaseWindow(const char *name) : BaseClass()
 {
 	bAllowDrag = false; // UNDONE
 	m_bHolding = false;

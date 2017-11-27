@@ -23,6 +23,8 @@ GNU General Public License for more details.
 class CMenuSpinControl : public CMenuEditable
 {
 public:
+	typedef CMenuEditable BaseClass;
+
 	CMenuSpinControl();
 
 	virtual void VidInit( void );

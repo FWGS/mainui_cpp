@@ -20,6 +20,7 @@ GNU General Public License for more details.
 class CMenuTabView : public CMenuItemsHolder
 {
 public:
+	typedef CMenuItemsHolder BaseClass;
 	CMenuTabView();
 
 	virtual void VidInit();

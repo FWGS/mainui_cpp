@@ -20,6 +20,8 @@ GNU General Public License for more details.
 class CMenuProgressBar : public CMenuBaseItem
 {
 public:
+	typedef CMenuBaseItem BaseClass;
+
     CMenuProgressBar();
 	void Draw( void );
 	void LinkCvar( const char *cvName, float flMin, float flMax );

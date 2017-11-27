@@ -20,7 +20,7 @@ GNU General Public License for more details.
 #include "Utils.h"
 
 
-CMenuField::CMenuField() : CMenuEditable(), szBuffer()
+CMenuField::CMenuField() : BaseClass(), szBuffer()
 {
 	bAllowColorstrings = true;
 	bHideInput = false;
@@ -53,7 +53,7 @@ CMenuField::Init
 */
 void CMenuField::VidInit( void )
 {
-	CMenuBaseItem::VidInit();
+	BaseClass::VidInit();
 
 	// calculate number of visible characters
 	iWidthInChars = (size.w / charSize.w);

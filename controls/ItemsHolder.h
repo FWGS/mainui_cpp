@@ -21,6 +21,8 @@ GNU General Public License for more details.
 class CMenuItemsHolder : public CMenuBaseItem
 {
 public:
+	typedef CMenuBaseItem BaseClass;
+
 	CMenuItemsHolder();
 
 	// Overload _Init, _VidInit instead of these methods

@@ -20,7 +20,7 @@ GNU General Public License for more details.
 #include "Utils.h"
 
 
-CMenuAction::CMenuAction() : CMenuBaseItem()
+CMenuAction::CMenuAction() : BaseClass()
 {
 	m_szBackground = NULL;
 	m_bfillBackground = false;
@@ -56,7 +56,7 @@ void CMenuAction::VidInit( )
 	}
 	else m_bLimitBySize = true;
 
-	CMenuBaseItem::VidInit();
+	BaseClass::VidInit();
 }
 
 /*

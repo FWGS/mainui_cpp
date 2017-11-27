@@ -29,6 +29,8 @@ GNU General Public License for more details.
 class CMenuCheckBox : public CMenuEditable
 {
 public:
+	typedef CMenuEditable BaseClass;
+
 	CMenuCheckBox();
 	virtual void VidInit();
 	virtual const char * Key( int key, int down );

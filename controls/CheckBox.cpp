@@ -19,7 +19,7 @@ GNU General Public License for more details.
 #include "CheckBox.h"
 #include "Utils.h"
 
-CMenuCheckBox::CMenuCheckBox() : CMenuEditable()
+CMenuCheckBox::CMenuCheckBox() : BaseClass()
 {
 	SetCharSize( QM_DEFAULTFONT );
 	SetSize( 32, 32 );
@@ -43,7 +43,7 @@ CMenuCheckBox::Init
 */
 void CMenuCheckBox::VidInit( void )
 {
-	CMenuBaseItem::VidInit();
+	BaseClass::VidInit();
 	m_scTextPos.x = m_scPos.x + (m_scSize.w * 1.5f );
 	m_scTextPos.y = m_scPos.y;
 

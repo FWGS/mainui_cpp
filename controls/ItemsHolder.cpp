@@ -21,7 +21,7 @@ GNU General Public License for more details.
 #include <string.h>
 
 CMenuItemsHolder::CMenuItemsHolder() :
-	CMenuBaseItem(), m_iCursor( 0 ), m_iCursorPrev( 0 ), m_pItems( ), m_numItems( 0 ),
+	BaseClass(), m_iCursor( 0 ), m_iCursorPrev( 0 ), m_pItems( ), m_numItems( 0 ),
 	m_events(), m_numEvents( 0 ), m_bInit( false ), m_bAllowEnterActivate( false ),
 	m_bWrapCursor( true ), m_szResFile( 0 )
 {
@@ -644,7 +644,7 @@ CEventCallback CMenuItemsHolder::FindEventByName(const char *name)
 
 bool CMenuItemsHolder::KeyValueData(const char *key, const char *data)
 {
-	return CMenuBaseItem::KeyValueData( key, data );
+	return BaseClass::KeyValueData( key, data );
 }
 
 Point CMenuItemsHolder::GetPositionOffset() const

@@ -20,7 +20,7 @@ GNU General Public License for more details.
 #include "Utils.h"
 #include "Scissor.h"
 
-CMenuTable::CMenuTable() : CMenuBaseItem(),
+CMenuTable::CMenuTable() : BaseClass(),
 	bFramedHintText( false ),
 	szHeaderTexts(), szBackground(),
 	szUpArrow( UI_UPARROW ), szUpArrowFocus( UI_UPARROWFOCUS ), szUpArrowPressed( UI_UPARROWPRESSED ),
@@ -36,7 +36,7 @@ CMenuTable::CMenuTable() : CMenuBaseItem(),
 
 void CMenuTable::VidInit()
 {
-	CMenuBaseItem::VidInit();
+	BaseClass::VidInit();
 
 	iNumRows = ( m_scSize.h - UI_OUTLINE_WIDTH * 2 ) / m_scChSize.h - 1;
 

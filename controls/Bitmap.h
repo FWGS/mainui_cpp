@@ -23,6 +23,8 @@ GNU General Public License for more details.
 class CMenuBitmap : public CMenuBaseItem
 {
 public:
+	typedef CMenuBaseItem BaseClass;
+
 	CMenuBitmap();
 
 	virtual void VidInit( void );
@@ -50,7 +52,9 @@ public:
 class CMenuBannerBitmap : public CMenuBitmap
 {
 public:
-	CMenuBannerBitmap() : CMenuBitmap()
+	typedef CMenuBitmap BaseClass;
+
+	CMenuBannerBitmap() : BaseClass()
 	{
 		iFlags = QMF_INACTIVE;
 		SetRect( UI_BANNER_POSX, UI_BANNER_POSY, UI_BANNER_WIDTH, UI_BANNER_HEIGHT );

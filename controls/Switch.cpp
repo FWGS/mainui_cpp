@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "BaseMenu.h"
 #include "Switch.h"
 
-CMenuSwitch::CMenuSwitch( ) : CMenuEditable( )
+CMenuSwitch::CMenuSwitch( ) : BaseClass( )
 {
 	szLeftName = szRightName = NULL;
 	bMouseToggle = true;
@@ -45,7 +45,7 @@ void CMenuSwitch::VidInit()
 	iFgTextColor.SetDefault( uiInputFgColor );
 	iBgTextColor.SetDefault( uiPromptTextColor );
 
-	CMenuBaseItem::VidInit();
+	BaseClass::VidInit();
 
 	int leftSize, rightSize;
 

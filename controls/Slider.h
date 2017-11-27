@@ -24,6 +24,8 @@ GNU General Public License for more details.
 class CMenuSlider : public CMenuEditable
 {
 public:
+	typedef CMenuEditable BaseClass;
+
 	CMenuSlider();
 	virtual void VidInit( void );
 	virtual const char * Key( int key, int down );
