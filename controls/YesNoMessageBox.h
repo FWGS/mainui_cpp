@@ -21,7 +21,7 @@ GNU General Public License for more details.
 #include "Action.h"
 #include "ItemsHolder.h"
 #include "BaseWindow.h"
-static void UI_ShowMessageBox( void );
+
 class CMenuYesNoMessageBox : public CMenuBaseWindow
 {
 public:
@@ -50,13 +50,14 @@ public:
 
 	CEventCallback onPositive;
 	CEventCallback onNegative;
+
+	static void UI_ShowMessageBox( void );
 private:
 	CMenuAction		dlgMessage1;
 	CMenuPicButton	yes;
 	CMenuPicButton	no;
 	bool m_bSetYes, m_bSetNo;
 	bool m_bIsAlert;
-	friend void UI_ShowMessageBox( void );
 };
 
 #endif // MENU_GENERICMSGBOX_H
