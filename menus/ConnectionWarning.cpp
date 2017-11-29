@@ -41,7 +41,7 @@ void CMenuConnectionWarning::_Init()
 	background.iColor = uiPromptBgColor;
 
 	normal.szName = "Normal internet connection";
-	SET_EVENT( normal, onChanged )
+	SET_EVENT_MULTI( normal.onChanged,
 	{
 		uiConnectionWarning.ClearCheckboxes();
 		EngFuncs::CvarSetValue("cl_maxpacket", 1400 );
@@ -50,12 +50,11 @@ void CMenuConnectionWarning::_Init()
 		EngFuncs::CvarSetValue("cl_updaterate", 60 );
 		EngFuncs::CvarSetValue("rate", 25000 );
 		((CMenuCheckBox*)pSelf)->bChecked = true;
-	}
-	END_EVENT( normal, onChanged )
+	});
 	normal.SetCoord( 20, 140 );
 
 	dsl.szName = "DSL or PPTP with limited packet size";
-	SET_EVENT( dsl, onChanged )
+	SET_EVENT_MULTI( dsl.onChanged,
 	{
 		uiConnectionWarning.ClearCheckboxes();
 		EngFuncs::CvarSetValue("cl_maxpacket", 1200 );
@@ -64,12 +63,11 @@ void CMenuConnectionWarning::_Init()
 		EngFuncs::CvarSetValue("cl_updaterate", 60 );
 		EngFuncs::CvarSetValue("rate", 25000 );
 		((CMenuCheckBox*)pSelf)->bChecked = true;
-	}
-	END_EVENT( dsl, onChanged )
+	});
 	dsl.SetCoord( 20, 200 );
 
 	slowest.szName = "Slow connection mode (64kbps)";
-	SET_EVENT( slowest, onChanged )
+	SET_EVENT_MULTI( slowest.onChanged,
 	{
 		uiConnectionWarning.ClearCheckboxes();
 		EngFuncs::CvarSetValue("cl_maxpacket", 900 );
@@ -78,8 +76,7 @@ void CMenuConnectionWarning::_Init()
 		EngFuncs::CvarSetValue("cl_updaterate", 30 );
 		EngFuncs::CvarSetValue("rate", 7500 );
 		((CMenuCheckBox*)pSelf)->bChecked = true;
-	}
-	END_EVENT( slowest, onChanged )
+	});
 	slowest.SetCoord( 20, 260 );
 
 	done.SetPicture( PC_DONE );
@@ -90,12 +87,11 @@ void CMenuConnectionWarning::_Init()
 
 	options.SetPicture( PC_ADV_OPT );
 	options.szName = "Adv Options";
-	SET_EVENT( options, onActivated )
+	SET_EVENT_MULTI( options.onActivated,
 	{
 		UI_GameOptions_Menu();
 		uiConnectionWarning.done.iFlags &= ~QMF_GRAYED;
-	}
-	END_EVENT( options, onActivated )
+	});
 	options.SetRect( 154, 320, UI_BUTTONS_WIDTH, UI_BUTTONS_HEIGHT );
 
 	title.iFlags = QMF_INACTIVE|QMF_DROPSHADOW;

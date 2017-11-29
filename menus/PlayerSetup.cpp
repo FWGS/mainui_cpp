@@ -477,12 +477,11 @@ void CMenuPlayerSetup::_Init( void )
 
 	AddButton( "Done", "Go back to the Multiplayer Menu", PC_DONE, SaveAndPopMenuCb );
 	CMenuPicButton *gameOpt = AddButton( "Game options", "Configure handness, fov and other advanced options", PC_GAME_OPTIONS );
-	SET_EVENT_PTR( gameOpt, onActivated )
+	SET_EVENT_MULTI( gameOpt->onActivated,
 	{
 		((CMenuPlayerSetup*)pSelf->Parent())->SetConfig();
 		UI_AdvUserOptions_Menu();
-	}
-	END_EVENT_PTR( gameOpt, onActivated )
+	});
 
 	AddButton( "Adv options", "", PC_ADV_OPT, UI_GameOptions_Menu );
 	gameOpt->SetGrayed( !UI_AdvUserOptions_IsAvailable() );

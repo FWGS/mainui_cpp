@@ -255,7 +255,7 @@ void CMenuTouchOptions::_Init( void )
 
 	GetProfileList();
 
-	SET_EVENT( profiles, onChanged )
+	SET_EVENT_MULTI( profiles.onChanged,
 	{
 		CMenuTouchOptions *parent = (CMenuTouchOptions *)pSelf->Parent();
 		CMenuScrollList *self = (CMenuScrollList*)pSelf;
@@ -274,39 +274,36 @@ void CMenuTouchOptions::_Init( void )
 			self->iCurItem++;
 		if( isCurrent )
 			parent->apply.iFlags |= QMF_GRAYED;
-	}
-	END_EVENT( profiles, onChanged )
+	});
 
 	profilename.szName = "New Profile:";
 	profilename.iMaxLength = 16;
 
 	reset.SetNameAndStatus( "Reset", "Reset touch to default state" );
 	reset.SetPicture("gfx/shell/btn_touch_reset");
-	SET_EVENT( reset, onActivated )
+	SET_EVENT_MULTI( reset.onActivated,
 	{
 		CMenuTouchOptions *parent = (CMenuTouchOptions *)pSelf->Parent();
 
 		parent->msgBox.SetMessage( "Reset all buttons?");
 		parent->msgBox.onPositive = CMenuTouchOptions::ResetButtonsCb;
 		parent->msgBox.Show();
-	}
-	END_EVENT( reset, onActivated )
+	});
 
 	remove.SetNameAndStatus( "Delete", "Delete saved game" );
 	remove.SetPicture( PC_DELETE );
-	SET_EVENT( remove, onActivated )
+	SET_EVENT_MULTI( remove.onActivated,
 	{
 		CMenuTouchOptions *parent = (CMenuTouchOptions *)pSelf->Parent();
 
 		parent->msgBox.SetMessage( "Delete selected profile?");
 		parent->msgBox.onPositive = CMenuTouchOptions::DeleteProfileCb;
 		parent->msgBox.Show();
-	}
-	END_EVENT( remove, onActivated )
+	});
 
 	apply.SetNameAndStatus( "Activate", "Apply selected profile" );
 	apply.SetPicture( PC_ACTIVATE );
-	SET_EVENT( apply, onActivated )
+	SET_EVENT_MULTI( apply.onActivated,
 	{
 		CMenuTouchOptions *parent = (CMenuTouchOptions *)pSelf->Parent();
 		int i = parent->profiles.iCurItem;
@@ -353,12 +350,11 @@ void CMenuTouchOptions::_Init( void )
 		}
 		parent->GetProfileList();
 		parent->GetConfig();
-	}
-	END_EVENT( apply, onActivated )
+	});
 
 	save.SetNameAndStatus( "Save", "Save new profile" );
 	save.SetPicture("gfx/shell/btn_touch_save");
-	SET_EVENT( save, onActivated )
+	SET_EVENT_MULTI( save.onActivated,
 	{
 		CMenuTouchOptions *parent = (CMenuTouchOptions*)pSelf->Parent();
 		char name[256];
@@ -371,8 +367,7 @@ void CMenuTouchOptions::_Init( void )
 		EngFuncs::ClientCmd( 1, "touch_writeconfig\n" );
 		parent->GetProfileList();
 		parent->profilename.Clear();
-	}
-	END_EVENT( save, onActivated )
+	});
 
 	msgBox.SetPositiveButton( "Ok", PC_OK );
 	msgBox.Link( this );

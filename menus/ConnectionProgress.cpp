@@ -204,7 +204,7 @@ void CMenuConnectionProgress::_Init( void )
 
 	consoleButton.SetPicture( PC_CONSOLE );
 	consoleButton.szName = "Console";
-	SET_EVENT( consoleButton, onActivated )
+	SET_EVENT_MULTI( consoleButton.onActivated,
 	{
 		CMenuConnectionProgress *parent = (CMenuConnectionProgress *)pSelf->Parent();
 		EngFuncs::KEY_SetDest( KEY_CONSOLE );
@@ -212,8 +212,7 @@ void CMenuConnectionProgress::_Init( void )
 		parent->m_iSource = SOURCE_CONSOLE;
 		UI_CloseMenu();
 		UI_SetActiveMenu( false );
-	}
-	END_EVENT( consoleButton, onActivated );
+	});
 
 	disconnectButton.SetPicture( PC_DISCONNECT );
 	disconnectButton.szName = "Disconnect";

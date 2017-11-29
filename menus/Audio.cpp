@@ -120,7 +120,7 @@ void CMenuAudio::_Init( void )
 	muteFocusLost.onChanged = CMenuEditable::WriteCvarCb;
 
 	vibrationEnable.SetNameAndStatus( "Enable vibration", "In-game vibration(when player injured, etc)");
-	SET_EVENT( vibrationEnable, onChanged )
+	SET_EVENT_MULTI( vibrationEnable.onChanged,
 	{
 		CMenuCheckBox *cb = (CMenuCheckBox *)pSelf;
 		CMenuAudio *audio = (CMenuAudio *)pSelf->Parent();
@@ -132,12 +132,11 @@ void CMenuAudio::_Init( void )
 		{
 			audio->vibration.iFlags &= ~(QMF_GRAYED|QMF_INACTIVE);
 		}
-	}
-	END_EVENT( vibrationEnable, onChanged )
+	});
 
 	vibration.SetNameAndStatus( "Vibration", "Default vibration length" );
 	vibration.Setup( 0.0f, 5.0f, 0.05f );
-	SET_EVENT( vibration, onChanged )
+	SET_EVENT_MULTI( vibration.onChanged,
 	{
 		static float oldValue;
 		float newValue = ((CMenuEditable*)pSelf)->CvarValue();
@@ -149,8 +148,7 @@ void CMenuAudio::_Init( void )
 			CMenuEditable::WriteCvarCb( pSelf, pExtra );
 			oldValue = newValue;
 		}
-	}
-	END_EVENT( vibration, onChanged )
+	});
 
 	reverseChannels.SetNameAndStatus( "Reverse audio channels", "Use it when you can't swap your headphones' speakers" );
 	reverseChannels.onChanged = CMenuEditable::WriteCvarCb;

@@ -86,23 +86,21 @@ void CMenuInputDevices::_Init( void )
 	mouse.szName = "Ignore mouse";
 	mouse.szStatusText = "Need for some servers. Will disable mouse in menu too";
 	mouse.iFlags |= QMF_NOTIFY;
-#ifndef __ANDROID
-	SET_EVENT( mouse, onChanged )
+#ifndef __ANDROID__
+	SET_EVENT_MULTI( mouse.onChanged,
 	{
 		if( ((CMenuCheckBox*)pSelf)->bChecked )
 		{
 			static CMenuYesNoMessageBox msgbox(false);
 			msgbox.SetMessage("If you do not have touchscreen, or joystick, you will not be able to play withot mouse. Are you sure to disable mouse?");
-			SET_EVENT( msgbox, onNegative )
+			SET_EVENT_MULTI( msgbox.onNegative,
 			{
 				uiInputDevices.mouse.bChecked = false;
-			}
-			END_EVENT( msgbox, onNegative )
+			});
 
 			msgbox.Show();
 		}
-	}
-	END_EVENT( mouse, onChanged )
+	});
 #endif
 	touch.szName = "Enable touch";
 	touch.szStatusText = "On-screen controls for touchscreen";
@@ -113,11 +111,10 @@ void CMenuInputDevices::_Init( void )
 	evdev.szStatusText = "Press this to enable full mouse and keyboard control on Android";
 	evdev.iFlags |= QMF_NOTIFY;
 
-	SET_EVENT( evdev, onActivated )
+	SET_EVENT_MULTI( evdev.onActivated,
 	{
 		EngFuncs::ClientCmd( FALSE, "evdev_autodetect\n");
-	}
-	END_EVENT( evdev, onActivated )
+	});
 
 	AddItem( background );
 	//AddItem( banner );

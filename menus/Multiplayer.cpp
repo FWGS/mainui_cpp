@@ -65,21 +65,19 @@ void CMenuMultiplayer::_Init( void )
 	msgBox.SetPositiveButton( "Ok", PC_OK );
 	msgBox.SetNegativeButton( "Cancel", PC_CANCEL );
 	msgBox.HighlightChoice( CMenuYesNoMessageBox::HIGHLIGHT_YES );
-	SET_EVENT( msgBox, onPositive )
+	SET_EVENT_MULTI( msgBox.onPositive,
 	{
 		EngFuncs::CvarSetValue( "cl_predict", 1.0f );
 		EngFuncs::CvarSetValue( "menu_mp_firsttime", 0.0f );
 
 		UI_PlayerIntroduceDialog_Show();
-	}
-	END_EVENT( msgBox, onPositive )
-	SET_EVENT( msgBox, onNegative )
+	});
+	SET_EVENT_MULTI( msgBox.onNegative,
 	{
 		EngFuncs::CvarSetValue( "menu_mp_firsttime", 0.0f );
 
 		UI_PlayerIntroduceDialog_Show();
-	}
-	END_EVENT( msgBox, onNegative )
+	});
 	msgBox.Link( this );
 
 }

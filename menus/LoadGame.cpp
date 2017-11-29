@@ -225,7 +225,7 @@ void CMenuLoadGame::_Init( void )
 {
 	save.SetNameAndStatus( "Save", "Save curret game" );
 	save.SetPicture( PC_SAVE_GAME );
-	SET_EVENT( save, onActivated )
+	SET_EVENT_MULTI( save.onActivated,
 	{
 		CMenuLoadGame *parent = (CMenuLoadGame*)pSelf->Parent();
 		const char *saveName = parent->savesListModel.saveName[parent->savesList.GetCurrentIndex()];
@@ -242,12 +242,11 @@ void CMenuLoadGame::_Init( void )
 
 			UI_CloseMenu();
 		}
-	}
-	END_EVENT( save, onActivated )
+	});
 
 	load.SetNameAndStatus( "Load", "Load saved game" );
 	load.SetPicture( PC_LOAD_GAME );
-	SET_EVENT( load, onActivated )
+	SET_EVENT_MULTI( load.onActivated,
 	{
 		CMenuLoadGame *parent = (CMenuLoadGame*)pSelf->Parent();
 		const char *saveName = parent->savesListModel.saveName[parent->savesList.GetCurrentIndex()];
@@ -262,8 +261,7 @@ void CMenuLoadGame::_Init( void )
 
 			UI_CloseMenu();
 		}
-	}
-	END_EVENT( load, onActivated )
+	});
 
 	remove.SetNameAndStatus( "Delete", "Delete saved game" );
 	remove.SetPicture( PC_DELETE );
@@ -274,7 +272,7 @@ void CMenuLoadGame::_Init( void )
 	cancel.onActivated = HideCb;
 
 	savesList.szName = hintText;
-	SET_EVENT( savesList, onChanged )
+	SET_EVENT_MULTI( savesList.onChanged,
 	{
 		CMenuTable *self = (CMenuTable*)pSelf;
 		CMenuLoadGame *parent = (CMenuLoadGame*)self->Parent();
@@ -290,8 +288,7 @@ void CMenuLoadGame::_Init( void )
 			parent->remove.SetGrayed( false );
 			parent->levelShot.szName = parent->savesListModel.saveName[self->GetCurrentIndex()];
 		}
-	}
-	END_EVENT( savesList, onChanged )
+	});
 	// savesList.onDeleteEntry = msgBox.MakeOpenEvent();
 	savesList.SetupColumn( 0, "Time", 0.30f );
 	savesList.SetupColumn( 1, "Game", 0.55f );
@@ -301,7 +298,7 @@ void CMenuLoadGame::_Init( void )
 	savesList.SetCharSize( QM_SMALLFONT );
 
 	msgBox.SetMessage( "Delete this save?" );
-	SET_EVENT( msgBox, onPositive )
+	SET_EVENT_MULTI( msgBox.onPositive,
 	{
 		CMenuLoadGame *parent = (CMenuLoadGame*)pSelf->Parent();
 		const char *delName = parent->savesListModel.delName[parent->savesList.GetCurrentIndex()];
@@ -318,8 +315,7 @@ void CMenuLoadGame::_Init( void )
 
 			parent->savesListModel.Update();
 		}
-	}
-	END_EVENT( msgBox, onPositive )
+	});
 	msgBox.Link( this );
 
 	AddItem( background );

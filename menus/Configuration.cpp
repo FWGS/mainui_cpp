@@ -53,11 +53,11 @@ void CMenuOptions::_Init( void )
 	banner.SetPicture( ART_BANNER );
 
 	msgBox.SetMessage( "Check the Internet for updates?" );
-	SET_EVENT( msgBox, onPositive )
+	SET_EVENT_MULTI( msgBox.onPositive,
 	{
 		EngFuncs::ShellExecute( ((CMenuOptions*)pSelf->Parent())->m_szUpdateUrl, NULL, TRUE );
-	}
-	END_EVENT( msgBox, onPositive )
+	});
+
 	msgBox.Link( this );
 
 	if( gMenu.m_gameinfo.update_url[0] != 0 )

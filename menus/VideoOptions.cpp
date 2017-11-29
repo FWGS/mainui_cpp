@@ -199,7 +199,7 @@ void CMenuVidOptions::_Init( void )
 	vbo.SetNameAndStatus( "Use VBO", "Use new world renderer. Faster, but rarely glitchy" );
 	vbo.SetCoord( 72, 565 );
 	vbo.LinkCvar( "r_vbo" );
-	SET_EVENT( vbo, onChanged )
+	SET_EVENT_MULTI( vbo.onChanged,
 	{
 		CMenuCheckBox *self = (CMenuCheckBox*)pSelf;
 		CMenuVidOptions *parent = (CMenuVidOptions*)pSelf->Parent();
@@ -212,8 +212,7 @@ void CMenuVidOptions::_Init( void )
 			parent->bump.iFlags |= QMF_GRAYED;
 			parent->bump.SetCvarValue( 0 );
 		}
-	}
-	END_EVENT( vbo, onChanged )
+	});
 
 	fastSky.SetNameAndStatus( "Draw simple sky", "enable/disable fast sky rendering (for old computers)" );
 	fastSky.SetCoord( 72, 615 );

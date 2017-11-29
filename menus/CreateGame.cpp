@@ -242,13 +242,12 @@ void CMenuCreateGame::_Init( void )
 	maxClients.bNumbersOnly = true;
 	maxClients.szName = "Max Players:";
 	maxClients.LinkCvar( "maxplayers" );
-	SET_EVENT( maxClients, onCvarChange )
+	SET_EVENT_MULTI( maxClients.onCvarChange,
 	{
 		CMenuField *self = (CMenuField*)pSelf;
 		if( atoi(self->GetBuffer()) <= 1 )
 			self->SetBuffer( "8" );
-	}
-	END_EVENT( maxClients, onCvarChange )
+	});
 
 	password.szName = "Password:";
 	password.iMaxLength = 16;

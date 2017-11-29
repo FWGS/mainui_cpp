@@ -44,24 +44,22 @@ CMenuYesNoMessageBox::CMenuYesNoMessageBox( bool alert ) : BaseClass( "YesNoMess
 	yes.onActivated.pExtra = no.onActivated.pExtra = this;
 	yes.bEnableTransitions = no.bEnableTransitions = false;
 
-	SET_EVENT( yes, onActivated )
+	SET_EVENT_MULTI( yes.onActivated,
 	{
 		CMenuYesNoMessageBox *msgBox = (CMenuYesNoMessageBox*)pExtra;
 
 		msgBox->Hide();
 		msgBox->onPositive( msgBox );
 
-	}
-	END_EVENT( yes, onActivated )
+	});
 
-	SET_EVENT( no, onActivated )
+	SET_EVENT_MULTI( no.onActivated,
 	{
 		CMenuYesNoMessageBox *msgBox = (CMenuYesNoMessageBox*)pExtra;
+
 		msgBox->Hide();
 		msgBox->onNegative( msgBox );
-
-	}
-	END_EVENT( no, onActivated )
+	});
 
 	m_bSetYes = m_bSetNo = false;
 	m_bIsAlert = alert;

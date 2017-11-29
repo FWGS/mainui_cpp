@@ -305,15 +305,14 @@ void CMenuServerBrowser::_Init( void )
 	joinGame->onActivatedClActive = msgBox.MakeOpenEvent();
 
 	createGame = AddButton( "Create game", NULL, PC_CREATE_GAME );
-	SET_EVENT_PTR( createGame, onActivated )
+	SET_EVENT_MULTI( createGame->onActivated,
 	{
 		if( ((CMenuServerBrowser*)pSelf->Parent())->m_bLanOnly )
 			EngFuncs::CvarSetValue( "public", 0.0f );
 		else EngFuncs::CvarSetValue( "public", 1.0f );
 
 		UI_CreateGame_Menu();
-	}
-	END_EVENT_PTR( createGame, onActivated )
+	});
 
 	// TODO: implement!
 	AddButton( "View game info", "Get detail game info", PC_VIEW_GAME_INFO, CEventCallback::NoopCb, QMF_GRAYED );
@@ -345,7 +344,7 @@ void CMenuServerBrowser::_Init( void )
 	natOrDirect.iSelectColor = uiInputFgColor;
 	// bit darker
 	natOrDirect.iFgTextColor = uiInputFgColor - 0x00151515;
-	SET_EVENT( natOrDirect, onChanged )
+	SET_EVENT_MULTI( natOrDirect.onChanged,
 	{
 		CMenuSwitch *self = (CMenuSwitch*)pSelf;
 		CMenuServerBrowser *parent = (CMenuServerBrowser*)self->Parent();
@@ -353,8 +352,7 @@ void CMenuServerBrowser::_Init( void )
 		self->WriteCvar();
 		parent->ClearList();
 		parent->RefreshList();
-	}
-	END_EVENT( natOrDirect, onChanged )
+	});
 
 	// server.dll needs for reading savefiles or startup newgame
 	if( !EngFuncs::CheckGameDll( ))
@@ -367,25 +365,24 @@ void CMenuServerBrowser::_Init( void )
 	password.iMaxLength = 16;
 	password.SetRect( 188, 140, 270, 32 );
 
-	SET_EVENT( askPassword, onPositive )
+	SET_EVENT_MULTI( askPassword.onPositive,
 	{
 		CMenuServerBrowser *parent = (CMenuServerBrowser*)pSelf->Parent();
 
 		EngFuncs::CvarSetString( "password", parent->password.GetBuffer() );
 		parent->password.Clear(); // we don't need entered password anymore
 		CMenuServerBrowser::Connect( staticServerSelect );
-	}
-	END_EVENT( askPassword, onPositive )
+	});
 
-	SET_EVENT( askPassword, onNegative )
+	SET_EVENT_MULTI( askPassword.onNegative,
 	{
 		CMenuServerBrowser *parent = (CMenuServerBrowser*)pSelf->Parent();
 
 		EngFuncs::CvarSetString( "password", "" );
 		parent->password.Clear(); // we don't need entered password anymore
 		staticWaitingPassword = false;
-	}
-	END_EVENT( askPassword, onNegative )
+	});
+
 	askPassword.SetMessage( "Enter server password to continue:" );
 	askPassword.Link( this );
 	askPassword.Init();

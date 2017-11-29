@@ -151,7 +151,7 @@ void CMenuGameOptions::_Init( void )
 	maxpacket.Setup( 150, 1550, 50 );
 	maxpacket.LinkCvar( "cl_maxpacket", CMenuEditable::CVAR_VALUE );
 	maxpacket.SetNameAndStatus( "Network packet size limit (cl_maxpacket)", "Split packet size and minimum size to compress");
-	SET_EVENT( maxpacket, onChanged )
+	SET_EVENT_MULTI( maxpacket.onChanged,
 	{
 		CMenuSpinControl *self = (CMenuSpinControl *)pSelf;
 		if( self->GetCurrentValue() == 1550 || self->GetCurrentValue() == 150 )
@@ -163,15 +163,14 @@ void CMenuGameOptions::_Init( void )
 		{
 			self->SetCurrentValue( 1500 );
 		}
-	}
-	END_EVENT( maxpacket, onChanged )
+	});
 	if( maxpacket.GetCurrentValue() == 40000 )
 		maxpacket.ForceDisplayString( "auto" );
 
 	maxpayload.Setup( 150, 1550, 50 );
 	maxpayload.LinkCvar( "cl_maxpayload", CMenuEditable::CVAR_VALUE );
 	maxpayload.SetNameAndStatus( "Singon size (cl_maxpayload)", "Singon cnain split decrease if cl_maxpacket does not help");
-	SET_EVENT( maxpayload, onChanged )
+	SET_EVENT_MULTI( maxpayload.onChanged,
 	{
 		CMenuSpinControl *self = (CMenuSpinControl *)pSelf;
 		if( self->GetCurrentValue() == 250 || self->GetCurrentValue() == 40050 )
@@ -183,8 +182,7 @@ void CMenuGameOptions::_Init( void )
 		{
 			self->SetCurrentValue( 300 );
 		}
-	}
-	END_EVENT( maxpayload, onChanged )
+	});
 	if( maxpayload.GetCurrentValue() == 0 )
 		maxpayload.ForceDisplayString( "auto" );
 
@@ -205,27 +203,24 @@ void CMenuGameOptions::_Init( void )
 	
 
 	normal.szName = "Normal internet connection";
-	SET_EVENT( normal, onChanged )
+	SET_EVENT_MULTI( normal.onChanged,
 	{
 		uiGameOptions.SetNetworkMode( 1400, 0, 30, 60, 25000 );
 		((CMenuCheckBox*)pSelf)->bChecked = true;
-	}
-	END_EVENT( normal, onChanged )
+	});
 
 	dsl.szName = "DSL or PPTP with limited packet size";
-	SET_EVENT( dsl, onChanged )
+	SET_EVENT_MULTI( dsl.onChanged,
 	{
 		uiGameOptions.SetNetworkMode( 1200, 1000, 30, 60, 25000 );
 		((CMenuCheckBox*)pSelf)->bChecked = true;
-	}
-	END_EVENT( dsl, onChanged )
+	});
 	slowest.szName = "Slow connection mode (64kbps)";
-	SET_EVENT( slowest, onChanged )
+	SET_EVENT_MULTI( slowest.onChanged,
 	{
 		uiGameOptions.SetNetworkMode( 900, 700, 25, 30, 7500 );
 		((CMenuCheckBox*)pSelf)->bChecked = true;
-	}
-	END_EVENT( slowest, onChanged )
+	});
 	compress.SetNameAndStatus( "Compress", "Compress splitted packets (need split to work)" );
 	compress.LinkCvar("cl_enable_splitcompress" );
 	split.SetNameAndStatus( "Split", "Split network packets" );

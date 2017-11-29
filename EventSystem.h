@@ -19,38 +19,37 @@ GNU General Public License for more details.
 #include "Utils.h"
 
 // Use these macros to set EventCallback, if no function pointer is available
-// SET_EVENT must be followed by event code and closed by END_EVENT
-// SET_EVENT_THIS can be used for setting event member inside it's class
-#if defined(MY_COMPILER_SUCKS)
 
+// SET_EVENT_MULTI( event, callback )
+// event -- CEventCallback object
+// callback -- callback code block. Must contain a braces
+
+// SET_EVENT( event, callback )
+// same as MULTI, but does not require code block. Inteded for one-line events
+
+#if defined(MY_COMPILER_SUCKS)
 // WARN: can't rely on "item" name, because it can be something like "ptr->member"
 // So we use something more valid for struct name
-
 #define PASTE(x,y) __##x##_##y
 #define PASTE2(x,y) PASTE(x,y)
 #define EVNAME(x) PASTE2(x, __LINE__)
 
-#define SET_EVENT( item, callback ) typedef struct { static void callback( CMenuBaseItem *pSelf, void *pExtra )
-#define END_EVENT( item, callback ) } EVNAME(callback); (item).callback = EVNAME(callback)::callback;
-
-#define SET_EVENT_PTR( ptr, callback ) SET_EVENT( (*ptr), callback )
-#define END_EVENT_PTR( ptr, callback ) END_EVENT( (*ptr), callback )
-
-#define SET_EVENT_THIS( callback ) SET_EVENT( (*this), callback )
-#define END_EVENT_THIS( callback ) END_EVENT( (*this), callback )
+#define SET_EVENT_MULTI( event, callback ) \
+	typedef struct                                                   \
+	{                                                                \
+		static void __callback( CMenuBaseItem *pSelf, void *pExtra )  \
+		callback                                                     \
+	} EVNAME( _event ); (event) = EVNAME( _event )::__callback
 
 #else
 
-#define SET_EVENT( item, callback ) (item).callback = [](CMenuBaseItem *pSelf, void *pExtra)
-#define END_EVENT( item, callback ) ;
-
-#define SET_EVENT_PTR( ptr, callback ) SET_EVENT( (*ptr), callback )
-#define END_EVENT_PTR( ptr, callback ) END_EVENT( (*ptr), callback )
-
-#define SET_EVENT_THIS( callback ) SET_EVENT( (*this), callback )
-#define END_EVENT_THIS( callback ) END_EVENT( (*this), callback )
+#define SET_EVENT_MULTI( event, callback ) \
+	(event) = [](CMenuBaseItem *pSelf, void *pExtra) \
+	callback                                         \
 
 #endif
+
+#define SET_EVENT( event, callback ) SET_EVENT_MULTI( event, { callback } )
 
 #define DECLARE_NAMED_EVENT_TO_ITEM_METHOD( className, method, eventName ) \
 	static void eventName##Cb( CMenuBaseItem *pSelf, void * ) \

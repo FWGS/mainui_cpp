@@ -137,19 +137,18 @@ void CAdvancedControls::_Init( void )
 
 	invertMouse.SetNameAndStatus( "Invert mouse", "Reverse mouse up/down axis" );
 	invertMouse.iFlags |= QMF_NOTIFY;
-	SET_EVENT( invertMouse, onChanged )
+	SET_EVENT_MULTI( invertMouse.onChanged,
 	{
 		CMenuCheckBox *self = (CMenuCheckBox*)pSelf;
 		float m_pitch = EngFuncs::GetCvarFloat( "m_pitch" );
 		if( (self->bChecked  && m_pitch > 0) ||
 			(!self->bChecked && m_pitch < 0) )
 			EngFuncs::CvarSetValue( "m_pitch", -m_pitch );
-	}
-	END_EVENT( invertMouse, onChanged )
+	});
 
 	mouseLook.SetNameAndStatus( "Mouse look", "Use the mouse to look around instead of using the mouse to move" );
 	mouseLook.iFlags |= QMF_NOTIFY;
-	SET_EVENT( mouseLook, onChanged )
+	SET_EVENT_MULTI( mouseLook.onChanged,
 	{
 		CMenuCheckBox *self = (CMenuCheckBox*)pSelf;
 		CAdvancedControls *parent = (CAdvancedControls*)self->Parent();
@@ -165,8 +164,7 @@ void CAdvancedControls::_Init( void )
 			parent->lookStrafe.iFlags &= ~QMF_GRAYED;
 			EngFuncs::ClientCmd( FALSE, "-mlook\nbind _force_write\n" );
 		}
-	}
-	END_EVENT( mouseLook, onChanged )
+	});
 
 	lookSpring.SetNameAndStatus("Look spring", "Causes the screen to 'spring' back to looking straight ahead when you\nmove forward" );
 	lookSpring.iFlags |= QMF_NOTIFY;

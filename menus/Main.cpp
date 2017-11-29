@@ -238,12 +238,11 @@ void CMenuMain::_Init( void )
 	console.SetNameAndStatus( "Console", "Show console" );
 	console.iFlags |= QMF_NOTIFY;
 	console.SetPicture( PC_CONSOLE );
-	SET_EVENT( console, onActivated )
+	SET_EVENT_MULTI( console.onActivated,
 	{
 		UI_SetActiveMenu( FALSE );
 		EngFuncs::KEY_SetDest( KEY_CONSOLE );
-	}
-	END_EVENT( console, onActivated )
+	});
 
 	resumeGame.SetNameAndStatus( "Resume Game", MenuStrings[IDS_MAIN_RETURNHELP] );
 	resumeGame.SetPicture( PC_RESUME_GAME );
@@ -288,11 +287,10 @@ void CMenuMain::_Init( void )
 	previews.SetNameAndStatus( "Previews", MenuStrings[ IDS_MAIN_PREVIEWSHELP ] );
 	previews.SetPicture( PC_PREVIEWS );
 	previews.iFlags |= QMF_NOTIFY;
-	SET_EVENT( previews, onActivated )
+	SET_EVENT_MULTI( previews.onActivated,
 	{
 		EngFuncs::ShellExecute( MenuStrings[IDS_MEDIA_PREVIEWURL], NULL, false );
-	}
-	END_EVENT( previews, onActivated )
+	});
 
 	quit.SetNameAndStatus( "Quit", MenuStrings[IDS_MAIN_QUITPROMPT] );
 	quit.SetPicture( PC_QUIT );

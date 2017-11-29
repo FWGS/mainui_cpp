@@ -185,19 +185,17 @@ void CMenuVidModes::_Init( void )
 
 	windowed.SetNameAndStatus( "Run in a window", "Run game in window mode" );
 	windowed.SetCoord( 360, 620 );
-	SET_EVENT( windowed, onChanged )
+	SET_EVENT_MULTI( windowed.onChanged,
 	{
 		if( !uiVidModes.windowed.bChecked && uiVidModes.vidList.GetCurrentIndex() < VID_AUTOMODE_POS )
 			uiVidModes.vidList.SetCurrentIndex( VID_AUTOMODE_POS );
-	}
-	END_EVENT( windowed, onChanged )
+	});
 
-	SET_EVENT( vidList, onChanged )
+	SET_EVENT_MULTI( vidList.onChanged,
 	{
 		if( !uiVidModes.windowed.bChecked && uiVidModes.vidList.GetCurrentIndex() < VID_AUTOMODE_POS )
 			uiVidModes.vidList.SetCurrentIndex( VID_AUTOMODE_POS );
-	}
-	END_EVENT( vidList, onChanged )
+	});
 
 	vsync.SetNameAndStatus( "Vertical sync", "Enable vertical synchronization" );
 	vsync.SetCoord( 360, 670 );
