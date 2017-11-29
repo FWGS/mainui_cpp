@@ -44,12 +44,10 @@ GNU General Public License for more details.
 #else
 
 #define SET_EVENT_MULTI( event, callback ) \
-	(event) = [](CMenuBaseItem *pSelf, void *pExtra) \
-	callback                                         \
-
+	(event) = [](CMenuBaseItem *pSelf, void *pExtra) callback
 #endif
 
-#define SET_EVENT( event, callback ) SET_EVENT_MULTI( event, { callback } )
+#define SET_EVENT( event, callback ) SET_EVENT_MULTI( event, { callback; } )
 
 #define DECLARE_NAMED_EVENT_TO_ITEM_METHOD( className, method, eventName ) \
 	static void eventName##Cb( CMenuBaseItem *pSelf, void * ) \
@@ -83,42 +81,56 @@ enum menuEvent_e
 
 typedef void (*EventCallback)(CMenuBaseItem *, void *);
 typedef void (*VoidCallback)(void);
+typedef void (CMenuItemsHolder::*ItemsHolderCallback)( void * );
+typedef void (CMenuBaseItem::*ItemCallback)( void * );
+
+#define MenuCb( a ) static_cast<ItemsHolderCallback>((a))
 
 class CEventCallback
 {
 public:
 	CEventCallback();
 	CEventCallback( EventCallback cb, void *ex = 0 );
-	CEventCallback( VoidCallback cb );
 	CEventCallback( int execute_now, const char *sz );
+	CEventCallback( VoidCallback cb );
+	CEventCallback( ItemsHolderCallback cb );
 
 	void *pExtra;
 
 	// convert to boolean for easy check in conditionals
-	operator bool()          { return callback != 0; }
-	operator EventCallback() { return callback; }
-
-	void operator() ( CMenuBaseItem *pSelf ) { callback( pSelf, pExtra ); }
-
-	EventCallback operator =( EventCallback cb ) { return callback = cb; }
-	size_t        operator =( size_t null )      { return (size_t)(callback = (EventCallback)null); }
-	void*         operator =( void *null )       { return (void*)(callback = (EventCallback)null); }
-	VoidCallback  operator =( VoidCallback cb )
+	operator bool()
 	{
-		callback = VoidCallbackWrapperCb;
-		return (VoidCallback)(pExtra = (void*)cb); // extradata can't be used anyway;
+		switch(	type )
+		{
+		case OLD_STYLE_CALLBACK: return callback != 0;
+		case ITEMS_HOLDER_CALLBACK: return itemsHolderCallback != 0;
+		// case ITEM_CALLBACK: return itemCallback != 0;
+		}
+		return false;
 	}
 
-	void SetCommand( int execute_now, const char *sz )
-	{
-		callback = execute_now ? CmdExecuteNowCb : CmdExecuteNextFrameCb;
-		pExtra = (void*)sz;
-	}
+	void operator() ( CMenuBaseItem *pSelf );
+
+	// ItemCallback operator =( ItemCallback cb );
+	ItemsHolderCallback operator =( ItemsHolderCallback cb );
+	EventCallback operator =( EventCallback cb );
+	size_t        operator =( size_t null );
+	void*         operator =( void *null );
+	VoidCallback  operator =( VoidCallback cb );
+	void SetCommand( int execute_now, const char *sz );
 
 	static void NoopCb( CMenuBaseItem *, void * ) {}
-
 private:
+	enum
+	{
+		OLD_STYLE_CALLBACK = 0,
+		ITEMS_HOLDER_CALLBACK
+		// ITEM_CALLBACK
+	} type;
+
 	EventCallback callback;
+	ItemsHolderCallback itemsHolderCallback;
+	// ItemCallback itemCallback;
 
 	// to find event command by name(for items holder)
 	const char *szName;

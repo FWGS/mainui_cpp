@@ -47,8 +47,7 @@ private:
 	virtual void _Init();
 	virtual void _VidInit( );
 
-	void QuitDialog();
-	DECLARE_EVENT_TO_MENU_METHOD( CMenuMain, QuitDialog )
+	void QuitDialog( void *pExtra = NULL );
 	static void DisconnectDialogCb( CMenuBaseItem *pSelf, void *pExtra );
 	static void HazardCourseDialogCb( CMenuBaseItem *pSelf, void *pExtra );
 	static void HazardCourseCb( CMenuBaseItem *pSelf, void *pExtra );
@@ -60,8 +59,6 @@ private:
 	{
 	public:
 		virtual void Draw();
-	private:
-		HIMAGE pic;
 	} banner;
 
 	CMenuPicButton	resumeGame;
@@ -115,7 +112,7 @@ void CMenuMain::QuitCb(CMenuBaseItem *, void *)
 	EngFuncs::ClientCmd( FALSE, "quit\n" );
 }
 
-void CMenuMain::QuitDialog()
+void CMenuMain::QuitDialog(void *pExtra)
 {
 	if( CL_IsActive() )
 		dialog.SetMessage( MenuStrings[IDS_MAIN_QUITPROMPTINGAME] );
@@ -161,7 +158,7 @@ const char *CMenuMain::Key( int key, int down )
 		}
 		else
 		{
-			QuitDialog();
+			QuitDialog( );
 		}
 		return uiSoundNull;
 	}
@@ -295,12 +292,12 @@ void CMenuMain::_Init( void )
 	quit.SetNameAndStatus( "Quit", MenuStrings[IDS_MAIN_QUITPROMPT] );
 	quit.SetPicture( PC_QUIT );
 	quit.iFlags |= QMF_NOTIFY;
-	quit.onActivated = QuitDialogCb;
+	quit.onActivated = MenuCb( &CMenuMain::QuitDialog );
 
 	quitButton.SetPicture( ART_CLOSEBTN_N, ART_CLOSEBTN_F, ART_CLOSEBTN_D );
 	quitButton.iFlags = QMF_MOUSEONLY|QMF_ACT_ONRELEASE;
 	quitButton.eFocusAnimation = QM_HIGHLIGHTIFFOCUS;
-	quitButton.onActivated = QuitDialogCb;
+	quitButton.onActivated = MenuCb( &CMenuMain::QuitDialog );
 
 	minimizeBtn.SetPicture( ART_MINIMIZE_N, ART_MINIMIZE_F, ART_MINIMIZE_D );
 	minimizeBtn.iFlags = QMF_MOUSEONLY|QMF_ACT_ONRELEASE;

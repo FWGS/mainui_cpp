@@ -58,13 +58,9 @@ private:
 	void Draw(); // put test mode timer here
 public:
 	CMenuVidModes() : CMenuFramework( "CMenuVidModes" ) { testModeTimer = 0; }
-	void SetConfig();
-	void RevertChanges();
-	void ApplyChanges();
-
-	DECLARE_EVENT_TO_MENU_METHOD( CMenuVidModes, SetConfig );
-	DECLARE_EVENT_TO_MENU_METHOD( CMenuVidModes, RevertChanges );
-	DECLARE_EVENT_TO_MENU_METHOD( CMenuVidModes, ApplyChanges );
+	void SetConfig( void * );
+	void RevertChanges( void * = NULL );
+	void ApplyChanges( void * );
 
 	CMenuCheckBox	windowed;
 	CMenuCheckBox	vsync;
@@ -107,7 +103,7 @@ void CMenuVidModesModel::Update( void )
 UI_VidModes_SetConfig
 =================
 */
-void CMenuVidModes::SetConfig( void )
+void CMenuVidModes::SetConfig( void * )
 {
 	bool testMode = false;
 	if( prevMode != vidList.GetCurrentIndex() - VID_MODES_POS )
@@ -140,13 +136,13 @@ void CMenuVidModes::SetConfig( void )
 	}
 }
 
-void CMenuVidModes::ApplyChanges()
+void CMenuVidModes::ApplyChanges( void * )
 {
 	prevMode = EngFuncs::GetCvarFloat( "vid_mode" );
 	prevFullscreen = EngFuncs::GetCvarFloat( "fullscreen" );
 }
 
-void CMenuVidModes::RevertChanges()
+void CMenuVidModes::RevertChanges( void * )
 {
 	EngFuncs::CvarSetValue( "vid_mode", prevMode );
 	EngFuncs::CvarSetValue( "fullscreen", prevFullscreen );
@@ -202,13 +198,13 @@ void CMenuVidModes::_Init( void )
 	vsync.LinkCvar( "gl_swapInterval" );
 
 	testModeMsgBox.SetMessage( testModeMsg );
-	testModeMsgBox.onPositive = ApplyChangesCb;
-	testModeMsgBox.onNegative = RevertChangesCb;
+	testModeMsgBox.onPositive = MenuCb( &CMenuVidModes::ApplyChanges );
+	testModeMsgBox.onNegative = MenuCb( &CMenuVidModes::RevertChanges );
 	testModeMsgBox.Link( this );
 
 	AddItem( background );
 	AddItem( banner );
-	AddButton( "Apply", "Apply changes", PC_OK, SetConfigCb );
+	AddButton( "Apply", "Apply changes", PC_OK, MenuCb( &CMenuVidModes::SetConfig ) );
 	AddButton( "Cancel", "Return back to previous menu", PC_CANCEL, HideCb );
 	AddItem( windowed );
 	AddItem( vsync );

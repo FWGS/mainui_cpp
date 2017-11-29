@@ -34,10 +34,14 @@ public:
 private:
 	virtual void _Init();
 
-	static void StartGameCb( CMenuBaseItem *pSelf, void *pExtra );
-	static void ShowDialogCb( CMenuBaseItem *pSelf, void *pExtra );
+	static void StartGameCb( float skill );
+	static void ShowDialogCb( CMenuBaseItem *pSelf, void *pExtra  );
 
 	CMenuYesNoMessageBox  msgBox;
+
+	CEventCallback easyCallback;
+	CEventCallback normCallback;
+	CEventCallback hardCallback;
 };
 
 static CMenuNewGame	uiNewGame;
@@ -47,12 +51,12 @@ static CMenuNewGame	uiNewGame;
 CMenuNewGame::StartGame
 =================
 */
-void CMenuNewGame::StartGameCb( CMenuBaseItem *pSelf, void *pExtra )
+void CMenuNewGame::StartGameCb( float skill )
 {
 	if( EngFuncs::GetCvarFloat( "host_serverstate" ) && EngFuncs::GetCvarFloat( "maxplayers" ) > 1 )
 		EngFuncs::HostEndGame( "end of the game" );
 
-	EngFuncs::CvarSetValue( "skill", int((size_t)pExtra) );
+	EngFuncs::CvarSetValue( "skill", skill );
 	EngFuncs::CvarSetValue( "deathmatch", 0.0f );
 	EngFuncs::CvarSetValue( "teamplay", 0.0f );
 	EngFuncs::CvarSetValue( "pausable", 1.0f ); // singleplayer is always allowing pause
@@ -66,10 +70,10 @@ void CMenuNewGame::StartGameCb( CMenuBaseItem *pSelf, void *pExtra )
 
 void CMenuNewGame::ShowDialogCb( CMenuBaseItem *pSelf, void *pExtra )
 {
-	CMenuNewGame *parent = (CMenuNewGame *)pSelf->Parent();
+	CMenuNewGame *ui = (CMenuNewGame*)pSelf->Parent();
 
-	parent->msgBox.onPositive.pExtra = pExtra;
-	parent->msgBox.Show();
+	ui->msgBox.onPositive = *(CEventCallback*)pExtra;
+	ui->msgBox.Show();
 }
 
 /*
@@ -83,17 +87,21 @@ void CMenuNewGame::_Init( void )
 	AddItem( banner );
 
 	banner.SetPicture( ART_BANNER );
+
+	SET_EVENT( easyCallback, StartGameCb( 1.0f ) );
+	SET_EVENT( normCallback, StartGameCb( 2.0f ) );
+	SET_EVENT( hardCallback, StartGameCb( 3.0f ) );
 	
-	CMenuPicButton *easy = AddButton( "Easy", MenuStrings[IDS_NEWGAME_EASYHELP], PC_EASY, StartGameCb, QMF_NOTIFY );
-	easy->onActivatedClActive.pExtra = easy->onActivated.pExtra = (void*)1;
+	CMenuPicButton *easy = AddButton( "Easy", MenuStrings[IDS_NEWGAME_EASYHELP], PC_EASY, easyCallback, QMF_NOTIFY );
+	CMenuPicButton *norm = AddButton( "Medium", MenuStrings[IDS_NEWGAME_MEDIUMHELP], PC_MEDIUM, normCallback, QMF_NOTIFY );
+	CMenuPicButton *hard = AddButton( "Difficult", MenuStrings[IDS_NEWGAME_DIFFICULTHELP], PC_DIFFICULT, hardCallback, QMF_NOTIFY );
 
-	CMenuPicButton *medium = AddButton( "Medium", MenuStrings[IDS_NEWGAME_MEDIUMHELP], PC_MEDIUM, StartGameCb, QMF_NOTIFY );
-	medium->onActivatedClActive.pExtra = medium->onActivated.pExtra = (void*)2;
-
-	CMenuPicButton *hard = AddButton( "Difficult", MenuStrings[IDS_NEWGAME_DIFFICULTHELP], PC_DIFFICULT, StartGameCb, QMF_NOTIFY );
-	hard->onActivatedClActive.pExtra = hard->onActivated.pExtra = (void*)3;
-
-	easy->onActivatedClActive = medium->onActivatedClActive = hard->onActivatedClActive = ShowDialogCb;
+	easy->onActivatedClActive =
+		norm->onActivatedClActive =
+		hard->onActivatedClActive = ShowDialogCb;
+	easy->onActivatedClActive.pExtra = &easyCallback;
+	norm->onActivatedClActive.pExtra = &normCallback;
+	hard->onActivatedClActive.pExtra = &hardCallback;
 
 	AddButton( "Cancel", "Go back to the main menu", PC_CANCEL, HideCb, QMF_NOTIFY );
 

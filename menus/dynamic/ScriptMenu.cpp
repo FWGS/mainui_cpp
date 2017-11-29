@@ -65,12 +65,9 @@ public:
 		CMenuFramework::SaveAndPopMenu();
 	}
 
-	void FlipMenu();
+	void FlipMenu( void * );
 	static void ListItemCvarWriteCb( CMenuBaseItem *pSelf, void *pExtra );
 	static void ListItemCvarGetCb( CMenuBaseItem *pSelf, void *pExtra );
-
-	DECLARE_EVENT_TO_MENU_METHOD( CMenuScriptConfig, FlipMenu )
-
 
 	CMenuBannerBitmap banner;
 
@@ -293,7 +290,7 @@ void CMenuScriptConfig::_Init( void )
 	pageSelector.SetInactive(false);
 	pageSelector.Setup( 1, m_iPagesCount, 1 );
 	pageSelector.SetCurrentValue( 1 );
-	pageSelector.onChanged = FlipMenuCb;
+	pageSelector.onChanged = MenuCb( &CMenuScriptConfig::FlipMenu );
 }
 
 void CMenuScriptConfig::SetScriptConfig(const char *path, bool earlyInit)
@@ -323,7 +320,7 @@ void CMenuScriptConfig::SetScriptConfig(const char *path, bool earlyInit)
 
 }
 
-void CMenuScriptConfig::FlipMenu()
+void CMenuScriptConfig::FlipMenu( void * )
 {
 	int newIndex = (int)pageSelector.GetCurrentValue() - 1;
 
