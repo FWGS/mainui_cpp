@@ -4,6 +4,8 @@
 #include "PicButton.h"
 #include "Action.h"
 
+enum EPresets { EPRESET_NORMAL = 0, EPRESET_DSL, EPRESET_SLOW, EPRESET_LAST };
+
 static class CMenuConnectionWarning : public CMenuBaseWindow
 {
 public:
@@ -14,8 +16,6 @@ public:
 	virtual void _Init();
 	virtual void _VidInit();
 	virtual const char *Key( int key, int down );
-
-	enum EPresets { EPRESET_NORMAL = 0, EPRESET_DSL, EPRESET_SLOW, EPRESET_LAST };
 
 	void WriteSettings(const EPresets preset );
 
@@ -99,7 +99,7 @@ void CMenuConnectionWarning::_VidInit()
 	SetRect( DLG_X + 192, 192, 640, 384 );
 }
 
-void CMenuConnectionWarning::WriteSettings( const CMenuConnectionWarning::EPresets preset)
+void CMenuConnectionWarning::WriteSettings( const EPresets preset)
 {
 	const struct
 	{

@@ -31,10 +31,10 @@ class CMenuNewGame : public CMenuFramework
 {
 public:
 	CMenuNewGame() : CMenuFramework( "CMenuNewGame" ) { }
+	static void StartGameCb( float skill );
 private:
 	virtual void _Init();
 
-	static void StartGameCb( float skill );
 	static void ShowDialogCb( CMenuBaseItem *pSelf, void *pExtra  );
 
 	CMenuYesNoMessageBox  msgBox;
@@ -88,9 +88,9 @@ void CMenuNewGame::_Init( void )
 
 	banner.SetPicture( ART_BANNER );
 
-	SET_EVENT( easyCallback, StartGameCb( 1.0f ) );
-	SET_EVENT( normCallback, StartGameCb( 2.0f ) );
-	SET_EVENT( hardCallback, StartGameCb( 3.0f ) );
+	SET_EVENT( easyCallback, CMenuNewGame::StartGameCb( 1.0f ) );
+	SET_EVENT( normCallback, CMenuNewGame::StartGameCb( 2.0f ) );
+	SET_EVENT( hardCallback, CMenuNewGame::StartGameCb( 3.0f ) );
 	
 	CMenuPicButton *easy = AddButton( "Easy", MenuStrings[IDS_NEWGAME_EASYHELP], PC_EASY, easyCallback, QMF_NOTIFY );
 	CMenuPicButton *norm = AddButton( "Medium", MenuStrings[IDS_NEWGAME_MEDIUMHELP], PC_MEDIUM, normCallback, QMF_NOTIFY );

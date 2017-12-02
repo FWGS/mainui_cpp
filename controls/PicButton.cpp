@@ -356,8 +356,8 @@ int	CMenuPicButton::transition_state = CMenuPicButton::AS_TO_TITLE;
 int	CMenuPicButton::transition_initial_time;
 CMenuPicButton* CMenuPicButton::temp = NULL;
 HIMAGE CMenuPicButton::s_hCurrentTransPic = 0;
-wrect_t CMenuPicButton::s_pCurrentTransRect = {};
-CMenuPicButton::Quad CMenuPicButton::s_CurrentLerpQuads[2] = {};
+wrect_t CMenuPicButton::s_pCurrentTransRect = { 0, 0, 0, 0 };
+CMenuPicButton::Quad CMenuPicButton::s_CurrentLerpQuads[2] = { {0} };
 
 float CMenuPicButton::GetTitleTransFraction( void )
 {

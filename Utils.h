@@ -226,7 +226,11 @@ namespace Key
 {
 inline bool IsEscape( int key )
 {
-	return ( key == K_ESCAPE || key == K_B_BUTTON );
+	return ( key == K_ESCAPE
+#ifndef XASH_DISABLE_FWGS_EXTENSIONS
+	|| key == K_B_BUTTON
+#endif // XASH_DISABLE_FWGS_EXTENSIONS
+);
 }
 }
 
