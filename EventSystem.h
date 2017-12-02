@@ -54,14 +54,6 @@ GNU General Public License for more details.
 	{\
 		((className *)pSelf)->method();\
 	}
-#define DECLARE_NAMED_EVENT_TO_MENU_METHOD( className, method, eventName ) \
-	static void eventName##Cb( CMenuBaseItem *pSelf, void * ) \
-	{\
-		((className *)pSelf->Parent())->method();\
-	}
-
-#define DECLARE_EVENT_TO_MENU_METHOD( className, method ) \
-	DECLARE_NAMED_EVENT_TO_MENU_METHOD( className, method, method )
 
 #define DECLARE_EVENT_TO_ITEM_METHOD( className, method ) \
 	DECLARE_NAMED_EVENT_TO_ITEM_METHOD( className, method, method )
@@ -79,32 +71,37 @@ enum menuEvent_e
 	QM_IMRESIZED
 };
 
-typedef void (*EventCallback)(CMenuBaseItem *, void *);
-typedef void (*VoidCallback)(void);
-typedef void (CMenuItemsHolder::*ItemsHolderCallback)( void * );
-typedef void (CMenuBaseItem::*ItemCallback)( void * );
+typedef void (*EventCallback)( CMenuBaseItem *, void * ); // extradata
+typedef void (*VoidCallback)( void ); // no extradata
+typedef void (CMenuItemsHolder::*IHCallback)( void * ); // extradata
+typedef void (CMenuItemsHolder::*VoidIHCallback)(); // no extradata
 
-#define MenuCb( a ) static_cast<ItemsHolderCallback>((a))
+// typedef void (CMenuBaseItem::*ItemCallback)( void * );
+
+#define MenuCb( a ) static_cast<IHCallback>((a))
+#define VoidCb( a ) static_cast<VoidIHCallback>((a))
 
 class CEventCallback
 {
 public:
 	CEventCallback();
 	CEventCallback( EventCallback cb, void *ex = 0 );
-	CEventCallback( int execute_now, const char *sz );
+	CEventCallback( IHCallback cb, void *ex = 0 );
 	CEventCallback( VoidCallback cb );
-	CEventCallback( ItemsHolderCallback cb );
+	CEventCallback( VoidIHCallback cb );
+	CEventCallback( int execute_now, const char *sz );
 
 	void *pExtra;
 
 	// convert to boolean for easy check in conditionals
 	operator bool()
 	{
-		switch(	type )
+		switch( type )
 		{
-		case OLD_STYLE_CALLBACK: return callback != 0;
-		case ITEMS_HOLDER_CALLBACK: return itemsHolderCallback != 0;
-		// case ITEM_CALLBACK: return itemCallback != 0;
+		case CB_OLD_EXTRA: return u.cb != 0;
+		case CB_OLD_VOID:  return u.voidCb != 0;
+		case CB_IH_EXTRA:  return u.itemsHolderCb != 0;
+		case CB_IH_VOID:   return u.voidItemsHolderCb != 0;
 		}
 		return false;
 	}
@@ -112,33 +109,45 @@ public:
 	void operator() ( CMenuBaseItem *pSelf );
 
 	// ItemCallback operator =( ItemCallback cb );
-	ItemsHolderCallback operator =( ItemsHolderCallback cb );
-	EventCallback operator =( EventCallback cb );
-	size_t        operator =( size_t null );
-	void*         operator =( void *null );
-	VoidCallback  operator =( VoidCallback cb );
+	IHCallback    operator=( IHCallback cb );
+	VoidIHCallback operator=( VoidIHCallback cb );
+	VoidCallback  operator=( VoidCallback cb );
+	EventCallback operator=( EventCallback cb );
+
+	// NULL assignment
+	size_t        operator=( size_t null );
+	void*         operator=( void *null );
+#ifndef MY_COMPILER_SUCKS
+	std::nullptr_t operator =( std::nullptr_t null );
+#endif
+
+	void Reset();
+
 	void SetCommand( int execute_now, const char *sz );
 
 	static void NoopCb( CMenuBaseItem *, void * ) {}
 private:
+	// matches type in union
 	enum
 	{
-		OLD_STYLE_CALLBACK = 0,
-		ITEMS_HOLDER_CALLBACK
-		// ITEM_CALLBACK
+		CB_OLD_EXTRA = 0,
+		CB_OLD_VOID,
+		CB_IH_EXTRA,
+		CB_IH_VOID
 	} type;
 
-	EventCallback callback;
-	ItemsHolderCallback itemsHolderCallback;
-	// ItemCallback itemCallback;
+	// event can be only one type at once,
+	// so place in union for memory
+	union
+	{
+		EventCallback cb;
+		VoidCallback voidCb;
+		IHCallback   itemsHolderCb;
+		VoidIHCallback voidItemsHolderCb;
+	} u;
 
 	// to find event command by name(for items holder)
 	const char *szName;
-
-	static void VoidCallbackWrapperCb( CMenuBaseItem *pSelf, void *pExtra )
-	{
-		((VoidCallback)pExtra)();
-	}
 
 	static void CmdExecuteNextFrameCb( CMenuBaseItem *pSelf, void *pExtra )
 	{

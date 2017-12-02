@@ -16,17 +16,15 @@ GNU General Public License for more details.
 #include "BaseItem.h"
 
 CEventCallback::CEventCallback() :
-	pExtra(), type( OLD_STYLE_CALLBACK ),
-	callback(), itemsHolderCallback(), szName( 0 )
+	pExtra( 0 ), type( CB_OLD_EXTRA ), szName( 0 )
 {
-
+	u.cb = 0;
 }
 
 CEventCallback::CEventCallback( EventCallback cb, void *ex ) :
-	pExtra( ex ), type( OLD_STYLE_CALLBACK ),
-	callback( cb ), itemsHolderCallback(), szName( 0 )
+	pExtra( ex ), type( CB_OLD_EXTRA ), szName( 0 )
 {
-
+	u.cb = cb;
 }
 
 CEventCallback::CEventCallback(int execute_now, const char *sz)
@@ -35,69 +33,64 @@ CEventCallback::CEventCallback(int execute_now, const char *sz)
 }
 
 CEventCallback::CEventCallback(VoidCallback cb) :
-	pExtra( (void*)cb ), type( OLD_STYLE_CALLBACK ),
-	callback( VoidCallbackWrapperCb ), itemsHolderCallback(), szName( 0 )
+	pExtra( 0 ), type( CB_OLD_VOID ), szName( 0 )
 {
+	u.voidCb = cb;
 }
 
-CEventCallback::CEventCallback(ItemsHolderCallback cb) :
-	pExtra(), type( ITEMS_HOLDER_CALLBACK ),
-	callback(), itemsHolderCallback( cb ),  szName( 0 )
-
+CEventCallback::CEventCallback( IHCallback cb, void *ex ) :
+	pExtra( ex ), type( CB_IH_EXTRA ), szName( 0 )
 {
-
+	u.itemsHolderCb = cb;
 }
+
+CEventCallback::CEventCallback( VoidIHCallback cb ) :
+	pExtra( 0 ), type( CB_IH_EXTRA ), szName( 0 )
+{
+	u.voidItemsHolderCb = cb;
+}
+
 
 void CEventCallback::operator()(CMenuBaseItem *pSelf)
 {
-	// if( pSelf->Parent() )
 	switch( type )
 	{
-	case OLD_STYLE_CALLBACK:
-		callback( pSelf, pExtra );
-		return;
-	case ITEMS_HOLDER_CALLBACK:
-		((*pSelf->Parent()).*itemsHolderCallback)( pExtra );
-		return;
-	/*case ITEM_CALLBACK:
-		((*pSelf->Parent()).*itemsHolderCallback)( pExtra );
-		return;*/
+	case CB_OLD_EXTRA: u.cb( pSelf, pExtra ); break;
+	case CB_OLD_VOID:  u.voidCb(); break;
+	case CB_IH_EXTRA:  (pSelf->Parent()->*u.itemsHolderCb)( pExtra ); break;
+	case CB_IH_VOID:   (pSelf->Parent()->*u.voidItemsHolderCb)(); break;
 	}
 }
 
 EventCallback CEventCallback::operator =( EventCallback cb )
 {
-	type = OLD_STYLE_CALLBACK;
-	return callback = cb;
+	type = CB_OLD_EXTRA;
+	return u.cb = cb;
 }
-size_t        CEventCallback::operator =( size_t null )
-{
-	type = OLD_STYLE_CALLBACK;
-	return (size_t)(callback = (EventCallback)null);
-}
-void*         CEventCallback::operator =( void *null )
-{
-	type = OLD_STYLE_CALLBACK;
-	return (void*)(callback = (EventCallback)null);
-}
+
 VoidCallback  CEventCallback::operator =( VoidCallback cb )
 {
-	type = OLD_STYLE_CALLBACK;
-	callback = VoidCallbackWrapperCb;
-	return (VoidCallback)(pExtra = (void*)cb); // extradata can't be used anyway;
-}
-/*ItemCallback CEventCallback::operator =( ItemCallback cb )
-{
-	type = ITEM_CALLBACK;
-	return itemCallback = cb;
-}*/
-
-ItemsHolderCallback CEventCallback::operator =( ItemsHolderCallback cb )
-{
-	type = ITEMS_HOLDER_CALLBACK;
-	return itemsHolderCallback = cb;
+	type = CB_OLD_VOID;
+	return u.voidCb = cb;
 }
 
+IHCallback CEventCallback::operator =( IHCallback cb )
+{
+	type = CB_IH_EXTRA;
+	return u.itemsHolderCb = cb;
+}
+
+VoidIHCallback CEventCallback::operator =( VoidIHCallback cb )
+{
+	type = CB_IH_EXTRA;
+	return u.voidItemsHolderCb = cb;
+}
+
+void CEventCallback::Reset()
+{
+	type = CB_OLD_EXTRA;
+	u.cb = 0;
+}
 
 void CEventCallback::SetCommand( int execute_now, const char *sz )
 {
@@ -105,3 +98,21 @@ void CEventCallback::SetCommand( int execute_now, const char *sz )
 	pExtra = (void*)sz;
 }
 
+size_t        CEventCallback::operator =( size_t null )
+{
+	Reset();
+	return 0;
+}
+void*         CEventCallback::operator =( void *null )
+{
+	Reset();
+	return NULL;
+}
+
+#ifndef MY_COMPILER_SUCKS
+std::nullptr_t CEventCallback::operator =( std::nullptr_t null )
+{
+	Reset();
+	return nullptr;
+}
+#endif
