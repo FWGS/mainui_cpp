@@ -38,7 +38,6 @@ public:
 
 	void AddButtonToList( const char *name, const char *texture, const char *command, unsigned char *color, int flags );
 	void GetButtonList();
-	bool gettingList;
 
 private:
 	void _Init();
@@ -47,21 +46,28 @@ public:
 	void DeleteButton();
 	void ResetButtons();
 	void UpdateFields();
+	void OpenFileDialog();
+	void UpdateTexture();
+	void UpdateSP();
+	void UpdateMP();
+	void SaveButton();
+	void RemoveMsgBox();
+	void ResetMsgBox();
 
-	DECLARE_EVENT_TO_MENU_METHOD( CMenuTouchButtons, ResetButtons )
-	DECLARE_EVENT_TO_MENU_METHOD( CMenuTouchButtons, DeleteButton )
-	DECLARE_EVENT_TO_MENU_METHOD( CMenuTouchButtons, UpdateFields )
 	static void ExitMenuCb(CMenuBaseItem *pSelf, void *pExtra);
 	// Use an event system here!
 	// Don't make this static method cry.
 	static void FileDialogCallback( bool success );
 
 
-	char		bNames[UI_MAXGAMES][95];
-	char		bTextures[UI_MAXGAMES][95];
-	char		bCommands[UI_MAXGAMES][95];
-	unsigned char bColors[UI_MAXGAMES][4];
-	int        bFlags[UI_MAXGAMES];
+	struct
+	{
+		char szName[128];
+		char szTexture[128];
+		char szCommand[128];
+		byte bColors[4];
+		int  iFlags;
+	} buttons[UI_MAXGAMES];
 
 	HIMAGE textureid;
 	char selectedName[256];
@@ -90,12 +96,12 @@ public:
 	CMenuField	command;
 	CMenuField	texture;
 	CMenuField	name;
-	class CMenuColor : public CMenuAction
+	class CMenuColor : public CMenuBaseItem
 	{
 	public:
 		virtual void Draw();
 	} color;
-	class CMenuButtonPreview : public CMenuAction
+	class CMenuButtonPreview : public CMenuBaseItem
 	{
 	public:
 		virtual void Draw();
@@ -105,8 +111,9 @@ public:
 
 	// prompt dialog
 	CMenuYesNoMessageBox msgBox;
-	bool initialized;
 
+	bool initialized;
+	bool gettingList;
 };
 
 static CMenuTouchButtons uiTouchButtons;
@@ -119,12 +126,13 @@ void CMenuTouchButtons::AddButtonToList( const char *name, const char *texture, 
 
 	int i = buttonList.iNumItems++;
 
-	strcpy( bNames[i], name );
-	bNamesPtr[i] = uiTouchButtons.bNames[i];
-	strcpy( bTextures[i], texture );
-	strcpy( bCommands[i], command );
-	memcpy( bColors[i], color, 4 );
-	bFlags[i] = flags;
+	Q_strncpy( buttons[i].szName, name, sizeof( buttons[i].szName ) );
+	Q_strncpy( buttons[i].szTexture, texture, sizeof( buttons[i].szTexture ) );
+	Q_strncpy( buttons[i].szCommand, command, sizeof( buttons[i].szCommand ) );
+	memcpy( buttons[i].bColors, color, sizeof( buttons[i].bColors ) );
+	buttons[i].iFlags = flags;
+
+	bNamesPtr[i] = buttons[i].szName;
 }
 
 // Engine callback
@@ -217,13 +225,13 @@ void CMenuTouchButtons::UpdateFields( )
 {
 	int i = buttonList.iCurItem;
 
-	strcpy( selectedName, bNames[i]);
-	red.SetCurrentValue( bColors[i][0] );
-	green.SetCurrentValue( bColors[i][1] );
-	blue.SetCurrentValue( bColors[i][2] );
-	alpha.SetCurrentValue( bColors[i][3] );
+	strcpy( selectedName, buttons[i].szName );
+	red.SetCurrentValue( buttons[i].bColors[0] );
+	green.SetCurrentValue( buttons[i].bColors[1] );
+	blue.SetCurrentValue( buttons[i].bColors[2] );
+	alpha.SetCurrentValue( buttons[i].bColors[3] );
 
-	curflags = bFlags[i];
+	curflags = buttons[i].iFlags;
 	mp.bChecked = !!( curflags & TOUCH_FL_MP );
 	sp.bChecked = !!( curflags & TOUCH_FL_SP );
 	lock.bChecked = !!( curflags & TOUCH_FL_NOEDIT );
@@ -232,15 +240,116 @@ void CMenuTouchButtons::UpdateFields( )
 	precision.bChecked = !!( curflags & TOUCH_FL_PRECISION );
 
 	name.Clear();
-	texture.SetBuffer( bTextures[i] );
+	texture.SetBuffer( buttons[i].szTexture );
+	UpdateTexture();
 
+	command.SetBuffer( buttons[i].szCommand );
+}
+
+void CMenuTouchButtons::OpenFileDialog()
+{
+	// TODO: Remove uiFileDialogGlobal
+	// TODO: Make uiFileDialog menu globally known
+	// TODO: Make FileDialogCallback as event
+	uiFileDialogGlobal.npatterns = 7;
+	strcpy( uiFileDialogGlobal.patterns[0], "touch/*.tga");
+	strcpy( uiFileDialogGlobal.patterns[1], "touch_default/*.tga");
+	strcpy( uiFileDialogGlobal.patterns[2], "gfx/touch/*");
+	strcpy( uiFileDialogGlobal.patterns[3], "gfx/vgui/*");
+	strcpy( uiFileDialogGlobal.patterns[4], "gfx/shell/*");
+	strcpy( uiFileDialogGlobal.patterns[5], "*.tga");
+	uiFileDialogGlobal.preview = true;
+	uiFileDialogGlobal.valid = true;
+	uiFileDialogGlobal.callback = CMenuTouchButtons::FileDialogCallback;
+	UI_FileDialog_Menu();
+}
+
+void CMenuTouchButtons::UpdateTexture()
+{
 	const char *buf = texture.GetBuffer();
 	if( buf[0] && buf[0] != '#' )
-		preview.textureId = EngFuncs::PIC_Load(buf);
+		preview.textureId = EngFuncs::PIC_Load( buf );
 	else
 		preview.textureId = 0;
+}
 
-	command.SetBuffer( bCommands[i] );
+void CMenuTouchButtons::UpdateSP()
+{
+	if( sp.bChecked )
+	{
+		curflags |= TOUCH_FL_SP;
+		curflags &= ~TOUCH_FL_MP;
+		mp.bChecked = false;
+	}
+	else
+	{
+		curflags &= ~TOUCH_FL_SP;
+	}
+}
+
+void CMenuTouchButtons::UpdateMP()
+{
+	if( mp.bChecked )
+	{
+		curflags |= TOUCH_FL_MP;
+		curflags &= ~TOUCH_FL_SP;
+		sp.bChecked = false;
+	}
+	else
+	{
+		curflags &= ~TOUCH_FL_MP;
+	}
+}
+
+void CMenuTouchButtons::SaveButton()
+{
+	char command[512];
+
+	if( name.GetBuffer()[0] )
+	{
+		snprintf( command, 512, "touch_addbutton \"%s\" \"%s\" \"%s\"\n",
+			name.GetBuffer(),
+			texture.GetBuffer(),
+			this->command.GetBuffer() );
+		EngFuncs::ClientCmd(0, command);
+	}
+	else
+	{
+		snprintf( command, 512, "touch_settexture \"%s\" \"%s\"\n", selectedName, texture.GetBuffer() );
+		EngFuncs::ClientCmd(0, command);
+		snprintf( command, 512, "touch_setcommand \"%s\" \"%s\"\n", selectedName, this->command.GetBuffer() );
+		EngFuncs::ClientCmd(0, command);
+	}
+
+	snprintf( command, 512, "touch_setflags \"%s\" %i\n", name.GetBuffer(), curflags );
+	EngFuncs::ClientCmd(0, command);
+
+	snprintf( command, 512, "touch_setcolor \"%s\" %u %u %u %u\n", name.GetBuffer(),
+		(uint)red.GetCurrentValue(),
+		(uint)green.GetCurrentValue(),
+		(uint)blue.GetCurrentValue(),
+		(uint)alpha.GetCurrentValue() );
+	EngFuncs::ClientCmd(1, command);
+
+	if( name.GetBuffer()[0] )
+	{
+		name.Clear();
+	}
+	GetButtonList();
+}
+
+void CMenuTouchButtons::RemoveMsgBox()
+{
+	msgBox.SetMessage( "Delete selected button?" );
+	msgBox.onPositive = VoidCb( &CMenuTouchButtons::DeleteButton );
+	msgBox.Show();
+}
+
+void CMenuTouchButtons::ResetMsgBox()
+{
+	msgBox.SetMessage( "Reset all buttons?" );
+	msgBox.onPositive = VoidCb( &CMenuTouchButtons::ResetButtons );
+	msgBox.Show();
 }
 
 void CMenuTouchButtons::FileDialogCallback( bool success )
@@ -308,38 +417,10 @@ void CMenuTouchButtons::_Init( void )
 	additive.onChanged = CMenuCheckBox::BitMaskCb;
 
 	mp.SetNameAndStatus( "MP", "Show button only in multiplayer" );
-	SET_EVENT_MULTI( mp.onChanged,
-	{
-		CMenuCheckBox *self = (CMenuCheckBox*)pSelf;
-		CMenuTouchButtons *parent = (CMenuTouchButtons*)pSelf->Parent();
-		if( self->bChecked )
-		{
-			parent->curflags |= TOUCH_FL_MP;
-			parent->curflags &= ~TOUCH_FL_SP;
-			parent->sp.bChecked = false;
-		}
-		else
-		{
-			parent->curflags &= ~TOUCH_FL_MP;
-		}
-	});
+	mp.onChanged = VoidCb( &CMenuTouchButtons::UpdateMP );
 
 	sp.SetNameAndStatus( "SP", "Show button only in singleplayer" );
-	SET_EVENT_MULTI( sp.onChanged,
-	{
-		CMenuCheckBox *self = (CMenuCheckBox*)pSelf;
-		CMenuTouchButtons *parent = (CMenuTouchButtons*)pSelf->Parent();
-		if( self->bChecked )
-		{
-			parent->curflags |= TOUCH_FL_SP;
-			parent->curflags &= ~TOUCH_FL_MP;
-			parent->mp.bChecked = false;
-		}
-		else
-		{
-			parent->curflags &= ~TOUCH_FL_SP;
-		}
-	});
+	sp.onChanged = VoidCb( &CMenuTouchButtons::UpdateSP );
 
 	lock.SetNameAndStatus( "Lock", "Lock button editing" );
 	lock.iMask = TOUCH_FL_NOEDIT;
@@ -353,44 +434,7 @@ void CMenuTouchButtons::_Init( void )
 
 	save.SetNameAndStatus( "Save", "Save as new button" );
 	save.SetPicture("gfx/shell/btn_touch_save");
-	SET_EVENT_MULTI( save.onActivated,
-	{
-		char command[512];
-		CMenuTouchButtons *parent = (CMenuTouchButtons*)pSelf->Parent();
-
-		if( parent->name.GetBuffer()[0] )
-		{
-			snprintf( command, 512, "touch_addbutton \"%s\" \"%s\" \"%s\"\n",
-				parent->name.GetBuffer(),
-				parent->texture.GetBuffer(),
-				parent->command.GetBuffer() );
-			EngFuncs::ClientCmd(0, command);
-
-		}
-		else
-		{
-			snprintf( command, 512, "touch_settexture \"%s\" \"%s\"\n", parent->selectedName, parent->texture.GetBuffer() );
-			EngFuncs::ClientCmd(0, command);
-			snprintf( command, 512, "touch_setcommand \"%s\" \"%s\"\n", parent->selectedName, parent->command.GetBuffer() );
-			EngFuncs::ClientCmd(0, command);
-		}
-
-		snprintf( command, 512, "touch_setflags \"%s\" %i\n", parent->name.GetBuffer(), parent->curflags );
-		EngFuncs::ClientCmd(0, command);
-
-		snprintf( command, 512, "touch_setcolor \"%s\" %u %u %u %u\n", parent->name.GetBuffer(),
-			(uint)parent->red.GetCurrentValue(),
-			(uint)parent->green.GetCurrentValue(),
-			(uint)parent->blue.GetCurrentValue(),
-			(uint)parent->alpha.GetCurrentValue() );
-		EngFuncs::ClientCmd(1, command);
-
-		if( parent->name.GetBuffer()[0] )
-		{
-			parent->name.Clear();
-		}
-		parent->GetButtonList();
-	});
+	save.onActivated = VoidCb( &CMenuTouchButtons::SaveButton );
 
 	editor.SetNameAndStatus( "Editor", "Open interactive editor" );
 	editor.SetPicture("gfx/shell/btn_touch_editor");
@@ -398,23 +442,7 @@ void CMenuTouchButtons::_Init( void )
 
 	select.SetNameAndStatus( "Select", "Select texture from list" );
 	select.SetPicture("gfx/shell/btn_touch_select");
-	SET_EVENT_MULTI( select.onActivated,
-	{
-		// TODO: Remove uiFileDialogGlobal
-		// TODO: Make uiFileDialog menu globally known
-		// TODO: Make FileDialogCallback as event
-		uiFileDialogGlobal.npatterns = 7;
-		strcpy( uiFileDialogGlobal.patterns[0], "touch/*.tga");
-		strcpy( uiFileDialogGlobal.patterns[1], "touch_default/*.tga");
-		strcpy( uiFileDialogGlobal.patterns[2], "gfx/touch/*");
-		strcpy( uiFileDialogGlobal.patterns[3], "gfx/vgui/*");
-		strcpy( uiFileDialogGlobal.patterns[4], "gfx/shell/*");
-		strcpy( uiFileDialogGlobal.patterns[5], "*.tga");
-		uiFileDialogGlobal.preview = true;
-		uiFileDialogGlobal.valid = true;
-		uiFileDialogGlobal.callback = CMenuTouchButtons::FileDialogCallback;
-		UI_FileDialog_Menu();
-	});
+	select.onActivated = VoidCb( &CMenuTouchButtons::OpenFileDialog );
 
 	name.szName = "New Button:";
 	name.iMaxLength = 255;
@@ -424,42 +452,18 @@ void CMenuTouchButtons::_Init( void )
 
 	texture.szName = "Texture:";
 	texture.iMaxLength = 255;
-	SET_EVENT_MULTI( texture.onChanged,
-	{
-		CMenuField *self = (CMenuField*)pSelf;
-
-		const char *buf = self->GetBuffer();
-		if( buf[0] && buf[0] != '#' )
-			((CMenuTouchButtons*)self->Parent())->preview.textureId = EngFuncs::PIC_Load( buf );
-		else
-			((CMenuTouchButtons*)self->Parent())->preview.textureId = 0;
-	});
-
-	msgBox.SetPositiveButton( "Ok", PC_OK );
-	msgBox.SetNegativeButton( "Cancel", PC_CANCEL );
+	texture.onChanged = VoidCb( &CMenuTouchButtons::UpdateTexture );
 
 	reset.SetNameAndStatus( "Reset", "Reset touch to default state" );
 	reset.SetPicture( "gfx/shell/btn_touch_reset" );
-	SET_EVENT_MULTI( reset.onActivated,
-	{
-		CMenuTouchButtons *parent = (CMenuTouchButtons*)pSelf->Parent();
-		parent->msgBox.SetMessage( "Reset all buttons?" );
-		parent->msgBox.onPositive = CMenuTouchButtons::ResetButtonsCb;
-		parent->msgBox.Show();
-	});
+	reset.onActivated = VoidCb( &CMenuTouchButtons::ResetMsgBox );
 
 	remove.SetNameAndStatus( "Delete", "Delete selected button" );
 	remove.SetPicture( PC_DELETE );
-	SET_EVENT_MULTI( remove.onActivated,
-	{
-		CMenuTouchButtons *parent = (CMenuTouchButtons*)pSelf->Parent();
-		parent->msgBox.SetMessage( "Delete selected button?" );
-		parent->msgBox.onPositive = CMenuTouchButtons::DeleteButtonCb;
-		parent->msgBox.Show();
-	});
+	remove.onActivated = VoidCb( &CMenuTouchButtons::RemoveMsgBox );
 
 	buttonList.pszItemNames = (const char **)bNamesPtr;
-	buttonList.onChanged = UpdateFieldsCb;
+	buttonList.onChanged = VoidCb( &CMenuTouchButtons::UpdateFields );
 	msgBox.Link( this );
 
 	AddItem( background );

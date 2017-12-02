@@ -393,6 +393,9 @@ void CMenuPicButton::SetTitleAnim( int anim_state )
 	if(	!button )
 		return;
 
+	if( !button->hPic )
+		return;
+
 	if( !button->bEnableTransitions )
 		return;
 
@@ -412,7 +415,7 @@ void CMenuPicButton::SetTitleAnim( int anim_state )
 void CMenuPicButton::RootChanged( bool isForward )
 {
 	// A guarantee, that we have changed root active menu
-	if( isForward > 0 )
+	if( isForward )
 	{
 		SetTitleAnim( AS_TO_TITLE );
 	}

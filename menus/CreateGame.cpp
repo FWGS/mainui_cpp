@@ -113,7 +113,7 @@ void CMenuCreateGame::Begin( CMenuBaseItem *pSelf, void *pExtra )
 
 	if( EngFuncs::GetCvarFloat( "host_serverstate" ) )
 	{
-		if(	EngFuncs::GetCvarFloat( "maxplayers" ) == 1 )
+		if(	EngFuncs::GetCvarFloat( "maxplayers" ) == 1.0f )
 			EngFuncs::HostEndGame( "end of the game" );
 		else
 			EngFuncs::HostEndGame( "starting new server" );
@@ -259,7 +259,7 @@ void CMenuCreateGame::_Init( void )
 	msgBox.SetMessage( "Starting a new game will exit\nany current game, OK to exit?" );
 	msgBox.Link( this );
 
-	AddButton( "Cancel", "Return to the previous menu", PC_CANCEL, HideCb );
+	AddButton( "Cancel", "Return to the previous menu", PC_CANCEL, VoidCb( &CMenuCreateGame::Hide ) );
 	AddItem( maxClients );
 	AddItem( hostName );
 	AddItem( password );

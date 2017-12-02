@@ -43,7 +43,6 @@ public:
 	virtual void _VidInit();
 	virtual const char *Key( int key, int down );
 
-	DECLARE_EVENT_TO_MENU_METHOD( CMenuPlayerIntroduceDialog, WriteOrDiscard )
 private:
 	CMenuAction dlgMessage;
 	CMenuField name;
@@ -98,7 +97,7 @@ void CMenuPlayerIntroduceDialog::_Init()
 
 	ok.SetRect( 298, 204, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
 	ok.SetPicture( PC_OK );
-	ok.onActivated = WriteOrDiscardCb;
+	ok.onActivated = VoidCb( &CMenuPlayerIntroduceDialog::WriteOrDiscard );
 
 	AddItem( background );
 	AddItem( dlgMessage );

@@ -28,11 +28,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 class CMenuMultiplayer : public CMenuFramework
 {
-private:
-	virtual void _Init();
-	virtual void _VidInit();
 public:
 	CMenuMultiplayer() : CMenuFramework( "CMenuMultiplayer" ) { }
+
+	void AskPredictEnable() { msgBox.Show(); }
+
+private:
+	virtual void _Init();
 
 	// prompt dialog
 	CMenuYesNoMessageBox msgBox;
@@ -59,7 +61,7 @@ void CMenuMultiplayer::_Init( void )
 	AddButton( "LAN game", "Set up the game on the local area network", PC_LAN_GAME, UI_LanGame_Menu, QMF_NOTIFY );
 	AddButton( "Customize", "Choose your player name, and select visual options for your character", PC_CUSTOMIZE, UI_PlayerSetup_Menu, QMF_NOTIFY );
 	AddButton( "Controls", "Change keyboard and mouse settings", PC_CONTROLS, UI_Controls_Menu, QMF_NOTIFY );
-	AddButton( "Done", "Go back to the Main menu", PC_DONE, HideCb, QMF_NOTIFY );
+	AddButton( "Done", "Go back to the Main menu", PC_DONE, VoidCb( &CMenuMultiplayer::Hide ), QMF_NOTIFY );
 
 	msgBox.SetMessage( "It is recomended to enable\nclient movement prediction\nPress OK to enable it now\nOr enable it later in\n^5(Multiplayer/Customize)");
 	msgBox.SetPositiveButton( "Ok", PC_OK );
@@ -80,10 +82,6 @@ void CMenuMultiplayer::_Init( void )
 	});
 	msgBox.Link( this );
 
-}
-
-void CMenuMultiplayer::_VidInit()
-{
 }
 
 /*
@@ -111,7 +109,7 @@ void UI_MultiPlayer_Menu( void )
 
 	if( EngFuncs::GetCvarFloat( "menu_mp_firsttime" ) && !EngFuncs::GetCvarFloat( "cl_predict" ) )
 	{
-		uiMultiPlayer.msgBox.Show();
+		uiMultiPlayer.AskPredictEnable();
 	}
 	else if( !UI::Names::CheckIsNameValid( EngFuncs::GetCvarString( "name" ) ) )
 	{

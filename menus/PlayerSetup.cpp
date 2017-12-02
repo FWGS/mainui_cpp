@@ -282,7 +282,6 @@ class CMenuPlayerSetup : public CMenuFramework
 {
 private:
 	void _Init();
-	void _VidInit();
 public:
 	CMenuPlayerSetup() : CMenuFramework( "CMenuPlayerSetup" ) { }
 
@@ -291,9 +290,6 @@ public:
 	void UpdateModel();
 	void ApplyColorToImagePreview();
 	void SaveAndPopMenu();
-
-	DECLARE_EVENT_TO_MENU_METHOD( CMenuPlayerSetup, UpdateModel );
-	DECLARE_EVENT_TO_MENU_METHOD( CMenuPlayerSetup, ApplyColorToImagePreview );
 
 	char	models[MAX_PLAYERMODELS][CS_SIZE];
 	char	*modelsPtr[MAX_PLAYERMODELS];
@@ -373,7 +369,7 @@ void CMenuPlayerSetup::SetConfig( void )
 	clLW.WriteCvar();
 }
 
-void CMenuPlayerSetup::SaveAndPopMenu( void )
+void CMenuPlayerSetup::SaveAndPopMenu()
 {
 	SetConfig();
 	CMenuFramework::SaveAndPopMenu();
@@ -432,50 +428,60 @@ void CMenuPlayerSetup::_Init( void )
 	name.szStatusText = "Enter your multiplayer display name";
 	name.iMaxLength = 32;
 	name.LinkCvar( "name" );
+	name.SetRect( 320, 260, 256, 36 );
 
 	FindModels();
 	model.Setup( (const char **)modelsPtr, (size_t)num_models );
 	model.LinkCvar( "model", CMenuEditable::CVAR_STRING );
-	model.onChanged = UpdateModelCb;
+	model.onChanged = VoidCb( &CMenuPlayerSetup::UpdateModel );
+	model.SetRect( 660, 580 + UI_OUTLINE_WIDTH, 260, 32 );
 
 	topColor.iFlags |= addFlags;
 	topColor.SetNameAndStatus( "Top color", "Set a player model top color" );
 	topColor.Setup( 0.0, 255, 1 );
 	topColor.LinkCvar( "topcolor" );
 	topColor.onCvarChange = CMenuEditable::WriteCvarCb;
-	topColor.onChanged = ApplyColorToImagePreviewCb;
+	topColor.onChanged = VoidCb( &CMenuPlayerSetup::ApplyColorToImagePreview );
+	topColor.SetCoord( 250, 550 );
+	topColor.size.w = 300;
 
 	bottomColor.iFlags |= addFlags;
 	bottomColor.SetNameAndStatus( "Bottom color", "Set a player model bottom color" );
 	bottomColor.Setup( 0.0, 255.0, 1 );
 	bottomColor.LinkCvar( "bottomcolor" );
 	bottomColor.onCvarChange = CMenuEditable::WriteCvarCb;
-	bottomColor.onChanged = ApplyColorToImagePreviewCb;
+	bottomColor.onChanged = VoidCb( &CMenuPlayerSetup::ApplyColorToImagePreview );;
+	bottomColor.SetCoord( 250, 620 );
+	bottomColor.size.w = 300;
 
 	clPredict.SetNameAndStatus( "Predict movement", "Enable player movement prediction" );
 	clPredict.LinkCvar( "cl_predict" );
+	clPredict.SetCoord( 72, 380 );
 
 	clLW.SetNameAndStatus( "Local weapons", "Enable local weapons" );
 	clLW.LinkCvar( "cl_lw" );
+	clLW.SetCoord( 72, 430 );
 
 	showModels.iFlags |= addFlags;
 	showModels.SetNameAndStatus( "Show 3D preview", "Show 3D player models instead of preview thumbnails" );
 	showModels.LinkCvar( "ui_showmodels" );
 	showModels.onCvarChange = CMenuEditable::WriteCvarCb;
+	showModels.SetCoord( 340, 380 );
 
 	hiModels.iFlags |= addFlags;
 	hiModels.SetNameAndStatus( "High quality models", "Show HD models in multiplayer" );
 	hiModels.LinkCvar( "cl_himodels" );
 	hiModels.onCvarChange = CMenuEditable::WriteCvarCb;
+	hiModels.SetCoord( 340, 430 );
 
 	view.iFlags |= addFlags;
+	view.SetRect( 660, 260, 260, 320 );
 	UpdateModel();
-	//view.
 
 	AddItem( background );
 	AddItem( banner );
 
-	AddButton( "Done", "Go back to the Multiplayer Menu", PC_DONE, SaveAndPopMenuCb );
+	AddButton( "Done", "Go back to the Multiplayer Menu", PC_DONE, VoidCb( &CMenuPlayerSetup::SaveAndPopMenu ) );
 	CMenuPicButton *gameOpt = AddButton( "Game options", "Configure handness, fov and other advanced options", PC_GAME_OPTIONS );
 	SET_EVENT_MULTI( gameOpt->onActivated,
 	{
@@ -501,23 +507,6 @@ void CMenuPlayerSetup::_Init( void )
 		if( game_hlRally == FALSE )
 			AddItem( view );
 	}
-}
-
-void CMenuPlayerSetup::_VidInit()
-{
-	view.SetRect( 660, 260, 260, 320 );
-	name.SetRect( 320, 260, 256, 36 );
-	model.SetRect( 660, 580 + UI_OUTLINE_WIDTH, 260, 32 );
-	topColor.SetCoord( 250, 550 );
-	topColor.size.w = 300;
-
-	bottomColor.SetCoord( 250, 620 );
-	bottomColor.size.w = 300;
-
-	clPredict.SetCoord( 72, 380 );
-	clLW.SetCoord( 72, 430 );
-	showModels.SetCoord( 340, 380 );
-	hiModels.SetCoord( 340, 430 );
 }
 
 /*

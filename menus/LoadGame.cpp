@@ -48,28 +48,7 @@ public:
 		iFlags = QMF_INACTIVE;
 	}
 
-	virtual void Draw()
-	{
-		const char *fallback = "{GRAF001";
-
-		if( szName && *szName )
-		{
-			char saveshot[128];
-
-			snprintf( saveshot, sizeof( saveshot ),
-				"save/%s.bmp", szName );
-
-			if( EngFuncs::FileExists( saveshot ))
-				UI_DrawPic( m_scPos, m_scSize, uiColorWhite, saveshot );
-			else
-				UI_DrawPicAdditive( m_scPos, m_scSize, uiColorWhite, fallback );
-		}
-		else
-			UI_DrawPicAdditive( m_scPos, m_scSize, uiColorWhite, fallback );
-
-		// draw the rectangle
-		UI_DrawRectangle( m_scPos, m_scSize, uiInputFgColor );
-	}
+	virtual void Draw();
 };
 
 class CMenuSavesListModel : public CMenuBaseModel
@@ -105,12 +84,23 @@ private:
 	int			m_iNumItems;
 };
 
-class CMenuLoadGame : public CMenuFramework
+static class CMenuLoadGame : public CMenuFramework
 {
 public:
+	CMenuLoadGame() : CMenuFramework( "CMenuLoadGame" ) { }
+
 	// true to turn this menu into save mode, false to turn into load mode
 	void SetSaveMode( bool saveMode );
 	bool IsSaveMode() { return m_fSaveMode; }
+	void UpdateList() { savesListModel.Update(); }
+
+private:
+	virtual void _Init( void );
+
+	void LoadGame();
+	void SaveGame();
+	void UpdateGame();
+	void DeleteGame();
 
 	CMenuPicButton	load;
 	CMenuPicButton  save;
@@ -120,19 +110,38 @@ public:
 	CMenuTable	savesList;
 
 	CMenuSavePreview	levelShot;
+	bool m_fSaveMode;
 	char		hintText[MAX_HINT_TEXT];
 
 	// prompt dialog
 	CMenuYesNoMessageBox msgBox;
 	CMenuSavesListModel savesListModel;
-private:
-	virtual void _Init( void );
-	virtual void _VidInit( void );
 
-	bool m_fSaveMode;
-};
+	friend class CMenuSavesListModel;
+} uiLoadGame;
 
-static CMenuLoadGame		uiLoadGame;
+void CMenuSavePreview::Draw()
+{
+	const char *fallback = "{GRAF001";
+
+	if( szName && *szName )
+	{
+		char saveshot[128];
+
+		snprintf( saveshot, sizeof( saveshot ),
+				  "save/%s.bmp", szName );
+
+		if( EngFuncs::FileExists( saveshot ))
+			UI_DrawPic( m_scPos, m_scSize, uiColorWhite, saveshot );
+		else
+			UI_DrawPicAdditive( m_scPos, m_scSize, uiColorWhite, fallback );
+	}
+	else
+		UI_DrawPicAdditive( m_scPos, m_scSize, uiColorWhite, fallback );
+
+	// draw the rectangle
+	UI_DrawRectangle( m_scPos, m_scSize, uiInputFgColor );
+}
 
 /*
 =================
@@ -194,21 +203,21 @@ void CMenuSavesListModel::Update( void )
 
 	if ( saveName[0][0] == 0 )
 	{
-		uiLoadGame.load.iFlags |= QMF_GRAYED;
+		uiLoadGame.load.SetGrayed( true );
 	}
 	else
 	{
 		uiLoadGame.levelShot.szName = saveName[0];
-		uiLoadGame.load.iFlags &= ~QMF_GRAYED;
+		uiLoadGame.load.SetGrayed( false );
 	}
 
 	if ( saveName[0][0] == 0 || !CL_IsActive() )
-		uiLoadGame.save.iFlags |= QMF_GRAYED;
-	else uiLoadGame.save.iFlags &= ~QMF_GRAYED;
+		uiLoadGame.save.SetGrayed( true );
+	else uiLoadGame.save.SetGrayed( false );
 
 	if ( delName[0][0] == 0 )
-		uiLoadGame.remove.iFlags |= QMF_GRAYED;
-	else uiLoadGame.remove.iFlags &= ~QMF_GRAYED;
+		uiLoadGame.remove.SetGrayed( true );
+	else uiLoadGame.remove.SetGrayed( false );
 }
 
 void CMenuSavesListModel::OnDeleteEntry(int line)
@@ -225,70 +234,26 @@ void CMenuLoadGame::_Init( void )
 {
 	save.SetNameAndStatus( "Save", "Save curret game" );
 	save.SetPicture( PC_SAVE_GAME );
-	SET_EVENT_MULTI( save.onActivated,
-	{
-		CMenuLoadGame *parent = (CMenuLoadGame*)pSelf->Parent();
-		const char *saveName = parent->savesListModel.saveName[parent->savesList.GetCurrentIndex()];
-		if( saveName[0] )
-		{
-			char	cmd[128];
-
-			sprintf( cmd, "save/%s.bmp", saveName );
-			EngFuncs::PIC_Free( cmd );
-
-			sprintf( cmd, "save \"%s\"\n", saveName );
-
-			EngFuncs::ClientCmd( FALSE, cmd );
-
-			UI_CloseMenu();
-		}
-	});
+	save.onActivated = VoidCb( &CMenuLoadGame::SaveGame );
+	save.SetCoord( 72, 230 );
 
 	load.SetNameAndStatus( "Load", "Load saved game" );
 	load.SetPicture( PC_LOAD_GAME );
-	SET_EVENT_MULTI( load.onActivated,
-	{
-		CMenuLoadGame *parent = (CMenuLoadGame*)pSelf->Parent();
-		const char *saveName = parent->savesListModel.saveName[parent->savesList.GetCurrentIndex()];
-		if( saveName[0] )
-		{
-			char	cmd[128];
-			sprintf( cmd, "load \"%s\"\n", saveName );
-
-			EngFuncs::StopBackgroundTrack( );
-
-			EngFuncs::ClientCmd( FALSE, cmd );
-
-			UI_CloseMenu();
-		}
-	});
+	load.onActivated = VoidCb( &CMenuLoadGame::LoadGame );
+	load.SetCoord( 72, 230 );
 
 	remove.SetNameAndStatus( "Delete", "Delete saved game" );
 	remove.SetPicture( PC_DELETE );
 	remove.onActivated = msgBox.MakeOpenEvent();
+	remove.SetCoord( 72, 280 );
 
 	cancel.SetNameAndStatus( "Cancel", "Return back to main menu" );
 	cancel.SetPicture( PC_CANCEL );
-	cancel.onActivated = HideCb;
+	cancel.onActivated = VoidCb( &CMenuLoadGame::Hide );
+	cancel.SetCoord( 72, 330 );
 
 	savesList.szName = hintText;
-	SET_EVENT_MULTI( savesList.onChanged,
-	{
-		CMenuTable *self = (CMenuTable*)pSelf;
-		CMenuLoadGame *parent = (CMenuLoadGame*)self->Parent();
-
-		// first item is for creating new saves
-		if( parent->IsSaveMode() && self->GetCurrentIndex() == 0 )
-		{
-			parent->remove.SetGrayed( true );
-			parent->levelShot.szName = NULL;
-		}
-		else
-		{
-			parent->remove.SetGrayed( false );
-			parent->levelShot.szName = parent->savesListModel.saveName[self->GetCurrentIndex()];
-		}
-	});
+	savesList.onChanged = VoidCb( &CMenuLoadGame::UpdateGame );
 	// savesList.onDeleteEntry = msgBox.MakeOpenEvent();
 	savesList.SetupColumn( 0, "Time", 0.30f );
 	savesList.SetupColumn( 1, "Game", 0.55f );
@@ -296,27 +261,13 @@ void CMenuLoadGame::_Init( void )
 
 	savesList.SetModel( &savesListModel );
 	savesList.SetCharSize( QM_SMALLFONT );
+	savesList.SetRect( 360, 255, -20, 440 );
 
 	msgBox.SetMessage( "Delete this save?" );
-	SET_EVENT_MULTI( msgBox.onPositive,
-	{
-		CMenuLoadGame *parent = (CMenuLoadGame*)pSelf->Parent();
-		const char *delName = parent->savesListModel.delName[parent->savesList.GetCurrentIndex()];
-
-		if( delName[0] )
-		{
-			char	cmd[128];
-			sprintf( cmd, "killsave \"%s\"\n", delName );
-
-			EngFuncs::ClientCmd( TRUE, cmd );
-
-			sprintf( cmd, "save/%s.bmp", delName );
-			EngFuncs::PIC_Free( cmd );
-
-			parent->savesListModel.Update();
-		}
-	});
+	msgBox.onPositive = VoidCb( &CMenuLoadGame::DeleteGame );
 	msgBox.Link( this );
+
+	levelShot.SetRect( LEVELSHOT_X, LEVELSHOT_Y, LEVELSHOT_W, LEVELSHOT_H );
 
 	AddItem( background );
 	AddItem( banner );
@@ -328,14 +279,70 @@ void CMenuLoadGame::_Init( void )
 	AddItem( savesList );
 }
 
-void CMenuLoadGame::_VidInit()
+void CMenuLoadGame::LoadGame()
 {
-	save.SetCoord( 72, 230 );
-	load.SetCoord( 72, 230 );
-	remove.SetCoord( 72, 280 );
-	cancel.SetCoord( 72, 330 );
-	levelShot.SetRect( LEVELSHOT_X, LEVELSHOT_Y, LEVELSHOT_W, LEVELSHOT_H );
-	savesList.SetRect( 360, 255, -20, 440 );
+	const char *saveName = savesListModel.saveName[savesList.GetCurrentIndex()];
+	if( saveName[0] )
+	{
+		char	cmd[128];
+		sprintf( cmd, "load \"%s\"\n", saveName );
+
+		EngFuncs::StopBackgroundTrack( );
+
+		EngFuncs::ClientCmd( FALSE, cmd );
+
+		UI_CloseMenu();
+	}
+}
+
+void CMenuLoadGame::SaveGame()
+{
+	const char *saveName = savesListModel.saveName[savesList.GetCurrentIndex()];
+	if( saveName[0] )
+	{
+		char	cmd[128];
+
+		sprintf( cmd, "save/%s.bmp", saveName );
+		EngFuncs::PIC_Free( cmd );
+
+		sprintf( cmd, "save \"%s\"\n", saveName );
+		EngFuncs::ClientCmd( FALSE, cmd );
+
+		UI_CloseMenu();
+	}
+}
+
+void CMenuLoadGame::UpdateGame()
+{
+	// first item is for creating new saves
+	if( IsSaveMode() && savesList.GetCurrentIndex() == 0 )
+	{
+		remove.SetGrayed( true );
+		levelShot.szName = NULL;
+	}
+	else
+	{
+		remove.SetGrayed( false );
+		levelShot.szName = savesListModel.saveName[savesList.GetCurrentIndex()];
+	}
+}
+
+void CMenuLoadGame::DeleteGame()
+{
+	const char *delName = savesListModel.delName[savesList.GetCurrentIndex()];
+
+	if( delName[0] )
+	{
+		char	cmd[128];
+		sprintf( cmd, "killsave \"%s\"\n", delName );
+
+		EngFuncs::ClientCmd( TRUE, cmd );
+
+		sprintf( cmd, "save/%s.bmp", delName );
+		EngFuncs::PIC_Free( cmd );
+
+		savesListModel.Update();
+	}
 }
 
 void CMenuLoadGame::SetSaveMode(bool saveMode)
@@ -368,6 +375,22 @@ void UI_LoadGame_Precache( void )
 	EngFuncs::PIC_Load( ART_BANNER_LOAD );
 }
 
+void UI_LoadSaveGame_Menu( bool saveMode )
+{
+	if( gMenu.m_gameinfo.gamemode == GAME_MULTIPLAYER_ONLY )
+	{
+		// completely ignore save\load menus for multiplayer_only
+		return;
+	}
+
+	if( !EngFuncs::CheckGameDll( )) return;
+
+	UI_LoadGame_Precache();
+	uiLoadGame.Show();
+	uiLoadGame.SetSaveMode( saveMode );
+	uiLoadGame.UpdateList();
+}
+
 /*
 =================
 UI_LoadGame_Menu
@@ -375,32 +398,10 @@ UI_LoadGame_Menu
 */
 void UI_LoadGame_Menu( void )
 {
-	if( gMenu.m_gameinfo.gamemode == GAME_MULTIPLAYER_ONLY )
-	{
-		// completely ignore save\load menus for multiplayer_only
-		return;
-	}
-
-	if( !EngFuncs::CheckGameDll( )) return;
-
-	UI_LoadGame_Precache();
-	uiLoadGame.Show();
-	uiLoadGame.SetSaveMode(false);
-	uiLoadGame.savesListModel.Update();
+	UI_LoadSaveGame_Menu( false );
 }
 
 void UI_SaveGame_Menu( void )
 {
-	if( gMenu.m_gameinfo.gamemode == GAME_MULTIPLAYER_ONLY )
-	{
-		// completely ignore save\load menus for multiplayer_only
-		return;
-	}
-
-	if( !EngFuncs::CheckGameDll( )) return;
-
-	UI_LoadGame_Precache();
-	uiLoadGame.Show();
-	uiLoadGame.SetSaveMode(true);
-	uiLoadGame.savesListModel.Update();
+	UI_LoadSaveGame_Menu( true );
 }

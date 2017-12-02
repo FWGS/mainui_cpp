@@ -34,6 +34,7 @@ CMenuCheckBox::CMenuCheckBox() : BaseClass()
 	iColor = uiColorWhite;
 	iFocusColor = uiColorWhite;
 	iMask = 0;
+	bInvertMask = false;
 }
 
 /*

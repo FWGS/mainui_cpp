@@ -103,7 +103,7 @@ void CMenuNewGame::_Init( void )
 	norm->onActivatedClActive.pExtra = &normCallback;
 	hard->onActivatedClActive.pExtra = &hardCallback;
 
-	AddButton( "Cancel", "Go back to the main menu", PC_CANCEL, HideCb, QMF_NOTIFY );
+	AddButton( "Cancel", "Go back to the main menu", PC_CANCEL, VoidCb( &CMenuNewGame::Hide ), QMF_NOTIFY );
 
 	msgBox.SetMessage( MenuStrings[IDS_NEWGAME_NEWPROMPT] );
 	msgBox.HighlightChoice( CMenuYesNoMessageBox::HIGHLIGHT_NO );

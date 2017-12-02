@@ -162,7 +162,7 @@ void CMenuBaseWindow::PopMenu()
 	}
 }
 
-void CMenuBaseWindow::SaveAndPopMenu( )
+void CMenuBaseWindow::SaveAndPopMenu()
 {
 	EngFuncs::ClientCmd( FALSE, "trysaveconfig\n" );
 	Hide();

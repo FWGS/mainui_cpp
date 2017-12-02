@@ -77,9 +77,6 @@ public:
 	void RegisterNamedEvent( CEventCallback ev, const char *name );
 	CEventCallback FindEventByName( const char *name );
 
-	DECLARE_EVENT_TO_MENU_METHOD( CMenuItemsHolder, Show );
-	DECLARE_EVENT_TO_MENU_METHOD( CMenuItemsHolder, Hide );
-
 protected:
 	virtual void _Init() {}
 	virtual void _VidInit() {}

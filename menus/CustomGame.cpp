@@ -61,11 +61,10 @@ public:
 	CMenuCustomGame() : CMenuFramework("CMenuCustomGame") { }
 
 private:
-	static void ChangeGame( CMenuBaseItem *pSelf, void *pExtra );
-	static void Go2Site( CMenuBaseItem *pSelf, void *pExtra );
-	static void UpdateExtras(CMenuBaseItem *pSelf, void *pExtra);
+	void ChangeGame( void *pExtra );
+	void Go2Site( void *pExtra );
+	void UpdateExtras( );
 	virtual void _Init( );
-	virtual void _VidInit( );
 
 	CMenuPicButton	*load;
 	CMenuPicButton	*go2url;
@@ -79,34 +78,31 @@ private:
 
 static CMenuCustomGame	uiCustomGame;
 
-void CMenuCustomGame::ChangeGame(CMenuBaseItem *pSelf, void *pExtra)
+void CMenuCustomGame::ChangeGame( void *pExtra )
 {
 	char cmd[128];
 	sprintf( cmd, "game %s\n", (const char*)pExtra );
 	EngFuncs::ClientCmd( FALSE, cmd );
 }
 
-void CMenuCustomGame::Go2Site(CMenuBaseItem *pSelf, void *pExtra)
+void CMenuCustomGame::Go2Site( void *pExtra )
 {
 	const char *url = (const char *)pExtra;
 	if( url[0] )
 		EngFuncs::ShellExecute( url, NULL, false );
 }
 
-void CMenuCustomGame::UpdateExtras( CMenuBaseItem *pSelf, void *pExtra )
+void CMenuCustomGame::UpdateExtras( )
 {
-	CMenuCustomGame *parent = (CMenuCustomGame*)pSelf->Parent();
-	CMenuTable *self = (CMenuTable*)pSelf;
+	int i = modList.GetCurrentIndex();
 
-	int i = self->GetCurrentIndex();
+	load->onActivated.pExtra = modListModel.modsDir[i];
+	load->SetGrayed( !stricmp( modListModel.modsDir[i], gMenu.m_gameinfo.gamefolder ) );
 
-	parent->load->onActivated.pExtra = parent->modListModel.modsDir[i];
-	parent->load->SetGrayed( !stricmp( parent->modListModel.modsDir[i], gMenu.m_gameinfo.gamefolder ) );
+	go2url->onActivated.pExtra = modListModel.modsWebSites[i];
+	go2url->SetGrayed( modListModel.modsWebSites[i][0] == 0 );
 
-	parent->go2url->onActivated.pExtra = parent->modListModel.modsWebSites[i];
-	parent->go2url->SetGrayed( parent->modListModel.modsWebSites[i][0] == 0 );
-
-	parent->msgBox.onPositive.pExtra = parent->modListModel.modsDir[i];
+	msgBox.onPositive.pExtra = modListModel.modsDir[i];
 }
 
 /*
@@ -158,21 +154,25 @@ void CMenuCustomGame::_Init( void )
 
 	AddItem( background );
 	AddItem( banner );
-	load = AddButton( "Activate", "Activate selected custom game", PC_ACTIVATE, ChangeGame );
+	load = AddButton( "Activate", "Activate selected custom game", PC_ACTIVATE,
+		MenuCb( &CMenuCustomGame::ChangeGame ) );
 	load->onActivatedClActive = msgBox.MakeOpenEvent();
 
-	go2url = AddButton( "Visit web site", "Visit the web site of game developers", PC_VISIT_WEB_SITE, Go2Site );
-	AddButton( "Done", "Return to main menu", PC_DONE, HideCb );
+	go2url = AddButton( "Visit web site", "Visit the web site of game developers", PC_VISIT_WEB_SITE,
+		MenuCb( &CMenuCustomGame::Go2Site ) );
+	AddButton( "Done", "Return to main menu", PC_DONE,
+		VoidCb( &CMenuCustomGame::Hide ) );
 
-	modList.onChanged = UpdateExtras;
+	modList.onChanged = VoidCb( &CMenuCustomGame::UpdateExtras );
 	modList.SetupColumn( 0, "Type", 0.20f );
 	modList.SetupColumn( 1, "Name", 0.50f );
 	modList.SetupColumn( 2, "Ver",  0.15f );
 	modList.SetupColumn( 3, "Size", 0.15f );
 	modList.SetModel( &modListModel );
+	modList.SetRect( 360, 255, -20, 440 );
 
 	msgBox.SetMessage( "Leave current game?" );
-	msgBox.onPositive = ChangeGame;
+	msgBox.onPositive = MenuCb( &CMenuCustomGame::ChangeGame );
 	msgBox.Link( this );
 
 	AddItem( modList );
@@ -186,11 +186,6 @@ void CMenuCustomGame::_Init( void )
 			break;
 		}
 	}
-}
-
-void CMenuCustomGame::_VidInit()
-{
-	modList.SetRect( 360, 255, -20, 440 );
 }
 
 /*

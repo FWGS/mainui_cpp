@@ -119,7 +119,7 @@ void CMenuBackgroundBitmap::Draw()
 	// HACKHACK: Don't draw background for root windows, which goes out and in transition
 	// for window which is goes in and in transition, alpha factor should be ignored
 	OverrideAlphaFactor alphaFactor;
-	if( m_pParent->IsWindow() )
+	if( m_pParent && m_pParent->IsWindow() )
 	{
 		CMenuBaseWindow *window = (CMenuBaseWindow*)m_pParent;
 		if( window->IsRoot() && window->bInTransition )

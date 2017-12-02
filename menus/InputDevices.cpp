@@ -81,7 +81,8 @@ void CMenuInputDevices::_Init( void )
 
 	done.SetNameAndStatus( "Done", "save changed and go back to the Customize Menu" );
 	done.SetPicture( PC_DONE );
-	done.onActivated = SaveAndPopMenuCb;
+	done.onActivated = VoidCb( &CMenuInputDevices::SaveAndPopMenu );
+	done.SetCoord( 72, 680 );
 
 	mouse.szName = "Ignore mouse";
 	mouse.szStatusText = "Need for some servers. Will disable mouse in menu too";
@@ -102,19 +103,21 @@ void CMenuInputDevices::_Init( void )
 		}
 	});
 #endif
+	mouse.SetCoord( 72, 230 );
+
 	touch.szName = "Enable touch";
 	touch.szStatusText = "On-screen controls for touchscreen";
 	touch.iFlags |= QMF_NOTIFY;
+	touch.SetCoord( 72, 280 );
+
 	joystick.szName = "Enable joystick";
+	joystick.SetCoord( 72, 330 );
 
 	evdev.szName = "Evdev input (root)";
 	evdev.szStatusText = "Press this to enable full mouse and keyboard control on Android";
 	evdev.iFlags |= QMF_NOTIFY;
-
-	SET_EVENT_MULTI( evdev.onActivated,
-	{
-		EngFuncs::ClientCmd( FALSE, "evdev_autodetect\n");
-	});
+	evdev.SetCoord( 72, 380 );
+	evdev.onActivated.SetCommand( FALSE, "evdev_autodetect\n" );
 
 	AddItem( background );
 	//AddItem( banner );
@@ -130,11 +133,6 @@ void CMenuInputDevices::_Init( void )
 
 void CMenuInputDevices::_VidInit()
 {
-	done.SetCoord( 72, 680 );
-	mouse.SetCoord( 72, 230 );
-	touch.SetCoord( 72, 280 );
-	joystick.SetCoord( 72, 330 );
-	evdev.SetCoord( 72, 380 );
 	GetConfig();
 }
 

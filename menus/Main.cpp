@@ -48,11 +48,9 @@ private:
 	virtual void _VidInit( );
 
 	void QuitDialog( void *pExtra = NULL );
-	static void DisconnectDialogCb( CMenuBaseItem *pSelf, void *pExtra );
-	static void HazardCourseDialogCb( CMenuBaseItem *pSelf, void *pExtra );
-	static void HazardCourseCb( CMenuBaseItem *pSelf, void *pExtra );
-	static void DisconnectCb( CMenuBaseItem *pSelf, void *pExtra );
-	static void QuitCb( CMenuBaseItem *, void * );
+	void DisconnectDialogCb();
+	void HazardCourseDialogCb();
+	void HazardCourseCb();
 
 	CMenuPicButton	console;
 	class CMenuMainBanner : public CMenuBannerBitmap
@@ -107,11 +105,6 @@ void CMenuMain::CMenuMainBanner::Draw()
 	EngFuncs::DrawLogo( "logo.avi", 0, logoPosY, logoWidth, logoHeight );
 }
 
-void CMenuMain::QuitCb(CMenuBaseItem *, void *)
-{
-	EngFuncs::ClientCmd( FALSE, "quit\n" );
-}
-
 void CMenuMain::QuitDialog(void *pExtra)
 {
 	if( CL_IsActive() )
@@ -119,27 +112,22 @@ void CMenuMain::QuitDialog(void *pExtra)
 	else
 		dialog.SetMessage( MenuStrings[IDS_MAIN_QUITPROMPT] );
 
-	dialog.onPositive = QuitCb;
+	dialog.onPositive.SetCommand( FALSE, "quit\n" );
 	dialog.Show();
 }
 
-void CMenuMain::DisconnectDialogCb( CMenuBaseItem *pSelf , void *pExtra)
+void CMenuMain::DisconnectDialogCb()
 {
-	CMenuMain *parent = (CMenuMain*)pSelf->Parent();
-
-	parent->dialog.onPositive = DisconnectCb;
-	parent->dialog.SetMessage( "Really disconnect?" );
-	parent->dialog.Show();
+	dialog.onPositive.SetCommand( FALSE, "cmd disconnect;endgame disconnect;wait;wait;wait;menu_options;menu_main\n" );
+	dialog.SetMessage( "Really disconnect?" );
+	dialog.Show();
 }
 
-void CMenuMain::HazardCourseDialogCb(CMenuBaseItem *pSelf, void *pExtra)
+void CMenuMain::HazardCourseDialogCb()
 {
-	CMenuMain *parent = (CMenuMain*)pSelf->Parent();
-
-	parent->dialog.onPositive = HazardCourseCb;
-	parent->dialog.SetMessage( MenuStrings[IDS_TRAINING_EXITCURRENT] );
-	parent->dialog.Show();
-
+	dialog.onPositive = VoidCb( &CMenuMain::HazardCourseCb );;
+	dialog.SetMessage( MenuStrings[IDS_TRAINING_EXITCURRENT] );
+	dialog.Show();
 }
 
 /*
@@ -198,7 +186,7 @@ const char *CMenuMain::Activate( void )
 UI_Main_HazardCourse
 =================
 */
-void CMenuMain::HazardCourseCb( CMenuBaseItem *pSelf, void* )
+void CMenuMain::HazardCourseCb()
 {
 	if( EngFuncs::GetCvarFloat( "host_serverstate" ) && EngFuncs::GetCvarFloat( "maxplayers" ) > 1 )
 		EngFuncs::HostEndGame( "end of the game" );
@@ -212,13 +200,6 @@ void CMenuMain::HazardCourseCb( CMenuBaseItem *pSelf, void* )
 	EngFuncs::PlayBackgroundTrack( NULL, NULL );
 
 	EngFuncs::ClientCmd( FALSE, "hazardcourse\n" );
-	uiMain.dialog.Hide( );
-}
-
-void CMenuMain::DisconnectCb( CMenuBaseItem *pSelf, void* )
-{
-	EngFuncs::ClientCmd( FALSE, "cmd disconnect;endgame disconnect;wait;wait;wait;menu_options;menu_main\n");
-	uiMain.dialog.Hide( );
 }
 
 void CMenuMain::_Init( void )
@@ -249,7 +230,7 @@ void CMenuMain::_Init( void )
 	disconnect.SetNameAndStatus( "Disconnect", "Disconnect from server" );
 	disconnect.SetPicture( PC_DISCONNECT );
 	disconnect.iFlags |= QMF_NOTIFY;
-	disconnect.onActivated = DisconnectDialogCb;
+	disconnect.onActivated = VoidCb( &CMenuMain::DisconnectDialogCb );
 
 	newGame.SetNameAndStatus( "New Game", MenuStrings[IDS_MAIN_NEWGAMEHELP] );
 	newGame.SetPicture( PC_NEW_GAME );
@@ -259,8 +240,8 @@ void CMenuMain::_Init( void )
 	hazardCourse.SetNameAndStatus( "Hazard Course", MenuStrings[IDS_MAIN_TRAININGHELP] );
 	hazardCourse.SetPicture( PC_HAZARD_COURSE );
 	hazardCourse.iFlags |= QMF_NOTIFY;
-	hazardCourse.onActivatedClActive = HazardCourseDialogCb;
-	hazardCourse.onActivated = HazardCourseCb;
+	hazardCourse.onActivatedClActive = VoidCb( &CMenuMain::HazardCourseDialogCb );
+	hazardCourse.onActivated = VoidCb( &CMenuMain::HazardCourseCb );
 
 	multiPlayer.SetNameAndStatus( "Multiplayer", MenuStrings[IDS_MAIN_MULTIPLAYERHELP] );
 	multiPlayer.SetPicture( PC_MULTIPLAYER );
@@ -284,10 +265,7 @@ void CMenuMain::_Init( void )
 	previews.SetNameAndStatus( "Previews", MenuStrings[ IDS_MAIN_PREVIEWSHELP ] );
 	previews.SetPicture( PC_PREVIEWS );
 	previews.iFlags |= QMF_NOTIFY;
-	SET_EVENT_MULTI( previews.onActivated,
-	{
-		EngFuncs::ShellExecute( MenuStrings[IDS_MEDIA_PREVIEWURL], NULL, false );
-	});
+	SET_EVENT( previews.onActivated, EngFuncs::ShellExecute( MenuStrings[IDS_MEDIA_PREVIEWURL], NULL, false ) );
 
 	quit.SetNameAndStatus( "Quit", MenuStrings[IDS_MAIN_QUITPROMPT] );
 	quit.SetPicture( PC_QUIT );

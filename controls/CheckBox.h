@@ -57,14 +57,20 @@ public:
 	const char	*szCheckPic;
 	const char	*szGrayedPic;	// when QMF_GRAYED is set
 
-	int iMask; // used only for BitMaskCb
+	unsigned int iMask; // used only for BitMaskCb
+	bool bInvertMask;
 	static void BitMaskCb( CMenuBaseItem *pSelf, void *pExtra )
 	{
 		CMenuCheckBox *self = (CMenuCheckBox*)pSelf;
 
-		if( self->bChecked )
-			*(int*)pExtra |= self->iMask;
-		else *(int*)pExtra &= ~self->iMask;
+		if( !self->bInvertMask == self->bChecked )
+		{
+			*(unsigned int*)pExtra |= self->iMask;
+		}
+		else
+		{
+			*(unsigned int*)pExtra &= ~self->iMask;
+		}
 	}
 
 private:

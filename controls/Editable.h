@@ -70,6 +70,7 @@ public:
 	CEventCallback onCvarChange; // called on internal values changes
 	CEventCallback onCvarGet;    // called on any cvar update
 
+	// events library
 	DECLARE_EVENT_TO_ITEM_METHOD( CMenuEditable, WriteCvar )
 	DECLARE_EVENT_TO_ITEM_METHOD( CMenuEditable, DiscardChanges )
 	DECLARE_EVENT_TO_ITEM_METHOD( CMenuEditable, ResetCvar )

@@ -32,7 +32,7 @@ static const char *uiCreditsDefault[] =
 	0
 };
 
-class CMenuCredits : public CMenuBaseWindow
+static class CMenuCredits : public CMenuBaseWindow
 {
 public:
 	CMenuCredits() : CMenuBaseWindow( "Credits" ) { }
@@ -58,9 +58,7 @@ private:
 	int		finalCredits;
 	char		*index[UI_CREDITS_MAXLINES];
 	char		*buffer;
-};
-
-CMenuCredits		uiCredits;
+} uiCredits;
 
 
 void CMenuCredits::Show()
@@ -83,7 +81,7 @@ void CMenuCredits::Draw( void )
 	int	color = 0;
 
 	// draw the background first
-	if( !uiCredits.finalCredits && !EngFuncs::GetCvarFloat( "cl_background" ) )
+	if( CL_IsActive() && !finalCredits )
 	{
 		background.Draw();
 	}

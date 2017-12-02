@@ -63,9 +63,6 @@ public:
 
 	virtual bool IsWindow() { return true; }
 
-	// Events library
-	DECLARE_EVENT_TO_MENU_METHOD( CMenuBaseWindow, SaveAndPopMenu );
-
 	void EnableTransition();
 
 	bool bAllowDrag;

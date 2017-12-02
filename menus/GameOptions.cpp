@@ -37,9 +37,8 @@ public:
 	void SetNetworkMode( int maxpacket, int maxpayload, int cmdrate, int updaterate, int rate );
 private:
 	virtual void _Init();
-	virtual void _VidInit();
-	static void SaveCb( CMenuBaseItem *pSelf, void *pExtra );
-	static void RestoreCb( CMenuBaseItem *pSelf, void *pExtra );
+	void SaveCb( );
+	void RestoreCb( );
 	void Restore();
 	void GetConfig();
 
@@ -82,24 +81,22 @@ void CMenuGameOptions::SetNetworkMode( int maxpacket1, int maxpayload1, int cmdr
 	rate.SetCurrentValue( rate1 );
 }
 
-void CMenuGameOptions::SaveCb(CMenuBaseItem *pSelf, void *pExtra)
+void CMenuGameOptions::SaveCb()
 {
-	CMenuGameOptions *parent = (CMenuGameOptions*)pSelf->Parent();
-
-	parent->maxFPS.WriteCvar();
-	//parent->hand.WriteCvar();
-	parent->allowDownload.WriteCvar();
-	parent->alwaysRun.WriteCvar();
-	parent->maxpacket.WriteCvar();
-	parent->maxpayload.WriteCvar();
-	parent->cmdrate.WriteCvar();
-	parent->updaterate.WriteCvar();
-	parent->rate.WriteCvar();
-	parent->split.WriteCvar();
-	parent->compress.WriteCvar();
+	maxFPS.WriteCvar();
+	//hand.WriteCvar();
+	allowDownload.WriteCvar();
+	alwaysRun.WriteCvar();
+	maxpacket.WriteCvar();
+	maxpayload.WriteCvar();
+	cmdrate.WriteCvar();
+	updaterate.WriteCvar();
+	rate.WriteCvar();
+	split.WriteCvar();
+	compress.WriteCvar();
 
 	EngFuncs::ClientCmd( FALSE, "trysaveconfig\n" );
-	parent->Hide();
+	Hide();
 }
 
 void CMenuGameOptions::Restore()
@@ -117,12 +114,10 @@ void CMenuGameOptions::Restore()
 	compress.DiscardChanges();
 }
 
-void CMenuGameOptions::RestoreCb(CMenuBaseItem *pSelf, void *pExtra)
+void CMenuGameOptions::RestoreCb()
 {
-	CMenuGameOptions *parent = (CMenuGameOptions*)pSelf->Parent();
-
-	parent->Restore();
-	parent->Hide();
+	Restore();
+	Hide();
 }
 
 /*
@@ -138,16 +133,21 @@ void CMenuGameOptions::_Init( void )
 	maxFPS.szStatusText = "Cap your game frame rate";
 	maxFPS.Setup( 20, 500, 20 );
 	maxFPS.LinkCvar( "fps_max", CMenuEditable::CVAR_VALUE );
+	maxFPS.SetRect( 240, 270, 220, 32 );
 
 	//hand.SetNameAndStatus( "Use left hand", "Draw gun at left side" );
-	//hand.LinkCvar( "hand" );
+	//hand.LinkCvar( "cl_righthand" );
+	// hand.SetCoord( 240, 330 );
 
 	allowDownload.SetNameAndStatus( "Allow download", "Allow download of files from servers" );
 	allowDownload.LinkCvar( "sv_allow_download" );
+	allowDownload.SetCoord( 240, 330 );
 
 	alwaysRun.SetNameAndStatus( "Always run", "Switch between run/step models when pressed 'run' button" );
 	alwaysRun.LinkCvar( "cl_run" );
+	alwaysRun.SetCoord( 240, 390 );
 
+	maxpacket.SetRect( 650, 270, 200, 32 );
 	maxpacket.Setup( 150, 1550, 50 );
 	maxpacket.LinkCvar( "cl_maxpacket", CMenuEditable::CVAR_VALUE );
 	maxpacket.SetNameAndStatus( "Network packet size limit (cl_maxpacket)", "Split packet size and minimum size to compress");
@@ -167,6 +167,7 @@ void CMenuGameOptions::_Init( void )
 	if( maxpacket.GetCurrentValue() == 40000 )
 		maxpacket.ForceDisplayString( "auto" );
 
+	maxpayload.SetRect( 650, 370, 200, 32 );
 	maxpayload.Setup( 150, 1550, 50 );
 	maxpayload.LinkCvar( "cl_maxpayload", CMenuEditable::CVAR_VALUE );
 	maxpayload.SetNameAndStatus( "Singon size (cl_maxpayload)", "Singon cnain split decrease if cl_maxpacket does not help");
@@ -186,12 +187,17 @@ void CMenuGameOptions::_Init( void )
 	if( maxpayload.GetCurrentValue() == 0 )
 		maxpayload.ForceDisplayString( "auto" );
 
+	cmdrate.SetRect( 650, 470, 200, 32 );
 	cmdrate.Setup( 20, 60, 5 );
 	cmdrate.LinkCvar( "cl_cmdrate", CMenuEditable::CVAR_VALUE );
 	cmdrate.SetNameAndStatus( "Command rate (cl_cmdrate)", "How many commands sent to server in second");
+
+	updaterate.SetRect( 650, 570, 200, 32 );
 	updaterate.Setup( 20, 100, 5 );
 	updaterate.LinkCvar( "cl_updaterate", CMenuEditable::CVAR_VALUE );
 	updaterate.SetNameAndStatus( "Update rate (cl_updaterate)", "How many uodates sent from server per second");
+
+	rate.SetRect( 650, 670, 200, 32 );
 	rate.Setup( 2500, 90000, 500 );
 	rate.LinkCvar( "rate", CMenuEditable::CVAR_VALUE );
 	rate.SetNameAndStatus( "Network speed (rate)", "Limit traffic (bytes per second)");
@@ -200,8 +206,9 @@ void CMenuGameOptions::_Init( void )
 	networkMode.szName = "Select network mode:";
 	networkMode.iColor = uiColorHelp;
 	networkMode.SetCharSize( QM_BIGFONT );
-	
+	networkMode.SetRect( 240, 450, 400, 32 );
 
+	normal.SetRect( 240, 510, 24, 24 );
 	normal.szName = "Normal internet connection";
 	SET_EVENT_MULTI( normal.onChanged,
 	{
@@ -209,12 +216,16 @@ void CMenuGameOptions::_Init( void )
 		((CMenuCheckBox*)pSelf)->bChecked = true;
 	});
 
+	dsl.SetRect( 240, 560, 24, 24 );
 	dsl.szName = "DSL or PPTP with limited packet size";
 	SET_EVENT_MULTI( dsl.onChanged,
 	{
 		uiGameOptions.SetNetworkMode( 1200, 1000, 30, 60, 25000 );
 		((CMenuCheckBox*)pSelf)->bChecked = true;
 	});
+
+
+	slowest.SetRect( 240, 610, 24, 24 );
 	slowest.szName = "Slow connection mode (64kbps)";
 	SET_EVENT_MULTI( slowest.onChanged,
 	{
@@ -223,13 +234,16 @@ void CMenuGameOptions::_Init( void )
 	});
 	compress.SetNameAndStatus( "Compress", "Compress splitted packets (need split to work)" );
 	compress.LinkCvar("cl_enable_splitcompress" );
+	compress.SetCoord( 390, 680 );
+
+	split.SetCoord( 240, 680 );
 	split.SetNameAndStatus( "Split", "Split network packets" );
 	split.LinkCvar("cl_enable_split" );
 
 	AddItem( background );
 	AddItem( banner );
-	AddButton( "Done", "Save changes and go back to the Customize Menu", PC_DONE, SaveCb );
-	AddButton( "Cancel", "Go back to the Customize Menu", PC_CANCEL, RestoreCb );
+	AddButton( "Done", "Save changes and go back to the Customize Menu", PC_DONE, VoidCb( &CMenuGameOptions::SaveCb ) );
+	AddButton( "Cancel", "Go back to the Customize Menu", PC_CANCEL, VoidCb( &CMenuGameOptions::RestoreCb ) );
 
 	AddItem( maxFPS );
 	//AddItem( hand );
@@ -247,28 +261,16 @@ void CMenuGameOptions::_Init( void )
 	AddItem( slowest );
 	AddItem( split );
 	AddItem( compress );
-}
 
-void CMenuGameOptions::_VidInit()
-{
-	maxFPS.SetRect( 240, 270, 220, 32 );
-	//maxFPSmessage.SetCoord( 240, 230 );
-	// hand.SetCoord( 240, 330 );
-	allowDownload.SetCoord( 240, 330 );
-	alwaysRun.SetCoord( 240, 390 );
-	maxpacket.SetRect( 650, 270, 200, 32 );
-	maxpayload.SetRect( 650, 370, 200, 32 );
-	cmdrate.SetRect( 650, 470, 200, 32 );
-	updaterate.SetRect( 650, 570, 200, 32 );
-	rate.SetRect( 650, 670, 200, 32 );
-	
-	//maxPacketmessage1.SetCoord( 240, 520 );
-	networkMode.SetRect( 240, 450, 400, 32 );
-	normal.SetRect( 240, 510, 24, 24 );
-	dsl.SetRect( 240, 560, 24, 24 );
-	slowest.SetRect( 240, 610, 24, 24 );
-	split.SetCoord( 240, 680 );
-	compress.SetCoord( 390, 680 );
+	// only for game/engine developers
+	if( EngFuncs::GetCvarFloat( "developer" ) < 4 )
+	{
+		maxpacket.Hide();
+		maxpayload.Hide();
+		cmdrate.Hide();
+		updaterate.Hide();
+		rate.Hide();
+	}
 }
 
 /*

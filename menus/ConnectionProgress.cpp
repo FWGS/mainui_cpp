@@ -94,8 +94,6 @@ public:
 		commonProgress.SetValue( 0 );
 	}
 
-	DECLARE_EVENT_TO_MENU_METHOD( CMenuConnectionProgress, Disconnect )
-
 	EState m_iState;
 	ESource m_iSource;
 private:
@@ -137,8 +135,8 @@ const char *CMenuConnectionProgress::Key( int key, int down )
 			return uiSoundLaunch;
 		case 'A':
 			HandleDisconnect();
-		default:
 			break;
+		default: break;
 		}
 	}
 
@@ -213,14 +211,16 @@ void CMenuConnectionProgress::_Init( void )
 		UI_CloseMenu();
 		UI_SetActiveMenu( false );
 	});
+	consoleButton.bEnableTransitions = false;
 
 	disconnectButton.SetPicture( PC_DISCONNECT );
 	disconnectButton.szName = "Disconnect";
-	disconnectButton.onActivated = DisconnectCb;
+	disconnectButton.onActivated = VoidCb( &CMenuConnectionProgress::Disconnect );
+	disconnectButton.bEnableTransitions = false;
 
 	dialog.SetMessage( "Really disconnect?" );
 	dialog.Link( this );
-	dialog.onPositive = DisconnectCb;
+	dialog.onPositive = VoidCb( &CMenuConnectionProgress::Disconnect );
 
 	title.iFlags = QMF_INACTIVE|QMF_DROPSHADOW;
 	title.eTextAlignment = QM_CENTER;
@@ -228,7 +228,8 @@ void CMenuConnectionProgress::_Init( void )
 
 	skipButton.szName = "Skip";
 	skipButton.onActivated.SetCommand( TRUE, "http_skip\n" );
-	
+	skipButton.bEnableTransitions = false;
+
 	downloadText.iFlags = commonText.iFlags = QMF_INACTIVE;
 	downloadText.szName = sDownloadString;
 	commonText.szName = sCommonString;

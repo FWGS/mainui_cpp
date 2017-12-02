@@ -50,7 +50,7 @@ static const char *axisNames[7] =
 	"NOT BOUND"
 };
 
-class CMenuGamePad : public CMenuFramework
+static class CMenuGamePad : public CMenuFramework
 {
 public:
 	CMenuGamePad() : CMenuFramework("CMenuGamePad") { }
@@ -80,7 +80,6 @@ void CMenuGamePad::GetConfig( void )
 {
 	float _side, _forward, _pitch, _yaw;
 	char binding[7] = { 0 };
-	static char lt_threshold_text[8], rt_threshold_text[8];
 
 	strncpy( binding, EngFuncs::GetCvarString( "joy_axis_binding"), sizeof( binding ));
 
@@ -140,7 +139,7 @@ void CMenuGamePad::GetConfig( void )
 CMenuGamePad::SetConfig
 =================
 */
-void CMenuGamePad::SaveAndPopMenu( void )
+void CMenuGamePad::SaveAndPopMenu()
 {
 	float _side, _forward, _pitch, _yaw;
 	char binding[7] = { 0 };
@@ -225,7 +224,7 @@ void CMenuGamePad::_Init( void )
 	AddItem( background );
 	AddItem( banner );
 	AddButton( "Controls", "Change keyboard and mouse settings", PC_CONTROLS, UI_Controls_Menu );
-	AddButton( "Done", "Go back to the Configuration Menu", PC_DONE, SaveAndPopMenuCb );
+	AddButton( "Done", "Go back to the Configuration Menu", PC_DONE, VoidCb( &CMenuGamePad::SaveAndPopMenu ) );
 	for( i = 0; i < 6; i++ )
 	{
 		AddItem( axisBind[i] );

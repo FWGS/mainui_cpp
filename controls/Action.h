@@ -34,9 +34,9 @@ public:
 	void SetBackground( unsigned int color );
 
 private:
-	bool m_bfillBackground;
 	CColor m_iBackcolor;
 	const char *m_szBackground;
+	bool m_bfillBackground;
 	bool m_bLimitBySize;
 };
 

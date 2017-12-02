@@ -30,15 +30,19 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 class CAdvancedControls : public CMenuFramework
 {
+public:
+	typedef CMenuFramework BaseClass;
+	CAdvancedControls() : CMenuFramework("CAdvancedControls") { }
+
+	void ToggleLookCheckboxes( bool write );
+
 private:
 	virtual void _Init( void );
 	virtual void _VidInit( void );
 
 	void GetConfig( void );
-	void SaveAndPopMenu( void );
-
-public:
-	CAdvancedControls() : CMenuFramework("CAdvancedControls") { }
+	void PitchInvert( void );
+	void SaveAndPopMenu();
 
 	CMenuPicButton done, inputDev;
 
@@ -59,7 +63,7 @@ static CAdvancedControls	uiAdvControls;
 UI_AdvControls_GetConfig
 =================
 */
-void CAdvancedControls::GetConfig( void )
+void CAdvancedControls::GetConfig( )
 {
 	kbutton_t	*mlook;
 
@@ -88,15 +92,31 @@ void CAdvancedControls::GetConfig( void )
 	autoaim.LinkCvar( "sv_aim" );
 	sensitivity.LinkCvar( "sensitivity" );
 
-	if( mouseLook.bChecked )
+	ToggleLookCheckboxes( false );
+}
+
+void CAdvancedControls::PitchInvert()
+{
+	bool invert = invertMouse.bChecked;
+	float m_pitch = EngFuncs::GetCvarFloat( "m_pitch" );
+	if( ( invert && (m_pitch > 0) ) ||
+		( !invert && (m_pitch < 0) ) )
 	{
-		lookSpring.iFlags |= QMF_GRAYED;
-		lookStrafe.iFlags |= QMF_GRAYED;
+		EngFuncs::CvarSetValue( "m_pitch", -m_pitch );
 	}
-	else
+}
+
+void CAdvancedControls::ToggleLookCheckboxes( bool write )
+{
+	lookSpring.SetGrayed( mouseLook.bChecked );
+	lookStrafe.SetGrayed( mouseLook.bChecked );
+
+	if( write )
 	{
-		lookSpring.iFlags &= ~QMF_GRAYED;
-		lookStrafe.iFlags &= ~QMF_GRAYED;
+		if( mouseLook.bChecked )
+			EngFuncs::ClientCmd( FALSE, "+mlook\nbind _force_write\n" );
+		else
+			EngFuncs::ClientCmd( FALSE, "-mlook\nbind _force_write\n" );
 	}
 }
 
@@ -111,10 +131,7 @@ void CAdvancedControls::SaveAndPopMenu()
 	autoaim.WriteCvar();
 	sensitivity.WriteCvar();
 
-	if( mouseLook.bChecked )
-		EngFuncs::ClientCmd( FALSE, "+mlook\nbind _force_write\n" );
-	else
-		EngFuncs::ClientCmd( FALSE, "-mlook\nbind _force_write\n" );
+	ToggleLookCheckboxes( true );
 
 	CMenuFramework::SaveAndPopMenu();
 }
@@ -130,62 +147,51 @@ void CAdvancedControls::_Init( void )
 
 	done.SetNameAndStatus( "Done", "save changed and go back to the Customize Menu" );
 	done.SetPicture( PC_DONE );
-	done.onActivated = SaveAndPopMenuCb;
+	done.onActivated = VoidCb( &CAdvancedControls::SaveAndPopMenu );
+	done.SetCoord( 72, 680 );
 
 	crosshair.SetNameAndStatus( "Crosshair", "Enable the weapon aiming crosshair" );
 	crosshair.iFlags |= QMF_NOTIFY;
+	crosshair.SetCoord( 72, 280 );
 
 	invertMouse.SetNameAndStatus( "Invert mouse", "Reverse mouse up/down axis" );
 	invertMouse.iFlags |= QMF_NOTIFY;
-	SET_EVENT_MULTI( invertMouse.onChanged,
-	{
-		CMenuCheckBox *self = (CMenuCheckBox*)pSelf;
-		float m_pitch = EngFuncs::GetCvarFloat( "m_pitch" );
-		if( (self->bChecked  && m_pitch > 0) ||
-			(!self->bChecked && m_pitch < 0) )
-			EngFuncs::CvarSetValue( "m_pitch", -m_pitch );
-	});
+	invertMouse.onChanged = VoidCb( &CAdvancedControls::PitchInvert );
+	invertMouse.SetCoord( 72, 330 );
 
 	mouseLook.SetNameAndStatus( "Mouse look", "Use the mouse to look around instead of using the mouse to move" );
 	mouseLook.iFlags |= QMF_NOTIFY;
-	SET_EVENT_MULTI( mouseLook.onChanged,
-	{
-		CMenuCheckBox *self = (CMenuCheckBox*)pSelf;
-		CAdvancedControls *parent = (CAdvancedControls*)self->Parent();
-		if( self->bChecked )
-		{
-			parent->lookSpring.iFlags |= QMF_GRAYED;
-			parent->lookStrafe.iFlags |= QMF_GRAYED;
-			EngFuncs::ClientCmd( FALSE, "+mlook\nbind _force_write\n" );
-		}
-		else
-		{
-			parent->lookSpring.iFlags &= ~QMF_GRAYED;
-			parent->lookStrafe.iFlags &= ~QMF_GRAYED;
-			EngFuncs::ClientCmd( FALSE, "-mlook\nbind _force_write\n" );
-		}
-	});
+	SET_EVENT( mouseLook.onChanged,
+		((CAdvancedControls*)pSelf->Parent())->ToggleLookCheckboxes( true ) );
+	mouseLook.SetCoord( 72, 380 );
 
 	lookSpring.SetNameAndStatus("Look spring", "Causes the screen to 'spring' back to looking straight ahead when you\nmove forward" );
 	lookSpring.iFlags |= QMF_NOTIFY;
+	lookSpring.SetCoord( 72, 430 );
 
 	lookStrafe.SetNameAndStatus( "Look strafe", "In combination with your mouse look modifier, causes left-right movements\nto strafe instead of turn");
 	lookStrafe.iFlags |= QMF_NOTIFY;
+	lookStrafe.SetCoord( 72, 480 );
 
 	lookFilter.SetNameAndStatus( "Look filter", "Average look inputs over the last two frames to smooth out movements(generic)" );
 	lookFilter.iFlags |= QMF_NOTIFY;
+	lookFilter.SetCoord( 72, 530 );
 
 	autoaim.SetNameAndStatus( "Autoaim", "Let game to help you aim at enemies" );
 	autoaim.iFlags |= QMF_NOTIFY;
+	autoaim.SetCoord( 72, 580 );
 
 	sensitivity.SetNameAndStatus( "Senitivity", "Set in-game mouse sensitivity" );
 	sensitivity.Setup( 0.0, 20.0f, 0.1 );
+	sensitivity.SetCoord( 72, 660 );
 
 	inputDev.SetNameAndStatus( "Input devices", "Toggle mouse, touch controls" );
 	inputDev.onActivated = UI_InputDevices_Menu;
 	inputDev.iFlags |= QMF_NOTIFY;
 	if( CL_IsActive() && !EngFuncs::GetCvarFloat( "host_serverstate" ))
 		inputDev.iFlags |= QMF_GRAYED;
+	//inputDev.SetRect( 72, 230, UI_BUTTONS_WIDTH, UI_BUTTONS_HEIGHT );
+	inputDev.SetCoord( 72, 230 );
 
 	AddItem( background );
 	AddItem( banner );
@@ -204,18 +210,6 @@ void CAdvancedControls::_Init( void )
 
 void CAdvancedControls::_VidInit()
 {
-	done.SetCoord( 72, 680 );
-	//inputDev.SetRect( 72, 230, UI_BUTTONS_WIDTH, UI_BUTTONS_HEIGHT );
-	inputDev.SetCoord( 72, 230 );
-	crosshair.SetCoord( 72, 280 );
-	invertMouse.SetCoord( 72, 330 );
-	mouseLook.SetCoord( 72, 380 );
-	lookSpring.SetCoord( 72, 430 );
-	lookStrafe.SetCoord( 72, 480 );
-	lookFilter.SetCoord( 72, 530 );
-	autoaim.SetCoord( 72, 580 );
-	sensitivity.SetCoord( 72, 660 );
-
 	GetConfig();
 }
 

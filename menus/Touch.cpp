@@ -24,39 +24,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define ART_BANNER		"gfx/shell/head_touch"
 
-class CMenuTouch : public CMenuFramework
-{
-public:
-	CMenuTouch() : CMenuFramework( "CMenuTouch" ) { }
-
-private:
-	void _Init();
-};
-
-static CMenuTouch	uiTouch;
-
-/*
-=================
-UI_Touch_Init
-=================
-*/
-void CMenuTouch::_Init( void )
-{
-	banner.SetPicture(ART_BANNER );
-	AddItem( background );
-	AddItem( banner );
-
-	AddButton( "Touch options", "Touch sensitivity and profile options", "gfx/shell/btn_touch_options",
-		UI_TouchOptions_Menu, QMF_NOTIFY );
-
-	AddButton( "Touch buttons", "Add, remove, edit touch buttons", "gfx/shell/btn_touch_buttons",
-		UI_TouchButtons_Menu, QMF_NOTIFY );
-
-	AddButton( "Done",  "Go back to the previous menu", PC_DONE, HideCb, QMF_NOTIFY );
-
-}
-
-
 /*
 =================
 UI_Touch_Precache
@@ -74,7 +41,25 @@ UI_Touch_Menu
 */
 void UI_Touch_Menu( void )
 {
+	static CMenuFramework touch("CMenuTouch");
+
 	UI_Touch_Precache();
-	uiTouch.Show();
+
+	if( !touch.WasInit() )
+	{
+		touch.banner.SetPicture( ART_BANNER );
+		touch.AddItem( touch.background );
+		touch.AddItem( touch.banner );
+
+		touch.AddButton( "Touch options", "Touch sensitivity and profile options", "gfx/shell/btn_touch_options",
+			UI_TouchOptions_Menu, QMF_NOTIFY );
+
+		touch.AddButton( "Touch buttons", "Add, remove, edit touch buttons", "gfx/shell/btn_touch_buttons",
+			UI_TouchButtons_Menu, QMF_NOTIFY );
+
+		touch.AddButton( "Done",  "Go back to the previous menu", PC_DONE, VoidCb( &CMenuFramework::Hide ), QMF_NOTIFY );
+	}
+
+	touch.Show();
 }
 

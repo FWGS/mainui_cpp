@@ -103,10 +103,8 @@ public:
 	void GetGamesList( void );
 	void ClearList( void );
 	void RefreshList( void );
+	void JoinGame( void );
 
-	DECLARE_EVENT_TO_MENU_METHOD( CMenuServerBrowser, RefreshList )
-
-	static void JoinGame( CMenuBaseItem *pSelf, void *pExtra );
 	static void Connect( netadr_t server, bool havePassword );
 	static void Connect( serverSelect_t server );
 
@@ -229,12 +227,11 @@ void CMenuServerBrowser::Connect( serverSelect_t server )
 CMenuServerBrowser::JoinGame
 =================
 */
-void CMenuServerBrowser::JoinGame( CMenuBaseItem *pSelf, void *pExtra )
+void CMenuServerBrowser::JoinGame()
 {
-	CMenuServerBrowser *parent = (CMenuServerBrowser *)pSelf->Parent();
-	int select = parent->gameList.GetCurrentIndex();
+	int select = gameList.GetCurrentIndex();
 
-	Connect( uiStatic.serverAddresses[select], parent->gameListModel.IsHavePassword( select ) );
+	Connect( uiStatic.serverAddresses[select], gameListModel.IsHavePassword( select ) );
 }
 
 void CMenuServerBrowser::ClearList()
@@ -301,7 +298,8 @@ void CMenuServerBrowser::_Init( void )
 	AddItem( background );
 	AddItem( banner );
 
-	joinGame = AddButton( "Join game", "Join to selected game", PC_JOIN_GAME, JoinGame, QMF_GRAYED );
+	joinGame = AddButton( "Join game", "Join to selected game", PC_JOIN_GAME,
+		VoidCb( &CMenuServerBrowser::JoinGame ), QMF_GRAYED );
 	joinGame->onActivatedClActive = msgBox.MakeOpenEvent();
 
 	createGame = AddButton( "Create game", NULL, PC_CREATE_GAME );
@@ -317,14 +315,14 @@ void CMenuServerBrowser::_Init( void )
 	// TODO: implement!
 	AddButton( "View game info", "Get detail game info", PC_VIEW_GAME_INFO, CEventCallback::NoopCb, QMF_GRAYED );
 
-	refresh = AddButton( "Refresh", "Refresh servers list", PC_REFRESH, RefreshListCb );
+	refresh = AddButton( "Refresh", "Refresh servers list", PC_REFRESH, VoidCb( &CMenuServerBrowser::RefreshList ) );
 
-	AddButton( "Done", "Return to main menu", PC_DONE, HideCb );
+	AddButton( "Done", "Return to main menu", PC_DONE, VoidCb( &CMenuServerBrowser::Hide ) );
 
 	msgBox.SetMessage( "Join a network game will exit any current game, OK to exit?" );
 	msgBox.SetPositiveButton( "Ok", PC_OK );
 	msgBox.HighlightChoice( CMenuYesNoMessageBox::HIGHLIGHT_YES );
-	msgBox.onPositive = JoinGame;
+	msgBox.onPositive = VoidCb( &CMenuServerBrowser::JoinGame );
 	msgBox.Link( this );
 
 	gameList.SetCharSize( QM_SMALLFONT );

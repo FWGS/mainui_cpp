@@ -34,17 +34,23 @@ class CMenuTouchOptions : public CMenuFramework
 {
 private:
 	void _Init();
-	void _VidInit();
 
 public:
 	CMenuTouchOptions() : CMenuFramework( "CMenuTouchOptions" ) { }
 
-	static void DeleteProfileCb( CMenuBaseItem *pSelf, void *pExtra );
-	static void ResetButtonsCb( CMenuBaseItem *pSelf, void *pExtra );
+	void DeleteProfileCb( );
+	void ResetButtonsCb();
 
 	void GetProfileList();
 	void SaveAndPopMenu();
 	void GetConfig();
+
+	void ResetMsgBox();
+	void DeleteMsgBox();
+
+	void Apply();
+	void Save();
+	void UpdateProfilies();
 
 	char		profileDesc[UI_MAXGAMES][95];
 	char		*profileDescPtr[UI_MAXGAMES];
@@ -173,24 +179,116 @@ void CMenuTouchOptions::GetConfig( void )
 	nomouse.UpdateEditable();
 }
 
-void CMenuTouchOptions::DeleteProfileCb(CMenuBaseItem *pSelf, void *pExtra)
+void CMenuTouchOptions::ResetMsgBox()
 {
-	CMenuTouchOptions *parent = (CMenuTouchOptions*)pSelf->Parent();
-	char command[256];
-
-	if( parent->profiles.iCurItem <= parent->firstProfile )
-		return;
-
-	snprintf(command, 256, "touch_deleteprofile \"%s\"\n", parent->profiles.GetSelectedItem() );
-	EngFuncs::ClientCmd(1, command);
-
-	parent->GetProfileList();
+	msgBox.SetMessage( "Reset all buttons?");
+	msgBox.onPositive = VoidCb( &CMenuTouchOptions::ResetButtonsCb );
+	msgBox.Show();
 }
 
-void CMenuTouchOptions::ResetButtonsCb(CMenuBaseItem *pSelf, void *pExtra)
+void CMenuTouchOptions::DeleteMsgBox()
 {
-	CMenuTouchOptions *parent = (CMenuTouchOptions*)pSelf->Parent();
+	msgBox.SetMessage( "Delete selected profile?");
+	msgBox.onPositive = VoidCb( &CMenuTouchOptions::DeleteProfileCb );
+	msgBox.Show();
+}
 
+void CMenuTouchOptions::Apply()
+{
+	int i = profiles.iCurItem;
+
+	// preset selected
+	if( i > 0 && i < firstProfile - 1 )
+	{
+		char command[256];
+		char *curconfig = EngFuncs::GetCvarString( "touch_config_file" );
+		snprintf( command, 256, "exec \"touch_presets/%s\"\n", profileDesc[ i ] );
+		EngFuncs::ClientCmd( 1,  command );
+
+		while( EngFuncs::FileExists( curconfig, TRUE ) )
+		{
+			char copystring[256];
+			char filebase[256];
+
+			COM_FileBase( curconfig, filebase );
+
+			if( snprintf( copystring, 256, "touch_profiles/%s (new).cfg", filebase ) > 255 )
+				break;
+
+			EngFuncs::CvarSetString( "touch_config_file", copystring );
+			curconfig = EngFuncs::GetCvarString( "touch_config_file" );
+		}
+	}
+	else if( i == firstProfile )
+		EngFuncs::ClientCmd( 1,"exec touch.cfg\n" );
+	else if( i > firstProfile )
+	{
+		char command[256];
+		snprintf( command, 256, "exec \"touch_profiles/%s\"\n", profileDesc[ i ] );
+		EngFuncs::ClientCmd( 1,  command );
+	}
+
+	// try save config
+	EngFuncs::ClientCmd( 1,  "touch_writeconfig\n" );
+
+	// check if it failed ant reset profile to default if it is
+	if( !EngFuncs::FileExists( EngFuncs::GetCvarString( "touch_config_file" ), TRUE ) )
+	{
+		EngFuncs::CvarSetString( "touch_config_file", "touch.cfg" );
+		profiles.iCurItem = firstProfile;
+	}
+	GetProfileList();
+	GetConfig();
+}
+
+void CMenuTouchOptions::Save()
+{
+	char name[256];
+
+	if( profilename.GetBuffer()[0] )
+	{
+		snprintf(name, 256, "touch_profiles/%s.cfg", profilename.GetBuffer() );
+		EngFuncs::CvarSetString("touch_config_file", name );
+	}
+	EngFuncs::ClientCmd( 1, "touch_writeconfig\n" );
+	GetProfileList();
+	profilename.Clear();
+}
+
+void CMenuTouchOptions::UpdateProfilies()
+{
+	char curprofile[256];
+	int isCurrent;
+	COM_FileBase( EngFuncs::GetCvarString( "touch_config_file" ), curprofile );
+	isCurrent = !strcmp( curprofile, profileDesc[ profiles.iCurItem ]);
+
+	// Scrolllist changed, update availiable options
+	remove.iFlags |= QMF_GRAYED;
+	if( ( profiles.iCurItem > firstProfile ) && !isCurrent )
+		remove.iFlags &= ~QMF_GRAYED;
+
+	apply.iFlags &= ~QMF_GRAYED;
+	if( profiles.iCurItem == 0 || profiles.iCurItem == firstProfile - 1 )
+		profiles.iCurItem++;
+	if( isCurrent )
+		apply.iFlags |= QMF_GRAYED;
+}
+
+void CMenuTouchOptions::DeleteProfileCb()
+{
+	char command[256];
+
+	if( profiles.iCurItem <= firstProfile )
+		return;
+
+	snprintf(command, 256, "touch_deleteprofile \"%s\"\n", profiles.GetSelectedItem() );
+	EngFuncs::ClientCmd(1, command);
+
+	GetProfileList();
+}
+
+void CMenuTouchOptions::ResetButtonsCb()
+{
 	EngFuncs::ClientCmd( 0, "touch_pitch 90\n" );
 	EngFuncs::ClientCmd( 0, "touch_yaw 120\n" );
 	EngFuncs::ClientCmd( 0, "touch_forwardzone 0.06\n" );
@@ -198,7 +296,7 @@ void CMenuTouchOptions::ResetButtonsCb(CMenuBaseItem *pSelf, void *pExtra)
 	EngFuncs::ClientCmd( 0, "touch_grid 1\n" );
 	EngFuncs::ClientCmd( 1, "touch_grid_count 50\n" );
 
-	parent->GetConfig();
+	GetConfig();
 }
 
 /*
@@ -209,25 +307,18 @@ UI_TouchOptions_Init
 void CMenuTouchOptions::_Init( void )
 {
 	banner.SetPicture(ART_BANNER);
-/*
-	testImage.generic.id = ID_BANNER;
-	testImage.generic.type = QMTYPE_BITMAP;
-	testImage.iFlags = QMF_INACTIVE;
-	testImage.generic.x = 390;
-	testImage.generic.y = 225;
-	testImage.generic.width = 480;
-	testImage.generic.height = 450;
-	testImage.pic = ART_GAMMA;
-	testImage.generic.ownerdraw = UI_TouchOptions_Ownerdraw;
-*/
+
 	done.SetNameAndStatus( "Done", "Go back to the Touch Menu" );
 	done.SetPicture( PC_DONE );
-	done.onActivated = SaveAndPopMenuCb;
+	done.onActivated = VoidCb( &CMenuTouchOptions::SaveAndPopMenu );
+	done.SetCoord ( 72, 680 );
 
 	lookX.SetNameAndStatus( "Look X", "Horizontal look sensitivity" );
 	lookX.Setup( 50, 500, 5 );
 	lookX.LinkCvar( "touch_yaw" );
+	lookX.SetCoord( 72, 280 );
 
+	lookY.SetCoord( 72, 340 );
 	lookY.SetNameAndStatus( "Look Y", "Vertical look sensitivity" );
 	lookY.Setup( 50, 500, 5 );
 	lookY.LinkCvar( "touch_pitch" );
@@ -235,7 +326,9 @@ void CMenuTouchOptions::_Init( void )
 	moveX.SetNameAndStatus( "Side", "Side move sensitivity" );
 	moveX.Setup( 0.02, 1.0, 0.05 );
 	moveX.LinkCvar( "touch_sidezone" );
+	moveX.SetCoord( 72, 400 );
 
+	moveY.SetCoord( 72, 460 );
 	moveY.SetNameAndStatus( "Forward", "Forward move sensitivity" );
 	moveY.Setup( 0.02, 1.0, 0.05 );
 	moveY.LinkCvar( "touch_forwardzone" );
@@ -243,131 +336,50 @@ void CMenuTouchOptions::_Init( void )
 	gridsize.szStatusText = "Set grid size";
 	gridsize.Setup( 25, 100, 5 );
 	gridsize.LinkCvar( "touch_grid_count", CMenuEditable::CVAR_VALUE );
+	gridsize.SetRect( 72, 580, 210, 30 );
 
 	grid.SetNameAndStatus( "Grid", "Enable/disable grid" );
 	grid.LinkCvar( "touch_grid_enable" );
+	grid.SetCoord( 72, 520 );
 
 	enable.SetNameAndStatus( "Enable", "enable/disable touch controls" );
 	enable.LinkCvar( "touch_enable" );
+	enable.SetCoord( 680, 630 );
 
 	nomouse.SetNameAndStatus( "Ignore Mouse", "Ignore mouse input" );
 	nomouse.LinkCvar( "m_ignore" );
+	nomouse.SetCoord( 680, 580 );
 
 	GetProfileList();
 
-	SET_EVENT_MULTI( profiles.onChanged,
-	{
-		CMenuTouchOptions *parent = (CMenuTouchOptions *)pSelf->Parent();
-		CMenuScrollList *self = (CMenuScrollList*)pSelf;
-		char curprofile[256];
-		int isCurrent;
-		COM_FileBase( EngFuncs::GetCvarString( "touch_config_file" ), curprofile );
-		isCurrent = !strcmp( curprofile, parent->profileDesc[ self->iCurItem ]);
-
-			// Scrolllist changed, update availiable options
-		parent->remove.iFlags |= QMF_GRAYED;
-		if( ( self->iCurItem > parent->firstProfile ) && !isCurrent )
-			parent->remove.iFlags &= ~QMF_GRAYED;
-
-		parent->apply.iFlags &= ~QMF_GRAYED;
-		if( self->iCurItem == 0 || self->iCurItem == parent->firstProfile - 1 )
-			self->iCurItem++;
-		if( isCurrent )
-			parent->apply.iFlags |= QMF_GRAYED;
-	});
+	profiles.SetRect( 360, 255, 300, 340 );
+	profiles.onChanged = VoidCb( &CMenuTouchOptions::UpdateProfilies );
 
 	profilename.szName = "New Profile:";
 	profilename.iMaxLength = 16;
+	profilename.SetRect( 680, 260, 205, 32 );
 
 	reset.SetNameAndStatus( "Reset", "Reset touch to default state" );
 	reset.SetPicture("gfx/shell/btn_touch_reset");
-	SET_EVENT_MULTI( reset.onActivated,
-	{
-		CMenuTouchOptions *parent = (CMenuTouchOptions *)pSelf->Parent();
-
-		parent->msgBox.SetMessage( "Reset all buttons?");
-		parent->msgBox.onPositive = CMenuTouchOptions::ResetButtonsCb;
-		parent->msgBox.Show();
-	});
+	reset.SetCoord( 72, 630 );
+	reset.onActivated = VoidCb( &CMenuTouchOptions::ResetMsgBox );
 
 	remove.SetNameAndStatus( "Delete", "Delete saved game" );
 	remove.SetPicture( PC_DELETE );
-	SET_EVENT_MULTI( remove.onActivated,
-	{
-		CMenuTouchOptions *parent = (CMenuTouchOptions *)pSelf->Parent();
-
-		parent->msgBox.SetMessage( "Delete selected profile?");
-		parent->msgBox.onPositive = CMenuTouchOptions::DeleteProfileCb;
-		parent->msgBox.Show();
-	});
+	remove.SetCoord( 560, 630 );
+	remove.size.w = 100;
+	remove.onActivated = VoidCb( &CMenuTouchOptions::DeleteMsgBox );
 
 	apply.SetNameAndStatus( "Activate", "Apply selected profile" );
 	apply.SetPicture( PC_ACTIVATE );
-	SET_EVENT_MULTI( apply.onActivated,
-	{
-		CMenuTouchOptions *parent = (CMenuTouchOptions *)pSelf->Parent();
-		int i = parent->profiles.iCurItem;
-
-		// preset selected
-		if( i > 0 && i < parent->firstProfile - 1 )
-		{
-			char command[256];
-			char *curconfig = EngFuncs::GetCvarString( "touch_config_file" );
-			snprintf( command, 256, "exec \"touch_presets/%s\"\n", parent->profileDesc[ i ] );
-			EngFuncs::ClientCmd( 1,  command );
-
-			while( EngFuncs::FileExists( curconfig, TRUE ) )
-			{
-				char copystring[256];
-				char filebase[256];
-
-				COM_FileBase( curconfig, filebase );
-
-				if( snprintf( copystring, 256, "touch_profiles/%s (new).cfg", filebase ) > 255 )
-					break;
-
-				EngFuncs::CvarSetString( "touch_config_file", copystring );
-				curconfig = EngFuncs::GetCvarString( "touch_config_file" );
-			}
-		}
-		else if( i == parent->firstProfile )
-			EngFuncs::ClientCmd( 1,"exec touch.cfg\n" );
-		else if( i > parent->firstProfile )
-		{
-			char command[256];
-			snprintf( command, 256, "exec \"touch_profiles/%s\"\n", parent->profileDesc[ i ] );
-			EngFuncs::ClientCmd( 1,  command );
-		}
-
-		// try save config
-		EngFuncs::ClientCmd( 1,  "touch_writeconfig\n" );
-
-		// check if it failed ant reset profile to default if it is
-		if( !EngFuncs::FileExists( EngFuncs::GetCvarString( "touch_config_file" ), TRUE ) )
-		{
-			EngFuncs::CvarSetString( "touch_config_file", "touch.cfg" );
-			parent->profiles.iCurItem = parent->firstProfile;
-		}
-		parent->GetProfileList();
-		parent->GetConfig();
-	});
+	apply.SetCoord( 360, 630 );
+	apply.size.w = 120;
+	apply.onActivated = VoidCb( &CMenuTouchOptions::Apply );
 
 	save.SetNameAndStatus( "Save", "Save new profile" );
 	save.SetPicture("gfx/shell/btn_touch_save");
-	SET_EVENT_MULTI( save.onActivated,
-	{
-		CMenuTouchOptions *parent = (CMenuTouchOptions*)pSelf->Parent();
-		char name[256];
-
-		if( parent->profilename.GetBuffer()[0] )
-		{
-			snprintf(name, 256, "touch_profiles/%s.cfg", parent->profilename.GetBuffer() );
-			EngFuncs::CvarSetString("touch_config_file", name );
-		}
-		EngFuncs::ClientCmd( 1, "touch_writeconfig\n" );
-		parent->GetProfileList();
-		parent->profilename.Clear();
-	});
+	save.onActivated = VoidCb( &CMenuTouchOptions::Save );
+	save.SetCoord( 680, 330 );
 
 	msgBox.SetPositiveButton( "Ok", PC_OK );
 	msgBox.Link( this );
@@ -389,30 +401,6 @@ void CMenuTouchOptions::_Init( void )
 	AddItem( apply );
 	AddItem( grid );
 	AddItem( gridsize );
-}
-
-void CMenuTouchOptions::_VidInit()
-{
-	reset.SetCoord( 72, 630 );
-	done.SetCoord ( 72, 680 );
-	lookX.SetCoord( 72, 280 );
-	lookY.SetCoord( 72, 340 );
-	moveX.SetCoord( 72, 400 );
-	moveY.SetCoord( 72, 460 );
-	grid.SetCoord( 72, 520 );
-	gridsize.SetRect( 72, 580, 210, 30 );
-	enable.SetCoord( 680, 630 );
-	nomouse.SetCoord( 680, 580 );
-	profiles.SetRect( 360, 255, 300, 340 );
-	remove.SetCoord( 560, 630 );
-	remove.size.w = 100;
-
-	apply.SetCoord( 360, 630 );
-	apply.size.w = 120;
-
-	profilename.SetRect( 680, 260, 205, 32 );
-	save.SetCoord( 680, 330 );
-
 }
 
 /*

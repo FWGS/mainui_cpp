@@ -176,8 +176,8 @@ void CMenuScriptConfig::_Init( void )
 {
 	AddItem( background );
 	AddItem( banner );
-	AddButton( "Done", "Save and Go back to previous menu", PC_DONE, SaveAndPopMenuCb );
-	AddButton( "Cancel", "Go back to previous menu", PC_CANCEL, HideCb );
+	AddButton( "Done", "Save and Go back to previous menu", PC_DONE, VoidCb( &CMenuScriptConfig::SaveAndPopMenu ) );
+	AddButton( "Cancel", "Go back to previous menu", PC_CANCEL, VoidCb( &CMenuScriptConfig::Hide ) );
 
 	if( !m_pVars )
 		return;

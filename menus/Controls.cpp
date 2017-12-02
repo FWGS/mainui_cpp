@@ -100,12 +100,6 @@ private:
 	}
 
 
-	DECLARE_EVENT_TO_MENU_METHOD( CMenuControls, ResetKeysList )
-	DECLARE_EVENT_TO_MENU_METHOD( CMenuControls, EnterGrabMode )
-	DECLARE_EVENT_TO_MENU_METHOD( CMenuControls, UnbindEntry )
-	DECLARE_EVENT_TO_MENU_METHOD( CMenuControls, Cancel )
-
-	
 	CMenuBannerBitmap banner;
 
 	// state toggle by
@@ -199,8 +193,6 @@ void CMenuKeysModel::Update( void )
 
 	while(( pfile = EngFuncs::COM_ParseFile( pfile, token )) != NULL )
 	{
-		char	str[128];
-
 		if( !stricmp( token, "blank" ))
 		{
 			// separator
@@ -394,15 +386,17 @@ void CMenuControls::_Init( void )
 	msgBox1.SetMessage( "Press a key or button" );
 
 	msgBox2.SetMessage( "Reset buttons to default?" );
-	msgBox2.onPositive = ResetKeysListCb;
+	msgBox2.onPositive = VoidCb( &CMenuControls::ResetKeysList );
 	msgBox2.Link( this );
 
 	AddItem( background );
 	AddItem( banner );
 	AddButton( "Use defaults", "Reset all buttons binding to their default values", PC_USE_DEFAULTS, msgBox2.MakeOpenEvent() );
 	AddButton( "Adv controls", "Change mouse sensitivity, enable autoaim, mouselook and crosshair", PC_ADV_CONTROLS, UI_AdvControls_Menu );
-	AddButton( "Ok", "Save changed and return to configuration menu", PC_DONE, SaveAndPopMenuCb );
-	AddButton( "Cancel", "Discard changes and return to configuration menu", PC_CANCEL, CancelCb );
+	AddButton( "Ok", "Save changed and return to configuration menu", PC_DONE,
+		VoidCb( &CMenuControls::SaveAndPopMenu ) );
+	AddButton( "Cancel", "Discard changes and return to configuration menu", PC_CANCEL,
+		VoidCb( &CMenuControls::Cancel ) );
 	AddItem( keysList );
 }
 

@@ -36,8 +36,8 @@ private:
 public:
 	CMenuVidOptions() : CMenuFramework( "CMenuVidOptions" ) { }
 	void SaveAndPopMenu();
-	static void GammaUpdate();
-	static void GammaGet();
+	void GammaUpdate();
+	void GammaGet();
 
 	int		outlineWidth;
 
@@ -67,31 +67,17 @@ CMenuVidOptions::GammaUpdate
 */
 void CMenuVidOptions::GammaUpdate( void )
 {
-	if( EngFuncs::GetCvarFloat( "gl_ignorehwgamma" ))
-	{
-		float val = RemapVal( uiVidOptions.gammaIntensity.GetCurrentValue(), 0.0, 1.0, 1.8, 7.0 );
-		EngFuncs::CvarSetValue( "gamma", val );
-		EngFuncs::ProcessImage( uiVidOptions.hTestImage, val );
-	}
-	else
-	{
-		EngFuncs::CvarSetValue( "gamma", RemapVal( uiVidOptions.gammaIntensity.GetCurrentValue(), 0.0, 1.0, 0.5, 2.3 ) );
-	}
+	float val = RemapVal( uiVidOptions.gammaIntensity.GetCurrentValue(), 0.0, 1.0, 1.8, 7.0 );
+	EngFuncs::CvarSetValue( "gamma", val );
+	EngFuncs::ProcessImage( uiVidOptions.hTestImage, val );
 }
 
 void CMenuVidOptions::GammaGet( void )
 {
 	float val = EngFuncs::GetCvarFloat( "gamma" );
 
-	if( EngFuncs::GetCvarFloat( "gl_ignorehwgamma" ))
-	{
-		uiVidOptions.gammaIntensity.SetCurrentValue( RemapVal( val, 1.8f, 7.0f, 0.0f, 1.0f ) );
-		EngFuncs::ProcessImage( uiVidOptions.hTestImage, val );
-	}
-	else
-	{
-		uiVidOptions.gammaIntensity.SetCurrentValue( RemapVal( val, 0.5f, 2.3f, 0.0f, 1.0f ) );
-	}
+	uiVidOptions.gammaIntensity.SetCurrentValue( RemapVal( val, 1.8f, 7.0f, 0.0f, 1.0f ) );
+	EngFuncs::ProcessImage( uiVidOptions.hTestImage, val );
 
 	uiVidOptions.gammaIntensity.SetOriginalValue( val );
 }
@@ -170,7 +156,7 @@ void CMenuVidOptions::_Init( void )
 	done.SetNameAndStatus( "Done", "Go back to the Video Menu" );
 	done.SetCoord( 72, 435 );
 	done.SetPicture( PC_DONE );
-	done.onActivated = SaveAndPopMenuCb;
+	done.onActivated = VoidCb( &CMenuVidOptions::SaveAndPopMenu );
 
 	screenSize.SetNameAndStatus( "Screen size",  "Set the screen size" );
 	screenSize.SetCoord( 72, 280 );
@@ -181,8 +167,8 @@ void CMenuVidOptions::_Init( void )
 	gammaIntensity.SetNameAndStatus( "Gamma", "Set gamma value (0.5 - 2.3)" );
 	gammaIntensity.SetCoord( 72, 340 );
 	gammaIntensity.Setup( 0.0, 1.0, 0.025 );
-	gammaIntensity.onChanged = GammaUpdate;
-	gammaIntensity.onCvarGet = GammaGet;
+	gammaIntensity.onChanged = VoidCb( &CMenuVidOptions::GammaUpdate );
+	gammaIntensity.onCvarGet = VoidCb( &CMenuVidOptions::GammaGet );
 	gammaIntensity.LinkCvar( "gamma" );
 
 	glareReduction.SetNameAndStatus( "Glare reduction", "Set glare reduction level" );
@@ -194,25 +180,15 @@ void CMenuVidOptions::_Init( void )
 	bump.SetCoord( 72, 515 );
 	bump.LinkCvar( "r_bump" );
 	if( !EngFuncs::GetCvarFloat( "r_vbo" ) )
-		bump.iFlags |= QMF_GRAYED;
+		bump.SetGrayed( true );
 
 	vbo.SetNameAndStatus( "Use VBO", "Use new world renderer. Faster, but rarely glitchy" );
 	vbo.SetCoord( 72, 565 );
 	vbo.LinkCvar( "r_vbo" );
-	SET_EVENT_MULTI( vbo.onChanged,
-	{
-		CMenuCheckBox *self = (CMenuCheckBox*)pSelf;
-		CMenuVidOptions *parent = (CMenuVidOptions*)pSelf->Parent();
-		if( self->bChecked )
-		{
-			parent->bump.iFlags &= ~QMF_GRAYED;
-		}
-		else
-		{
-			parent->bump.iFlags |= QMF_GRAYED;
-			parent->bump.SetCvarValue( 0 );
-		}
-	});
+	vbo.onChanged = CMenuCheckBox::BitMaskCb;
+	vbo.onChanged.pExtra = &bump.iFlags;
+	vbo.bInvertMask = true;
+	vbo.iMask = QMF_GRAYED;
 
 	fastSky.SetNameAndStatus( "Draw simple sky", "enable/disable fast sky rendering (for old computers)" );
 	fastSky.SetCoord( 72, 615 );

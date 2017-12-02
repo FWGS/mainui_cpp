@@ -33,6 +33,7 @@ private:
 	virtual void _Init( void );
 
 public:
+	typedef CMenuFramework BaseClass;
 	CMenuOptions() : CMenuFramework("CMenuOptions") { }
 
 	// update dialog
@@ -53,10 +54,8 @@ void CMenuOptions::_Init( void )
 	banner.SetPicture( ART_BANNER );
 
 	msgBox.SetMessage( "Check the Internet for updates?" );
-	SET_EVENT_MULTI( msgBox.onPositive,
-	{
-		EngFuncs::ShellExecute( ((CMenuOptions*)pSelf->Parent())->m_szUpdateUrl, NULL, TRUE );
-	});
+	SET_EVENT( msgBox.onPositive,
+		EngFuncs::ShellExecute( ((CMenuOptions*)pSelf->Parent())->m_szUpdateUrl, NULL, TRUE ) );
 
 	msgBox.Link( this );
 
@@ -80,7 +79,7 @@ void CMenuOptions::_Init( void )
 	AddButton( "Update",   "Check for updates",
 		PC_UPDATE, msgBox.MakeOpenEvent(), QMF_NOTIFY );
 	AddButton( "Done",     "Go back to the Main menu",
-		PC_DONE, HideCb, QMF_NOTIFY );
+		PC_DONE, VoidCb( &CMenuOptions::Hide ), QMF_NOTIFY );
 }
 
 /*

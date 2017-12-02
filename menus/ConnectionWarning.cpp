@@ -4,7 +4,7 @@
 #include "PicButton.h"
 #include "Action.h"
 
-class CMenuConnectionWarning : public CMenuBaseWindow
+static class CMenuConnectionWarning : public CMenuBaseWindow
 {
 public:
 	CMenuConnectionWarning() : CMenuBaseWindow( "ConnectionWarning" )
@@ -14,14 +14,17 @@ public:
 	virtual void _Init();
 	virtual void _VidInit();
 	virtual const char *Key( int key, int down );
-	void ClearCheckboxes();
-	CMenuPicButton options, done;
+
+	enum EPresets { EPRESET_NORMAL = 0, EPRESET_DSL, EPRESET_SLOW, EPRESET_LAST };
+
+	void WriteSettings(const EPresets preset );
+
+	CMenuPicButton done;
 private:
+	CMenuPicButton options;
 	CMenuCheckBox normal, dsl, slowest;
 	CMenuAction title, message;
-};
-
-CMenuConnectionWarning uiConnectionWarning;
+} uiConnectionWarning;
 
 const char *CMenuConnectionWarning::Key( int key, int down )
 {
@@ -41,49 +44,26 @@ void CMenuConnectionWarning::_Init()
 	background.iColor = uiPromptBgColor;
 
 	normal.szName = "Normal internet connection";
-	SET_EVENT_MULTI( normal.onChanged,
-	{
-		uiConnectionWarning.ClearCheckboxes();
-		EngFuncs::CvarSetValue("cl_maxpacket", 1400 );
-		EngFuncs::CvarSetValue("cl_maxpayload", 0 );
-		EngFuncs::CvarSetValue("cl_cmdrate", 30 );
-		EngFuncs::CvarSetValue("cl_updaterate", 60 );
-		EngFuncs::CvarSetValue("rate", 25000 );
-		((CMenuCheckBox*)pSelf)->bChecked = true;
-	});
 	normal.SetCoord( 20, 140 );
+	SET_EVENT( normal.onActivated,
+		((CMenuConnectionWarning*)pSelf->Parent())->WriteSettings( EPRESET_NORMAL ) );
 
 	dsl.szName = "DSL or PPTP with limited packet size";
-	SET_EVENT_MULTI( dsl.onChanged,
-	{
-		uiConnectionWarning.ClearCheckboxes();
-		EngFuncs::CvarSetValue("cl_maxpacket", 1200 );
-		EngFuncs::CvarSetValue("cl_maxpayload", 1000 );
-		EngFuncs::CvarSetValue("cl_cmdrate", 30 );
-		EngFuncs::CvarSetValue("cl_updaterate", 60 );
-		EngFuncs::CvarSetValue("rate", 25000 );
-		((CMenuCheckBox*)pSelf)->bChecked = true;
-	});
 	dsl.SetCoord( 20, 200 );
+	SET_EVENT( dsl.onActivated,
+		((CMenuConnectionWarning*)pSelf->Parent())->WriteSettings( EPRESET_DSL ) );
 
 	slowest.szName = "Slow connection mode (64kbps)";
-	SET_EVENT_MULTI( slowest.onChanged,
-	{
-		uiConnectionWarning.ClearCheckboxes();
-		EngFuncs::CvarSetValue("cl_maxpacket", 900 );
-		EngFuncs::CvarSetValue("cl_maxpayload", 700 );
-		EngFuncs::CvarSetValue("cl_cmdrate", 25 );
-		EngFuncs::CvarSetValue("cl_updaterate", 30 );
-		EngFuncs::CvarSetValue("rate", 7500 );
-		((CMenuCheckBox*)pSelf)->bChecked = true;
-	});
 	slowest.SetCoord( 20, 260 );
+	SET_EVENT( slowest.onActivated,
+		((CMenuConnectionWarning*)pSelf->Parent())->WriteSettings( EPRESET_SLOW ) );
 
 	done.SetPicture( PC_DONE );
 	done.szName = "Done";
 	done.iFlags |= QMF_GRAYED;
 	done.SetRect( 410, 320, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
-	done.onActivated = HideCb;
+	done.onActivated = VoidCb( &CMenuConnectionWarning::Hide );
+	done.bEnableTransitions = false;
 
 	options.SetPicture( PC_ADV_OPT );
 	options.szName = "Adv Options";
@@ -93,6 +73,7 @@ void CMenuConnectionWarning::_Init()
 		uiConnectionWarning.done.iFlags &= ~QMF_GRAYED;
 	});
 	options.SetRect( 154, 320, UI_BUTTONS_WIDTH, UI_BUTTONS_HEIGHT );
+	options.bEnableTransitions = false;
 
 	title.iFlags = QMF_INACTIVE|QMF_DROPSHADOW;
 	title.eTextAlignment = QM_CENTER;
@@ -118,9 +99,32 @@ void CMenuConnectionWarning::_VidInit()
 	SetRect( DLG_X + 192, 192, 640, 384 );
 }
 
-void CMenuConnectionWarning::ClearCheckboxes()
+void CMenuConnectionWarning::WriteSettings( const CMenuConnectionWarning::EPresets preset)
 {
-	normal.bChecked = dsl.bChecked = slowest.bChecked = false;
+	const struct
+	{
+		float cl_maxpacket;
+		float cl_maxpayload;
+		float cl_cmdrate;
+		float cl_updaterate;
+		float rate;
+	} presets[EPRESET_LAST] =
+	{
+	{ 1400, 0,    30, 60, 25000 },
+	{ 1200, 1000, 30, 60, 25000 },
+	{ 900,  700,  25, 30, 7500 }
+	};
+
+	EngFuncs::CvarSetValue("cl_maxpacket",  presets[preset].cl_maxpacket );
+	EngFuncs::CvarSetValue("cl_maxpayload", presets[preset].cl_maxpayload );
+	EngFuncs::CvarSetValue("cl_cmdrate",    presets[preset].cl_cmdrate );
+	EngFuncs::CvarSetValue("cl_updaterate", presets[preset].cl_updaterate );
+	EngFuncs::CvarSetValue("rate",          presets[preset].rate );
+
+	normal.bChecked  = preset == EPRESET_NORMAL;
+	dsl.bChecked     = preset == EPRESET_DSL;
+	slowest.bChecked = preset == EPRESET_SLOW;
+
 	done.iFlags &= ~QMF_GRAYED;
 }
 
