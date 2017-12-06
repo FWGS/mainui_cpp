@@ -63,6 +63,11 @@ void CMenuBaseItem::VidInit()
 	iFocusColor.SetDefault( uiPromptFocusColor );
 }
 
+void CMenuBaseItem::Reload()
+{
+	;
+}
+
 void CMenuBaseItem::Draw()
 {
 	;

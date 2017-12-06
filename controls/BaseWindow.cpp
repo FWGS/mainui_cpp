@@ -31,6 +31,7 @@ void CMenuBaseWindow::Show()
 {
 	Init();
 	VidInit();
+	Reload(); // take a chance to reload info for items
 	PushMenu();
 	EnableTransition();
 	m_bAllowEnterActivate = false;

@@ -25,7 +25,7 @@ public:
 	typedef CMenuBaseItem BaseClass;
 
 	CMenuEditable();
-	virtual void VidInit();
+	virtual void Reload();
 
 	// Every derived class can define how it will work with cvars
 	virtual void UpdateEditable() = 0;
@@ -41,10 +41,10 @@ public:
 	void LinkCvar( const char *name, cvarType_e type );
 
 	// Getters
-	inline const char *CvarName()   { return m_szCvarName; }
-	inline float       CvarValue()  { return m_flValue; }
-	inline const char *CvarString() { return m_szString; }
-	inline cvarType_e  CvarType()   { return m_eType; }
+	inline const char *CvarName()   const { return m_szCvarName; }
+	inline float       CvarValue()  const { return m_flValue; }
+	inline const char *CvarString() const { return m_szString; }
+	inline cvarType_e  CvarType()   const { return m_eType; }
 
 	// Set cvar value/string and emit an event(does not written to engine)
 	void SetCvarValue( float value );
@@ -52,7 +52,7 @@ public:
 
 	// Set last got engine cvar values
 	void SetOriginalValue( float val );
-	void SetOriginalString( char *psz );
+	void SetOriginalString( const char *psz );
 
 	// Reset editable to last got engine values
 	void ResetCvar();

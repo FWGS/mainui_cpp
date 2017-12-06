@@ -36,10 +36,8 @@ void CMenuEditable::LinkCvar(const char *name, cvarType_e type)
 	UpdateCvar();
 }
 
-void CMenuEditable::VidInit()
+void CMenuEditable::Reload()
 {
-	BaseClass::VidInit();
-
 	// editable already initialized, so update
 	if( m_szCvarName )
 		UpdateCvar();
@@ -63,7 +61,7 @@ void CMenuEditable::SetCvarString(const char *string)
 	if( onCvarChange ) onCvarChange( this );
 }
 
-void CMenuEditable::SetOriginalString(char *psz)
+void CMenuEditable::SetOriginalString(const char *psz)
 {
 	strncpy( m_szString, psz, CS_SIZE );
 	strncpy( m_szOriginalString, m_szString, CS_SIZE );
@@ -81,21 +79,42 @@ void CMenuEditable::SetOriginalValue(float val)
 
 void CMenuEditable::UpdateCvar()
 {
-	if( onCvarGet ) onCvarGet( this );
+	bool haveUpdate = false;
+
+	if( onCvarGet )
+	{
+		onCvarGet( this );
+		haveUpdate = true; // FIXME
+	}
 	else
 	{
 		switch( m_eType )
 		{
 		case CVAR_STRING:
-			SetOriginalString( EngFuncs::GetCvarString( m_szCvarName ) );
+		{
+			const char *str = EngFuncs::GetCvarString( m_szCvarName );
+			if( strcmp( m_szOriginalString, str ) )
+			{
+				SetOriginalString( str );
+				haveUpdate = true;
+			}
 			break;
+		}
 		case CVAR_VALUE:
-			SetOriginalValue( EngFuncs::GetCvarFloat( m_szCvarName ) );
+		{
+			float val = EngFuncs::GetCvarFloat( m_szCvarName );
+			if( m_flOriginalValue != val )
+			{
+				SetOriginalValue( val );
+				haveUpdate = true;
+			}
 			break;
+		}
 		}
 	}
 
-	UpdateEditable();
+	if( haveUpdate )
+		UpdateEditable();
 }
 
 void CMenuEditable::ResetCvar()

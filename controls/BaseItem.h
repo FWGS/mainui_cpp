@@ -37,6 +37,10 @@ public:
 	// VidInit can be called multiple times
 	virtual void VidInit( void );
 
+	// Reload is called after VidInit item method
+	// should be used for reloading internal data, like cvar values
+	virtual void Reload( void );
+
 	// Key is called every key press
 	// Must return sound name, or NULL
 	virtual const char *Key( int key, int down );

@@ -1382,6 +1382,8 @@ int UI_VidInit( void )
 			// do vid restart for all pushed elements
 			item->VidInit();
 
+			item->Reload();
+
 			if( valid )
 			{
 				// don't notify menu widget about cursor changes

@@ -29,6 +29,7 @@ public:
 	void Init();
 	void VidInit();
 
+	virtual void Reload();
 	virtual const char *Key( int key, int down );
 	virtual void Char( int key );
 	virtual const char *Activate( void );
