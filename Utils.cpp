@@ -606,6 +606,9 @@ static struct
 
 bool UI::Names::CheckIsNameValid(const char *name)
 {
+	if( !name || !*name )
+		return false;
+
 	for( size_t i = 0; i < ARRAYSIZE( prohibitedNames ); i++ )
 	{
 		if( prohibitedNames[i].substring )
