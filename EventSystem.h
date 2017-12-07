@@ -117,9 +117,6 @@ public:
 	// NULL assignment
 	size_t        operator=( size_t null );
 	void*         operator=( void *null );
-#ifndef MY_COMPILER_SUCKS
-	std::nullptr_t operator =( std::nullptr_t null );
-#endif
 
 	void Reset();
 

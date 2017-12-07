@@ -14,6 +14,7 @@ GNU General Public License for more details.
 */
 #include "BaseMenu.h"
 #include "BaseItem.h"
+#include "EventSystem.h"
 
 CEventCallback::CEventCallback() :
 	pExtra( 0 ), type( CB_OLD_EXTRA ), szName( 0 )
@@ -108,11 +109,3 @@ void*         CEventCallback::operator =( void *null )
 	Reset();
 	return NULL;
 }
-
-#ifndef MY_COMPILER_SUCKS
-std::nullptr_t CEventCallback::operator =( std::nullptr_t null )
-{
-	Reset();
-	return nullptr;
-}
-#endif
