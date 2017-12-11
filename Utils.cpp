@@ -363,25 +363,6 @@ void operator delete[]( void *ptr )
 
 typedef unsigned short       word;
 
-typedef struct
-{
-	//char	id[2];		// bmfh.bfType
-	uint	fileSize;		// bmfh.bfSize
-	uint	reserved0;	// bmfh.bfReserved1 + bmfh.bfReserved2
-	uint	bitmapDataOffset;	// bmfh.bfOffBits
-	uint	bitmapHeaderSize;	// bmih.biSize
-	uint	width;		// bmih.biWidth
-	int	height;		// bmih.biHeight
-	word	planes;		// bmih.biPlanes
-	word	bitsPerPixel;	// bmih.biBitCount
-	uint	compression;	// bmih.biCompression
-	uint	bitmapDataSize;	// bmih.biSizeImage
-	uint	hRes;		// bmih.biXPelsPerMeter
-	uint	vRes;		// bmih.biYPelsPerMeter
-	uint	colors;		// bmih.biClrUsed
-	uint	importantColors;	// bmih.biClrImportant
-} bmp_t;
-
 byte *UI::Graphics::MakeBMP( unsigned int w, unsigned int h, byte **ptr, int *size, int *texOffset )
 {
 	bmp_t bhdr;

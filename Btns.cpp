@@ -26,101 +26,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define ART_BUTTONS_MAIN		"gfx/shell/btns_main.bmp"	// we support bmp only
 
-const char *MenuButtons[PC_BUTTONCOUNT] =
-{
-	"New game",
-	"Resume Game",
-	"Hazard Course",
-	"Configuration",
-	"Load game",
-	"Save/load game",
-	"View readme",
-	"Quit",
-	"Multiplayer",
-	"Easy",
-	"Medium",
-	"Difficult",
-	"Save game",
-	"Load game",
-	"Cancel",
-	"Game options",
-	"Video",
-	"Audio",
-	"Controls",
-	"Done",
-	"Quickstart",
-	"Use defaults",
-	"Ok",
-	"Video options",
-	"Video modes",
-	"Adv controls",
-	"Order Half-life",
-	"Delete",
-	"Internet games",
-	"Chat rooms",
-	"Lan games",
-	"Customize",
-	"Skip",
-	"Exit",
-	"Connect",
-	"Refresh",
-	"Filter",
-	"Filter",
-	"Create",
-	"Create game",
-	"Chat rooms",
-	"List rooms",
-	"Search",
-	"Servers",
-	"Join",
-	"Find",
-	"Create room",
-	"Join game",
-	"Search games",
-	"Find game",
-	"Start game",
-	"View game info",
-	"Update",
-	"Add server",
-	"Disconnect",
-	"Console",
-	"Content control",
-	"Update",
-	"Visit won",
-	"Previews",
-	"Adv options",
-	"3D info site",
-	"Custom Game",
-	"Activate",
-	"Install",
-	"Visit web site",
-	"Refresh list",
-	"Deactivate",
-	"Adv options",
-	"Spectate game",
-	"Spectate games"
-};
-
-typedef struct bmp_s
-{
-	//char magic[2];	//Useless.
-	unsigned int	filesz;
-	unsigned short	creator1;
-	unsigned short	creator2;
-	unsigned int	bmp_offset;
-	unsigned int	biSize;
-	unsigned int	biWidth;
-	unsigned int	biHeight;
-	unsigned short	biPlanes;
-	unsigned short	biBitCount;
-	unsigned int	biCompression;
-	unsigned int	biSizeImage;
-	unsigned int	biXPelsPerMeter;
-	unsigned int	biYPelsPerMeter;
-	unsigned int	biClrUsed;
-	unsigned int	biClrImportant;
-}bmp_t;
-
 /*
 =================
 UI_LoadBmpButtons
@@ -142,17 +47,17 @@ void UI_LoadBmpButtons( void )
 	bmp_t bhdr;
 	memcpy( &bhdr, &bmp_buffer[sizeof( short )], sizeof( bmp_t ));
 
-	int pallete_sz = bhdr.bmp_offset - sizeof( bmp_t ) - sizeof( short );
+	int pallete_sz = bhdr.bitmapDataOffset - sizeof( bmp_t ) - sizeof( short );
 
-	uiStatic.buttons_height = ( bhdr.biBitCount == 4 ) ? 80 : 78; // bugstompers issues
-	uiStatic.buttons_width = bhdr.biWidth - 3; // make some offset
+	uiStatic.buttons_height = ( bhdr.bitsPerPixel == 4 ) ? 80 : 78; // bugstompers issues
+	uiStatic.buttons_width = bhdr.width - 3; // make some offset
 
-	int stride = bhdr.biWidth * bhdr.biBitCount / 8;
+	int stride = bhdr.width * bhdr.bitsPerPixel / 8;
 	int cutted_img_sz = ((stride + 3 ) & ~3) * uiStatic.buttons_height;
 	int CuttedBmpSize = sizeof( bmp_t ) + sizeof( short ) + pallete_sz + cutted_img_sz;
 	byte *img_data = &bmp_buffer[bmp_len_holder-cutted_img_sz];
 
-	if ( bhdr.biBitCount <= 8 )
+	if ( bhdr.bitsPerPixel <= 8 )
 	{
 		byte* pallete=&bmp_buffer[sizeof( bmp_t ) + sizeof( short )];
 		byte* firstpixel_col=&pallete[img_data[0]*4];
@@ -161,11 +66,11 @@ void UI_LoadBmpButtons( void )
 
 	// determine buttons count by image height...
 	// int EngFuncs::PIC_count = ( pInfoHdr->biHeight == 5538 ) ? PC_BUTTONCOUNT
-	int pic_count = ( bhdr.biHeight / 78 );
+	int pic_count = ( bhdr.height / 78 );
 
-	bhdr.biHeight = 78;     //uiStatic.buttons_height;
-	bhdr.filesz = CuttedBmpSize;
-	bhdr.biSizeImage = CuttedBmpSize - bhdr.bmp_offset;
+	bhdr.height = 78;     //uiStatic.buttons_height;
+	bhdr.fileSize = CuttedBmpSize;
+	bhdr.bitmapDataSize = CuttedBmpSize - bhdr.bitmapDataOffset;
 
 	char fname[256];
 	byte *raw_img_buff = (byte *)MALLOC( sizeof( bmp_t ) + sizeof( short ) + pallete_sz + cutted_img_sz );
@@ -180,7 +85,7 @@ void UI_LoadBmpButtons( void )
 		memcpy( &raw_img_buff[offset], &bhdr, sizeof( bmp_t ));
 		offset += sizeof( bmp_t );
 
-		if( bhdr.biBitCount <= 8 )
+		if( bhdr.bitsPerPixel <= 8 )
 		{
 			memcpy( &raw_img_buff[offset], &bmp_buffer[offset], pallete_sz );
 			offset += pallete_sz;
