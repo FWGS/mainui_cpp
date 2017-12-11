@@ -256,7 +256,7 @@ void CMenuCreateGame::_Init( void )
 	password.LinkCvar( "sv_password" );
 
 	msgBox.onPositive = Begin;
-	msgBox.SetMessage( "Starting a new game will exit\nany current game, OK to exit?" );
+	msgBox.SetMessage( "Starting a new game will exit any current game, OK to exit?" );
 	msgBox.Link( this );
 
 	AddButton( "Cancel", "Return to the previous menu", PC_CANCEL, VoidCb( &CMenuCreateGame::Hide ) );

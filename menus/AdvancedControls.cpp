@@ -165,11 +165,11 @@ void CAdvancedControls::_Init( void )
 		((CAdvancedControls*)pSelf->Parent())->ToggleLookCheckboxes( true ) );
 	mouseLook.SetCoord( 72, 380 );
 
-	lookSpring.SetNameAndStatus("Look spring", "Causes the screen to 'spring' back to looking straight ahead when you\nmove forward" );
+	lookSpring.SetNameAndStatus("Look spring", "Causes the screen to 'spring' back to looking straight ahead when you move forward" );
 	lookSpring.iFlags |= QMF_NOTIFY;
 	lookSpring.SetCoord( 72, 430 );
 
-	lookStrafe.SetNameAndStatus( "Look strafe", "In combination with your mouse look modifier, causes left-right movements\nto strafe instead of turn");
+	lookStrafe.SetNameAndStatus( "Look strafe", "In combination with your mouse look modifier, causes left-right movements to strafe instead of turn");
 	lookStrafe.iFlags |= QMF_NOTIFY;
 	lookStrafe.SetCoord( 72, 480 );
 

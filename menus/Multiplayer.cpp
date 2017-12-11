@@ -63,7 +63,7 @@ void CMenuMultiplayer::_Init( void )
 	AddButton( "Controls", "Change keyboard and mouse settings", PC_CONTROLS, UI_Controls_Menu, QMF_NOTIFY );
 	AddButton( "Done", "Go back to the Main menu", PC_DONE, VoidCb( &CMenuMultiplayer::Hide ), QMF_NOTIFY );
 
-	msgBox.SetMessage( "It is recomended to enable\nclient movement prediction\nPress OK to enable it now\nOr enable it later in\n^5(Multiplayer/Customize)");
+	msgBox.SetMessage( "It is recomended to enable client movement prediction.\nPress OK to enable it now or enable it later in ^5(Multiplayer/Customize)");
 	msgBox.SetPositiveButton( "Ok", PC_OK );
 	msgBox.SetNegativeButton( "Cancel", PC_CANCEL );
 	msgBox.HighlightChoice( CMenuYesNoMessageBox::HIGHLIGHT_YES );
