@@ -80,7 +80,7 @@ void CAdvancedControls::GetConfig( )
 	}
 	else
 	{
-		mouseLook.iFlags |= QMF_GRAYED;
+		mouseLook.SetGrayed( true );
 		mouseLook.bChecked = true;
 	}
 
@@ -189,7 +189,7 @@ void CAdvancedControls::_Init( void )
 	inputDev.onActivated = UI_InputDevices_Menu;
 	inputDev.iFlags |= QMF_NOTIFY;
 	if( CL_IsActive() && !EngFuncs::GetCvarFloat( "host_serverstate" ))
-		inputDev.iFlags |= QMF_GRAYED;
+		inputDev.SetGrayed( true );
 	//inputDev.SetRect( 72, 230, UI_BUTTONS_WIDTH, UI_BUTTONS_HEIGHT );
 	inputDev.SetCoord( 72, 230 );
 

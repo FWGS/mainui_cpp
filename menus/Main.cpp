@@ -283,23 +283,23 @@ void CMenuMain::_Init( void )
 	minimizeBtn.onActivated.SetCommand( FALSE, "minimize\n" );
 
 	if ( gMenu.m_gameinfo.gamemode == GAME_MULTIPLAYER_ONLY || gMenu.m_gameinfo.startmap[0] == 0 )
-		newGame.iFlags |= QMF_GRAYED;
+		newGame.SetGrayed( true );
 
 	if ( gMenu.m_gameinfo.gamemode == GAME_SINGLEPLAYER_ONLY )
-		multiPlayer.iFlags |= QMF_GRAYED;
+		multiPlayer.SetGrayed( true );
 
 	if ( gMenu.m_gameinfo.gamemode == GAME_MULTIPLAYER_ONLY )
 	{
-		saveRestore.iFlags |= QMF_GRAYED;
-		hazardCourse.iFlags |= QMF_GRAYED;
+		saveRestore.SetGrayed( true );
+		hazardCourse.SetGrayed( true );
 	}
 
 	// server.dll needs for reading savefiles or startup newgame
 	if( !EngFuncs::CheckGameDll( ))
 	{
-		saveRestore.iFlags |= QMF_GRAYED;
-		hazardCourse.iFlags |= QMF_GRAYED;
-		newGame.iFlags |= QMF_GRAYED;
+		saveRestore.SetGrayed( true );
+		hazardCourse.SetGrayed( true );
+		newGame.SetGrayed( true );
 	}
 
 	dialog.Link( this );
@@ -366,7 +366,7 @@ void CMenuMain::_VidInit( void )
 
 	// too short execute string - not a real command
 	if( strlen( MenuStrings[IDS_MEDIA_PREVIEWURL] ) <= 3 )
-		previews.iFlags |= QMF_GRAYED;
+		previews.SetGrayed( true );
 
 	quit.SetCoord( 72, (bCustomGame) ? (bTrainMap ? 630 : 580) : (bTrainMap ? 580 : 530));
 

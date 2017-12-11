@@ -130,8 +130,8 @@ void CMenuTouchOptions::GetProfileList( void )
 	}
 	profiles.iNumItems = i;
 
-	remove.iFlags |= QMF_GRAYED;
-	apply.iFlags |= QMF_GRAYED;
+	remove.SetGrayed( true );
+	apply.SetGrayed( true );
 
 	if( profiles.charSize.h )
 	{
@@ -263,15 +263,15 @@ void CMenuTouchOptions::UpdateProfilies()
 	isCurrent = !strcmp( curprofile, profileDesc[ profiles.iCurItem ]);
 
 	// Scrolllist changed, update availiable options
-	remove.iFlags |= QMF_GRAYED;
+	remove.SetGrayed( true );
 	if( ( profiles.iCurItem > firstProfile ) && !isCurrent )
-		remove.iFlags &= ~QMF_GRAYED;
+		remove.SetGrayed( false );
 
-	apply.iFlags &= ~QMF_GRAYED;
+	apply.SetGrayed( false );
 	if( profiles.iCurItem == 0 || profiles.iCurItem == firstProfile - 1 )
 		profiles.iCurItem++;
 	if( isCurrent )
-		apply.iFlags |= QMF_GRAYED;
+		apply.SetGrayed( true );
 }
 
 void CMenuTouchOptions::DeleteProfileCb()

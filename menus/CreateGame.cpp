@@ -171,7 +171,7 @@ void CMenuMapListModel::Update( void )
 
 	if( !EngFuncs::CreateMapsList( FALSE ) || (afile = (char *)EngFuncs::COM_LoadFile( "maps.lst", NULL )) == NULL )
 	{
-		uiCreateGame.done->iFlags |= QMF_GRAYED;
+		uiCreateGame.done->SetGrayed( true );
 		m_iNumItems = 0;
 		Con_Printf( "Cmd_GetMapsList: can't open maps.lst\n" );
 		return;
@@ -198,7 +198,7 @@ void CMenuMapListModel::Update( void )
 		numMaps++;
 	}
 
-	if( !( numMaps - 1) ) uiCreateGame.done->iFlags |= QMF_GRAYED;
+	if( !( numMaps - 1) ) uiCreateGame.done->SetGrayed( true );
 	m_iNumItems = numMaps;
 	EngFuncs::COM_FreeFile( afile );
 }

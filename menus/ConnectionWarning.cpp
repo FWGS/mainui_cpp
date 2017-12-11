@@ -60,7 +60,7 @@ void CMenuConnectionWarning::_Init()
 
 	done.SetPicture( PC_DONE );
 	done.szName = "Done";
-	done.iFlags |= QMF_GRAYED;
+	done.SetGrayed( true );
 	done.SetRect( 410, 320, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
 	done.onActivated = VoidCb( &CMenuConnectionWarning::Hide );
 	done.bEnableTransitions = false;
@@ -70,7 +70,7 @@ void CMenuConnectionWarning::_Init()
 	SET_EVENT_MULTI( options.onActivated,
 	{
 		UI_GameOptions_Menu();
-		uiConnectionWarning.done.iFlags &= ~QMF_GRAYED;
+		uiConnectionWarning.done.SetGrayed( false );
 	});
 	options.SetRect( 154, 320, UI_BUTTONS_WIDTH, UI_BUTTONS_HEIGHT );
 	options.bEnableTransitions = false;
@@ -125,7 +125,7 @@ void CMenuConnectionWarning::WriteSettings( const EPresets preset)
 	dsl.bChecked     = preset == EPRESET_DSL;
 	slowest.bChecked = preset == EPRESET_SLOW;
 
-	done.iFlags &= ~QMF_GRAYED;
+	done.SetGrayed( false );
 }
 
 void UI_ConnectionWarning_f()

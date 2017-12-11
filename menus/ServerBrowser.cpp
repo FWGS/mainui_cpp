@@ -252,7 +252,7 @@ void CMenuServerBrowser::RefreshList()
 		{
 			UI_RefreshInternetServerList();
 			refreshTime2 = uiStatic.realTime + (EngFuncs::GetCvarFloat("cl_nat") ? 4000:1000);
-			refresh->iFlags |= QMF_GRAYED;
+			refresh->SetGrayed( true );
 			if( uiStatic.realTime + 20000 < refreshTime )
 				refreshTime = uiStatic.realTime + 20000;
 		}
@@ -277,7 +277,7 @@ void CMenuServerBrowser::Draw( void )
 
 	if( uiStatic.realTime > refreshTime2 )
 	{
-		refresh->iFlags &= ~QMF_GRAYED;
+		refresh->SetGrayed( false );
 	}
 
 	// serverinfo has been changed update display
@@ -354,7 +354,7 @@ void CMenuServerBrowser::_Init( void )
 
 	// server.dll needs for reading savefiles or startup newgame
 	if( !EngFuncs::CheckGameDll( ))
-		createGame->iFlags |= QMF_GRAYED;	// server.dll is missed - remote servers only
+		createGame->SetGrayed( true );	// server.dll is missed - remote servers only
 
 	password.bHideInput = true;
 	password.bAllowColorstrings = false;
