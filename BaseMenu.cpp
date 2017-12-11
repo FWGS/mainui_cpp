@@ -306,15 +306,16 @@ void UI_DrawRectangleExt( int in_x, int in_y, int in_w, int in_h, const int colo
 UI_DrawString
 =================
 */
-void UI_DrawString( HFont font, int x, int y, int w, int h,
+int UI_DrawString( HFont font, int x, int y, int w, int h,
 		const char *string, const int color, int forceColor,
 		int charW, int charH, ETextAlignment justify, bool shadow, bool limitBySize )
 {
 	int	modulate, shadowModulate;
 	int	xx = 0, yy, ofsX = 0, ofsY = 0, ch;
+	int maxX = x;
 
 	if( !string || !string[0] )
-		return;
+		return x;
 
 	if( shadow )
 	{
@@ -523,6 +524,8 @@ void UI_DrawString( HFont font, int x, int y, int w, int h,
 			EngFuncs::DrawCharacter( xx, yy, charW, charH, ch, modulate, uiStatic.hFont );
 			xx += charW;
 #endif
+
+			maxX = Q_max( xx, maxX );
 		}
 		yy += charH;
 
@@ -530,6 +533,8 @@ void UI_DrawString( HFont font, int x, int y, int w, int h,
 	}
 
 	EngFuncs::UtfProcessChar( 0 );
+
+	return maxX;
 }
 
 #ifdef XASH_DISABLE_FWGS_EXTENSIONS
