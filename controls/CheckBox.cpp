@@ -131,7 +131,7 @@ void CMenuCheckBox::Draw( void )
 		Point coord;
 
 		if( szName[0] )
-			coord.x = 250 * uiStatic.scaleX;
+			coord.x = 290 * uiStatic.scaleX;
 		else
 			coord.x = m_scSize.w + 16 * uiStatic.scaleX;
 		coord.x += m_scPos.x;
