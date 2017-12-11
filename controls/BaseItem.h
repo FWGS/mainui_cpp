@@ -82,38 +82,38 @@ public:
 	virtual void Hide() { iFlags |= QMF_HIDDEN;  }
 
 	// Determine, is this item is visible
-	virtual bool IsVisible() { return !(iFlags & QMF_HIDDEN); }
+	virtual bool IsVisible() const { return !(iFlags & QMF_HIDDEN); }
 
 	// Key value data reading, both parameters are zero-terminated string
 	virtual bool KeyValueData( const char *key, const char *data );
 
 	// Toggle visibiltiy.
-	void ToggleVisibility()
+	inline void ToggleVisibility()
 	{
 		if( IsVisible() ) Hide();
 		else Show();
 	}
 
 	// Direct visibility set
-	void SetVisibility( bool show )
+	inline void SetVisibility( const bool show )
 	{
 		if( show ) Show();
 		else Hide();
 	}
 
-	void SetGrayed( bool grayed )
+	inline void SetGrayed( const bool grayed )
 	{
 		if( grayed ) iFlags |= QMF_GRAYED;
 		else iFlags &= ~(QMF_GRAYED);
 	}
 
-	void ToggleGrayed( )
+	inline void ToggleGrayed( )
 	{
 		iFlags ^= QMF_GRAYED;
 	}
 
 	// Checks item is current selected in parent Framework
-	bool IsCurrentSelected( void );
+	bool IsCurrentSelected( void ) const;
 
 	// Calculate render positions based on relative positions.
 	void CalcPosition( void );
@@ -135,8 +135,8 @@ public:
 	inline void SetSize( int w, int h )                 { size.w = w; size.h = h; }
 	inline void SetRect( int x, int y, int w, int h )   { SetCoord( x, y ); SetSize( w, h ); }
 	// inline void SetCharSize( int w, int h )             { charSize.w = w; charSize.h = h; }
-	inline Point GetRenderPosition() { return m_scPos; }
-	inline Size GetRenderSize() { return m_scSize; }
+	inline Point GetRenderPosition() const { return m_scPos; }
+	inline Size  GetRenderSize()     const { return m_scSize; }
 
 	void SetCharSize( EFontSizes fs );
 

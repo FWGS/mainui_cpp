@@ -31,7 +31,7 @@ public:
 	// Window visibility is switched through window stack
 	virtual void Hide();
 	virtual void Show();
-	virtual bool IsVisible();
+	virtual bool IsVisible() const;
 
 	virtual const char *Key( int key, int down );
 	virtual void Draw();

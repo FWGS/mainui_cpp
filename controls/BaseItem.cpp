@@ -144,7 +144,7 @@ void CMenuBaseItem::_Event( int ev )
 	if( callback ) callback( this );
 }
 
-bool CMenuBaseItem::IsCurrentSelected()
+bool CMenuBaseItem::IsCurrentSelected() const
 {
 	if( m_pParent )
 		return this == m_pParent->ItemAtCursor();

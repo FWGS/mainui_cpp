@@ -43,7 +43,7 @@ void CMenuBaseWindow::Hide()
 	EnableTransition();
 }
 
-bool CMenuBaseWindow::IsVisible()
+bool CMenuBaseWindow::IsVisible() const
 {
 	// slow!
 	for( int i = uiStatic.rootPosition; i < uiStatic.menuDepth; i++  )
