@@ -268,7 +268,7 @@ void CMenuControls::ResetKeysList( void )
 	{
 		char	key[32];
 
-		strncpy( key, token, sizeof( key ));
+		Q_strncpy( key, token, sizeof( key ));
 
 		pfile = EngFuncs::COM_ParseFile( pfile, token );
 		if( !pfile ) break;	// technically an error

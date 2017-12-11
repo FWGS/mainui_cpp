@@ -230,8 +230,7 @@ bool CStbFont::FindFontDataFile(const char *name, int tall, int weight, int flag
 
 bool CStbFont::Create(const char *name, int tall, int weight, int blur, float brighten, int outlineSize, int scanlineOffset, float scanlineScale, int flags)
 {
-	strncpy( m_szName, name, sizeof( m_szName ) - 1 );
-	m_szName[sizeof( m_szName ) - 1] = 0;
+	Q_strncpy( m_szName, name, sizeof( m_szName ) );
 	m_iTall = tall;
 	m_iWeight = weight;
 	m_iFlags = flags;

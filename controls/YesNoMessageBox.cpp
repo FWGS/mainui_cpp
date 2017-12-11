@@ -236,8 +236,7 @@ void CMenuYesNoMessageBox::UI_ShowMessageBox( void )
 	static char msg[1024];
 	static CMenuYesNoMessageBox msgBox( true );
 
-	strncpy( msg, EngFuncs::CmdArgv(1), 1023 );
-	msg[1023] = 0;
+	Q_strncpy( msg, EngFuncs::CmdArgv(1), sizeof( msg ) );
 
 	if( !UI_IsVisible() )
 	{

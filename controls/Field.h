@@ -46,8 +46,7 @@ public:
 
 	void SetBuffer( const char *buffer )
 	{
-		strncpy( szBuffer, buffer, UI_MAX_FIELD_LINE );
-		szBuffer[UI_MAX_FIELD_LINE-1] = 0;
+		Q_strncpy( szBuffer, buffer, UI_MAX_FIELD_LINE );
 		iCursor = strlen( szBuffer );
 		if( iCursor > iWidthInChars )
 			iScroll = iCursor;

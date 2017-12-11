@@ -79,7 +79,7 @@ void CMenuFileDialog::GetFileList( void )
 		for ( j = 0; j < numFiles; i++, j++ )
 		{
 			if( i >= UI_MAXGAMES ) break;
-			strcpy( filePath[i],filenames[j] );
+			Q_strncpy( filePath[i],filenames[j], sizeof( filePath[0] ) );
 			filePathPtr[i] = filePath[i];
 		}
 	}
@@ -102,7 +102,7 @@ void CMenuFileDialog::GetFileList( void )
 
 void CMenuFileDialog::ApplyChanges(const char *fileName)
 {
-	strncpy( uiFileDialogGlobal.result, fileName, 256 );
+	Q_strncpy( uiFileDialogGlobal.result, fileName, sizeof( uiFileDialogGlobal.result ) );
 	uiFileDialogGlobal.result[255] = 0;
 	uiFileDialogGlobal.valid = false;
 	uiFileDialogGlobal.callback( fileName[0] != 0 );

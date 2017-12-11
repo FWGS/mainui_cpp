@@ -81,7 +81,7 @@ void CMenuGamePad::GetConfig( void )
 	float _side, _forward, _pitch, _yaw;
 	char binding[7] = { 0 };
 
-	strncpy( binding, EngFuncs::GetCvarString( "joy_axis_binding"), sizeof( binding ));
+	Q_strncpy( binding, EngFuncs::GetCvarString( "joy_axis_binding"), sizeof( binding ));
 
 	_side = EngFuncs::GetCvarFloat( "joy_side" );
 	_forward = EngFuncs::GetCvarFloat( "joy_forward" );

@@ -76,8 +76,7 @@ public:
 	}
 	void SetCommonText( const char *pszText )
 	{
-		strncpy( sCommonString, pszText, sizeof( sCommonString ) - 1 );
-		sCommonString[sizeof( sCommonString ) - 1] = 0;
+		Q_strncpy( sCommonString, pszText, sizeof( sCommonString ) );
 		// snprintf( sCommonString, sizeof( sCommonString ) - 1, "%s", pszText );
 	}
 	void SetServer( const char *pszName )

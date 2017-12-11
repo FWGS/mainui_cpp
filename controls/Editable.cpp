@@ -54,7 +54,7 @@ void CMenuEditable::SetCvarString(const char *string)
 {
 	if( string != m_szString )
 	{
-		strncpy( m_szString, string, CS_SIZE );
+		Q_strncpy( m_szString, string, CS_SIZE );
 		m_szString[CS_SIZE-1] = 0;
 	}
 
@@ -63,8 +63,8 @@ void CMenuEditable::SetCvarString(const char *string)
 
 void CMenuEditable::SetOriginalString(const char *psz)
 {
-	strncpy( m_szString, psz, CS_SIZE );
-	strncpy( m_szOriginalString, m_szString, CS_SIZE );
+	Q_strncpy( m_szString, psz, CS_SIZE );
+	Q_strncpy( m_szOriginalString, m_szString, CS_SIZE );
 	m_szOriginalString[CS_SIZE-1] = 0;
 
 	SetCvarString( m_szOriginalString );

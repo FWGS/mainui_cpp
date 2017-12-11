@@ -85,7 +85,7 @@ void CMenuTouchOptions::GetProfileList( void )
 	int	i = 0, numFiles, j = 0;
 	char *curprofile;
 
-	strncpy( profileDesc[i], "Presets:", CS_SIZE );
+	Q_strncpy( profileDesc[i], "Presets:", CS_SIZE );
 	profileDescPtr[i] = profileDesc[i];
 	i++;
 
@@ -107,11 +107,11 @@ void CMenuTouchOptions::GetProfileList( void )
 	j = 0;
 	curprofile = EngFuncs::GetCvarString("touch_config_file");
 
-	strncpy( profileDesc[i], "Profiles:", CS_SIZE );
+	Q_strncpy( profileDesc[i], "Profiles:", CS_SIZE );
 	profileDescPtr[i] = profileDesc[i];
 	i++;
 
-	strncpy( profileDesc[i], "default", CS_SIZE );
+	Q_strncpy( profileDesc[i], "default", CS_SIZE );
 	profileDescPtr[i] = profileDesc[i];
 
 	profiles.iHighlight = i;

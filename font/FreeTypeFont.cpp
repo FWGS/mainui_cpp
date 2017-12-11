@@ -119,8 +119,7 @@ bool CFreeTypeFont::FindFontDataFile( const char *name, int tall, int weight, in
 	if( !FcPatternGetString( pattern, "file", 0, &filename ) )
 	{
 		bRet = true;
-		strncpy( dataFile, (char*)filename, dataFileChars );
-		dataFile[dataFileChars-1] = 0;
+		Q_strncpy( dataFile, (char*)filename, dataFileChars );
 	}
 	else bRet = false;
 
@@ -132,8 +131,7 @@ bool CFreeTypeFont::FindFontDataFile( const char *name, int tall, int weight, in
 
 bool CFreeTypeFont::Create(const char *name, int tall, int weight, int blur, float brighten, int outlineSize, int scanlineOffset, float scanlineScale, int flags)
 {
-	strncpy( m_szName, name, sizeof( m_szName ) - 1 );
-	m_szName[sizeof( m_szName ) - 1] = 0;
+	Q_strncpy( m_szName, name, sizeof( m_szName ) );
 	m_iTall = tall;
 	m_iWeight = weight;
 	m_iFlags = flags;
@@ -147,7 +145,7 @@ bool CFreeTypeFont::Create(const char *name, int tall, int weight, int blur, flo
 	m_fScanlineScale = scanlineScale;
 
 
-	if( !FindFontDataFile( name, tall, weight, flags, m_szRealFontFile, 4096 ) )
+	if( !FindFontDataFile( name, tall, weight, flags, m_szRealFontFile, sizeof( m_szRealFontFile ) ) )
 	{
 		Con_DPrintf( "Unable to find font named %s\n", name );
 		m_szName[0] = 0;

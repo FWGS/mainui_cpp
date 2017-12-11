@@ -342,7 +342,7 @@ void CMenuPlayerSetup::FindModels( void )
 		if( !EngFuncs::FileExists( path, TRUE ))
 			continue;
 
-		strcpy( models[num_models], name );
+		Q_strncpy( models[num_models], name, sizeof( models[0] ) );
 		modelsPtr[num_models] = models[num_models];
 		num_models++;
 	}

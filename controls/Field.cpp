@@ -527,8 +527,7 @@ void CMenuField::UpdateEditable()
 
 	if( szValue )
 	{
-		strncpy( szBuffer, szValue, iMaxLength );
-		szBuffer[iMaxLength-1] = 0;
+		Q_strncpy( szBuffer, szValue, iMaxLength );
 	}
 }
 
