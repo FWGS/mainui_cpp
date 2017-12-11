@@ -123,7 +123,9 @@ add_library (${MAINUI_LIBRARY} SHARED ${MAINUI_SOURCES})
 if(NOT WIN32 AND NOT MINGW)
 	add_compile_options(-Wall -Wextra -Wpedantic -Wno-unused-parameter -Wno-unused-variable)
 else()
-	add_definitions(-DMY_COMPILER_SUCKS) # Disable C++11 requirement
+
+	# Only for MSVC6 compability mode! Newer VC does fail with this define
+	# add_definitions(-DMY_COMPILER_SUCKS)
 endif()
 
 if(NOT XASH_SDK)
