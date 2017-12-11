@@ -335,6 +335,9 @@ void UI_EnableTextInput( bool enable )
 	EngFuncs::EnableTextInput( enable );
 }
 
+// Doesn't need anymore
+
+/*
 void *operator new( size_t a )
 {
 	return MALLOC( a );
@@ -354,6 +357,7 @@ void operator delete[]( void *ptr )
 {
 	if( ptr ) FREE( ptr );
 }
+*/
 
 #define BI_SIZE	40 //size of bitmap info header.
 

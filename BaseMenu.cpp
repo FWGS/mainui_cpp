@@ -1080,7 +1080,7 @@ void UI_AddServerToList( netadr_t adr, const char *info )
 	// add it to the list
 	uiStatic.updateServers = true; // info has been updated
 	uiStatic.serverAddresses[uiStatic.numServers] = adr;
-	strncpy( uiStatic.serverNames[uiStatic.numServers], info, 256 );
+	Q_strncpy( uiStatic.serverNames[uiStatic.numServers], info, sizeof( uiStatic.serverNames[0] ) );
 	uiStatic.serverPings[uiStatic.numServers] = Sys_DoubleTime() - uiStatic.serversRefreshTime;
 	if( uiStatic.serverPings[uiStatic.numServers] < 0 || uiStatic.serverPings[uiStatic.numServers] > 9.999f )
 		uiStatic.serverPings[uiStatic.numServers] = 9.999f;
@@ -1283,7 +1283,7 @@ static void UI_LoadBackgroundMapList( void )
 		// skip the numbers (old format list)
 		if( isdigit( token[0] )) continue;
 
-		strncpy( uiStatic.bgmaps[uiStatic.bgmapcount], token, sizeof( uiStatic.bgmaps[0] ));
+		Q_strncpy( uiStatic.bgmaps[uiStatic.bgmapcount], token, sizeof( uiStatic.bgmaps[0] ));
 		if( ++uiStatic.bgmapcount > UI_MAX_BGMAPS )
 			break; // list is full
 	}
