@@ -70,23 +70,17 @@ void EngFuncs::DrawSetTextColor(int r, int g, int b, int alpha)
 
 int EngFuncs::DrawConsoleString(int x, int y, const char *string)
 {
-	const char *ptext = string;
+	Point pt( x, y );
+	Size sz;
+	Size charSz;
 
-	Point pt(x, y);
+	sz.w = ScreenWidth - pt.x;
+	sz.h = ScreenHeight - pt.y;
 
-	for( ; *ptext; ptext++ )
-	{
-		if( *ptext == '\n' )
-		{
-			pt.x = x;
-			pt.y += g_FontMgr.GetFontTall( uiStatic.hConsoleFont );
-			continue;
-		}
+	charSz.w = 0;
+	charSz.h = g_FontMgr.GetFontTall( uiStatic.hConsoleFont );
 
-		pt.x += g_FontMgr.DrawCharacter( uiStatic.hConsoleFont, *ptext, pt, Size(), color );
-	}
-
-	return pt.x;
+	return UI_DrawString( uiStatic.hConsoleFont, pt, sz, string, color, false, charSz, QM_TOPLEFT, false );
 }
 
 void EngFuncs::ConsoleStringLen(const char *string, int *length, int *height)
