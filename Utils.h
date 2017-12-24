@@ -200,40 +200,54 @@ inline size_t Q_strncpy( char *dst, const char *src, size_t size )
 
 typedef unsigned short       word;
 
-typedef struct
+#pragma pack( push, 1 )
+struct bmp_t
 {
-	//char	id[2];		// bmfh.bfType
-	uint	fileSize;		// bmfh.bfSize
-	uint	reserved0;	// bmfh.bfReserved1 + bmfh.bfReserved2
-	uint	bitmapDataOffset;	// bmfh.bfOffBits
-	uint	bitmapHeaderSize;	// bmih.biSize
-	uint	width;		// bmih.biWidth
-	int	height;		// bmih.biHeight
-	word	planes;		// bmih.biPlanes
-	word	bitsPerPixel;	// bmih.biBitCount
-	uint	compression;	// bmih.biCompression
-	uint	bitmapDataSize;	// bmih.biSizeImage
-	uint	hRes;		// bmih.biXPelsPerMeter
-	uint	vRes;		// bmih.biYPelsPerMeter
-	uint	colors;		// bmih.biClrUsed
-	uint	importantColors;	// bmih.biClrImportant
-} bmp_t;
+	// char id[2];		// bmfh.bfType
+	uint fileSize;		// bmfh.bfSize
+	uint reserved0;	// bmfh.bfReserved1 + bmfh.bfReserved2
+	uint bitmapDataOffset;	// bmfh.bfOffBits
+	uint bitmapHeaderSize;	// bmih.biSize
+	uint width;		// bmih.biWidth
+	int	 height;		// bmih.biHeight
+	word planes;		// bmih.biPlanes
+	word bitsPerPixel;	// bmih.biBitCount
+	uint compression;	// bmih.biCompression
+	uint bitmapDataSize;	// bmih.biSizeImage
+	uint hRes;		// bmih.biXPelsPerMeter
+	uint vRes;		// bmih.biYPelsPerMeter
+	uint colors;		// bmih.biClrUsed
+	uint importantColors;	// bmih.biClrImportant
+};
+#pragma pack( pop )
+
+class CBMP
+{
+public:
+	CBMP( uint w, uint h );
+	~CBMP() { if( data ) delete []data; }
+
+	void Increase(uint newW, uint newH);
+	inline byte *GetBitmap()
+	{
+		return data;
+	}
+
+	inline bmp_t *GetBitmapHdr()
+	{
+		return (bmp_t*)(data + sizeof( short )); // skip BM magic
+	}
+	inline byte *GetTextureData()
+	{
+		return data + GetBitmapHdr()->bitmapDataOffset;
+	}
+
+private:
+	byte    *data;
+};
 
 namespace UI
 {
-namespace Graphics
-{
-/*
- * Creates 32-bit RGBA BMP
- *  w -- width
- *  h -- height
- * **ptr -- BMP header pointer. Should be freed by delete[]
- * *size -- BMP size
- * *texOffset -- rgbdata offset
- * Return value is rgbdata
- **/
-byte *MakeBMP( unsigned int w, unsigned int h, byte **ptr, int *size, int *texOffset );
-}
 
 namespace Font
 {

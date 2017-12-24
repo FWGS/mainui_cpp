@@ -359,51 +359,79 @@ void operator delete[]( void *ptr )
 }
 */
 
-#define BI_SIZE	40 //size of bitmap info header.
+#define BI_SIZE	40 // size of bitmap info header.
 
 typedef unsigned short       word;
 
-byte *UI::Graphics::MakeBMP( unsigned int w, unsigned int h, byte **ptr, int *size, int *texOffset )
+CBMP::CBMP( uint w, uint h )
 {
 	bmp_t bhdr;
 
-	if( !ptr || !size )
-		return NULL;
-
-	int biTrueWidth = (w + 3) & ~3;
 	const char magic[2] = { 'B', 'M' };
-	const int pixel_size = 4; // create 32 bit image everytime
-	const size_t cbPalBytes = 0; // TODO: calculate it, when it would be needed to create BMP with palette
-	size_t cbBmpBits = biTrueWidth * h * pixel_size;
+	const size_t cbPalBytes = 0; // UNUSED
+	const uint pixel_size = 4; // Always RGBA
 
-	bhdr.fileSize = sizeof( magic ) + sizeof( bmp_t ) + cbBmpBits + cbPalBytes;
-	bhdr.reserved0 = 0;
-	bhdr.bitmapDataOffset = sizeof( magic ) + sizeof( bmp_t ) + cbPalBytes;
-	bhdr.bitmapHeaderSize = BI_SIZE;
-	bhdr.width = biTrueWidth;
+	bhdr.width = ( w + 3 ) & ~3;
 	bhdr.height = h;
+	bhdr.bitmapHeaderSize = BI_SIZE; // must be 40!
+	bhdr.bitmapDataOffset = sizeof( short ) + sizeof( bmp_t ) + cbPalBytes;
+	bhdr.bitmapDataSize = bhdr.width * bhdr.height * pixel_size;
+	bhdr.fileSize = bhdr.bitmapDataOffset + bhdr.bitmapDataSize;
+
+	// constant
+	bhdr.reserved0 = 0;
 	bhdr.planes = 1;
 	bhdr.bitsPerPixel = pixel_size * 8;
 	bhdr.compression = 0;
-	bhdr.bitmapDataSize = cbBmpBits;
 	bhdr.hRes = bhdr.vRes = 0;
 	bhdr.colors = ( pixel_size == 1 ) ? 256 : 0;
 	bhdr.importantColors = 0;
 
-	*ptr = new byte[bhdr.fileSize];
-	*size = bhdr.fileSize;
+	data = new byte[bhdr.fileSize];
+	memcpy( data, magic, sizeof( magic ));
+	memcpy( data + sizeof(magic), &bhdr, sizeof( bhdr ));
+	memset( data + bhdr.bitmapDataOffset, 0, bhdr.bitmapDataSize );
+}
 
-	if( texOffset )
-		*texOffset = bhdr.bitmapDataOffset;
+void CBMP::Increase( uint w, uint h )
+{
+	bmp_t *hdr = GetBitmapHdr();
+	bmp_t bhdr;
 
-	memcpy( *ptr, magic, sizeof( magic ) );
-	memcpy( *ptr + sizeof( magic ), &bhdr, sizeof( bhdr ) );
+	const int pixel_size = 4; // create 32 bit image everytime
+	const char magic[2] = { 'B', 'M' };
 
-	byte *rgbdata = *ptr + bhdr.bitmapDataOffset;
+	memcpy( &bhdr, hdr, sizeof( bhdr ));
 
-	memset( rgbdata, 0, cbBmpBits );
+	bhdr.width  = (w + 3) & ~3;
+	bhdr.height = h;
+	bhdr.bitmapDataSize = bhdr.width * bhdr.height * pixel_size;
+	bhdr.fileSize = bhdr.bitmapDataOffset + bhdr.bitmapDataSize;
 
-	return rgbdata;
+	// I think that we need to only increase BMP size
+	assert( bhdr.width >= hdr->width );
+	assert( bhdr.height >= hdr->height );
+
+	byte *newData = new byte[bhdr.fileSize];
+	memcpy( newData, magic, sizeof( magic ));
+	memcpy( newData + sizeof( magic ), &bhdr, sizeof( bhdr ));
+	memset( newData + bhdr.bitmapDataOffset, 0, sizeof( bhdr.bitmapDataSize ));
+
+	// now copy texture
+	byte *src = GetTextureData();
+	byte *dst = newData + bhdr.bitmapDataOffset;
+
+	// to keep texcoords still valid, we copy old texture through the end
+	for( int y = 0; y < hdr->height; y++ )
+	{
+		byte *ydst = &dst[(y + (bhdr.height - hdr->height))* bhdr.width * 4];
+		byte *ysrc = &src[y * hdr->width * 4];
+
+		memcpy( ydst, ysrc, 4 * hdr->width );
+	}
+
+	delete []data;
+	data = newData;
 }
 
 int UI::Font::GetTextWide( HFont font, const char *szName, Size charSize, int size )
