@@ -102,6 +102,7 @@ private:
 
 	CUtlRBTree<glyph_t, int> m_glyphs;
 	// CUtlVector<HIMAGE> m_Pages;
+	// CUtlVector<uint> m_Lines;
 	int m_iPages;
 	static bool GlyphLessFunc( const glyph_t &a, const glyph_t &b );
 	friend class CFontManager;

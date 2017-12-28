@@ -122,8 +122,8 @@ struct Point
 		return *this;
 	}
 
-	Point operator *( float scale ) { return Point( x * scale, y * scale );	}
-	Point operator /( float scale ) { return Point( x / scale, y / scale );	}
+	Point operator *( float scale ) { return Point( (int)(x * scale), (int)(y * scale) ); }
+	Point operator /( float scale ) { return Point( (int)(x / scale), (int)(y / scale) ); }
 };
 
 struct Size

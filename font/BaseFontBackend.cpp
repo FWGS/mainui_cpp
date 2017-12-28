@@ -87,22 +87,26 @@ void CBaseFont::GetTextureName(char *dst, size_t len, int pageNum) const
 
 void CBaseFont::UploadGlyphsForRanges(CBaseFont::charRange_t *range, int rangeSize)
 {
-	char name[256];
 	const int maxWidth = GetMaxCharWidth();
 	const int height = GetHeight();
+	const int tempSize = maxWidth * height * 4; // allocate temporary buffer for max possible glyph size
+	const Point nullPt( 0, 0 );
+	char name[256];
 
-	// allocate temporary buffer for max possible glyph size
-	const int tempSize = maxWidth * height * 4;
-
-	int bmpSize;
-	byte *bmp, *temp = new byte[tempSize],
-		 *rgbdata = UI::Graphics::MakeBMP( MAX_PAGE_SIZE, MAX_PAGE_SIZE, &bmp, &bmpSize, NULL );
+	CBMP bmp( MAX_PAGE_SIZE, MAX_PAGE_SIZE );
+	byte *rgbdata = bmp.GetTextureData();
+	size_t bmpSize = bmp.GetBitmapHdr()->fileSize;
+	bmp_t *hdr = bmp.GetBitmapHdr();
 
 	Size tempDrawSize( maxWidth, height );
-	const Point nullPt( 0, 0 );
+	byte *temp = new byte[tempSize];
+
+	// abscissa atlas optimization
+	CUtlVector<uint> lines;
+	int line = 0;
 
 	// texture is reversed by Y coordinates
-	int xstart = 0, ystart = MAX_PAGE_SIZE-1;
+	int xstart = 0, ystart = hdr->height-1;
 	for( int iRange = 0; iRange < rangeSize; iRange++ )
 	{
 		for( int ch = range[iRange].chMin; ch <= range[iRange].chMax; ch++ )
@@ -115,38 +119,58 @@ void CBaseFont::UploadGlyphsForRanges(CBaseFont::charRange_t *range, int rangeSi
 			GetCharRGBA( ch, nullPt, tempDrawSize, temp, drawSize );
 
 			// see if we need to go down or create a new page
-			if( xstart + drawSize.w > MAX_PAGE_SIZE )
+			if( xstart + drawSize.w > hdr->width )
 			{
-				xstart = 0;
+				// update or push
+				if( lines.IsValidIndex( line ) )
+				{
+					lines[line] = xstart;
+					line++;
+					// do we have next or don't have it yet?
+					if( lines.IsValidIndex( line ) )
+						xstart = lines[line];
+					else
+						xstart = 0;
+				}
+				else
+				{
+					lines.AddToTail(xstart);
+					line++;
+					// obviously we don't have next
+					xstart = 0;
+
+				}
 				ystart -= height + 1; // HACKHACK: Add more space between rows, this removes ugly 1 height pixel rubbish
+
 				// No free space now
 				if( ystart - height - 1 <= 0 )
 				{
-					GetTextureName( name, sizeof( name ), m_iPages );
-					HIMAGE hImage = EngFuncs::PIC_Load( name, bmp, bmpSize, 0 );
-					Con_DPrintf( "Uploaded %s to %i\n", name, hImage );
-
-					for( int i = m_glyphs.FirstInorder(); ;
-						i = m_glyphs.NextInorder( i ) )
+					if( hdr->height <= hdr->width ) // prioritize height grow
 					{
-						glyph_t &glyph = m_glyphs[i];
-						if( !glyph.texture )
-							glyph.texture = hImage;
-						if( i == m_glyphs.LastInorder() )
-							break;
+						int oldheight = hdr->height - ystart;
+						bmp.Increase( hdr->width, hdr->height * 2 );
+						hdr = bmp.GetBitmapHdr();
+						ystart = hdr->height - oldheight - 1;
+					}
+					else
+					{
+						bmp.Increase( hdr->width * 2, hdr->height );
+						hdr = bmp.GetBitmapHdr();
+						line = 0;
+						xstart = lines[line];
+						ystart = hdr->height - 1;
 					}
 
-					// m_Pages.AddToTail( hImage );
-					m_iPages++;
-					memset( rgbdata, 0, MAX_PAGE_SIZE * MAX_PAGE_SIZE * 4 );
-					ystart = MAX_PAGE_SIZE-1;
+					// update pointers
+					rgbdata = bmp.GetTextureData();
+					bmpSize = hdr->fileSize;
 				}
 			}
 
 			// set rgbdata rect
 			wrect_t rect;
-			rect.top    = MAX_PAGE_SIZE - ystart;
-			rect.bottom = MAX_PAGE_SIZE - ystart + height;
+			rect.top    = hdr->height - ystart;
+			rect.bottom = hdr->height - ystart + height;
 			rect.left   = xstart;
 			rect.right  = xstart + drawSize.w;
 
@@ -154,7 +178,7 @@ void CBaseFont::UploadGlyphsForRanges(CBaseFont::charRange_t *range, int rangeSi
 
 			for( int y = 0; y < height; y++ )
 			{
-				byte *dst = &rgbdata[(ystart - y) * MAX_PAGE_SIZE * 4];
+				byte *dst = &rgbdata[(ystart - y) * hdr->width * 4];
 				byte *src = &temp[y * maxWidth * 4];
 				for( int x = 0; x < drawSize.w; x++ )
 				{
@@ -179,9 +203,11 @@ void CBaseFont::UploadGlyphsForRanges(CBaseFont::charRange_t *range, int rangeSi
 	}
 
 	GetTextureName( name, sizeof( name ), m_iPages );
-	HIMAGE hImage = EngFuncs::PIC_Load( name, bmp, bmpSize, 0 );
+	// bmp.Increase( hdr->width * 2, hdr->height );
+	bmp.Increase( hdr->width, hdr->height * 2 );
+	HIMAGE hImage = EngFuncs::PIC_Load( name, bmp.GetBitmap(), bmpSize, 0 );
 	Con_DPrintf( "Uploaded %s to %i\n", name, hImage );
-	delete[] bmp;
+	//delete[] bmp;
 	delete[] temp;
 
 	for( int i = m_glyphs.FirstInorder();; i = m_glyphs.NextInorder( i ) )
@@ -240,16 +266,18 @@ void CBaseFont::DebugDraw()
 
 	for( int i = 0; i < m_iPages; i++ )
 	{
-		int x = i * MAX_PAGE_SIZE;
 		GetTextureName( name, sizeof( name ), i );
 
 		hImage = EngFuncs::PIC_Load( name );
-
+		int w, h;
+		w = EngFuncs::PIC_Width( hImage );
+		h = EngFuncs::PIC_Height( hImage );
+		int x = i * w;
 		EngFuncs::PIC_Set( hImage, 255, 255, 255 );
 		if( IsAdditive() )
-			EngFuncs::PIC_DrawAdditive(  Point(x, 0), Size( MAX_PAGE_SIZE, MAX_PAGE_SIZE ) );
+			EngFuncs::PIC_DrawAdditive(  Point(x, 0), Size( w, h ) );
 		else
-			EngFuncs::PIC_DrawTrans( Point(x, 0), Size( MAX_PAGE_SIZE, MAX_PAGE_SIZE ) );
+			EngFuncs::PIC_DrawTrans( Point(x, 0), Size( w, h ) );
 
 		for( int i = m_glyphs.FirstInorder();; i = m_glyphs.NextInorder( i ) )
 		{
