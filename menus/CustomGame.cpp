@@ -182,7 +182,8 @@ void CMenuCustomGame::_Init( void )
 		if( !stricmp( modListModel.modsDir[i], gMenu.m_gameinfo.gamefolder ) )
 		{
 			modList.SetCurrentIndex( i );
-			modList.onChanged( &modList );
+			if( modList.onChanged ) 
+				modList.onChanged( &modList );
 			break;
 		}
 	}

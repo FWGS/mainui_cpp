@@ -18,6 +18,10 @@ GNU General Public License for more details.
 
 #define BIT( x ) ( 1U << x )
 
+#ifdef _MSC_VER
+#pragma warning(disable:4244) // float->int
+#endif
+
 // engine constants
 enum
 {
