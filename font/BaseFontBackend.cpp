@@ -33,7 +33,7 @@ bool CBaseFont::GlyphLessFunc( const glyph_t &a, const glyph_t &b )
 CBaseFont::CBaseFont()
 	: m_szName(), m_iTall(), m_iWeight(), m_iFlags(),
 	m_iHeight(), m_iMaxCharWidth(), m_iAscent(),
-	m_iGLTexture(), m_iBlur(), m_pGaussianDistribution(), m_fBrighten(),
+	m_iBlur(), m_pGaussianDistribution(), m_fBrighten(),
 	m_glyphs(0, 0, GlyphLessFunc), m_iPages(), m_iEllipsisWide( 0 )
 {
 }
@@ -85,7 +85,7 @@ void CBaseFont::GetTextureName(char *dst, size_t len, int pageNum) const
 
 #define MAX_PAGE_SIZE 256
 
-void CBaseFont::UploadGlyphsForRanges(CBaseFont::charRange_t *range, int rangeSize)
+void CBaseFont::UploadGlyphsForRanges(charRange_t *range, int rangeSize)
 {
 	const int maxWidth = GetMaxCharWidth();
 	const int height = GetHeight();
@@ -217,7 +217,6 @@ void CBaseFont::UploadGlyphsForRanges(CBaseFont::charRange_t *range, int rangeSi
 		if( i == m_glyphs.LastInorder() )
 			break;
 	}
-	// m_Pages.AddToTail(hImage);
 	m_iPages++;
 
 	int dotWideA, dotWideB, dotWideC;
@@ -467,4 +466,73 @@ void CBaseFont::ApplyStrikeout(Size rgbaSz, byte *rgba)
 		src[0] = src[1] = src[2] = 127;
 		src[3] = 255;
 	}
+}
+
+int CBaseFont::DrawCharacter(int ch, Point pt, Size sz, const int color)
+{
+	Size charSize;
+	int a, b, c, width;
+
+#ifdef SCALE_FONTS
+	float factor = (float)sz.h / (float)font->GetTall();
+#endif
+
+	GetCharABCWidths( ch, a, b, c );
+	width = a + b + c;
+
+	// skip whitespace
+	if( ch == ' ' )
+	{
+#ifdef SCALE_FONTS
+		if( sz.h > 0 )
+		{
+			return width * factor + 0.5f;
+		}
+		else
+#endif
+		{
+			return width;
+		}
+	}
+
+	CBaseFont::glyph_t find( ch );
+	int idx = m_glyphs.Find( find );
+
+	if( m_glyphs.IsValidIndex( idx ) )
+	{
+		CBaseFont::glyph_t &glyph = m_glyphs[idx];
+
+		int r, g, b, alpha;
+
+		UnpackRGBA(r, g, b, alpha, color );
+
+#ifdef SCALE_FONTS	// Scale font
+		if( sz.h > 0 )
+		{
+			charSize.w = (glyph.rect.right - glyph.rect.left) * factor + 0.5f;
+			charSize.h = font->GetHeight() * factor + 0.5f;
+		}
+		else
+#endif
+		{
+			charSize.w = glyph.rect.right - glyph.rect.left;
+			charSize.h = GetHeight();
+		}
+
+		pt.x += a;
+
+		EngFuncs::PIC_Set( glyph.texture, r, g, b, alpha );
+		if( IsAdditive() )
+			EngFuncs::PIC_DrawAdditive( pt, charSize, &glyph.rect );
+		else
+			EngFuncs::PIC_DrawTrans( pt, charSize, &glyph.rect );
+	}
+
+#ifdef SCALE_FONTS
+	if( sz.h > 0 )
+	{
+		return width * factor + 0.5f;
+	}
+#endif
+	return width;
 }

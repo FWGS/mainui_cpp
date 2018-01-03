@@ -29,9 +29,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "BaseMenu.h"
 #include "PicButton.h"
 #include "keydefs.h"
-#ifndef MAINUI_USE_CUSTOM_FONT_RENDER
-#include "menufont.h"	// built-in menu font
-#endif
 #include "Utils.h"
 #include "BtnsBMPTable.h"
 #include "YesNoMessageBox.h"
@@ -341,7 +338,7 @@ int UI_DrawString( HFont font, int x, int y, int w, int h,
 	}
 
 	int i = 0;
-	int ellipsisWide = UI::Font::GetEllipsisWide( font, charW );
+	int ellipsisWide = g_FontMgr.GetEllipsisWide( font );
 	bool giveup = false;
 
 	while( string[i] && !giveup )
@@ -402,7 +399,7 @@ int UI_DrawString( HFont font, int x, int y, int w, int h,
 					}
 				}
 
-				charWide = UI::Font::GetCharacterWidth( font, uch, charW );
+				charWide = g_FontMgr.GetCharacterWidth( font, uch );
 
 				if( limitBySize && pixelWide + charWide >= w )
 				{
@@ -501,11 +498,7 @@ int UI_DrawString( HFont font, int x, int y, int w, int h,
 
 			if( shadow )
 			{
-#ifdef MAINUI_USE_CUSTOM_FONT_RENDER
 				g_FontMgr.DrawCharacter( font, ch, Point( xx + ofsX, yy + ofsY ), Size( charW, charH ), shadowModulate );
-#else
-				EngFuncs::DrawCharacter( xx + ofsX, yy + ofsY, charW, charH, ch, shadowModulate, uiStatic.hFont );
-#endif
 			}
 
 // #define DEBUG_WHITESPACE
@@ -518,12 +511,7 @@ int UI_DrawString( HFont font, int x, int y, int w, int h,
 			}
 #endif
 
-#ifdef MAINUI_USE_CUSTOM_FONT_RENDER
 			xx += g_FontMgr.DrawCharacter( font, ch, Point( xx, yy ), Size( charW, charH ), modulate );
-#else
-			EngFuncs::DrawCharacter( xx, yy, charW, charH, ch, modulate, uiStatic.hFont );
-			xx += charW;
-#endif
 
 			maxX = Q_max( xx, maxX );
 		}
@@ -1345,21 +1333,7 @@ int UI_VidInit( void )
 	UI_LoadBmpButtons ();
 
 	// VidInit FontManager
-#ifdef MAINUI_USE_CUSTOM_FONT_RENDER
 	g_FontMgr.VidInit();
-#else
-	// register menu font
-	uiStatic.hFont = EngFuncs::PIC_Load( "#XASH_SYSTEMFONT_001.bmp", menufont_bmp, sizeof( menufont_bmp ));
-#if 0
-	FILE *f;
-
-	// dump menufont onto disk
-	f = fopen( "menufont.bmp", "wb" );
-	fwrite( menufont_bmp, sizeof( menufont_bmp ), 1, f );
-	fclose( f );
-#endif
-
-#endif
 
 	// now recalc all the menus in stack
 	for( int i = 0; i < uiStatic.menuDepth; i++ )

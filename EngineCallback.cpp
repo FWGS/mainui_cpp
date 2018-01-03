@@ -35,31 +35,8 @@ void EngFuncs::FillRGBA(int x, int y, int width, int height, int r, int g, int b
 
 void EngFuncs::DrawCharacter(int x, int y, int width, int height, int ch, int ulRGBA, HIMAGE hFont)
 {
-	if( uiStatic.enableAlphaFactor )
-	{
-		return;
-
-		/*int copy = ulRGBA;
-		int a = UnpackAlpha( copy );
-		a *= uiStatic.alphaFactor;
-
-		ulRGBA = PackAlpha( copy, a );*/
-	}
-
 	engfuncs.pfnDrawCharacter( x, y, width, height, ch, ulRGBA, hFont );
 }
-
-#ifndef MAINUI_USE_CUSTOM_FONT_RENDER
-void EngFuncs::DrawSetTextColor(int r, int g, int b, int alpha)
-{
-	if( uiStatic.enableAlphaFactor )
-		alpha *= uiStatic.alphaFactor;
-
-	engfuncs.pfnDrawSetTextColor( r, g, b, alpha );
-}
-#endif
-
-#ifdef MAINUI_USE_CUSTOM_FONT_RENDER
 
 unsigned int color;
 
@@ -93,37 +70,18 @@ int EngFuncs::ConsoleCharacterHeight()
 	return g_FontMgr.GetFontTall( uiStatic.hConsoleFont );
 }
 
-#endif
-
+// We have full unicode support now
 int EngFuncs::UtfProcessChar(int ch)
 {
-#ifdef MAINUI_USE_CUSTOM_FONT_RENDER
 	return Con_UtfProcessChar( ch );
-#else
-	if( textfuncs.pfnUtfProcessChar )
-		return textfuncs.pfnUtfProcessChar( ch );
-	else return ch;
-#endif
 }
 
 int EngFuncs::UtfMoveLeft(char *str, int pos)
 {
-#ifndef MAINUI_USE_CUSTOM_FONT_RENDER
-	if( textfuncs.pfnUtfMoveLeft )
-		return textfuncs.pfnUtfMoveLeft( str, pos );
-	else return pos - 1;
-#else
 	return Con_UtfMoveLeft( str, pos );
-#endif
 }
 
 int EngFuncs::UtfMoveRight(char *str, int pos, int length)
 {
-#ifndef MAINUI_USE_CUSTOM_FONT_RENDER
-	if( textfuncs.pfnUtfMoveLeft )
-		return textfuncs.pfnUtfMoveRight( str, pos, length );
-	else return pos + 1;
-#else
 	return Con_UtfMoveRight( str, pos, length );
-#endif
 }

@@ -50,12 +50,12 @@ void CMenuSwitch::VidInit()
 	int leftSize, rightSize;
 
 	if( szLeftName )
-		leftSize = UI::Font::GetTextWide( font, szLeftName, m_scChSize );
+		leftSize = g_FontMgr.GetTextWideScaled( font, szLeftName, m_scChSize.h );
 	else
 		leftSize = m_scSize.w / 2;
 
 	if( szRightName )
-		rightSize = UI::Font::GetTextWide( font, szRightName, m_scChSize );
+		rightSize = g_FontMgr.GetTextWideScaled( font, szRightName, m_scChSize.h );
 	else
 		rightSize = m_scSize.w / 2;
 
@@ -73,7 +73,7 @@ void CMenuSwitch::VidInit()
 	m_scTextPos.x = m_scPos.x + (m_scSize.w * 1.5f );
 	m_scTextPos.y = m_scPos.y;
 
-	m_scTextSize.w = UI::Font::GetTextWide( font, szName, m_scChSize );
+	m_scTextSize.w = g_FontMgr.GetTextWideScaled( font, szName, m_scChSize.h );
 	m_scTextSize.h = m_scChSize.h;
 }
 

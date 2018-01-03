@@ -18,14 +18,12 @@ GNU General Public License for more details.
 
 #include "BaseFontBackend.h"
 
-#  if defined(MAINUI_USE_FREETYPE)
+#if defined(MAINUI_USE_FREETYPE)
 #include "FreeTypeFont.h"
 #elif defined(MAINUI_USE_STB)
 #include "StbFont.h"
 #elif defined(_WIN32)
 #include "WinAPIFont.h"
-#else
-#error "No font rendering backend found"
 #endif
 
 #include "BitmapFont.h"
@@ -394,13 +392,13 @@ void CFontManager::UploadTextureForFont(CBaseFont *font)
 	// upload only latin needed for english and cyrillic needed for russian
 	// maybe it would be extended someday...
 
-	CBaseFont::charRange_t range[] =
+	charRange_t range[] =
 	{
 	{ 33, 126 },			// ascii printable range
 	{ 0x0400, 0x045F },		// cyrillic range
 	};
 
-	font->UploadGlyphsForRanges( range, sizeof( range ) / sizeof( CBaseFont::charRange_t ) );
+	font->UploadGlyphsForRanges( range, ARRAYSIZE( range ) );
 }
 
 int CFontManager::DrawCharacter(HFont fontHandle, int ch, Point pt, Size sz, const int color )
@@ -410,71 +408,8 @@ int CFontManager::DrawCharacter(HFont fontHandle, int ch, Point pt, Size sz, con
 	if( !font )
 		return 0;
 
-	Size charSize;
-	int a, b, c, width;
+	font->DrawCharacter( ch, pt, sz, color );
 
-#ifdef SCALE_FONTS
-	float factor = (float)sz.h / (float)font->GetTall();
-#endif
-
-	font->GetCharABCWidths( ch, a, b, c );
-	width = a + b + c;
-
-	// skip whitespace
-	if( ch == ' ' )
-	{
-#ifdef SCALE_FONTS
-		if( sz.h > 0 )
-		{
-			return width * factor + 0.5f;
-		}
-		else
-#endif
-		{
-			return width;
-		}
-	}
-
-	CBaseFont::glyph_t find( ch );
-	int idx = font->m_glyphs.Find( find );
-
-	if( font->m_glyphs.IsValidIndex( idx ) )
-	{
-		CBaseFont::glyph_t &glyph = font->m_glyphs[idx];
-
-		int r, g, b, alpha;
-
-		UnpackRGBA(r, g, b, alpha, color );
-
-#ifdef SCALE_FONTS	// Scale font
-		if( sz.h > 0 )
-		{
-			charSize.w = (glyph.rect.right - glyph.rect.left) * factor + 0.5f;
-			charSize.h = font->GetHeight() * factor + 0.5f;
-		}
-		else
-#endif
-		{
-			charSize.w = glyph.rect.right - glyph.rect.left;
-			charSize.h = font->GetHeight();
-		}
-
-		pt.x += a;
-
-		EngFuncs::PIC_Set( glyph.texture, r, g, b, alpha );
-		if( font->IsAdditive() )
-			EngFuncs::PIC_DrawAdditive( pt, charSize, &glyph.rect );
-		else
-			EngFuncs::PIC_DrawTrans( pt, charSize, &glyph.rect );
-	}
-
-#ifdef SCALE_FONTS
-	if( sz.h > 0 )
-	{
-		return width * factor + 0.5f;
-	}
-#endif
-	return width;
 }
 
 void CFontManager::DebugDraw(HFont fontHandle)
@@ -505,8 +440,10 @@ HFont CFontBuilder::Create()
 	font = new CFreeTypeFont();
 #elif defined(MAINUI_USE_STB)
 	font = new CStbFont();
-#else
+#elif defined(_WIN32)
 	font = new CWinAPIFont();
+#else
+	font = new CBitmapFont();
 #endif
 
 	double starttime = Sys_DoubleTime();
@@ -514,14 +451,23 @@ HFont CFontBuilder::Create()
 	if( !font->Create( m_szName, m_iTall, m_iWeight, m_iBlur, m_fBrighten, m_iOutlineSize, m_iScanlineOffset, m_fScanlineScale, m_iFlags ) )
 	{
 		delete font;
-		return -1;
+
+		// fallback to bitmap font
+		font = new CBitmapFont();
+
+		// should never fail
+		if( !font->Create( "Bitmap Font", m_iTall, m_iWeight, m_iBlur, m_fBrighten, m_iOutlineSize, m_iScanlineOffset, m_fScanlineScale, m_iFlags ) )
+		{
+			delete font;
+			return -1;
+		}
 	}
 
 	g_FontMgr.UploadTextureForFont( font );
 
 	double endtime = Sys_DoubleTime();
 
-	Con_DPrintf( "Rendering %s(%i, %i) took %f seconds\n", m_szName, m_iTall, m_iWeight, endtime - starttime );
+	Con_DPrintf( "Rendering %s(%i, %i) took %f seconds\n", font->GetName(), m_iTall, m_iWeight, endtime - starttime );
 
 	if( m_hForceHandle != -1 && g_FontMgr.m_Fonts.Count() != m_hForceHandle )
 	{

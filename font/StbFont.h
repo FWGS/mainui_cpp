@@ -15,7 +15,6 @@ GNU General Public License for more details.
 #pragma once
 
 #if defined(MAINUI_USE_CUSTOM_FONT_RENDER) && defined(MAINUI_USE_STB)
-
 #include "BaseFontBackend.h"
 #include "utl/utlmemory.h"
 #include "utl/utlrbtree.h"

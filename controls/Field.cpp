@@ -224,7 +224,7 @@ const char *CMenuField::Key( int key, int down )
 			text[iWidthInChars] = 0;
 
 			int w;
-			charpos = UI::Font::CutText(font, szBuffer + iScroll, m_scChSize, uiStatic.cursorX - x, w);
+			charpos = g_FontMgr.CutText(font, szBuffer + iScroll, m_scChSize.h, uiStatic.cursorX - x, w);
 
 			if( eTextAlignment & QM_LEFT )
 			{
@@ -480,16 +480,16 @@ void CMenuField::Draw( void )
 	}
 	else if( eTextAlignment & QM_RIGHT )
 	{
-		x = newPos.x + (m_scSize.w - UI::Font::GetTextWide( font, text, m_scChSize ) );
+		x = newPos.x + (m_scSize.w - g_FontMgr.GetTextWideScaled( font, text, m_scChSize.h ) );
 	}
 	else
 	{
-		x = newPos.x + (m_scSize.w - UI::Font::GetTextWide( font, text, m_scChSize )) / 2;
+		x = newPos.x + (m_scSize.w - g_FontMgr.GetTextWideScaled( font, text, m_scChSize.h )) / 2;
 	}
 
 	UI_DrawString( font, newPos, m_scSize, text, iColor, false, m_scChSize, eTextAlignment, shadow, limitBySize );
 
-	int cursorOffset = cursor? UI::Font::GetTextWide( font, text, m_scChSize, cursor ):0;
+	int cursorOffset = cursor? g_FontMgr.GetTextWideScaled( font, text, m_scChSize.h, cursor ):0;
 
 	// int cursorOffset = 0;
 

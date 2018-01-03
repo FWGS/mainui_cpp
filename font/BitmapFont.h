@@ -12,3 +12,30 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
+#pragma once
+#ifndef BITMAPFONT_H
+#define BITMAPFONT_H
+
+class CBitmapFont : public CBaseFont
+{
+public:
+	CBitmapFont();
+	~CBitmapFont();
+
+	virtual bool Create( const char *name,
+						 int tall, int weight,
+						 int blur, float brighten,
+						 int outlineSize,
+						 int scanlineOffset, float scanlineScale,
+						 int flags );
+	virtual void GetCharRGBA( int ch, Point pt, Size sz, byte *rgba, Size &drawSize );
+	virtual bool IsValid() const;
+	virtual void GetCharABCWidths( int ch, int &a, int &b, int &c ) ;
+	virtual bool HasChar( int ch ) const;
+	virtual void UploadGlyphsForRanges( charRange_t *range, int rangeSize );
+	virtual int DrawCharacter(int ch, Point pt, Size sz, const int color);
+private:
+	HIMAGE hImage;
+};
+
+#endif // BITMAPFONT_H

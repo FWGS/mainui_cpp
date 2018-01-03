@@ -46,7 +46,7 @@ void CMenuAction::VidInit( )
 		else
 		{
 			if( size.w < 1 )
-				size.w = UI::Font::GetTextWide( font, szName, charSize ) / uiStatic.scaleX;
+				size.w = g_FontMgr.GetTextWideScaled( font, szName, charSize.h ) / uiStatic.scaleX;
 
 			if( size.h < 1 )
 				size.h = charSize.h * 1.5;

@@ -131,24 +131,10 @@ public:
 
 	// text message system
 	static void	DrawCharacter( int x, int y, int width, int height, int ch, int ulRGBA, HIMAGE hFont );
-#ifndef MAINUI_USE_CUSTOM_FONT_RENDER
-	static inline int	DrawConsoleString( int x, int y, const char *string )
-	{ return  engfuncs.pfnDrawConsoleString( x, y, string ); }
-	static void	DrawSetTextColor( int r, int g, int b, int alpha = 255 );
-	static inline void	ConsoleStringLen(  const char *string, int *length, int *height )
-	{ engfuncs.pfnDrawConsoleStringLen( string, length, height ); }
-	static inline int   ConsoleCharacterHeight()
-	{
-		int height;
-		engfuncs.pfnDrawConsoleStringLen( "", 0, &height );
-		return height;
-	}
-#else
 	static int DrawConsoleString( int x, int y, const char *string );
 	static void	DrawSetTextColor( int r, int g, int b, int alpha = 255 );
 	static void	ConsoleStringLen(  const char *string, int *length, int *height );
 	static int   ConsoleCharacterHeight();
-#endif
 
 	static inline int   DrawConsoleString( Point coord, const char *string )
 	{ return DrawConsoleString( coord.x, coord.y, string ); }

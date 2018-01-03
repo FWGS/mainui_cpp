@@ -16,8 +16,6 @@ GNU General Public License for more details.
 #ifndef FONTMANAGER_H
 #define FONTMANAGER_H
 
-#ifdef MAINUI_USE_CUSTOM_FONT_RENDER
-
 #include "BaseMenu.h"
 #include "utl/utlvector.h"
 
@@ -30,12 +28,11 @@ enum EFontFlags
 	FONT_UNDERLINE = BIT( 1 ),
 	FONT_STRIKEOUT = BIT( 2 ),
 	FONT_ADDITIVE  = BIT( 3 )
-	// FONT_DROPSHADOW = BIT( 7 )
 };
 
 /*
  * Font manager is used for creating and operating with fonts
- */
+ **/
 class CFontManager
 {
 public:
@@ -143,7 +140,5 @@ private:
 };
 
 extern CFontManager g_FontMgr;
-
-#endif // USE_CUSTOM_FONT_RENDER
 
 #endif // FONTMANAGER_H

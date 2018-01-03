@@ -13,7 +13,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 #pragma once
-#ifndef WINAPIFONT_H
+#if !defined(WINAPIFONT_H) && defined(MAINUI_USE_CUSTOM_FONT_RENDER) && defined(_WIN32)
 #define WINAPIFONT_H
 
 #define WIN32_LEAN_AND_MEAN

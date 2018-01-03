@@ -434,45 +434,6 @@ void CBMP::Increase( uint w, uint h )
 	data = newData;
 }
 
-int UI::Font::GetTextWide( HFont font, const char *szName, Size charSize, int size )
-{
-#ifdef MAINUI_USE_CUSTOM_FONT_RENDER
-	return g_FontMgr.GetTextWideScaled( font, szName, charSize.h, size );
-#else
-	if( size > 0 )
-		return size * charSize.w;
-	return strlen( szName ) * charSize.w;
-#endif
-}
-
-int UI::Font::CutText(HFont fontHandle, const char *text, Size charSize, int visibleSize, int &width )
-{
-#ifdef MAINUI_USE_CUSTOM_FONT_RENDER
-	return g_FontMgr.CutText( fontHandle, text, charSize.h, visibleSize, width );
-#else //todo
-	return 0;
-#endif
-}
-
-int UI::Font::GetEllipsisWide( HFont font, int charW )
-{
-#ifdef MAINUI_USE_CUSTOM_FONT_RENDER
-	return g_FontMgr.GetEllipsisWide( font );
-#else
-	return charW * 3;
-#endif
-}
-
-int UI::Font::GetCharacterWidth(HFont font, int uch, int charW)
-{
-#ifdef MAINUI_USE_CUSTOM_FONT_RENDER
-	return g_FontMgr.GetCharacterWidth( font, uch );
-#else
-	return charW * 3;
-#endif
-
-}
-
 /*
 ============================
 Con_UtfProcessChar
@@ -602,25 +563,26 @@ int Con_UtfMoveRight( char *str, int pos, int length )
 }
 
 
-// exclude some default names, that may be set from engine or just come with config files
-static struct
-{
-	const char *name;
-	bool substring;
-} prohibitedNames[] =
-{
-{ "default", false, },
-{ "unnamed", false, },
-{ "Player", false, },
-{ "<Warrior> Player", false, },
-{ "Shinji", false, },
-{ "CSDuragiCOM", true },
-};
-
 bool UI::Names::CheckIsNameValid(const char *name)
 {
 	if( !name || !*name )
 		return false;
+
+	// exclude some default names, that may be set from engine or just come with config files
+	static struct
+	{
+		const char *name;
+		bool substring;
+	} prohibitedNames[] =
+	{
+	{ "default", false, },
+	{ "unnamed", false, },
+	{ "Player", false, },
+	{ "<Warrior> Player", false, },
+	{ "Shinji", false, },
+	{ "CSDuragiCOM", true },
+	{ "Nero Claudius", true }, // *purrrt* you found a secret area!
+	};
 
 	for( size_t i = 0; i < ARRAYSIZE( prohibitedNames ); i++ )
 	{

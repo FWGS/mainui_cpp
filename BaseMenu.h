@@ -29,7 +29,7 @@ GNU General Public License for more details.
 #define UI_BLINK_TIME		250
 #define UI_BLINK_MASK		499
 
-#define UI_SMALL_CHAR_WIDTH		10
+#define UI_SMALL_CHAR_WIDTH		11
 #define UI_SMALL_CHAR_HEIGHT	23
 
 #define UI_MED_CHAR_WIDTH		13

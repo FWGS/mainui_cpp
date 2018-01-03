@@ -19,6 +19,16 @@ GNU General Public License for more details.
 #include "BaseMenu.h"
 #include "utlrbtree.h"
 
+#ifdef __ANDROID__
+#define SCALE_FONTS
+#endif
+
+struct charRange_t
+{
+	int chMin;
+	int chMax;
+};
+
 class CBaseFont
 {
 public:
@@ -36,6 +46,8 @@ public:
 	virtual bool IsValid() const = 0;
 	virtual void GetCharABCWidths( int ch, int &a, int &b, int &c ) = 0;
 	virtual bool HasChar( int ch ) const = 0;
+	virtual void UploadGlyphsForRanges( charRange_t *range, int rangeSize );
+	virtual int DrawCharacter( int ch, Point pt, Size sz, const int color );
 
 	inline int GetHeight() const       { return m_iHeight + GetEfxOffset(); }
 	inline int GetTall() const         { return m_iTall; }
@@ -51,13 +63,8 @@ public:
 
 	void DebugDraw();
 
-	struct charRange_t
-	{
-		int chMin;
-		int chMax;
-	};
 
-	void UploadGlyphsForRanges( charRange_t *range, int rangeSize );
+
 
 	void GetTextureName( char *dst, size_t len, int pageNum ) const;
 
@@ -73,7 +80,6 @@ protected:
 	char m_szName[32];
 	int	 m_iTall, m_iWeight, m_iFlags, m_iHeight, m_iMaxCharWidth;
 	int  m_iAscent;
-	int  m_iGLTexture;
 	bool m_bAdditive;
 
 	// blurring
@@ -87,6 +93,7 @@ protected:
 
 	// Outlines
 	int  m_iOutlineSize;
+	int m_iEllipsisWide;
 
 private:
 	void GetBlurValueForPixel(byte *src, Point srcPt, Size srcSz, byte *dest);
@@ -107,7 +114,6 @@ private:
 	static bool GlyphLessFunc( const glyph_t &a, const glyph_t &b );
 	friend class CFontManager;
 
-	int m_iEllipsisWide;
 };
 
 
