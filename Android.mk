@@ -79,6 +79,7 @@ LOCAL_SRC_FILES := \
 	font/FontManager.cpp				\
 	font/BaseFontBackend.cpp			\
 	font/StbFont.cpp				\
+	font/BitmapFont.cpp				\
 	EventSystem.cpp                                 \
 	BaseMenu.cpp                                    \
 	Btns.cpp                                        \
