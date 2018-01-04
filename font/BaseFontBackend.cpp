@@ -474,7 +474,7 @@ int CBaseFont::DrawCharacter(int ch, Point pt, Size sz, const int color)
 	int a, b, c, width;
 
 #ifdef SCALE_FONTS
-	float factor = (float)sz.h / (float)fGetTall();
+	float factor = (float)sz.h / (float)GetTall();
 #endif
 
 	GetCharABCWidths( ch, a, b, c );
