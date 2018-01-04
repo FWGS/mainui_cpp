@@ -51,7 +51,7 @@ bool CBitmapFont::Create(const char *name, int tall, int weight, int blur, float
 void CBitmapFont::GetCharRGBA(int ch, Point pt, Size sz, byte *rgba, Size &drawSize)
 {
 	// stub!
-	Con_DPrintf( "CBitmapFont::GetCharRGBA\n", __PRETTY_FUNCTION__ );
+	Con_DPrintf( "CBitmapFont::GetCharRGBA\n" );
 }
 
 void CBitmapFont::GetCharABCWidths(int ch, int &a, int &b, int &c)
@@ -73,14 +73,14 @@ bool CBitmapFont::HasChar(int ch) const
 bool CBitmapFont::IsValid() const
 {
 	// stub!
-	Con_DPrintf( "CBitmapFont::IsValid\n", __PRETTY_FUNCTION__ );
+	Con_DPrintf( "CBitmapFont::IsValid\n" );
 	return true;
 }
 
 void CBitmapFont::UploadGlyphsForRanges(charRange_t *range, int rangeSize)
 {
 	// stub!
-	Con_DPrintf( "CBitmapFont::UploadGlyphsForRanges\n", __PRETTY_FUNCTION__ );
+	Con_DPrintf( "CBitmapFont::UploadGlyphsForRanges\n" );
 }
 
 int table_cp1251[64] = {

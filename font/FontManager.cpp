@@ -408,8 +408,7 @@ int CFontManager::DrawCharacter(HFont fontHandle, int ch, Point pt, Size sz, con
 	if( !font )
 		return 0;
 
-	font->DrawCharacter( ch, pt, sz, color );
-
+	return font->DrawCharacter( ch, pt, sz, color );
 }
 
 void CFontManager::DebugDraw(HFont fontHandle)

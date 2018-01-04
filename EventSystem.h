@@ -58,6 +58,9 @@ GNU General Public License for more details.
 #define DECLARE_EVENT_TO_ITEM_METHOD( className, method ) \
 	DECLARE_NAMED_EVENT_TO_ITEM_METHOD( className, method, method )
 
+#ifdef _MSC_VER
+#pragma pointers_to_members( full_generality, virtual_inheritance )  
+#endif
 class CMenuBaseItem;
 class CMenuItemsHolder;
 
@@ -75,8 +78,6 @@ typedef void (*EventCallback)( CMenuBaseItem *, void * ); // extradata
 typedef void (*VoidCallback)( void ); // no extradata
 typedef void (CMenuItemsHolder::*IHCallback)( void * ); // extradata
 typedef void (CMenuItemsHolder::*VoidIHCallback)(); // no extradata
-
-// typedef void (CMenuBaseItem::*ItemCallback)( void * );
 
 #define MenuCb( a ) static_cast<IHCallback>((a))
 #define VoidCb( a ) static_cast<VoidIHCallback>((a))

@@ -19,38 +19,42 @@ GNU General Public License for more details.
 CEventCallback::CEventCallback() :
 	pExtra( 0 ), type( CB_OLD_EXTRA ), szName( 0 )
 {
-	u.cb = 0;
+	memset(&u, 0, sizeof(u));
 }
 
 CEventCallback::CEventCallback( EventCallback cb, void *ex ) :
 	pExtra( ex ), type( CB_OLD_EXTRA ), szName( 0 )
 {
+	memset(&u, 0, sizeof(u));
 	u.cb = cb;
 }
 
 CEventCallback::CEventCallback(int execute_now, const char *sz)
 {
+	memset(&u, 0, sizeof(u));
 	SetCommand( execute_now, sz );
 }
 
 CEventCallback::CEventCallback(VoidCallback cb) :
 	pExtra( 0 ), type( CB_OLD_VOID ), szName( 0 )
 {
+	memset(&u, 0, sizeof(u));
 	u.voidCb = cb;
 }
 
 CEventCallback::CEventCallback( IHCallback cb, void *ex ) :
 	pExtra( ex ), type( CB_IH_EXTRA ), szName( 0 )
 {
+	memset(&u, 0, sizeof(u));
 	u.itemsHolderCb = cb;
 }
 
 CEventCallback::CEventCallback( VoidIHCallback cb ) :
-	pExtra( 0 ), type( CB_IH_EXTRA ), szName( 0 )
+	pExtra( 0 ), type( CB_IH_VOID ), szName( 0 )
 {
+	memset(&u, 0, sizeof(u));
 	u.voidItemsHolderCb = cb;
 }
-
 
 void CEventCallback::operator()(CMenuBaseItem *pSelf)
 {
@@ -83,7 +87,7 @@ IHCallback CEventCallback::operator =( IHCallback cb )
 
 VoidIHCallback CEventCallback::operator =( VoidIHCallback cb )
 {
-	type = CB_IH_EXTRA;
+	type = CB_IH_VOID;
 	return u.voidItemsHolderCb = cb;
 }
 

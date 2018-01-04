@@ -133,6 +133,8 @@ endif()
 include_directories(${XASH_SDK}/common ${XASH_SDK}/engine ${XASH_SDK}/pm_shared . controls/ menus/ utl/ font/)
 
 if(MSVC)
+	# add_compile_options(/vmg /vms) 
+	# set(CMAKE_CXX_FLAGS "/vmg /vmv") # Override by-design MSVC bug with optimized pointer-to-member calling convention
 	add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 endif()
 
