@@ -1294,8 +1294,7 @@ int UI_VidInit( void )
 	static bool calledOnce = true;
 	if( uiStatic.textInput )
 	{
-	/*
-		int rootPos = uiStatic.rootPosition;
+		/*int rootPos = uiStatic.rootPosition;
 		for( int i = uiStatic.menuDepth-1; i >= rootPos; i-- )
 		{
 			uiStatic.menuStack[i]->_Event( QM_IMRESIZED );
@@ -1309,8 +1308,19 @@ int UI_VidInit( void )
 		return 0;
 	}
 	UI_Precache ();
-	// Sizes are based on screen height
-	uiStatic.scaleX = uiStatic.scaleY = ScreenHeight / 768.0f;
+	// don't allow screenwidth is slower than 4:3 screens
+	// it's really not intended to use, just for keeping menu working
+	if (ScreenWidth * 3 < ScreenHeight * 4)
+	{
+		uiStatic.scaleX = uiStatic.scaleY = ScreenWidth / 1024.0f;
+	}
+	else
+	{
+		// Sizes are based on screen height
+		uiStatic.scaleX = uiStatic.scaleY = ScreenHeight / 768.0f;
+	}
+
+	
 	uiStatic.width = ScreenWidth / uiStatic.scaleX;
 	// move cursor to screen center
 	uiStatic.cursorX = ScreenWidth / 2;
