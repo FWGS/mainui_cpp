@@ -1387,6 +1387,55 @@ int UI_VidInit( void )
 	return 1;
 }
 
+void UI_OpenUpdatePage( bool engine, bool preferstore )
+{
+	const char *updateUrl;
+
+	if( engine || !gMenu.m_gameinfo.update_url[0] )
+	{
+#ifndef XASH_DISABLE_FWGS_EXTENSIONS
+		if( preferstore )
+			updateUrl = "PlatformUpdatePage";
+		else
+			updateUrl = "GenericUpdatePage";
+#else
+		// TODO: Replace by macro for mainui_cpp modders?
+		updateUrl = "https://github.com/FWGS/xash3d/releases/latest";
+#endif
+	}
+	else
+	{
+		updateUrl = gMenu.m_gameinfo.update_url;
+	}
+
+	EngFuncs::ShellExecute( updateUrl, NULL, TRUE );
+}
+
+static void UI_UpdateDialog_f( void )
+{
+	static CMenuYesNoMessageBox msgBox;
+	static bool ignore = false;
+	static bool preferStore;
+
+	if( ignore )
+		return;
+
+	if( !strcmp( EngFuncs::CmdArgv( 1 ), "nostore" ))
+		preferStore = false;
+	else
+		preferStore = true;
+
+	msgBox.SetMessage( "A new update is available.\nPress Update to open download page." );
+	msgBox.SetPositiveButton( "Update", PC_UPDATE );
+	msgBox.SetNegativeButton( "Later", PC_CANCEL );
+
+	SET_EVENT( msgBox.onPositive, UI_OpenUpdatePage( true, *(bool*)pExtra ) );
+	msgBox.onPositive.pExtra = &preferStore;
+
+	SET_EVENT( msgBox.onNegative, *(bool*)pExtra = true ); // set ignore
+	msgBox.onNegative.pExtra = &ignore;
+}
+
 /*
 =================
 UI_Init
@@ -1400,9 +1449,11 @@ void UI_Init( void )
 	ui_show_window_stack = EngFuncs::CvarRegister( "ui_show_window_stack", 0, FCVAR_ARCHIVE );
 	ui_borderclip = EngFuncs::CvarRegister( "ui_borderclip", "0", FCVAR_ARCHIVE );
 
+
 	// show cl_predict dialog
 	EngFuncs::CvarRegister( "menu_mp_firsttime", "1", FCVAR_ARCHIVE );
 
+	EngFuncs::Cmd_AddCommand( "menu_updatedialog", UI_UpdateDialog_f ); // only for engine updates
 	EngFuncs::Cmd_AddCommand( "menu_main", UI_Main_Menu );
 	EngFuncs::Cmd_AddCommand( "menu_newgame", UI_NewGame_Menu );
 	EngFuncs::Cmd_AddCommand( "menu_options", UI_Options_Menu );

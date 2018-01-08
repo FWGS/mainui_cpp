@@ -38,8 +38,6 @@ public:
 
 	// update dialog
 	CMenuYesNoMessageBox msgBox;
-
-	const char *m_szUpdateUrl;
 };
 
 static CMenuOptions	uiOptions;
@@ -54,15 +52,9 @@ void CMenuOptions::_Init( void )
 	banner.SetPicture( ART_BANNER );
 
 	msgBox.SetMessage( "Check the Internet for updates?" );
-	SET_EVENT( msgBox.onPositive,
-		EngFuncs::ShellExecute( ((CMenuOptions*)pSelf->Parent())->m_szUpdateUrl, NULL, TRUE ) );
+	SET_EVENT( msgBox.onPositive, UI_OpenUpdatePage( false, true ) );
 
 	msgBox.Link( this );
-
-	if( gMenu.m_gameinfo.update_url[0] != 0 )
-		m_szUpdateUrl = gMenu.m_gameinfo.update_url;
-	else
-		m_szUpdateUrl = "https://github.com/FWGS/xash3d/releases/latest";
 
 	AddItem( background );
 	AddItem( banner );
