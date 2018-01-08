@@ -1387,6 +1387,7 @@ int UI_VidInit( void )
 	return 1;
 }
 
+#undef ShellExecute //  "thanks", windows.h!
 void UI_OpenUpdatePage( bool engine, bool preferstore )
 {
 	const char *updateUrl;
@@ -1434,6 +1435,8 @@ static void UI_UpdateDialog_f( void )
 
 	SET_EVENT( msgBox.onNegative, *(bool*)pExtra = true ); // set ignore
 	msgBox.onNegative.pExtra = &ignore;
+
+	msgBox.Show();
 }
 
 /*
