@@ -31,7 +31,7 @@ CMenuPicButton::CMenuPicButton() : BaseClass()
 {
 	bEnableTransitions = true;
 	eFocusAnimation = QM_HIGHLIGHTIFFOCUS;
-	iFlags = QMF_DROPSHADOW;
+	iFlags = QMF_DROPSHADOW|QMF_ACT_ONRELEASE;
 
 	iFocusStartTime = 0;
 
@@ -307,9 +307,6 @@ void CMenuPicButton::SetPicture(EDefaultBtns ID )
 
 	hPic = uiStatic.buttonsPics[ID];
 	button_id = ID;
-
-	if( hPic ) // text buttons not use it
-		iFlags |= QMF_ACT_ONRELEASE;
 #endif
 }
 
@@ -320,9 +317,6 @@ void CMenuPicButton::SetPicture(const char *filename)
 	size.h = UI_BUTTONS_HEIGHT;
 
 	hPic = EngFuncs::PIC_Load( filename );
-
-	if( hPic ) // text buttons not use it
-		iFlags |= QMF_ACT_ONRELEASE;
 #endif
 }
 
