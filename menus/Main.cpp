@@ -107,7 +107,7 @@ void CMenuMain::CMenuMainBanner::Draw()
 
 void CMenuMain::QuitDialog(void *pExtra)
 {
-	if( CL_IsActive() )
+	if( CL_IsActive() && EngFuncs::GetCvarFloat( "host_serverstate" ) && EngFuncs::GetCvarFloat( "maxplayers" ) == 1.0f )
 		dialog.SetMessage( MenuStrings[IDS_MAIN_QUITPROMPTINGAME] );
 	else
 		dialog.SetMessage( MenuStrings[IDS_MAIN_QUITPROMPT] );
