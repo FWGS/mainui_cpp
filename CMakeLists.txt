@@ -23,9 +23,10 @@
 cmake_minimum_required(VERSION 2.6.0)
 project (MAINUI)
 
-if(NOT MSVC AND NOT MINGW)
-	set(CMAKE_CXX_STANDARD 11)
-endif()
+# By default we require C++11 support.
+# But it can be overriden with -DMY_COMPILER_SUCKS compiler option
+# It's not recommended and may not work(as it's done only for MSVC6 support)
+set(CMAKE_CXX_STANDARD 11)
 
 set(MAINUI_LIBRARY xashmenu)
 
@@ -133,8 +134,6 @@ endif()
 include_directories(${XASH_SDK}/common ${XASH_SDK}/engine ${XASH_SDK}/pm_shared . controls/ menus/ utl/ font/)
 
 if(MSVC)
-	# add_compile_options(/vmg /vms) 
-	# set(CMAKE_CXX_FLAGS "/vmg /vmv") # Override by-design MSVC bug with optimized pointer-to-member calling convention
 	add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 endif()
 
