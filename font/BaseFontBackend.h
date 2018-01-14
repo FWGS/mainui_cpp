@@ -16,10 +16,11 @@ GNU General Public License for more details.
 #ifndef BASEFONT_H
 #define BASEFONT_H
 
+#include "port.h" // defines XASH_MOBILE_PLATFORM
 #include "BaseMenu.h"
 #include "utlrbtree.h"
 
-#ifdef __ANDROID__
+#ifdef XASH_MOBILE_PLATFORM
 #define SCALE_FONTS
 #endif
 

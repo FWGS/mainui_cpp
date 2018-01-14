@@ -68,6 +68,7 @@ public:
 
 	int GetEllipsisWide( HFont font ); // cached wide of "..."
 
+	int GetCharacterWidthScaled(HFont font, int ch, int charH );
 private:
 	void UploadTextureForFont(CBaseFont *font );
 

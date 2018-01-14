@@ -399,7 +399,7 @@ int UI_DrawString( HFont font, int x, int y, int w, int h,
 					}
 				}
 
-				charWide = g_FontMgr.GetCharacterWidth( font, uch );
+				charWide = g_FontMgr.GetCharacterWidthScaled( font, uch, charH );
 
 				if( limitBySize && pixelWide + charWide >= w )
 				{

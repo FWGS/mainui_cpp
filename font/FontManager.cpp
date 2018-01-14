@@ -189,6 +189,15 @@ int CFontManager::GetCharacterWidth(HFont font, int ch)
 	return a + b + c;
 }
 
+int CFontManager::GetCharacterWidthScaled(HFont font, int ch, int height)
+{
+	return GetCharacterWidth( font, ch )
+#ifdef SCALE_FONTS
+		* ((float)height / (float)GetFontTall( font ))
+#endif
+	;
+}
+
 HFont CFontManager::GetFontByName(const char *name)
 {
 	for( int i = 0; i < m_Fonts.Count(); i++ )
