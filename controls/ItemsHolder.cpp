@@ -22,7 +22,7 @@ GNU General Public License for more details.
 
 CMenuItemsHolder::CMenuItemsHolder() :
 	BaseClass(), m_iCursor( 0 ), m_iCursorPrev( 0 ), m_pItems( ), m_numItems( 0 ),
-	m_events(), m_numEvents( 0 ), m_bInit( false ), m_bAllowEnterActivate( false ),
+	m_events(), m_numEvents( 0 ), m_bInit( false ),
 	m_bWrapCursor( true ), m_szResFile( 0 )
 {
 	;
@@ -39,24 +39,15 @@ const char *CMenuItemsHolder::Key( int key, int down )
 
 		if( item && item->IsVisible() && !(item->iFlags & (QMF_GRAYED|QMF_INACTIVE) ) )
 		{
-			if( key == K_ENTER && !m_bAllowEnterActivate )
+			// mouse keys must be checked for item bounds
+			if( key < K_MOUSE1 || key > K_MOUSE5 ||
+				( uiStatic.cursorX >= item->m_scPos.x &&
+				uiStatic.cursorY >= item->m_scPos.y &&
+				uiStatic.cursorX <= item->m_scPos.x + item->m_scSize.w &&
+				uiStatic.cursorY <= item->m_scPos.y + item->m_scSize.h ) )
 			{
-				if( !down )
-					m_bAllowEnterActivate = true;
-				return uiSoundNull;
-			}
-			else
-			{
-				// mouse keys must be checked for item bounds
-				if( key < K_MOUSE1 || key > K_MOUSE5 ||
-					( uiStatic.cursorX >= item->m_scPos.x &&
-					uiStatic.cursorY >= item->m_scPos.y &&
-					uiStatic.cursorX <= item->m_scPos.x + item->m_scSize.w &&
-					uiStatic.cursorY <= item->m_scPos.y + item->m_scSize.h ) )
-				{
-					sound = item->Key( key, down );
-					if( sound ) return sound;
-				}
+				sound = item->Key( key, down );
+				if( sound ) return sound;
 			}
 		}
 
@@ -64,7 +55,7 @@ const char *CMenuItemsHolder::Key( int key, int down )
 		if( !down )
 			return 0;
 
-		// default handling
+		// default handling -- items navigation
 		switch( key )
 		{
 		case K_UPARROW:
@@ -85,7 +76,6 @@ const char *CMenuItemsHolder::Key( int key, int down )
 					m_pItems[m_iCursorPrev]->iFlags &= ~QMF_HASKEYBOARDFOCUS;
 					m_pItems[m_iCursor]->iFlags |= QMF_HASKEYBOARDFOCUS;
 				}
-				m_bAllowEnterActivate = true;
 			}
 			else
 			{
@@ -110,23 +100,11 @@ const char *CMenuItemsHolder::Key( int key, int down )
 					m_pItems[m_iCursorPrev]->iFlags &= ~QMF_HASKEYBOARDFOCUS;
 					m_pItems[m_iCursor]->iFlags |= QMF_HASKEYBOARDFOCUS;
 				}
-				m_bAllowEnterActivate = true;
 			}
 			else
 			{
 				sound = NULL;
 			}
-			break;
-		case K_MOUSE1:
-			if( item && (item->iFlags & QMF_HASMOUSEFOCUS) && item->IsVisible() && !(item->iFlags & (QMF_GRAYED|QMF_INACTIVE)))
-				return item->Activate();
-			break;
-		case K_ENTER:
-		case K_KP_ENTER:
-		case K_AUX1:
-		case K_AUX13:
-			if( m_bAllowEnterActivate && item && item->IsVisible() && !(item->iFlags & (QMF_GRAYED|QMF_INACTIVE|QMF_MOUSEONLY)) )
-				return item->Activate();
 			break;
 		}
 	}

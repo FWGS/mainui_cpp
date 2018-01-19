@@ -96,7 +96,6 @@ protected:
 	int m_numEvents;
 
 	bool m_bInit;
-	bool m_bAllowEnterActivate;
 	bool m_bWrapCursor;
 
 	const char *m_szResFile;

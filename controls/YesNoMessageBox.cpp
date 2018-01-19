@@ -131,11 +131,10 @@ CMenuYesNoMessageBox::Key
 */
 const char *CMenuYesNoMessageBox::Key(int key, int down)
 {
-	if( UI::Key::IsEscape( key ) && down && m_bAllowEnterActivate )
+	if( UI::Key::IsEscape( key ) && down )
 	{
 		Hide();
 		onNegative( this );
-		m_bAllowEnterActivate = true;
 
 		return uiSoundNull;
 	}
