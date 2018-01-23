@@ -23,6 +23,8 @@
 cmake_minimum_required(VERSION 2.6.0)
 project (MAINUI)
 
+include(FWGSLib)
+
 # By default we require C++11 support.
 # But it can be overriden with -DMY_COMPILER_SUCKS compiler option
 # It's not recommended and may not work(as it's done only for MSVC6 support)
@@ -160,32 +162,11 @@ if(MAINUI_USE_CUSTOM_FONT_RENDER)
 	endif()
 endif()
 
-set_target_properties(${MAINUI_LIBRARY} PROPERTIES
-	POSITION_INDEPENDENT_CODE 1)
-
 # Name library as it named in Unkle Mike's Xash3D
 if(WIN32)
 	set_target_properties(${MAINUI_LIBRARY} PROPERTIES
 		OUTPUT_NAME menu PREFIX "")
 endif()
 
-if(NOT WIN32)
-	install(TARGETS ${MAINUI_LIBRARY} DESTINATION ${LIB_INSTALL_DIR}/${LIB_INSTALL_SUBDIR}
-		PERMISSIONS OWNER_READ OWNER_WRITE
-		            GROUP_READ
-					WORLD_READ)
-else()
-	install(TARGETS ${MAINUI_LIBRARY}
-		CONFIGURATIONS Debug 
-		RUNTIME DESTINATION ${LIB_INSTALL_DIR}/Debug/
-		LIBRARY DESTINATION ${LIB_INSTALL_DIR}/Debug/)
-	if(MSVC)
-		install(FILES $<TARGET_PDB_FILE:${MAINUI_LIBRARY}>
-			CONFIGURATIONS Debug 
-			DESTINATION ${LIB_INSTALL_DIR}/Debug/)
-	endif()
-	install(TARGETS ${MAINUI_LIBRARY}
-		CONFIGURATIONS Release 
-		RUNTIME DESTINATION ${LIB_INSTALL_DIR}/Release/
-		LIBRARY DESTINATION ${LIB_INSTALL_DIR}/Release/)
-endif()
+fwgs_set_default_properties(${MAINUI_LIBRARY})
+fwgs_install(${MAINUI_LIBRARY})
