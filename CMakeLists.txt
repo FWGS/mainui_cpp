@@ -20,7 +20,7 @@
 # SOFTWARE.
 #
 
-cmake_minimum_required(VERSION 2.6.0)
+cmake_minimum_required(VERSION  2.8.0)
 project (MAINUI)
 
 include(FWGSLib)
@@ -122,7 +122,7 @@ list(APPEND MAINUI_SOURCES ${MAINUI_FONT_RENDER_SOURCES})
 add_library (${MAINUI_LIBRARY} SHARED ${MAINUI_SOURCES})
 
 if(NOT WIN32 AND NOT MINGW)
-	add_compile_options(-Wall -Wextra -Wpedantic -Wno-unused-parameter -Wno-unused-variable)
+	fwgs_add_compile_options(C -Wall -Wextra -Wpedantic -Wno-unused-parameter -Wno-unused-variable)
 else()
 
 	# Only for MSVC6 compability mode! Newer VC does fail with this define
