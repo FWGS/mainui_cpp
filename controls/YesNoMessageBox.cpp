@@ -39,7 +39,6 @@ CMenuYesNoMessageBox::CMenuYesNoMessageBox( bool alert ) : BaseClass( "YesNoMess
 	no.SetRect( 338, 204, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
 
 
-	yes.iFlags = no.iFlags = QMF_DROPSHADOW;
 	yes.eTextAlignment = no.eTextAlignment = QM_CENTER;
 	yes.onActivated.pExtra = no.onActivated.pExtra = this;
 	yes.bEnableTransitions = no.bEnableTransitions = false;
