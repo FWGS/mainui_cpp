@@ -32,6 +32,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Slider.h"
 #include "Field.h"
 #include "SpinControl.h"
+#include "YesNoMessageBox.h"
 
 #define ART_BANNER		"gfx/shell/head_customize"
 
@@ -283,7 +284,7 @@ class CMenuPlayerSetup : public CMenuFramework
 private:
 	void _Init();
 public:
-	CMenuPlayerSetup() : CMenuFramework( "CMenuPlayerSetup" ) { }
+	CMenuPlayerSetup() : CMenuFramework( "CMenuPlayerSetup" ), msgBox( true ) { }
 
 	void FindModels();
 	void SetConfig();
@@ -307,6 +308,8 @@ public:
 
 	CMenuField	name;
 	CMenuSpinControl	model;
+
+	CMenuYesNoMessageBox msgBox;
 
 } uiPlayerSetup;
 
@@ -371,6 +374,12 @@ void CMenuPlayerSetup::SetConfig( void )
 
 void CMenuPlayerSetup::SaveAndPopMenu()
 {
+	if( !UI::Names::CheckIsNameValid( name.GetBuffer() ) )
+	{
+		msgBox.Show();
+		return;
+	}
+
 	SetConfig();
 	CMenuFramework::SaveAndPopMenu();
 }
@@ -481,6 +490,9 @@ void CMenuPlayerSetup::_Init( void )
 	view.iFlags |= addFlags;
 	view.SetRect( 660, 260, 260, 320 );
 	UpdateModel();
+
+	msgBox.SetMessage( "Please, choose another player name" );
+	msgBox.Link( this );
 
 	AddItem( background );
 	AddItem( banner );

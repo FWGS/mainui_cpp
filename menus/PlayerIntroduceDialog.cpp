@@ -35,9 +35,6 @@ public:
 	{
 	}
 
-	~CMenuPlayerIntroduceDialog()
-	{
-	}
 	void WriteOrDiscard();
 	virtual void _Init();
 	virtual void _VidInit();
@@ -92,7 +89,7 @@ void CMenuPlayerIntroduceDialog::_Init()
 	name.LinkCvar( "name" );
 	name.iMaxLength = MAX_SCOREBOARDNAME;
 
-	msgBox.SetMessage( "This player name is not allowed!" );
+	msgBox.SetMessage( "Please, choose another player name" );
 	msgBox.Link( this );
 
 	ok.SetRect( 298, 204, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
