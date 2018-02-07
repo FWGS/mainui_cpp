@@ -263,15 +263,11 @@ void CMenuSpinControl::UpdateEditable()
 	switch( m_eType )
 	{
 	case CVAR_STRING:
-	{
 		SetCurrentValue( CvarString() );
 		break;
-	}
 	case CVAR_VALUE:
-	{
 		SetCurrentValue( CvarValue() );
 		break;
-	}
 	}
 }
 

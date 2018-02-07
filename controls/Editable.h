@@ -80,6 +80,7 @@ protected:
 	const char *m_szCvarName;
 	cvarType_e  m_eType;
 
+	bool		m_bForceUpdate;
 	char		m_szString[CS_SIZE], m_szOriginalString[CS_SIZE];
 	float		m_flValue, m_flOriginalValue;
 

@@ -16,7 +16,7 @@ GNU General Public License for more details.
 #include "Editable.h"
 
 CMenuEditable::CMenuEditable() : BaseClass(),
-	m_szCvarName(), m_eType(),
+	m_szCvarName(), m_eType(), m_bForceUpdate( false ),
 	m_szString(), m_szOriginalString(),
 	m_flValue(), m_flOriginalValue()
 {
@@ -33,7 +33,11 @@ void CMenuEditable::LinkCvar(const char *name, cvarType_e type)
 	m_szCvarName = name;
 	m_eType = type;
 
-	UpdateCvar();
+	m_bForceUpdate = true;
+
+		UpdateCvar();
+
+	m_bForceUpdate = false;
 }
 
 void CMenuEditable::Reload()
@@ -61,7 +65,7 @@ void CMenuEditable::SetCvarString(const char *string)
 	if( onCvarChange ) onCvarChange( this );
 }
 
-void CMenuEditable::SetOriginalString(const char *psz)
+void CMenuEditable::SetOriginalString( const char *psz )
 {
 	Q_strncpy( m_szString, psz, CS_SIZE );
 	Q_strncpy( m_szOriginalString, m_szString, CS_SIZE );
@@ -70,7 +74,7 @@ void CMenuEditable::SetOriginalString(const char *psz)
 	SetCvarString( m_szOriginalString );
 }
 
-void CMenuEditable::SetOriginalValue(float val)
+void CMenuEditable::SetOriginalValue( float val )
 {
 	m_flValue =	m_flOriginalValue = val;
 
@@ -79,7 +83,7 @@ void CMenuEditable::SetOriginalValue(float val)
 
 void CMenuEditable::UpdateCvar()
 {
-	bool haveUpdate = false;
+	bool haveUpdate = m_bForceUpdate;
 
 	if( onCvarGet )
 	{
@@ -93,7 +97,7 @@ void CMenuEditable::UpdateCvar()
 		case CVAR_STRING:
 		{
 			const char *str = EngFuncs::GetCvarString( m_szCvarName );
-			if( strcmp( m_szOriginalString, str ) )
+			if( !haveUpdate && strcmp( m_szOriginalString, str ) )
 			{
 				SetOriginalString( str );
 				haveUpdate = true;
@@ -103,7 +107,7 @@ void CMenuEditable::UpdateCvar()
 		case CVAR_VALUE:
 		{
 			float val = EngFuncs::GetCvarFloat( m_szCvarName );
-			if( m_flOriginalValue != val )
+			if( !haveUpdate && m_flOriginalValue != val )
 			{
 				SetOriginalValue( val );
 				haveUpdate = true;
