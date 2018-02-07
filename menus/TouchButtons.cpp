@@ -312,6 +312,15 @@ void CMenuTouchButtons::SaveButton()
 			texture.GetBuffer(),
 			this->command.GetBuffer() );
 		EngFuncs::ClientCmd(0, command);
+		snprintf( command, 512, "touch_setflags \"%s\" %i\n", name.GetBuffer(), curflags );
+		EngFuncs::ClientCmd(0, command);
+		snprintf( command, 512, "touch_setcolor \"%s\" %u %u %u %u\n", name.GetBuffer(),
+			(uint)red.GetCurrentValue(),
+			(uint)green.GetCurrentValue(),
+			(uint)blue.GetCurrentValue(),
+			(uint)alpha.GetCurrentValue() );
+		EngFuncs::ClientCmd(1, command);
+		name.Clear();
 	}
 	else
 	{
@@ -319,22 +328,16 @@ void CMenuTouchButtons::SaveButton()
 		EngFuncs::ClientCmd(0, command);
 		snprintf( command, 512, "touch_setcommand \"%s\" \"%s\"\n", selectedName, this->command.GetBuffer() );
 		EngFuncs::ClientCmd(0, command);
+		snprintf( command, 512, "touch_setflags \"%s\" %i\n", selectedName, curflags );
+		EngFuncs::ClientCmd(0, command);
+		snprintf( command, 512, "touch_setcolor \"%s\" %u %u %u %u\n", selectedName,
+			(uint)red.GetCurrentValue(),
+			(uint)green.GetCurrentValue(),
+			(uint)blue.GetCurrentValue(),
+			(uint)alpha.GetCurrentValue() );
+		EngFuncs::ClientCmd(1, command);
 	}
 
-	snprintf( command, 512, "touch_setflags \"%s\" %i\n", name.GetBuffer(), curflags );
-	EngFuncs::ClientCmd(0, command);
-
-	snprintf( command, 512, "touch_setcolor \"%s\" %u %u %u %u\n", name.GetBuffer(),
-		(uint)red.GetCurrentValue(),
-		(uint)green.GetCurrentValue(),
-		(uint)blue.GetCurrentValue(),
-		(uint)alpha.GetCurrentValue() );
-	EngFuncs::ClientCmd(1, command);
-
-	if( name.GetBuffer()[0] )
-	{
-		name.Clear();
-	}
 	GetButtonList();
 }
 
@@ -357,7 +360,7 @@ void CMenuTouchButtons::FileDialogCallback( bool success )
 	if( success )
 	{
 		uiTouchButtons.texture.SetBuffer( uiFileDialogGlobal.result );
-		uiTouchButtons.textureid = EngFuncs::PIC_Load(uiTouchButtons.texture.GetBuffer());
+		uiTouchButtons.UpdateTexture();
 	}
 }
 
@@ -555,7 +558,8 @@ UI_TouchButtons_Menu
 */
 void UI_TouchButtons_Menu( void )
 {
-    UI_TouchButtons_Precache();
+	UI_TouchButtons_Precache();
+	uiTouchButtons.GetButtonList();
 
 	uiTouchButtons.Show();
 }
