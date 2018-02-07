@@ -23,6 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Bitmap.h"
 #include "PicButton.h"
 #include "CheckBox.h"
+#include "SpinControl.h"
 
 #define ART_BANNER			"gfx/shell/head_audio"
 
@@ -40,11 +41,13 @@ private:
 	void VibrateChanged();
 	void SaveAndPopMenu();
 
+	void LerpingCvarWrite();
+
 	CMenuSlider	soundVolume;
 	CMenuSlider	musicVolume;
 	CMenuSlider	suitVolume;
 	CMenuSlider	vibration;
-	CMenuCheckBox lerping;
+	CMenuSpinControl lerping;
 	CMenuCheckBox noDSP;
 	CMenuCheckBox muteFocusLost;
 	CMenuCheckBox vibrationEnable;
@@ -67,7 +70,7 @@ void CMenuAudio::GetConfig( void )
 	suitVolume.LinkCvar( "suitvolume" );
 	vibration.LinkCvar( "vibration_length" );
 
-	lerping.LinkCvar( "s_lerping" );
+	lerping.LinkCvar( "s_lerping", CMenuEditable::CVAR_VALUE );
 	noDSP.LinkCvar( "dsp_off" );
 	muteFocusLost.LinkCvar( "snd_mute_losefocus" );
 	vibrationEnable.LinkCvar( "vibration_enable" );
@@ -118,6 +121,11 @@ CMenuAudio::Init
 */
 void CMenuAudio::_Init( void )
 {
+	static const char *lerpingStr[] =
+	{
+		"Disabled", "Balance", "Quality"
+	};
+
 	banner.SetPicture(ART_BANNER);
 
 	soundVolume.SetNameAndStatus( "Game sound volume", "Set master volume level" );
@@ -135,9 +143,11 @@ void CMenuAudio::_Init( void )
 	suitVolume.onChanged = CMenuEditable::WriteCvarCb;
 	suitVolume.SetCoord( 320, 400 );
 
-	lerping.SetNameAndStatus( "Enable sound interpolation", "Enable/disable interpolation on sound output" );
+	lerping.SetNameAndStatus( "Sound interpolation", "Enable/disable interpolation on sound output" );
+	lerping.Setup( lerpingStr, ARRAYSIZE( lerpingStr ) );
 	lerping.onChanged = CMenuEditable::WriteCvarCb;
-	lerping.SetCoord( 320, 470 );
+	lerping.font = QM_SMALLFONT;
+	lerping.SetRect( 320, 470, 300, 32 );
 
 	noDSP.SetNameAndStatus( "Disable DSP effects", "Disable sound processing (like echo, flanger, etc)" );
 	noDSP.onChanged = CMenuEditable::WriteCvarCb;
