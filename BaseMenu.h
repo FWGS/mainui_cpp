@@ -21,6 +21,7 @@ GNU General Public License for more details.
 #include "EventSystem.h"
 #include "Utils.h"
 #include "FontManager.h"
+#include "BtnsBMPTable.h"
 
 #define UI_MAX_MENUDEPTH		64
 #define UI_MAX_MENUITEMS		64
@@ -126,7 +127,7 @@ typedef struct
 	int		initialized;
 
 	// btns_main.bmp stuff
-	HIMAGE	buttonsPics[71];	// Fpos.xME: replace with PC_BUTTONCOUNT
+	HIMAGE	buttonsPics[PC_BUTTONCOUNT];
 
 	int		buttons_width;	// btns_main.bmp global width
 	int		buttons_height;	// per one button with all states (inactive, focus, pressed)
