@@ -1313,11 +1313,13 @@ int UI_VidInit( void )
 	if (ScreenWidth * 3 < ScreenHeight * 4)
 	{
 		uiStatic.scaleX = uiStatic.scaleY = ScreenWidth / 1024.0f;
+		uiStatic.yOffset = ( ScreenHeight / 2.0 ) / uiStatic.scaleX - 768 / 2;
 	}
 	else
 	{
 		// Sizes are based on screen height
 		uiStatic.scaleX = uiStatic.scaleY = ScreenHeight / 768.0f;
+		uiStatic.yOffset = 0;
 	}
 
 	

@@ -17,7 +17,6 @@ GNU General Public License for more details.
 
 CMenuFramework::CMenuFramework( const char *name ) : BaseClass( name )
 {
-	iFlags = QMF_DISABLESCAILING;
 	memset( m_apBtns, 0, sizeof( m_apBtns ) );
 	m_iBtnsNum = 0;
 }
@@ -66,16 +65,18 @@ void CMenuFramework::Hide()
 void CMenuFramework::Init()
 {
 	BaseClass::Init();
-	m_scPos.x = m_scPos.y = pos.x = pos.y = 0;
-	m_scSize.w = size.w = ScreenWidth;
-	m_scSize.h = size.h = ScreenHeight;
+	pos.x = uiStatic.xOffset;
+	pos.y = uiStatic.yOffset;
+	size.w = uiStatic.width;
+	size.h = 768;
 }
 
 void CMenuFramework::VidInit()
 {
-	m_scPos.x = m_scPos.y = pos.x = pos.y = 0;
-	m_scSize.w = size.w = ScreenWidth;
-	m_scSize.h = size.h = ScreenHeight;
+	pos.x = uiStatic.xOffset;
+	pos.y = uiStatic.yOffset;
+	size.w = uiStatic.width;
+	size.h = 768;
 	BaseClass::VidInit();
 }
 

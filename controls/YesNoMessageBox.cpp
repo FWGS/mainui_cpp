@@ -104,6 +104,8 @@ CMenuYesNoMessageBox::VidInit
 void CMenuYesNoMessageBox::_VidInit( void )
 {
 	SetRect( DLG_X + 192, 256, 640, 256 );
+	pos.x += uiStatic.xOffset;
+	pos.y += uiStatic.yOffset;
 	CalcPosition();
 	CalcSizes();
 

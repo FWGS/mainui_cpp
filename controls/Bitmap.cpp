@@ -174,7 +174,7 @@ void CMenuBannerBitmap::VidInit()
 	if( !szPic )
 		return;
 	// CMenuPicButton::SetTitleAnim( CMenuPicButton::AS_TO_TITLE );
-	CMenuPicButton::SetupTitleQuadForLast( pos.x, pos.y, size.w, size.h );
+	CMenuPicButton::SetupTitleQuadForLast( uiStatic.xOffset + pos.x, uiStatic.yOffset + pos.y, size.w, size.h );
 #if defined(TA_ALT_MODE2) && !defined(TA_ALT_MODE)
 	CMenuPicButton::SetTransPicForLast( EngFuncs::PIC_Load( szPic ) );
 #endif

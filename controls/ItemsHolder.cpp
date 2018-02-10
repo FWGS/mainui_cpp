@@ -292,7 +292,7 @@ void CMenuItemsHolder::Draw( )
 		EngFuncs::DrawSetTextColor( r, g, b, alpha * 255 );
 		x = ( ScreenWidth - len ) * 0.5; // centering
 
-		EngFuncs::DrawConsoleString( x, 720 * uiStatic.scaleY, statusText );
+		EngFuncs::DrawConsoleString( x, uiStatic.yOffset + 720 * uiStatic.scaleY, statusText );
 	}
 	else statusFadeTime = uiStatic.realTime;
 }

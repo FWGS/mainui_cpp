@@ -105,6 +105,8 @@ void CMenuPlayerIntroduceDialog::_Init()
 void CMenuPlayerIntroduceDialog::_VidInit( void )
 {
 	SetRect( DLG_X + 192, 256, 640, 256 );
+	pos.x += uiStatic.xOffset;
+	pos.y += uiStatic.yOffset;
 }
 
 void UI_PlayerIntroduceDialog_Precache()

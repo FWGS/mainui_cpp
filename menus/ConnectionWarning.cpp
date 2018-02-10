@@ -97,6 +97,8 @@ void CMenuConnectionWarning::_Init()
 void CMenuConnectionWarning::_VidInit()
 {
 	SetRect( DLG_X + 192, 192, 640, 384 );
+	pos.x += uiStatic.xOffset;
+	pos.y += uiStatic.yOffset;
 }
 
 void CMenuConnectionWarning::WriteSettings( const EPresets preset)

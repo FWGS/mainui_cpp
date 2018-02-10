@@ -138,6 +138,7 @@ typedef struct
 
 	bool	enableAlphaFactor;
 	float	alphaFactor;
+	int xOffset, yOffset;
 } uiStatic_t;
 
 extern float	cursorDY;			// use for touch scroll

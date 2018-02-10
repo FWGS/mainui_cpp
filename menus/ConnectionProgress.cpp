@@ -253,6 +253,8 @@ void CMenuConnectionProgress::_VidInit( void )
 	int cursor = dlg_h;
 
 	SetRect( DLG_X + 192, dlg_y, 640, dlg_h );
+	pos.x += uiStatic.xOffset;
+	pos.y += uiStatic.yOffset;
 
 	title.SetCharSize( QM_DEFAULTFONT );
 	title.SetRect( 0, 16, 640, 20 );

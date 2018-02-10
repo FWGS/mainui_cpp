@@ -403,6 +403,8 @@ void CMenuControls::_Init( void )
 void CMenuControls::_VidInit()
 {
 	msgBox1.SetRect( DLG_X + 192, 256, 640, 128 );
+	msgBox1.pos.x += uiStatic.xOffset;
+	msgBox1.pos.y += uiStatic.yOffset;
 
 	keysListModel.Update();
 }
