@@ -35,11 +35,11 @@ GNU General Public License for more details.
 #define EVNAME(x) PASTE2(x, __LINE__)
 
 #define SET_EVENT_MULTI( event, callback ) \
-	typedef struct                                                   \
-	{                                                                \
-		static void __callback( CMenuBaseItem *pSelf, void *pExtra )  \
-		callback                                                     \
-	} EVNAME( _event ); (event) = EVNAME( _event )::__callback
+	typedef struct                                             \
+	{                                                          \
+		static void __cb( CMenuBaseItem *pSelf, void *pExtra ) \
+		callback                                               \
+	} EVNAME( _ev ); (event) = EVNAME( _ev )::__cb
 
 #else
 
