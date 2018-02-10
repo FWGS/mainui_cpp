@@ -263,13 +263,18 @@ void CMenuGameOptions::_Init( void )
 	AddItem( compress );
 
 	// only for game/engine developers
-	if( EngFuncs::GetCvarFloat( "developer" ) < 4 )
+	if( EngFuncs::GetCvarFloat( "developer" ) < 3 )
 	{
 		maxpacket.Hide();
+		rate.Hide();
+	}
+
+	if( EngFuncs::GetCvarFloat( "developer" ) < 4 )
+	{
 		maxpayload.Hide();
 		cmdrate.Hide();
 		updaterate.Hide();
-		rate.Hide();
+		rate.SetCoord( 650, 370 );
 	}
 }
 
