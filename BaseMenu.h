@@ -140,6 +140,8 @@ typedef struct
 	bool	enableAlphaFactor;
 	float	alphaFactor;
 	int xOffset, yOffset;
+
+	bool isForkedEngine;
 } uiStatic_t;
 
 extern float	cursorDY;			// use for touch scroll

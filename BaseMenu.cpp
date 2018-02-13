@@ -80,6 +80,11 @@ const unsigned int g_iColorTable[8] =
 0xFFFFFFFF, // white
 };
 
+bool UI_IsXashFWGS( void )
+{
+	return uiStatic.isForkedEngine;
+}
+
 /*
 =================
 UI_ScaleCoords
@@ -525,7 +530,7 @@ int UI_DrawString( HFont font, int x, int y, int w, int h,
 	return maxX;
 }
 
-#ifdef XASH_DISABLE_FWGS_EXTENSIONS
+#ifdef _WIN32
 #include <windows.h> // DrawMouseCursor
 #endif
 
@@ -535,13 +540,13 @@ UI_DrawMouseCursor
 =================
 */
 void UI_DrawMouseCursor( void )
-{
-#ifdef XASH_DISABLE_FWGS_EXTENSIONS
+{	
+#ifdef _WIN32
 	CMenuBaseItem	*item;
 	HICON		hCursor = NULL;
 	int		i;
 
-	if( uiStatic.hideCursor ) return;
+	if( uiStatic.hideCursor || UI_IsXashFWGS() ) return;
 
 	for( i = 0; i < uiStatic.menuActive->m_numItems; i++ )
 	{
@@ -568,8 +573,9 @@ void UI_DrawMouseCursor( void )
 	if( !hCursor ) hCursor = (HICON)LoadCursor( NULL, (LPCTSTR)OCR_NORMAL );
 
 	EngFuncs::SetCursor( hCursor );
-#endif
-	//TODO: Unified LoadCursor interface extension
+#else // _WIN32
+	// TODO: Unified LoadCursor interface extension
+#endif // _WIN32
 }
 
 const char *COM_ExtractExtension( const char *s )
@@ -1454,7 +1460,6 @@ void UI_Init( void )
 	ui_show_window_stack = EngFuncs::CvarRegister( "ui_show_window_stack", 0, FCVAR_ARCHIVE );
 	ui_borderclip = EngFuncs::CvarRegister( "ui_borderclip", "0", FCVAR_ARCHIVE );
 
-
 	// show cl_predict dialog
 	EngFuncs::CvarRegister( "menu_mp_firsttime", "1", FCVAR_ARCHIVE );
 
@@ -1493,6 +1498,9 @@ void UI_Init( void )
 	EngFuncs::CreateMapsList( TRUE );
 
 	uiStatic.initialized = true;
+
+	// can be hijacked, but please, don't do it
+	uiStatic.isForkedEngine = EngFuncs::GetCvarString( "host_ver" ) != 0;
 
 	// setup game info
 	EngFuncs::GetGameInfo( &gMenu.m_gameinfo );
