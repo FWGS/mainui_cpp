@@ -133,6 +133,12 @@ if(NOT XASH_SDK)
 	set(XASH_SDK "../")
 endif()
 
+# Force stb_truetype for Apple devices, as there is no Apple native font renderer
+# And freetype&fontconfig isn't used on this platform by default
+if(APPLE)
+	set(MAINUI_USE_STB TRUE)
+endif()
+
 include_directories(${XASH_SDK}/common ${XASH_SDK}/engine ${XASH_SDK}/pm_shared . controls/ menus/ utl/ font/)
 
 if(MSVC)
