@@ -31,10 +31,10 @@ bool CBaseFont::GlyphLessFunc( const glyph_t &a, const glyph_t &b )
 }
 
 CBaseFont::CBaseFont()
-	: m_szName(), m_iTall(), m_iWeight(), m_iFlags(),
+	: m_szName( ), m_iTall(), m_iWeight(), m_iFlags(),
 	m_iHeight(), m_iMaxCharWidth(), m_iAscent(),
-	m_iBlur(), m_pGaussianDistribution(), m_fBrighten(),
-	m_glyphs(0, 0, GlyphLessFunc), m_iPages(), m_iEllipsisWide( 0 )
+	m_iBlur(), m_fBrighten(),
+	m_glyphs(0, 0, GlyphLessFunc), m_iEllipsisWide( 0 )
 {
 }
 
@@ -46,7 +46,7 @@ CBaseFont::GetTextureName
 Mangle texture name, so using same font names with different attributes will not confuse engine or font renderer
 =========================
 +*/
-void CBaseFont::GetTextureName(char *dst, size_t len, int pageNum) const
+void CBaseFont::GetTextureName(char *dst, size_t len) const
 {
 	char attribs[256];
 	int i = 0;
@@ -72,13 +72,13 @@ void CBaseFont::GetTextureName(char *dst, size_t len, int pageNum) const
 
 	if( i == 0 )
 	{
-		snprintf( dst, len - 1, "%s%i_%i_%i_font.bmp", GetName(), pageNum, GetTall(), GetWeight() );
+		snprintf( dst, len - 1, "%s_%i_%i_font.bmp", GetName(), GetTall(), GetWeight() );
 		dst[len - 1] = 0;
 	}
 	else
 	{
 		attribs[i] = 0;
-		snprintf( dst, len - 1, "%s%i_%i_%i_%s_font.bmp", GetName(), pageNum, GetTall(), GetWeight(), attribs );
+		snprintf( dst, len - 1, "%s_%i_%i_%s_font.bmp", GetName(), GetTall(), GetWeight(), attribs );
 		dst[len - 1] = 0;
 	}
 }
@@ -95,7 +95,6 @@ void CBaseFont::UploadGlyphsForRanges(charRange_t *range, int rangeSize)
 
 	CBMP bmp( MAX_PAGE_SIZE, MAX_PAGE_SIZE );
 	byte *rgbdata = bmp.GetTextureData();
-	size_t bmpSize = bmp.GetBitmapHdr()->fileSize;
 	bmp_t *hdr = bmp.GetBitmapHdr();
 
 	Size tempDrawSize( maxWidth, height );
@@ -163,7 +162,6 @@ void CBaseFont::UploadGlyphsForRanges(charRange_t *range, int rangeSize)
 
 					// update pointers
 					rgbdata = bmp.GetTextureData();
-					bmpSize = hdr->fileSize;
 				}
 			}
 
@@ -202,10 +200,10 @@ void CBaseFont::UploadGlyphsForRanges(charRange_t *range, int rangeSize)
 		}
 	}
 
-	GetTextureName( name, sizeof( name ), m_iPages );
+	GetTextureName( name, sizeof( name ) );
 	// bmp.Increase( hdr->width * 2, hdr->height );
-	bmp.Increase( hdr->width, hdr->height * 2 );
-	HIMAGE hImage = EngFuncs::PIC_Load( name, bmp.GetBitmap(), bmpSize, 0 );
+	// bmp.Increase( hdr->width, hdr->height * 2 );
+	HIMAGE hImage = EngFuncs::PIC_Load( name, bmp.GetBitmap(), bmp.GetBitmapHdr()->fileSize, 0 );
 	Con_DPrintf( "Uploaded %s to %i\n", name, hImage );
 	//delete[] bmp;
 	delete[] temp;
@@ -217,7 +215,6 @@ void CBaseFont::UploadGlyphsForRanges(charRange_t *range, int rangeSize)
 		if( i == m_glyphs.LastInorder() )
 			break;
 	}
-	m_iPages++;
 
 	int dotWideA, dotWideB, dotWideC;
 	GetCharABCWidths( '.', dotWideA, dotWideB, dotWideC );
@@ -228,14 +225,8 @@ void CBaseFont::UploadGlyphsForRanges(charRange_t *range, int rangeSize)
 CBaseFont::~CBaseFont()
 {
 	char name[256];
-	for( int i = 0; i < m_iPages; i++ )
-	{
-		GetTextureName( name, sizeof( name ), i );
-		EngFuncs::PIC_Free( name );
-	}
-	m_iPages = 0;
-
-	delete[] m_pGaussianDistribution;
+	GetTextureName( name, sizeof( name ) );
+	EngFuncs::PIC_Free( name );
 }
 
 bool CBaseFont::IsEqualTo(const char *name, int tall, int weight, int blur, int flags)  const
@@ -263,15 +254,14 @@ void CBaseFont::DebugDraw()
 	HIMAGE hImage;
 	char name[256];
 
-	for( int i = 0; i < m_iPages; i++ )
 	{
-		GetTextureName( name, sizeof( name ), i );
+		GetTextureName( name, sizeof( name ) );
 
 		hImage = EngFuncs::PIC_Load( name );
 		int w, h;
 		w = EngFuncs::PIC_Width( hImage );
 		h = EngFuncs::PIC_Height( hImage );
-		int x = i * w;
+		int x = 0;
 		EngFuncs::PIC_Set( hImage, 255, 255, 255 );
 		if( IsAdditive() )
 			EngFuncs::PIC_DrawAdditive(  Point(x, 0), Size( w, h ) );
@@ -315,27 +305,42 @@ void CBaseFont::DebugDraw()
 
 void CBaseFont::ApplyBlur(Size rgbaSz, byte *rgba)
 {
-	if( !m_pGaussianDistribution )
+	if( !m_iBlur )
 		return;
 
 	const int size = rgbaSz.w * rgbaSz.h * 4;
 	byte *src = new byte[size];
+	double sigma2;
 	memcpy( src, rgba, size );
+
+	sigma2 = 0.5 * m_iBlur;
+	sigma2 *= sigma2;
+	float * distribution = new float[m_iBlur * 2 + 1];
+	for( int x = 0; x <= m_iBlur * 2; x++ )
+	{
+		int val = x - m_iBlur;
+		distribution[x] = (float)(1.0f / sqrt(2 * 3.14 * sigma2)) * pow(2.7, -1 * (val * val) / (2 * sigma2));
+
+		// brightening factor
+		distribution[x] *= m_fBrighten;
+	}
+
 
 	for( int y = 0; y < rgbaSz.h; y++ )
 	{
 		for( int x = 0; x < rgbaSz.w; x++ )
 		{
-			GetBlurValueForPixel( src, Point(x, y), rgbaSz, rgba );
+			GetBlurValueForPixel( distribution, src, Point(x, y), rgbaSz, rgba );
 
 			rgba += 4;
 		}
 	}
 
+	delete[] distribution;
 	delete[] src;
 }
 
-void CBaseFont::GetBlurValueForPixel(byte *src, Point srcPt, Size srcSz, byte *dest)
+void CBaseFont::GetBlurValueForPixel(float *distribution, byte *src, Point srcPt, Size srcSz, byte *dest)
 {
 	float accum = 0.0f;
 	bool additive = IsAdditive();
@@ -352,8 +357,8 @@ void CBaseFont::GetBlurValueForPixel(byte *src, Point srcPt, Size srcSz, byte *d
 			byte *srcPos = src + ((x + (y * srcSz.w)) * 4);
 
 			// muliply by the value matrix
-			float weight = m_pGaussianDistribution[(x - srcPt.x) + m_iBlur];
-			float weight2 = m_pGaussianDistribution[(y - srcPt.y) + m_iBlur];
+			float weight = distribution[(x - srcPt.x) + m_iBlur];
+			float weight2 = distribution[(y - srcPt.y) + m_iBlur];
 			accum += ( additive ? srcPos[0] : srcPos[3] ) * (weight * weight2);
 		}
 	}
@@ -368,25 +373,6 @@ void CBaseFont::GetBlurValueForPixel(byte *src, Point srcPt, Size srcSz, byte *d
 	{
 		dest[0] = dest[1] = dest[2] = Q_min( (int)(accum + 0.5f), 255 );
 		dest[3] = 255;
-	}
-}
-
-void CBaseFont::CreateGaussianDistribution()
-{
-	double sigma2;
-	if( m_iBlur < 1 )
-		return;
-
-	sigma2 = 0.5 * m_iBlur;
-	sigma2 *= sigma2;
-	m_pGaussianDistribution = new float[m_iBlur * 2 + 1];
-	for( int x = 0; x <= m_iBlur * 2; x++ )
-	{
-		int val = x - m_iBlur;
-		m_pGaussianDistribution[x] = (float)(1.0f / sqrt(2 * 3.14 * sigma2)) * pow(2.7, -1 * (val * val) / (2 * sigma2));
-
-		// brightening factor
-		m_pGaussianDistribution[x] *= m_fBrighten;
 	}
 }
 

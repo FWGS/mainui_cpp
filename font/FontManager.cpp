@@ -448,7 +448,7 @@ HFont CFontBuilder::Create()
 	font = new CFreeTypeFont();
 #elif defined(MAINUI_USE_STB)
 	font = new CStbFont();
-#elif defined(_WIN32)
+#elif defined(_WIN32) && defined(MAINUI_USE_CUSTOM_FONT_RENDER)
 	font = new CWinAPIFont();
 #else
 	font = new CBitmapFont();

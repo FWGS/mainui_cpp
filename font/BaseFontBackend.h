@@ -68,7 +68,7 @@ public:
 
 
 
-	void GetTextureName( char *dst, size_t len, int pageNum ) const;
+	void GetTextureName(char *dst, size_t len) const;
 
 	inline int GetEllipsisWide( ) { return m_iEllipsisWide; }
 
@@ -77,7 +77,6 @@ protected:
 	void ApplyOutline(Point pt, Size rgbaSz, byte *rgba );
 	void ApplyScanline( Size rgbaSz, byte *rgba );
 	void ApplyStrikeout( Size rgbaSz, byte *rgba );
-	void CreateGaussianDistribution();
 
 	char m_szName[32];
 	int	 m_iTall, m_iWeight, m_iFlags, m_iHeight, m_iMaxCharWidth;
@@ -86,7 +85,6 @@ protected:
 
 	// blurring
 	int  m_iBlur;
-	float *m_pGaussianDistribution;
 	float m_fBrighten;
 
 	// Scanlines
@@ -98,7 +96,7 @@ protected:
 	int m_iEllipsisWide;
 
 private:
-	void GetBlurValueForPixel(byte *src, Point srcPt, Size srcSz, byte *dest);
+	void GetBlurValueForPixel(float *distribution, byte *src, Point srcPt, Size srcSz, byte *dest);
 
 	struct glyph_t
 	{
@@ -110,9 +108,6 @@ private:
 	};
 
 	CUtlRBTree<glyph_t, int> m_glyphs;
-	// CUtlVector<HIMAGE> m_Pages;
-	// CUtlVector<uint> m_Lines;
-	int m_iPages;
 	static bool GlyphLessFunc( const glyph_t &a, const glyph_t &b );
 	friend class CFontManager;
 

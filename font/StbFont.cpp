@@ -14,8 +14,11 @@ GNU General Public License for more details.
 */
 #if defined(MAINUI_USE_STB)
 #include <stdarg.h>
+
+#ifndef _WIN32
 #include <stdint.h>
 #include <unistd.h>
+#endif
 
 #include "FontManager.h"
 #define STB_TRUETYPE_IMPLEMENTATION
@@ -24,9 +27,14 @@ GNU General Public License for more details.
 #ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-function"
+#endif
+
 #include "StbFont.h"
+
+#ifdef __GNUC__
 #pragma GCC diagnostic pop
 #endif
+
 #include "Utils.h"
 
 bool ABCCacheLessFunc( const abc_t &a, const abc_t &b )
@@ -216,11 +224,11 @@ bool CStbFont::FindFontDataFile(const char *name, int tall, int weight, int flag
 
 	return true;
 #elif defined _WIN32
-		if( !strcmp( name, "Arial" ) )
-			snprintf( dataFile, dataFileChars, "C:\\Windows\\Fonts\\arial.ttf" );
-		else
-			snprintf( dataFile, dataFileChars, "C:/Windows/Fonts/trebucbd.ttf" );
-		return true;
+	if( !strcmp( name, "Arial" ) )
+		snprintf( dataFile, dataFileChars, "%s\\Fonts\\arial.ttf", getenv( "WINDIR" ) );
+	else
+		snprintf( dataFile, dataFileChars, "%s\\Fonts\\trebucbd.ttf", getenv( "WINDIR" ) );
+	return true;
 #else
 	// strcpy( dataFile, "/usr/share/fonts/truetype/droid/DroidSans.ttf");
 	// return true;
@@ -290,8 +298,6 @@ bool CStbFont::Create(const char *name, int tall, int weight, int blur, float br
 	m_iHeight = (( y1 - y0 ) * scale); // maybe wrong!
 	m_iMaxCharWidth = (( x1 - x0 ) * scale); // maybe wrong!
 
-	CreateGaussianDistribution();
-
 	return true;
 }
 
@@ -335,7 +341,7 @@ void CStbFont::GetCharRGBA(int ch, Point pt, Size sz, unsigned char *rgba, Size 
 	// iterate through copying the generated dib into the texture
 	for (int j = ystart; j < yend; j++, dst += 4 * sz.w, buf += bm_width )
 	{
-		uint32_t *xdst = (uint32_t*)(dst + 4 * ( m_iBlur + m_iOutlineSize ));
+		unsigned int *xdst = (unsigned int*)(dst + 4 * ( m_iBlur + m_iOutlineSize ));
 		for (int i = xstart; i < xend; i++, xdst++)
 		{
 			if( buf[i] > 0 )

@@ -13,7 +13,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 
-#ifdef _WIN32
+#if defined _WIN32 && defined(MAINUI_USE_CUSTOM_FONT_RENDER) && !defined(MAINUI_USE_STB)
 #include <stdarg.h>
 #include <malloc.h>
 
@@ -35,7 +35,7 @@ CWinAPIFont::~CWinAPIFont( )
 
 }
 
-int CALLBACK FontEnumProc( const LOGFONT *, const TEXTMETRIC *, DWORD, LPARAM lpParam )
+int CALLBACK FontEnumProc( const LOGFONTA *, const TEXTMETRICA *, DWORD, LPARAM lpParam )
 {
 	CWinAPIFont *font = ( CWinAPIFont * )lpParam;
 	font->m_bFound = true;
@@ -62,21 +62,21 @@ bool CWinAPIFont::Create( const char *name, int tall, int weight, int blur, floa
 	// create device context
 	m_hDC = ::CreateCompatibleDC( NULL );
 
-	int charset = RUSSIAN_CHARSET;
+	int charset = DEFAULT_CHARSET;
 
 	// check exists or not
-	LOGFONT font;
-	font.lfCharSet = RUSSIAN_CHARSET; //!!!
+	LOGFONTA font = { 0 };
+	font.lfCharSet = DEFAULT_CHARSET; //!!!
 	font.lfPitchAndFamily = 0;
-	mbstowcs( font.lfFaceName, m_szName, sizeof( font.lfFaceName ) );
-	::EnumFontFamiliesEx( m_hDC, &font, &FontEnumProc, (LPARAM)this, 0 );
+	Q_strncpy( font.lfFaceName, m_szName, sizeof( font.lfFaceName ) );
+	::EnumFontFamiliesExA( m_hDC, &font, &FontEnumProc, (LPARAM)this, 0 );
 	if( !m_bFound )
 	{
-		Con_DPrintf( "Couldn't create windows font %s\n", name );
+		Host_Error( "Couldn't create windows font %s\n", name );
 		return false;
 	}
 
-	m_hFont = ::CreateFont( m_iTall, 0, 0, 0, m_iWeight,
+	m_hFont = ::CreateFontA( m_iTall, 0, 0, 0, m_iWeight,
 		m_iFlags & FONT_ITALIC,
 		m_iFlags & FONT_UNDERLINE,
 		m_iFlags & FONT_STRIKEOUT,
@@ -118,8 +118,6 @@ bool CWinAPIFont::Create( const char *name, int tall, int weight, int blur, floa
 
 	m_hDIB = ::CreateDIBSection( m_hDC, ( BITMAPINFO* )&header, DIB_RGB_COLORS, ( void** )&m_pBuf, NULL, 0 );
 	::SelectObject( m_hDC, m_hDIB );
-
-	CreateGaussianDistribution( );
 
 	return true;
 }

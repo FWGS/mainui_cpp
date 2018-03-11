@@ -162,8 +162,6 @@ bool CFreeTypeFont::Create(const char *name, int tall, int weight, int blur, flo
 	m_iHeight = PIXEL( face->size->metrics.height );
 	m_iMaxCharWidth = PIXEL(face->size->metrics.max_advance );
 
-	CreateGaussianDistribution();
-
 	return true;
 }
 

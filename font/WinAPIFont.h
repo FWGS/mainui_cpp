@@ -49,6 +49,9 @@ public:
 	bool IsValid( ) const;
 	void GetCharABCWidths( int ch, int &a, int &b, int &c );
 	bool HasChar( int ch ) const;
+
+	bool m_bFound;
+
 private:
 	CUtlRBTree<abc_t, int> m_ABCCache;
 
@@ -56,7 +59,6 @@ private:
 	HDC m_hDC;
 	HBITMAP m_hDIB;
 
-	bool m_bFound;
 
 	int m_rgiBitmapSize[2];
 
