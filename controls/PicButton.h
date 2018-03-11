@@ -28,7 +28,7 @@ GNU General Public License for more details.
 #define TA_ALT_MODE2 1
 
 // Title Transition Time period
-#define TTT_PERIOD		300.0f
+#define TTT_PERIOD		200.0f
 
 class CMenuPicButton : public CMenuBaseItem
 {
