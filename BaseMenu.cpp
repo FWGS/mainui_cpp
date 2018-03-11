@@ -836,7 +836,7 @@ void UI_UpdateMenu( float flTime )
 			}
 		}
 	}
-	g_FontMgr.DebugDraw( uiStatic.hBigFont );
+	// g_FontMgr.DebugDraw( uiStatic.hBigFont );
 }
 
 /*
