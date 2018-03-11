@@ -548,31 +548,40 @@ void UI_DrawMouseCursor( void )
 
 	if( uiStatic.hideCursor || UI_IsXashFWGS() ) return;
 
-	for( i = 0; i < uiStatic.menuActive->m_numItems; i++ )
+	int cursor = uiStatic.menuActive->GetCursor();
+	item = uiStatic.menuActive->m_pItems[cursor];
+
+	if( item->iFlags & QMF_HASMOUSEFOCUS ) 	// fast approach
 	{
-		item = (CMenuBaseItem *)uiStatic.menuActive->m_pItems[i];
-
-		if ( !item->IsVisible() )
-			continue;
-
-		if( !(item->iFlags & QMF_HASMOUSEFOCUS) )
-			continue;
-
 		if ( item->iFlags & QMF_GRAYED )
 		{
 			hCursor = (HICON)LoadCursor( NULL, (LPCTSTR)OCR_NO );
 		}
-		else
+	}
+	else
+	{
+		for( i = 0; i < uiStatic.menuActive->m_numItems; i++ )
 		{
-			//if( item->type == QMTYPE_FIELD )
-			//	hCursor = (HICON)LoadCursor( NULL, (LPCTSTR)OCR_IBEAM );
+			item = (CMenuBaseItem *)uiStatic.menuActive->m_pItems[i];
+
+			if ( !item->IsVisible() )
+				continue;
+
+			if( !(item->iFlags & QMF_HASMOUSEFOCUS) )
+				continue;
+
+			if ( item->iFlags & QMF_GRAYED )
+			{
+				hCursor = (HICON)LoadCursor( NULL, (LPCTSTR)OCR_NO );
+			}
+			break;
 		}
-		break;
 	}
 
-	if( !hCursor ) hCursor = (HICON)LoadCursor( NULL, (LPCTSTR)OCR_NORMAL );
+	if( !hCursor )
+		hCursor = (HICON)LoadCursor( NULL, (LPCTSTR)OCR_NORMAL );
 
-	EngFuncs::SetCursor( hCursor );
+	EngFuncs::SetCursor( (HICON)LoadCursor( NULL, (LPCTSTR)OCR_NORMAL ) );
 #else // _WIN32
 	// TODO: Unified LoadCursor interface extension
 #endif // _WIN32
@@ -827,7 +836,7 @@ void UI_UpdateMenu( float flTime )
 			}
 		}
 	}
-	// g_FontMgr.DebugDraw( uiStatic.hBigFont );
+	g_FontMgr.DebugDraw( uiStatic.hBigFont );
 }
 
 /*
