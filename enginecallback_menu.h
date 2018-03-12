@@ -118,8 +118,7 @@ public:
 	{ engfuncs.pfnPlayLocalSound( szSound ); }
 
 	// cinematic handlers
-	static inline void	DrawLogo( const char *filename, float x, float y, float width, float height )
-	{ engfuncs.pfnDrawLogo( filename, x, y, width, height ); }
+	static void	DrawLogo( const char *filename, float x, float y, float width, float height );
 	static inline void	PrecacheLogo( const char *filename )
 	{ engfuncs.pfnDrawLogo( filename, 0, 0, 0, 0 ); }
 	static inline int	GetLogoWidth( void )

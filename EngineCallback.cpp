@@ -33,6 +33,15 @@ void EngFuncs::FillRGBA(int x, int y, int width, int height, int r, int g, int b
 	engfuncs.pfnFillRGBA( x, y, width, height, r, g, b, a );
 }
 
+void EngFuncs::DrawLogo( const char *filename, float x, float y, float width, float height )
+{
+	if( uiStatic.enableAlphaFactor )
+		return;
+
+	engfuncs.pfnDrawLogo( filename, x, y, width, height );
+}
+
+
 void EngFuncs::DrawCharacter(int x, int y, int width, int height, int ch, int ulRGBA, HIMAGE hFont)
 {
 	engfuncs.pfnDrawCharacter( x, y, width, height, ch, ulRGBA, hFont );
