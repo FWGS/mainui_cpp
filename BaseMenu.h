@@ -174,6 +174,8 @@ extern int	uiColorBlack;
 
 // TODO: Move it under namespace?
 
+bool UI_IsXashFWGS( void );
+
 void UI_ScaleCoords( int *x, int *y, int *w, int *h );
 void UI_ScaleCoords( int &x, int &y, int &w, int &h );
 void UI_ScaleCoords( int &x, int &y );

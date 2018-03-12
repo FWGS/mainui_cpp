@@ -171,10 +171,19 @@ void CMenuVidOptions::_Init( void )
 	gammaIntensity.onCvarGet = VoidCb( &CMenuVidOptions::GammaGet );
 	gammaIntensity.LinkCvar( "gamma" );
 
-	glareReduction.SetNameAndStatus( "Glare reduction", "Set glare reduction level" );
 	glareReduction.SetCoord( 72, 400 );
-	glareReduction.Setup( 100, 300, 15 );
-	glareReduction.LinkCvar( "r_flaresize" );
+	if( UI_IsXashFWGS() )
+	{
+		glareReduction.SetNameAndStatus( "Glare reduction", "Set glare reduction level" );
+		glareReduction.Setup( 100, 300, 15 );
+		glareReduction.LinkCvar( "r_flaresize" );
+	}
+	else
+	{
+		glareReduction.SetNameAndStatus( "Brightness", "Set brightness level" );
+		glareReduction.Setup( 0, 3, 0.1 );
+		glareReduction.LinkCvar( "brightness" );
+	}
 
 	bump.SetNameAndStatus( "Bump-mapping", "Enable bump mapping" );
 	bump.SetCoord( 72, 515 );
