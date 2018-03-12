@@ -196,6 +196,7 @@ void CMenuMain::HazardCourseCb()
 	EngFuncs::CvarSetValue( "teamplay", 0.0f );
 	EngFuncs::CvarSetValue( "pausable", 1.0f ); // singleplayer is always allowing pause
 	EngFuncs::CvarSetValue( "coop", 0.0f );
+	EngFuncs::CvarSetValue( "maxplayers", 1.0f ); // singleplayer
 
 	EngFuncs::PlayBackgroundTrack( NULL, NULL );
 
