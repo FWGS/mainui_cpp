@@ -220,7 +220,7 @@ void CMenuTouchOptions::Apply()
 		}
 	}
 	else if( i == firstProfile )
-		EngFuncs::ClientCmd( 1,"exec touch.cfg\n" );
+		EngFuncs::ClientCmd( 1, "exec touch.cfg\n" );
 	else if( i > firstProfile )
 	{
 		char command[256];
