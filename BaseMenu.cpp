@@ -581,7 +581,7 @@ void UI_DrawMouseCursor( void )
 	if( !hCursor )
 		hCursor = (HICON)LoadCursor( NULL, (LPCTSTR)OCR_NORMAL );
 
-	EngFuncs::SetCursor( (HICON)LoadCursor( NULL, (LPCTSTR)OCR_NORMAL ) );
+	EngFuncs::SetCursor( hCursor );
 #else // _WIN32
 	// TODO: Unified LoadCursor interface extension
 #endif // _WIN32
@@ -732,15 +732,6 @@ void UI_UpdateMenu( float flTime )
 
 	// find last root element
 	int i;
-#if 0
-	for( i = uiStatic.menuDepth-1; i >= 0; i-- )
-	{
-		if( uiStatic.menuStack[i]->IsRoot() )
-			break;
-	}
-#endif
-
-
 	for( i = uiStatic.rootPosition ; i < uiStatic.menuDepth; i++ )
 	{
 		CMenuBaseWindow *window = uiStatic.menuStack[i];
@@ -787,6 +778,8 @@ void UI_UpdateMenu( float flTime )
 	//CR
 	// CMenuPicButton::DrawTitleAnim();
 	//
+
+
 
 	// draw cursor
 	UI_DrawMouseCursor();
@@ -1509,7 +1502,9 @@ void UI_Init( void )
 	uiStatic.initialized = true;
 
 	// can be hijacked, but please, don't do it
-	uiStatic.isForkedEngine = EngFuncs::GetCvarString( "host_ver" ) != 0;
+	const char *version = EngFuncs::GetCvarString( "host_ver" );
+
+	uiStatic.isForkedEngine = version && version[0];
 
 	// setup game info
 	EngFuncs::GetGameInfo( &gMenu.m_gameinfo );
