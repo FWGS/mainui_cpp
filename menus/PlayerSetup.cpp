@@ -331,12 +331,13 @@ void CMenuPlayerSetup::FindModels( void )
 	if( !numFiles )
 		filenames = EngFuncs::GetFilesList(  "models/player/*", &numFiles, FALSE );
 
-#if 1
+#if 0
 	// add default singleplayer model
 	strcpy( models[num_models], "player" );
 	modelsPtr[num_models] = models[num_models];
 	num_models++;
 #endif
+
 	// build the model list
 	for( i = 0; i < numFiles; i++ )
 	{
