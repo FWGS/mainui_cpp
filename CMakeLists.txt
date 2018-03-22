@@ -122,7 +122,7 @@ list(APPEND MAINUI_SOURCES ${MAINUI_FONT_RENDER_SOURCES})
 add_library (${MAINUI_LIBRARY} SHARED ${MAINUI_SOURCES})
 
 if(NOT WIN32 AND NOT MINGW)
-	fwgs_add_compile_options(C -Wall -Wextra -Wpedantic -Wno-unused-parameter -Wno-unused-variable)
+	fwgs_add_compile_options(C -Wall -Wextra -Wno-unused-parameter -Wno-unused-variable)
 else()
 
 	# Only for MSVC6 compability mode! Newer VC does fail with this define
@@ -172,6 +172,15 @@ endif()
 if(WIN32)
 	set_target_properties(${MAINUI_LIBRARY} PROPERTIES
 		OUTPUT_NAME menu PREFIX "")
+endif()
+
+if(XASH_64BIT)
+	get_target_property(MAINUI_NAME ${MAINUI_LIBRARY} OUTPUT_NAME)
+	if(NOT MAINUI_NAME)
+		set(MAINUI_NAME ${MAINUI_LIBRARY})
+	endif()
+	set_target_properties(${MAINUI_LIBRARY} PROPERTIES 
+		OUTPUT_NAME ${MAINUI_NAME}64)
 endif()
 
 fwgs_set_default_properties(${MAINUI_LIBRARY})
