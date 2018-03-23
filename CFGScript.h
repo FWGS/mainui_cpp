@@ -52,7 +52,7 @@ typedef struct
 struct scrvardef_t
 {
 	scrvardef_t() :
-		flags(0), name(""), value(""), desc(""),
+		flags(0), name(), value(), desc(),
 		type(T_NONE), next(0) {}
 
 	int flags;
