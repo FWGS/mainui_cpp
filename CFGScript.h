@@ -49,8 +49,12 @@ typedef struct
 	float fMax;
 } scrvarnumber_t;
 
-typedef struct scrvardef_s
+struct scrvardef_t
 {
+	scrvardef_t() :
+		flags(0), name(""), value(""), desc(""),
+		type(T_NONE), next(0) {}
+
 	int flags;
 	char name[MAX_STRING];
 	char value[MAX_STRING];
@@ -61,8 +65,8 @@ typedef struct scrvardef_s
 		scrvarlist_t list;
 	};
 	cvartype_t type;
-	struct scrvardef_s *next;
-} scrvardef_t;
+	struct scrvardef_t *next;
+};
 
 scrvardef_t *CSCR_LoadDefaultCVars( const char *scriptfilename, int *count );
 void CSCR_FreeList( scrvardef_t *list );

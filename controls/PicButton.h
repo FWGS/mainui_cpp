@@ -58,7 +58,11 @@ public:
 	static void RootChanged( bool isForward );
 private:
 	enum animState_e { AS_TO_TITLE = 0, AS_TO_BUTTON };
-	struct Quad { float x, y, lx, ly; };
+	struct Quad
+	{
+		Quad(): x(0), y(0), lx(0), ly(0) {}
+		float x, y, lx, ly;
+	};
 
 	static void SetTitleAnim( int state );
 	void TACheckMenuDepth( void );

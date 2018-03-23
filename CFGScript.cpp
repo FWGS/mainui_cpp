@@ -24,12 +24,13 @@ GNU General Public License for more details.
 
 const char *cvartypes[] = { NULL, "BOOL" , "NUMBER", "LIST", "STRING" };
 
-typedef struct parserstate_s
+struct parserstate_t
 {
+	parserstate_t() : buf( NULL ), token( "" ), filename( NULL ) {}
 	char *buf;
 	char token[MAX_STRING];
 	const char *filename;
-} parserstate_t;
+};
 
 /*
 ===================
@@ -262,7 +263,7 @@ scrvardef_t *CSCR_LoadDefaultCVars( const char *scriptfilename, int *count )
 {
 	int length = 0;
 	char *start;
-	parserstate_t state = { 0 };
+	parserstate_t state;
 	bool success = false;
 	scrvardef_t *list = 0, *last;
 
@@ -291,7 +292,7 @@ scrvardef_t *CSCR_LoadDefaultCVars( const char *scriptfilename, int *count )
 
 	while( !CSCR_ExpectString( &state, "}", false, false ) )
 	{
-		scrvardef_t var = { 0 };
+		scrvardef_t var;
 
 		// Create a new object
 		if( CSCR_ParseSingleCvar( &state, &var ) )
