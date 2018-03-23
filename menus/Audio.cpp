@@ -66,7 +66,7 @@ CMenuAudio::GetConfig
 void CMenuAudio::GetConfig( void )
 {
 	soundVolume.LinkCvar( "volume" );
-	musicVolume.LinkCvar( "musicvolume" );
+	musicVolume.LinkCvar( "MP3Volume" );
 	suitVolume.LinkCvar( "suitvolume" );
 	vibration.LinkCvar( "vibration_length" );
 
