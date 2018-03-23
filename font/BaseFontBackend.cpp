@@ -34,7 +34,8 @@ CBaseFont::CBaseFont()
 	: m_szName( ), m_iTall(), m_iWeight(), m_iFlags(),
 	m_iHeight(), m_iMaxCharWidth(), m_iAscent(),
 	m_iBlur(), m_fBrighten(),
-	m_glyphs(0, 0, GlyphLessFunc), m_iEllipsisWide( 0 )
+	m_iEllipsisWide( 0 ),
+	m_glyphs(0, 0, GlyphLessFunc)
 {
 }
 
@@ -118,7 +119,7 @@ void CBaseFont::UploadGlyphsForRanges(charRange_t *range, int rangeSize)
 			GetCharRGBA( ch, nullPt, tempDrawSize, temp, drawSize );
 
 			// see if we need to go down or create a new page
-			if( xstart + drawSize.w > hdr->width )
+			if( xstart + drawSize.w > (int)hdr->width )
 			{
 				// update or push
 				if( lines.IsValidIndex( line ) )
@@ -144,7 +145,7 @@ void CBaseFont::UploadGlyphsForRanges(charRange_t *range, int rangeSize)
 				// No free space now
 				if( ystart - height - 1 <= 0 )
 				{
-					if( hdr->height <= hdr->width ) // prioritize height grow
+					if( hdr->height <= (int)hdr->width ) // prioritize height grow
 					{
 						int oldheight = hdr->height - ystart;
 						bmp.Increase( hdr->width, hdr->height * 2 );
