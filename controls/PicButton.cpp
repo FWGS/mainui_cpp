@@ -20,6 +20,7 @@ GNU General Public License for more details.
 #include "PicButton.h"
 #include "Utils.h"
 #include "Scissor.h"
+#include "BtnsBMPTable.h"
 #include <stdlib.h>
 
 // Button stack
@@ -35,7 +36,7 @@ CMenuPicButton::CMenuPicButton() : BaseClass()
 
 	iFocusStartTime = 0;
 
-	eTextAlignment = QM_LEFT;
+	eTextAlignment = QM_TOPLEFT;
 
 	hPic = 0;
 	button_id = 0;
@@ -51,16 +52,6 @@ CMenuPicButton::CMenuPicButton() : BaseClass()
 
 	TransPic = 0;
 	memset( TitleLerpQuads, 0, sizeof( TitleLerpQuads ));
-}
-
-/*
-=================
-CMenuPicButton::Init
-=================
-*/
-void CMenuPicButton::VidInit( void )
-{
-	BaseClass::VidInit();
 }
 
 /*
@@ -292,30 +283,21 @@ void CMenuPicButton::Draw( )
 	iOldState = state;
 }
 
-void CMenuPicButton::SetPicture(EDefaultBtns ID )
+void CMenuPicButton::SetPicture( EDefaultBtns ID )
 {
 #ifndef MAINUI_RENDER_PICBUTTON_TEXT
 	if( ID < 0 || ID > PC_BUTTONCOUNT )
 		return; // bad id
 
-#if 0	// too different results on various games. disabled
-	width = PicButtonWidth( ID ) * UI_BUTTON_CHARWIDTH;
-#else
-	size.w = UI_BUTTONS_WIDTH;
-#endif
-	size.h = UI_BUTTONS_HEIGHT;
-
 	hPic = uiStatic.buttonsPics[ID];
+
 	button_id = ID;
 #endif
 }
 
-void CMenuPicButton::SetPicture(const char *filename)
+void CMenuPicButton::SetPicture( const char *filename )
 {
 #ifndef MAINUI_RENDER_PICBUTTON_TEXT
-	size.w = UI_BUTTONS_WIDTH;
-	size.h = UI_BUTTONS_HEIGHT;
-
 	hPic = EngFuncs::PIC_Load( filename );
 #endif
 }

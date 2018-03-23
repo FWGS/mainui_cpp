@@ -36,7 +36,6 @@ public:
 	typedef CMenuBaseItem BaseClass;
 
 	CMenuPicButton();
-	virtual void VidInit( void );
 	virtual const char * Key( int key, int down );
 	virtual void Draw( void );
 
