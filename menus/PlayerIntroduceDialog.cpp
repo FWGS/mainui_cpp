@@ -92,6 +92,7 @@ void CMenuPlayerIntroduceDialog::_Init()
 	msgBox.SetMessage( "Please, choose another player name" );
 	msgBox.Link( this );
 
+	ok.szName = "Ok";
 	ok.SetRect( 298, 204, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
 	ok.SetPicture( PC_OK );
 	ok.onActivated = VoidCb( &CMenuPlayerIntroduceDialog::WriteOrDiscard );
