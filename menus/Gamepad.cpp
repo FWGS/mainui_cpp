@@ -202,7 +202,7 @@ void CMenuGamePad::_Init( void )
 	for( i = 0, y = 230; i < 6; i++, y += 50 )
 	{
 		axisBind[i].szStatusText = "Set axis binding";
-		axisBind[i].Setup( axisNames, JOY_AXIS_NULL + 1 );
+		axisBind[i].Setup( axisNames, ARRAYSIZE( axisNames ) );
 	}
 
 	side.Setup( 0.0f, 1.0f, 0.1f );

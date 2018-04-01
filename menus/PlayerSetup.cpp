@@ -427,12 +427,12 @@ UI_PlayerSetup_Init
 */
 void CMenuPlayerSetup::_Init( void )
 {
-	bool game_hlRally = false;
+	bool hideModels = false;
 	int addFlags = 0;
 
 	// disable playermodel preview for HLRally to prevent crash
 	if( !stricmp( gMenu.m_gameinfo.gamefolder, "hlrally" ))
-		game_hlRally = true;
+		hideModels = true;
 
 	if( gMenu.m_gameinfo.flags & GFL_NOMODELS )
 		addFlags |= QMF_INACTIVE;
@@ -445,10 +445,18 @@ void CMenuPlayerSetup::_Init( void )
 	name.SetRect( 320, 260, 256, 36 );
 
 	FindModels();
-	model.Setup( (const char **)modelsPtr, (size_t)num_models );
-	model.LinkCvar( "model", CMenuEditable::CVAR_STRING );
-	model.onChanged = VoidCb( &CMenuPlayerSetup::UpdateModel );
-	model.SetRect( 660, 580 + UI_OUTLINE_WIDTH, 260, 32 );
+	if( !num_models )
+	{
+		model.SetVisibility( false );
+		hideModels = true;
+	}
+	else
+	{
+		model.Setup( (const char **)modelsPtr, (size_t)num_models );
+		model.LinkCvar( "model", CMenuEditable::CVAR_STRING );
+		model.onChanged = VoidCb( &CMenuPlayerSetup::UpdateModel );
+		model.SetRect( 660, 580 + UI_OUTLINE_WIDTH, 260, 32 );
+	}
 
 	topColor.iFlags |= addFlags;
 	topColor.SetNameAndStatus( "Top color", "Set a player model top color" );
@@ -490,7 +498,6 @@ void CMenuPlayerSetup::_Init( void )
 
 	view.iFlags |= addFlags;
 	view.SetRect( 660, 260, 260, 320 );
-	UpdateModel();
 
 	msgBox.SetMessage( "Please, choose another player name" );
 	msgBox.Link( this );
@@ -511,8 +518,8 @@ void CMenuPlayerSetup::_Init( void )
 
 
 	AddItem( name );
-	AddItem( clPredict);
-	AddItem( clLW);
+	AddItem( clPredict );
+	AddItem( clLW );
 	if( !(gMenu.m_gameinfo.flags & GFL_NOMODELS) )
 	{
 		AddItem( topColor );
@@ -521,8 +528,11 @@ void CMenuPlayerSetup::_Init( void )
 		AddItem( hiModels );
 		AddItem( model );
 		// disable playermodel preview for HLRally to prevent crash
-		if( game_hlRally == FALSE )
+		if( !hideModels )
+		{
+			UpdateModel();
 			AddItem( view );
+		}
 	}
 }
 
