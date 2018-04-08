@@ -245,8 +245,23 @@ void CMenuCreateGame::_Init( void )
 	SET_EVENT_MULTI( maxClients.onCvarChange,
 	{
 		CMenuField *self = (CMenuField*)pSelf;
-		if( atoi(self->GetBuffer()) <= 1 )
-			self->SetBuffer( "8" );
+		if( !self->GetBuffer()[0] )
+			return;
+		int players = atoi( self->GetBuffer() );
+		if( players <= 1 )
+			self->SetBuffer( "2" );
+		else if( players > 32 )
+			self->SetBuffer( "32" );
+	});
+
+	SET_EVENT_MULTI( maxClients.onLostFocus,
+	{
+		CMenuField *self = (CMenuField*)pSelf;
+		int players = atoi( self->GetBuffer() );
+		if( players <= 1 )
+			self->SetBuffer( "2" );
+		else if( players > 32 )
+			self->SetBuffer( "32" );
 	});
 
 	password.szName = "Password:";
