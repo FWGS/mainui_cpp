@@ -95,8 +95,7 @@ void CMenuGameOptions::SaveCb()
 	split.WriteCvar();
 	compress.WriteCvar();
 
-	EngFuncs::ClientCmd( FALSE, "trysaveconfig\n" );
-	Hide();
+	SaveAndPopMenu();
 }
 
 void CMenuGameOptions::Restore()

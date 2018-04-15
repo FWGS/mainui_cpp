@@ -56,7 +56,7 @@ void CMenuPlayerIntroduceDialog::WriteOrDiscard()
 	else
 	{
 		name.WriteCvar();
-		Hide();
+		SaveAndPopMenu();
 	}
 }
 
