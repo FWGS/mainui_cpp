@@ -257,7 +257,16 @@ inline bool IsEscape( int key )
 #ifndef XASH_DISABLE_FWGS_EXTENSIONS
 	|| key == K_B_BUTTON
 #endif // XASH_DISABLE_FWGS_EXTENSIONS
-);
+	);
+}
+
+inline bool IsEnter( int key )
+{
+	return ( key == K_ENTER
+#ifndef XASH_DISABLE_FWGS_EXTENSIONS
+	|| key == K_A_BUTTON
+#endif // XASH_DISABLE_FWGS_EXTENSIONS
+	);
 }
 }
 
