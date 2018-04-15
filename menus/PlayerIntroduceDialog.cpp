@@ -67,6 +67,11 @@ const char *CMenuPlayerIntroduceDialog::Key( int key, int down )
 		return uiSoundNull; // handled
 	}
 
+	if( down && UI::Key::IsEnter( key ) && ItemAtCursor() == &name )
+	{
+		WriteOrDiscard();
+	}
+
 	return CMenuBaseWindow::Key( key, down );
 }
 
