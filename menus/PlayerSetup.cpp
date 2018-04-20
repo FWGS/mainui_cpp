@@ -205,7 +205,7 @@ void CMenuPlayerModelView::Draw()
 		EngFuncs::ClearScene();
 
 		// update renderer timings
-#ifndef PRERELEASE_INTERFACE
+#ifndef NEW_ENGINE_INTERFACE
 		refdef.time = gpGlobals->time;
 		refdef.frametime = gpGlobals->frametime;
 #endif

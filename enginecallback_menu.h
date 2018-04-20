@@ -22,7 +22,7 @@ GNU General Public License for more details.
 #include "Primitive.h"
 #include "netadr.h"
 
-#ifdef PRERELEASE_INTERFACE
+#ifdef NEW_ENGINE_INTERFACE
 #define ref_params_t ref_viewpass_t
 #define ref_params_s ref_viewpass_s
 #endif
