@@ -47,6 +47,7 @@ LOCAL_SRC_FILES := \
 	controls/BaseWindow.cpp                         \
 	controls/BackgroundBitmap.cpp                   \
 	controls/Table.cpp                              \
+	controls/PlayerModelView.cpp                    \
 	menus/AdvancedControls.cpp                      \
 	menus/Audio.cpp                                 \
 	menus/Configuration.cpp                         \

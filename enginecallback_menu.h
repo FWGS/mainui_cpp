@@ -23,8 +23,11 @@ GNU General Public License for more details.
 #include "netadr.h"
 
 #ifdef NEW_ENGINE_INTERFACE
-#define ref_params_t ref_viewpass_t
-#define ref_params_s ref_viewpass_s
+#define ref_menu_params_t ref_viewpass_t
+#define ref_menu_params_s ref_viewpass_s
+#else
+#define ref_menu_params_t ref_params_t
+#define ref_menu_params_s ref_params_s
 #endif
 
 class EngFuncs
@@ -152,7 +155,7 @@ public:
 	{  engfuncs.pfnSetModel( ed, path ); }
 	static inline void	ClearScene( void )
 	{  engfuncs.pfnClearScene(); }
-	static inline void	RenderScene( const struct ref_params_s *fd )
+	static inline void	RenderScene( const struct ref_menu_params_s *fd )
 	{  engfuncs.pfnRenderScene( fd ); }
 	static inline int	CL_CreateVisibleEntity( int type, struct cl_entity_s *ent )
 	{  return engfuncs.CL_CreateVisibleEntity( type, ent ); }

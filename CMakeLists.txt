@@ -57,6 +57,7 @@ set(MAINUI_CONTROLS_SOURCES
 	controls/BackgroundBitmap.cpp
 	controls/Table.cpp
 	controls/TabView.cpp
+	controls/PlayerModelView.cpp
 	#controls/VideoPlayer.cpp
 	# controls/ScrollView.cpp
 )
