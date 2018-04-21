@@ -460,7 +460,7 @@ void CMenuPlayerSetup::_Init( void )
 	topColor.LinkCvar( "topcolor" );
 	topColor.onCvarChange = CMenuEditable::WriteCvarCb;
 	topColor.onChanged = VoidCb( &CMenuPlayerSetup::ApplyColorToImagePreview );
-	topColor.SetCoord( 250, 550 );
+	topColor.SetCoord( 340, 520 );
 	topColor.size.w = 300;
 
 	bottomColor.iFlags |= addFlags;
@@ -469,7 +469,7 @@ void CMenuPlayerSetup::_Init( void )
 	bottomColor.LinkCvar( "bottomcolor" );
 	bottomColor.onCvarChange = CMenuEditable::WriteCvarCb;
 	bottomColor.onChanged = VoidCb( &CMenuPlayerSetup::ApplyColorToImagePreview );;
-	bottomColor.SetCoord( 250, 620 );
+	bottomColor.SetCoord( 340, 590 );
 	bottomColor.size.w = 300;
 
 	showModels.iFlags |= addFlags;
