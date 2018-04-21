@@ -45,7 +45,8 @@ private:
 	CMenuSpinControl	maxFPS;
 	//CMenuCheckBox	hand;
 	CMenuCheckBox	allowDownload;
-	CMenuCheckBox	alwaysRun;
+	CMenuCheckBox	cl_predict;
+	CMenuCheckBox	cl_lw;
 
 	CMenuSpinControl	maxpacket, maxpayload, cmdrate, updaterate, rate;
 	CMenuAction networkMode;
@@ -86,7 +87,6 @@ void CMenuGameOptions::SaveCb()
 	maxFPS.WriteCvar();
 	//hand.WriteCvar();
 	allowDownload.WriteCvar();
-	alwaysRun.WriteCvar();
 	maxpacket.WriteCvar();
 	maxpayload.WriteCvar();
 	cmdrate.WriteCvar();
@@ -94,6 +94,8 @@ void CMenuGameOptions::SaveCb()
 	rate.WriteCvar();
 	split.WriteCvar();
 	compress.WriteCvar();
+	cl_predict.WriteCvar();
+	cl_lw.WriteCvar();
 
 	SaveAndPopMenu();
 }
@@ -103,7 +105,6 @@ void CMenuGameOptions::Restore()
 	maxFPS.DiscardChanges();
 	//hand.DiscardChanges();
 	allowDownload.DiscardChanges();
-	alwaysRun.DiscardChanges();
 	maxpacket.DiscardChanges();
 	maxpayload.DiscardChanges();
 	cmdrate.DiscardChanges();
@@ -111,6 +112,8 @@ void CMenuGameOptions::Restore()
 	rate.DiscardChanges();
 	split.DiscardChanges();
 	compress.DiscardChanges();
+	cl_lw.DiscardChanges();
+	cl_predict.DiscardChanges();
 }
 
 void CMenuGameOptions::RestoreCb()
@@ -127,7 +130,6 @@ UI_GameOptions_Init
 void CMenuGameOptions::_Init( void )
 {
 	banner.SetPicture( ART_BANNER );
-
 	maxFPS.szName = "Limit game FPS";
 	maxFPS.szStatusText = "Cap your game frame rate";
 	maxFPS.Setup( 20, 500, 20 );
@@ -140,11 +142,20 @@ void CMenuGameOptions::_Init( void )
 
 	allowDownload.SetNameAndStatus( "Allow download", "Allow download of files from servers" );
 	allowDownload.LinkCvar( "sv_allow_download" );
-	allowDownload.SetCoord( 240, 330 );
+	allowDownload.SetCoord( 240, 315 );
 
-	alwaysRun.SetNameAndStatus( "Always run", "Switch between run/step models when pressed 'run' button" );
-	alwaysRun.LinkCvar( "cl_run" );
-	alwaysRun.SetCoord( 240, 390 );
+#ifdef NEW_ENGINE_INTERFACE
+	cl_predict.SetNameAndStatus( "Disable predicting", "Disable player movement prediction" );
+	cl_predict.LinkCvar( "cl_nopred" );
+#else
+	cl_predict.SetNameAndStatus( "Predict movement", "Enable player movement prediction" );
+	cl_predict.LinkCvar( "cl_predict" );
+#endif
+	cl_predict.SetCoord( 240, 365 );
+
+	cl_lw.SetNameAndStatus( "Local weapons", "Enable local weapons" );
+	cl_lw.LinkCvar( "cl_lw" );
+	cl_lw.SetCoord( 240, 415 );
 
 	maxpacket.SetRect( 650, 270, 200, 32 );
 	maxpacket.Setup( 150, 1550, 50 );
@@ -248,7 +259,8 @@ void CMenuGameOptions::_Init( void )
 	//AddItem( hand );
 
 	AddItem( allowDownload );
-	AddItem( alwaysRun );
+	AddItem( cl_predict );
+	AddItem( cl_lw );
 	AddItem( maxpacket );
 	AddItem( maxpayload );
 	AddItem( cmdrate );
@@ -262,13 +274,21 @@ void CMenuGameOptions::_Init( void )
 	AddItem( compress );
 
 	// only for game/engine developers
+#ifdef NEW_ENGINE_INTERFACE
+	if( EngFuncs::GetCvarFloat( "developer" ) < 1 )
+#else
 	if( EngFuncs::GetCvarFloat( "developer" ) < 3 )
+#endif
 	{
 		maxpacket.Hide();
 		rate.Hide();
 	}
 
+#ifdef NEW_ENGINE_INTERFACE
+	if( EngFuncs::GetCvarFloat( "developer" ) < 2 )
+#else
 	if( EngFuncs::GetCvarFloat( "developer" ) < 4 )
+#endif
 	{
 		maxpayload.Hide();
 		cmdrate.Hide();

@@ -301,8 +301,6 @@ public:
 
 	CMenuCheckBox	showModels;
 	CMenuCheckBox	hiModels;
-	CMenuCheckBox	clPredict;
-	CMenuCheckBox	clLW;
 	CMenuSlider	topColor;
 	CMenuSlider	bottomColor;
 
@@ -369,8 +367,6 @@ void CMenuPlayerSetup::SetConfig( void )
 	bottomColor.WriteCvar();
 	hiModels.WriteCvar();
 	showModels.WriteCvar();
-	clPredict.WriteCvar();
-	clLW.WriteCvar();
 }
 
 void CMenuPlayerSetup::SaveAndPopMenu()
@@ -476,14 +472,6 @@ void CMenuPlayerSetup::_Init( void )
 	bottomColor.SetCoord( 250, 620 );
 	bottomColor.size.w = 300;
 
-	clPredict.SetNameAndStatus( "Predict movement", "Enable player movement prediction" );
-	clPredict.LinkCvar( "cl_predict" );
-	clPredict.SetCoord( 72, 380 );
-
-	clLW.SetNameAndStatus( "Local weapons", "Enable local weapons" );
-	clLW.LinkCvar( "cl_lw" );
-	clLW.SetCoord( 72, 430 );
-
 	showModels.iFlags |= addFlags;
 	showModels.SetNameAndStatus( "Show 3D preview", "Show 3D player models instead of preview thumbnails" );
 	showModels.LinkCvar( "ui_showmodels" );
@@ -518,8 +506,6 @@ void CMenuPlayerSetup::_Init( void )
 
 
 	AddItem( name );
-	AddItem( clPredict );
-	AddItem( clLW );
 	if( !(gMenu.m_gameinfo.flags & GFL_NOMODELS) )
 	{
 		AddItem( topColor );
