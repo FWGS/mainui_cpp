@@ -23,14 +23,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Slider.h"
 #include "PicButton.h"
 #include "CheckBox.h"
-#include "ScrollList.h"
+#include "Table.h"
 #include "SpinControl.h"
 #include "Field.h"
 #include "YesNoMessageBox.h"
+#include "StringArrayModel.h"
 
 #define ART_BANNER	  	"gfx/shell/head_touch_options"
 
-class CMenuTouchOptions : public CMenuFramework
+static class CMenuTouchOptions : public CMenuFramework
 {
 private:
 	void _Init();
@@ -41,7 +42,6 @@ public:
 	void DeleteProfileCb( );
 	void ResetButtonsCb();
 
-	void GetProfileList();
 	void SaveAndPopMenu();
 	void GetConfig();
 
@@ -50,12 +50,18 @@ public:
 
 	void Apply();
 	void Save();
-	void UpdateProfilies();
 
-	char		profileDesc[UI_MAXGAMES][95];
-	char		*profileDescPtr[UI_MAXGAMES];
-	int			firstProfile;
-	
+	class CProfiliesListModel : public CStringArrayModel
+	{
+	public:
+		CProfiliesListModel() : CStringArrayModel( (const char*)profileDesc, 95, 0 ) {}
+		void Update();
+		const char *GetText( int line ) { return profileDesc[line]; }
+		char profileDesc[UI_MAXGAMES][95];
+		int	 iHighlight;
+		int	 firstProfile;
+	} model;
+
 	CMenuPicButton	done;
 
 	CMenuSlider	lookX;
@@ -70,23 +76,21 @@ public:
 	CMenuPicButton	remove;
 	CMenuPicButton	apply;
 	CMenuField	profilename;
-	CMenuScrollList profiles;
+	CMenuTable profiles;
 	CMenuSpinControl gridsize;
 
 	// prompt dialog
 	CMenuYesNoMessageBox msgBox;
-};
+	void UpdateProfilies();
+} uiTouchOptions;
 
-static CMenuTouchOptions	uiTouchOptions;
-
-void CMenuTouchOptions::GetProfileList( void )
+void CMenuTouchOptions::CProfiliesListModel::Update( void )
 {
 	char	**filenames;
 	int	i = 0, numFiles, j = 0;
-	char *curprofile;
+	const char *curprofile;
 
 	Q_strncpy( profileDesc[i], "Presets:", CS_SIZE );
-	profileDescPtr[i] = profileDesc[i];
 	i++;
 
 	filenames = EngFuncs::GetFilesList( "touch_presets/*.cfg", &numFiles, TRUE );
@@ -96,7 +100,6 @@ void CMenuTouchOptions::GetProfileList( void )
 
 		// strip path, leave only filename (empty slots doesn't have savename)
 		COM_FileBase( filenames[j], profileDesc[i] );
-		profileDescPtr[i] = profileDesc[i];
 	}
 
 	// Overwrite "Presets:" line if there is no presets
@@ -108,15 +111,11 @@ void CMenuTouchOptions::GetProfileList( void )
 	curprofile = EngFuncs::GetCvarString("touch_config_file");
 
 	Q_strncpy( profileDesc[i], "Profiles:", CS_SIZE );
-	profileDescPtr[i] = profileDesc[i];
 	i++;
 
 	Q_strncpy( profileDesc[i], "default", CS_SIZE );
-	profileDescPtr[i] = profileDesc[i];
 
-	profiles.iHighlight = i;
-
-	firstProfile = i;
+	iHighlight = firstProfile = i;
 	i++;
 
 	for ( ; j < numFiles; i++, j++ )
@@ -124,28 +123,11 @@ void CMenuTouchOptions::GetProfileList( void )
 		if( i >= UI_MAXGAMES ) break;
 
 		COM_FileBase( filenames[j], profileDesc[i] );
-		profileDescPtr[i] = profileDesc[i];
 		if( !strcmp( filenames[j], curprofile ) )
-			profiles.iHighlight = i;
-	}
-	profiles.iNumItems = i;
-
-	remove.SetGrayed( true );
-	apply.SetGrayed( true );
-
-	if( profiles.charSize.h )
-	{
-		profiles.iNumRows = (profiles.size.h / profiles.charSize.h) - 2;
-		if( profiles.iNumRows > profiles.iNumItems )
-			profiles.iNumRows = i;
+			iHighlight = i;
 	}
 
-	for ( ; i < UI_MAXGAMES; i++ )
-		profileDescPtr[i] = NULL;
-	profiles.iCurItem = profiles.iHighlight;
-
-
-	profiles.pszItemNames = (const char **)profileDescPtr;
+	m_iCount = i;
 }
 
 /*
@@ -195,14 +177,14 @@ void CMenuTouchOptions::DeleteMsgBox()
 
 void CMenuTouchOptions::Apply()
 {
-	int i = profiles.iCurItem;
+	int i = profiles.GetCurrentIndex();
 
 	// preset selected
-	if( i > 0 && i < firstProfile - 1 )
+	if( i > 0 && i < model.firstProfile - 1 )
 	{
 		char command[256];
-		char *curconfig = EngFuncs::GetCvarString( "touch_config_file" );
-		snprintf( command, 256, "exec \"touch_presets/%s\"\n", profileDesc[ i ] );
+		const char *curconfig = EngFuncs::GetCvarString( "touch_config_file" );
+		snprintf( command, 256, "exec \"touch_presets/%s\"\n", model.profileDesc[ i ] );
 		EngFuncs::ClientCmd( 1,  command );
 
 		while( EngFuncs::FileExists( curconfig, TRUE ) )
@@ -219,12 +201,12 @@ void CMenuTouchOptions::Apply()
 			curconfig = EngFuncs::GetCvarString( "touch_config_file" );
 		}
 	}
-	else if( i == firstProfile )
+	else if( i == model.firstProfile )
 		EngFuncs::ClientCmd( 1, "exec touch.cfg\n" );
-	else if( i > firstProfile )
+	else if( i > model.firstProfile )
 	{
 		char command[256];
-		snprintf( command, 256, "exec \"touch_profiles/%s\"\n", profileDesc[ i ] );
+		snprintf( command, 256, "exec \"touch_profiles/%s\"\n", model.profileDesc[ i ] );
 		EngFuncs::ClientCmd( 1,  command );
 	}
 
@@ -235,9 +217,9 @@ void CMenuTouchOptions::Apply()
 	if( !EngFuncs::FileExists( EngFuncs::GetCvarString( "touch_config_file" ), TRUE ) )
 	{
 		EngFuncs::CvarSetString( "touch_config_file", "touch.cfg" );
-		profiles.iCurItem = firstProfile;
+		profiles.SetCurrentIndex( model.firstProfile );
 	}
-	GetProfileList();
+	model.Update();
 	GetConfig();
 }
 
@@ -251,7 +233,7 @@ void CMenuTouchOptions::Save()
 		EngFuncs::CvarSetString("touch_config_file", name );
 	}
 	EngFuncs::ClientCmd( 1, "touch_writeconfig\n" );
-	GetProfileList();
+	model.Update();
 	profilename.Clear();
 }
 
@@ -259,17 +241,19 @@ void CMenuTouchOptions::UpdateProfilies()
 {
 	char curprofile[256];
 	int isCurrent;
+	int idx = profiles.GetCurrentIndex();
+
 	COM_FileBase( EngFuncs::GetCvarString( "touch_config_file" ), curprofile );
-	isCurrent = !strcmp( curprofile, profileDesc[ profiles.iCurItem ]);
+	isCurrent = !strcmp( curprofile, model.profileDesc[ idx ]);
 
 	// Scrolllist changed, update availiable options
 	remove.SetGrayed( true );
-	if( ( profiles.iCurItem > firstProfile ) && !isCurrent )
+	if( ( idx > model.firstProfile ) && !isCurrent )
 		remove.SetGrayed( false );
 
 	apply.SetGrayed( false );
-	if( profiles.iCurItem == 0 || profiles.iCurItem == firstProfile - 1 )
-		profiles.iCurItem++;
+	if( idx == 0 || idx == model.firstProfile - 1 )
+		profiles.SetCurrentIndex( idx + 1 );
 	if( isCurrent )
 		apply.SetGrayed( true );
 }
@@ -278,23 +262,23 @@ void CMenuTouchOptions::DeleteProfileCb()
 {
 	char command[256];
 
-	if( profiles.iCurItem <= firstProfile )
+	if( profiles.GetCurrentIndex() <= model.firstProfile )
 		return;
 
-	snprintf(command, 256, "touch_deleteprofile \"%s\"\n", profiles.GetSelectedItem() );
-	EngFuncs::ClientCmd(1, command);
+	snprintf(command, 256, "touch_deleteprofile \"%s\"\n", model.profileDesc[ profiles.GetCurrentIndex() ] );
+	EngFuncs::ClientCmd( TRUE, command );
 
-	GetProfileList();
+	model.Update();
 }
 
 void CMenuTouchOptions::ResetButtonsCb()
 {
-	EngFuncs::ClientCmd( 0, "touch_pitch 90\n" );
-	EngFuncs::ClientCmd( 0, "touch_yaw 120\n" );
-	EngFuncs::ClientCmd( 0, "touch_forwardzone 0.06\n" );
-	EngFuncs::ClientCmd( 0, "touch_sidezone 0.06\n" );
-	EngFuncs::ClientCmd( 0, "touch_grid 1\n" );
-	EngFuncs::ClientCmd( 1, "touch_grid_count 50\n" );
+	EngFuncs::ClientCmd( FALSE, "touch_pitch 90\n" );
+	EngFuncs::ClientCmd( FALSE, "touch_yaw 120\n" );
+	EngFuncs::ClientCmd( FALSE, "touch_forwardzone 0.06\n" );
+	EngFuncs::ClientCmd( FALSE, "touch_sidezone 0.06\n" );
+	EngFuncs::ClientCmd( FALSE, "touch_grid 1\n" );
+	EngFuncs::ClientCmd( TRUE,  "touch_grid_count 50\n" );
 
 	GetConfig();
 }
@@ -350,9 +334,9 @@ void CMenuTouchOptions::_Init( void )
 	nomouse.LinkCvar( "m_ignore" );
 	nomouse.SetCoord( 680, 580 );
 
-	GetProfileList();
-
 	profiles.SetRect( 360, 255, 300, 340 );
+	profiles.SetModel( &model );
+	UpdateProfilies();
 	profiles.onChanged = VoidCb( &CMenuTouchOptions::UpdateProfilies );
 
 	profilename.szName = "New Profile:";

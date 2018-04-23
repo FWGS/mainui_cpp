@@ -188,6 +188,7 @@ bool CSCR_ParseSingleCvar( parserstate_t *ps, scrvardef_t *result )
 		scrvarlistentry_t *entry = result->list.pEntries;
 
 		result->list.pArray = ( const char ** )MALLOC( result->list.iCount * sizeof( char * ) );
+		result->list.pModel = new CStringArrayModel( result->list.pArray, result->list.iCount );
 
 		for( int i = 0; entry; entry = entry->next, i++ )
 		{
@@ -204,6 +205,8 @@ error:
 			scrvarlistentry_s *next = result->list.pEntries->next;
 			if( result->list.pArray )
 				FREE( result->list.pArray );
+			if( result->list.pModel )
+				delete result->list.pModel;
 			FREE( result->list.pEntries->szName );
 			FREE( result->list.pEntries );
 

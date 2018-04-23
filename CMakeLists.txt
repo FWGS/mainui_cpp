@@ -45,7 +45,6 @@ set(MAINUI_CONTROLS_SOURCES
 	controls/ItemsHolder.cpp
 	controls/Field.cpp
 	controls/PicButton.cpp
-	controls/ScrollList.cpp
 	controls/Slider.cpp
 	controls/SpinControl.cpp
 	controls/YesNoMessageBox.cpp
@@ -140,7 +139,7 @@ if(APPLE)
 	set(MAINUI_USE_STB TRUE)
 endif()
 
-include_directories(${XASH_SDK}/common ${XASH_SDK}/engine ${XASH_SDK}/pm_shared . controls/ menus/ utl/ font/)
+include_directories(${XASH_SDK}/common ${XASH_SDK}/engine ${XASH_SDK}/pm_shared . controls/ menus/ utl/ font/ model/)
 
 if(MSVC)
 	add_definitions(-D_CRT_SECURE_NO_WARNINGS)

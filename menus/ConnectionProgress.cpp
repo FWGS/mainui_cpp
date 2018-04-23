@@ -61,7 +61,7 @@ public:
 		commonProgress.LinkCvar( "scr_loading", 0, 100 );
 		m_iState = STATE_CONNECTING;
 	}
-	void HandleStufftext( float flProgress, char *pszText )
+	void HandleStufftext( float flProgress, const char *pszText )
 	{
 		SetCommonText( pszText );
 		commonProgress.SetValue( flProgress );

@@ -24,6 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "PicButton.h"
 #include "CheckBox.h"
 #include "SpinControl.h"
+#include "StringArrayModel.h"
 
 #define ART_BANNER			"gfx/shell/head_audio"
 
@@ -143,8 +144,9 @@ void CMenuAudio::_Init( void )
 	suitVolume.onChanged = CMenuEditable::WriteCvarCb;
 	suitVolume.SetCoord( 320, 400 );
 
+	static CStringArrayModel model( lerpingStr, ARRAYSIZE( lerpingStr ));
 	lerping.SetNameAndStatus( "Sound interpolation", "Enable/disable interpolation on sound output" );
-	lerping.Setup( lerpingStr, ARRAYSIZE( lerpingStr ) );
+	lerping.Setup( &model );
 	lerping.onChanged = CMenuEditable::WriteCvarCb;
 	lerping.font = QM_SMALLFONT;
 	lerping.SetRect( 320, 470, 300, 32 );

@@ -18,6 +18,8 @@ GNU General Public License for more details.
 
 #define MAX_STRING 256
 
+#include "StringArrayModel.h"
+
 typedef enum
 {
 	T_NONE = 0,
@@ -41,6 +43,7 @@ typedef struct scrvarlist_s
 	scrvarlistentry_t *pEntries;
 	scrvarlistentry_t *pLast;
 	const char **pArray;
+	CStringArrayModel *pModel; // ready model for use in UI
 } scrvarlist_t;
 
 typedef struct

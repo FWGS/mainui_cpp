@@ -97,7 +97,7 @@ void CMenuEditable::UpdateCvar()
 		case CVAR_STRING:
 		{
 			const char *str = EngFuncs::GetCvarString( m_szCvarName );
-			if( !haveUpdate && strcmp( m_szOriginalString, str ) )
+			if( m_bForceUpdate || strcmp( m_szOriginalString, str ) )
 			{
 				SetOriginalString( str );
 				haveUpdate = true;
@@ -107,7 +107,7 @@ void CMenuEditable::UpdateCvar()
 		case CVAR_VALUE:
 		{
 			float val = EngFuncs::GetCvarFloat( m_szCvarName );
-			if( !haveUpdate && m_flOriginalValue != val )
+			if( m_bForceUpdate || m_flOriginalValue != val )
 			{
 				SetOriginalValue( val );
 				haveUpdate = true;

@@ -26,6 +26,7 @@ LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)/controls 				\
 	$(LOCAL_PATH)/font 				\
 	$(LOCAL_PATH)/utl 				\
+	$(LOCAL_PATH)/model				\
 
 LOCAL_SRC_FILES := \
 	controls/Framework.cpp                          \
@@ -37,7 +38,6 @@ LOCAL_SRC_FILES := \
 	controls/ItemsHolder.cpp                        \
 	controls/Field.cpp                              \
 	controls/PicButton.cpp                          \
-	controls/ScrollList.cpp                         \
 	controls/Slider.cpp                             \
 	controls/SpinControl.cpp                        \
 	controls/YesNoMessageBox.cpp                    \

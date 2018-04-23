@@ -19,6 +19,7 @@ GNU General Public License for more details.
 #define MENU_SPINCONTROL_H
 
 #include "Editable.h"
+#include "BaseArrayModel.h"
 
 class CMenuSpinControl : public CMenuEditable
 {
@@ -32,8 +33,8 @@ public:
 	virtual void Draw( void );
 	virtual void UpdateEditable();
 
+	void Setup( CMenuBaseArrayModel *model );
 	void Setup( float minValue, float maxValue, float range );
-	void Setup( const char **stringValues, size_t size );
 
 	void SetDisplayPrecision( short precision );
 
@@ -41,7 +42,7 @@ public:
 	void SetCurrentValue( float curValue );
 
 	float GetCurrentValue( ) { return m_flCurValue; }
-	const char *GetCurrentString( ) { return m_stringValues[(int)m_flCurValue]; }
+	const char *GetCurrentString( ) { return m_pModel->GetText( (int)m_flCurValue ); }
 
 	void ForceDisplayString( const char *display );
 
@@ -60,7 +61,7 @@ private:
 	float		m_flCurValue;
 	float		m_flRange;
 
-	const char **m_stringValues;
+	CMenuBaseArrayModel *m_pModel;
 	short m_iFloatPrecision;
 
 	char m_szDisplay[CS_SIZE];

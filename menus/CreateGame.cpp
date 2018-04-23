@@ -24,7 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Field.h"
 #include "CheckBox.h"
 #include "PicButton.h"
-#include "ScrollList.h"
+#include "Table.h"
 #include "Action.h"
 #include "YesNoMessageBox.h"
 #include "Table.h"

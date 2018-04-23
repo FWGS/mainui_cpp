@@ -230,7 +230,6 @@ void CMenuScriptConfig::_Init( void )
 			else fMax = var->number.fMax;
 
 			spinControl->Setup( fMin, fMax, 1 );
-			spinControl->SetSize( 300, 32 );
 			editable = spinControl;
 
 			cvarType = CMenuEditable::CVAR_VALUE;
@@ -240,7 +239,6 @@ void CMenuScriptConfig::_Init( void )
 		{
 			CMenuField *field = new CMenuField;
 			field->iMaxLength = CS_SIZE;
-			field->SetSize( 300, 32 );
 			editable = field;
 			cvarType = CMenuEditable::CVAR_STRING;
 			break;
@@ -249,8 +247,7 @@ void CMenuScriptConfig::_Init( void )
 		{
 			CMenuSpinControl *spinControl = new CMenuSpinControl;
 
-			spinControl->Setup( var->list.pArray, var->list.iCount );
-			spinControl->SetSize( 300, 32 );
+			spinControl->Setup( var->list.pModel );
 			spinControl->onCvarGet = ListItemCvarGetCb;
 			spinControl->onCvarGet.pExtra = (void*)&var->list;
 			spinControl->onCvarWrite = ListItemCvarWriteCb;
@@ -261,6 +258,9 @@ void CMenuScriptConfig::_Init( void )
 		}
 		default: continue;
 		}
+
+		if( var->type != T_BOOL )
+			editable->SetSize( 300, 32 );
 
 		editable->iFlags |= QMF_NOTIFY;
 		// editable->szName = var->name;

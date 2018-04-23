@@ -22,7 +22,7 @@ GNU General Public License for more details.
 
 CMenuSpinControl::CMenuSpinControl()  : BaseClass(), m_szBackground(),
 		m_szLeftArrow(), m_szRightArrow(), m_szLeftArrowFocus(), m_szRightArrowFocus(),
-		m_flMinValue(0), m_flMaxValue(1), m_flCurValue(0), m_flRange(0.1), m_stringValues(0),
+		m_flMinValue(0), m_flMaxValue(1), m_flCurValue(0), m_flRange(0.1), m_pModel( NULL ),
 		m_iFloatPrecision(0), m_szDisplay()
 {
 	m_szBackground = NULL;
@@ -278,12 +278,11 @@ void CMenuSpinControl::Setup( float minValue, float maxValue, float range )
 	m_flRange = range;
 }
 
-void CMenuSpinControl::Setup( const char **stringValues, size_t size )
+void CMenuSpinControl::Setup( CMenuBaseArrayModel *model )
 {
-	m_stringValues = stringValues;
-
+	m_pModel = model;
 	m_flMinValue = 0;
-	m_flMaxValue = size - 1;
+	m_flMaxValue = model->GetRows() - 1;
 	m_flRange = 1;
 }
 
@@ -295,13 +294,13 @@ void CMenuSpinControl::SetCurrentValue( float curValue )
 
 void CMenuSpinControl::SetCurrentValue( const char *stringValue )
 {
-	ASSERT( m_stringValues );
+	ASSERT( m_pModel );
 
 	int i = 0;
 
 	for( ; i < (int)m_flMaxValue; i++ )
 	{
-		if( !strcmp( m_stringValues[i], stringValue ) )
+		if( !strcmp( m_pModel->GetText( i ), stringValue ) )
 		{
 			m_flCurValue = i;
 			Display();
@@ -322,7 +321,7 @@ void CMenuSpinControl::SetDisplayPrecision( short precision )
 
 void CMenuSpinControl::Display()
 {
-	if( !m_stringValues )
+	if( !m_pModel )
 	{
 		SetCvarValue( m_flCurValue );
 
@@ -331,7 +330,7 @@ void CMenuSpinControl::Display()
 	else
 	{
 		ASSERT( m_flCurValue >= m_flMinValue && m_flCurValue <= m_flMaxValue );
-		const char *stringValue = m_stringValues[(int)m_flCurValue];
+		const char *stringValue = m_pModel->GetText( (int)m_flCurValue );
 
 		switch( m_eType )
 		{

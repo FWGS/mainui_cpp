@@ -95,7 +95,7 @@ public:
 
 	static inline float	GetCvarFloat( const char *szName )
 	{ return engfuncs.pfnGetCvarFloat( szName ); }
-	static inline char*	GetCvarString( const char *szName )
+	static inline const char*	GetCvarString( const char *szName )
 	{ return engfuncs.pfnGetCvarString( szName ); }
 	static inline void	CvarSetString( const char *szName, const char *szValue )
 	{ engfuncs.pfnCvarSetString( szName, szValue ); }
@@ -111,9 +111,9 @@ public:
 	{ engfuncs.pfnDelCommand( cmd_name ); }
 	static inline int   CmdArgc( void )
 	{ return engfuncs.pfnCmdArgc(); }
-	static inline char*	CmdArgv( int argi )
+	static inline const char*	CmdArgv( int argi )
 	{ return engfuncs.pfnCmdArgv( argi ); }
-	static inline char*	CmdArgs( void )
+	static inline const char*	CmdArgs( void )
 	{ return engfuncs.pfnCmd_Args(); }
 
 	// sound handlers

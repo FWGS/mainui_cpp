@@ -18,6 +18,7 @@ GNU General Public License for more details.
 #define MENU_TABLE_H
 
 #include "BaseItem.h"
+#include "BaseModel.h"
 
 #define MAX_TABLE_COLUMNS 16
 
@@ -41,36 +42,6 @@ GNU General Public License for more details.
  * 6. Column widths are constant(at this moment). You should not exceed 1.0 in total columns width
  *
  */
-
-enum ECellType
-{
-	CELL_TEXT = 0,
-	CELL_IMAGE_DEFAULT,
-	CELL_IMAGE_ADDITIVE,
-	CELL_IMAGE_TRANS,
-	CELL_IMAGE_HOLES,
-	// CELL_ITEM,
-};
-
-class CMenuBaseModel
-{
-public:
-	virtual ~CMenuBaseModel()  { }
-
-	// every model must implement these methods
-	virtual void Update() = 0;
-	virtual int GetColumns() const = 0;
-	virtual int GetRows() const = 0;
-	virtual const char *GetCellText( int line, int column ) = 0;
-
-	// customization
-	virtual void OnDeleteEntry( int line ) { }
-	virtual void OnActivateEntry( int line ) { }
-	virtual ETextAlignment GetAlignmentForColumn( int column ) const { return QM_LEFT; }
-	virtual ECellType GetCellType( int line, int column ) { return CELL_TEXT; }
-	virtual bool IsCellTextWrapped( int line, int column ) { return true; }
-	// virtual CMenuBaseItem *GetCellItem( int line, int column ) { return NULL; }
-};
 
 class CMenuTable : public CMenuBaseItem
 {

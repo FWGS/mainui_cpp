@@ -58,11 +58,19 @@ void CMenuTable::VidInit()
 
 	for( int i = 0; i < m_pModel->GetColumns(); i++ )
 	{
+		// this isn't valid behaviour, but still enough for tables without
+		// set columns width
+		if( !columns[i].flWidth )
+		{
+			SetColumnWidth( i, 1 / m_pModel->GetColumns(), false );
+		}
+
 		if( columns[i].fStaticWidth )
 			flFixedSumm += columns[i].flWidth;
 		else
 			flDynamicSumm += columns[i].flWidth;
 	}
+
 	flFixedSumm *= uiStatic.scaleX;
 }
 

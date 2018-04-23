@@ -24,6 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Slider.h"
 #include "CheckBox.h"
 #include "SpinControl.h"
+#include "StringArrayModel.h"
 #include "Action.h"
 
 #define ART_BANNER			"gfx/shell/head_gamepad"
@@ -192,6 +193,8 @@ void CMenuGamePad::_Init( void )
 {
 	int i, y;
 
+	static CStringArrayModel model( axisNames, ARRAYSIZE( axisNames ) );
+
 	banner.SetPicture( ART_BANNER );
 
 	axisBind_label.eTextAlignment = QM_CENTER;
@@ -202,7 +205,7 @@ void CMenuGamePad::_Init( void )
 	for( i = 0, y = 230; i < 6; i++, y += 50 )
 	{
 		axisBind[i].szStatusText = "Set axis binding";
-		axisBind[i].Setup( axisNames, ARRAYSIZE( axisNames ) );
+		axisBind[i].Setup( &model );
 	}
 
 	side.Setup( 0.0f, 1.0f, 0.1f );

@@ -25,9 +25,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Slider.h"
 #include "Field.h"
 #include "Action.h"
-#include "ScrollList.h"
+#include "Table.h"
 #include "CheckBox.h"
 #include "YesNoMessageBox.h"
+#include "StringArrayModel.h"
 
 #define ART_BANNER	  	"gfx/shell/head_touch_buttons"
 
@@ -36,16 +37,12 @@ class CMenuTouchButtons : public CMenuFramework
 public:
 	CMenuTouchButtons() : CMenuFramework( "CMenuTouchButtons" ) { }
 
-	void AddButtonToList( const char *name, const char *texture, const char *command, unsigned char *color, int flags );
-	void GetButtonList();
-
 private:
 	void _Init();
 	void _VidInit();
 public:
 	void DeleteButton();
 	void ResetButtons();
-	void UpdateFields();
 	void OpenFileDialog();
 	void UpdateTexture();
 	void UpdateSP();
@@ -53,27 +50,17 @@ public:
 	void SaveButton();
 	void RemoveMsgBox();
 	void ResetMsgBox();
+	void UpdateFields();
 
 	static void ExitMenuCb(CMenuBaseItem *pSelf, void *pExtra);
 	// Use an event system here!
 	// Don't make this static method cry.
 	static void FileDialogCallback( bool success );
 
-
-	struct
-	{
-		char szName[128];
-		char szTexture[128];
-		char szCommand[128];
-		byte bColors[4];
-		int  iFlags;
-	} buttons[UI_MAXGAMES];
-
 	HIMAGE textureid;
 	char selectedName[256];
 	int curflags;
 
-    char		*bNamesPtr[UI_MAXGAMES];
 	
 	CMenuPicButton	done;
 	CMenuPicButton	cancel;
@@ -107,69 +94,69 @@ public:
 		virtual void Draw();
 		HIMAGE textureId;
 	} preview;
-	CMenuScrollList buttonList;
+
+	class CButtonListModel : public CStringArrayModel
+	{
+	public:
+		CButtonListModel() : CStringArrayModel( (const char*)&buttons, sizeof( buttons[0] ), 0 ) {}
+
+		void Update();
+		void AddButtonToList( const char *name, const char *texture, const char *command, unsigned char *color, int flags );
+
+		struct
+		{
+			char szName[128];
+			char szTexture[128];
+			char szCommand[128];
+			byte bColors[4];
+			int  iFlags;
+		} buttons[UI_MAXGAMES];
+
+		bool gettingList;
+		bool initialized;
+	} model;
+	CMenuTable buttonList;
 
 	// prompt dialog
 	CMenuYesNoMessageBox msgBox;
-
-	bool initialized;
-	bool gettingList;
 };
 
 static CMenuTouchButtons uiTouchButtons;
 
 
-void CMenuTouchButtons::AddButtonToList( const char *name, const char *texture, const char *command, unsigned char *color, int flags )
+void CMenuTouchButtons::CButtonListModel::AddButtonToList( const char *name, const char *texture, const char *command, unsigned char *color, int flags )
 {
 	if( !gettingList )
 		return;
 
-	int i = buttonList.iNumItems++;
+	int i = m_iCount++;
 
 	Q_strncpy( buttons[i].szName, name, sizeof( buttons[i].szName ) );
 	Q_strncpy( buttons[i].szTexture, texture, sizeof( buttons[i].szTexture ) );
 	Q_strncpy( buttons[i].szCommand, command, sizeof( buttons[i].szCommand ) );
 	memcpy( buttons[i].bColors, color, sizeof( buttons[i].bColors ) );
 	buttons[i].iFlags = flags;
-
-	bNamesPtr[i] = buttons[i].szName;
 }
 
 // Engine callback
 extern "C" EXPORT void AddTouchButtonToList( const char *name, const char *texture, const char *command, unsigned char *color, int flags )
 {
-	uiTouchButtons.AddButtonToList( name, texture, command, color, flags );
+	uiTouchButtons.model.AddButtonToList( name, texture, command, color, flags );
 }
 
 
-void CMenuTouchButtons::GetButtonList()
+void CMenuTouchButtons::CButtonListModel::Update()
 {
 	if( !initialized )
 		return;
 
-	buttonList.iNumItems = 0;
+	m_iCount = 0;
 
 	EngFuncs::ClientCmd( TRUE, "" ); // perform Cbuf_Execute()
 
 	gettingList = true;
 	EngFuncs::ClientCmd( TRUE, "touch_list\n" );
 	gettingList = false;
-
-	int i = buttonList.iNumItems;
-
-	if( buttonList.charSize.h )
-	{
-		buttonList.iNumRows = (buttonList.size.h / buttonList.charSize.h ) - 2;
-		if( buttonList.iNumRows > buttonList.iNumItems )
-			buttonList.iNumRows = i;
-	}
-
-	for ( ; i < UI_MAXGAMES; i++ )
-		bNamesPtr[i] = NULL;
-
-	buttonList.pszItemNames = (const char **)bNamesPtr;
-
-	UpdateFields();
 }
 
 void CMenuTouchButtons::CMenuColor::Draw()
@@ -211,27 +198,27 @@ void CMenuTouchButtons::DeleteButton()
 	char command[512];
 	snprintf(command, 512, "touch_removebutton \"%s\"\n", selectedName );
 	EngFuncs::ClientCmd(1, command);
-	GetButtonList();
+	model.Update();
 }
 
 void CMenuTouchButtons::ResetButtons()
 {
 	EngFuncs::ClientCmd( 0, "touch_removeall\n" );
 	EngFuncs::ClientCmd( 1, "touch_loaddefaults\n" );
-	GetButtonList();
+	model.Update();
 }
 
 void CMenuTouchButtons::UpdateFields( )
 {
-	int i = buttonList.iCurItem;
+	int i = buttonList.GetCurrentIndex();
 
-	strcpy( selectedName, buttons[i].szName );
-	red.SetCurrentValue( buttons[i].bColors[0] );
-	green.SetCurrentValue( buttons[i].bColors[1] );
-	blue.SetCurrentValue( buttons[i].bColors[2] );
-	alpha.SetCurrentValue( buttons[i].bColors[3] );
+	strcpy( selectedName, model.buttons[i].szName );
+	red.SetCurrentValue( model.buttons[i].bColors[0] );
+	green.SetCurrentValue( model.buttons[i].bColors[1] );
+	blue.SetCurrentValue( model.buttons[i].bColors[2] );
+	alpha.SetCurrentValue( model.buttons[i].bColors[3] );
 
-	curflags = buttons[i].iFlags;
+	curflags = model.buttons[i].iFlags;
 	mp.bChecked = !!( curflags & TOUCH_FL_MP );
 	sp.bChecked = !!( curflags & TOUCH_FL_SP );
 	lock.bChecked = !!( curflags & TOUCH_FL_NOEDIT );
@@ -240,10 +227,10 @@ void CMenuTouchButtons::UpdateFields( )
 	precision.bChecked = !!( curflags & TOUCH_FL_PRECISION );
 
 	name.Clear();
-	texture.SetBuffer( buttons[i].szTexture );
+	texture.SetBuffer( model.buttons[i].szTexture );
 	UpdateTexture();
 
-	command.SetBuffer( buttons[i].szCommand );
+	command.SetBuffer( model.buttons[i].szCommand );
 }
 
 void CMenuTouchButtons::OpenFileDialog()
@@ -338,7 +325,7 @@ void CMenuTouchButtons::SaveButton()
 		EngFuncs::ClientCmd(1, command);
 	}
 
-	GetButtonList();
+	model.Update();
 }
 
 void CMenuTouchButtons::RemoveMsgBox()
@@ -379,7 +366,7 @@ UI_TouchButtons_Init
 */
 void CMenuTouchButtons::_Init( void )
 {
-	initialized = true;
+	model.initialized = true;
 
 	banner.SetPicture(ART_BANNER);
 
@@ -465,8 +452,9 @@ void CMenuTouchButtons::_Init( void )
 	remove.SetPicture( PC_DELETE );
 	remove.onActivated = VoidCb( &CMenuTouchButtons::RemoveMsgBox );
 
-	buttonList.pszItemNames = (const char **)bNamesPtr;
+	buttonList.SetModel( &model );
 	buttonList.onChanged = VoidCb( &CMenuTouchButtons::UpdateFields );
+	UpdateFields();
 	msgBox.Link( this );
 
 	AddItem( background );
@@ -497,8 +485,6 @@ void CMenuTouchButtons::_Init( void )
 	AddItem( command );
 	AddItem( texture );
 	AddItem( name );
-
-	GetButtonList();
 }
 
 void CMenuTouchButtons::_VidInit()
@@ -548,7 +534,7 @@ UI_TouchButtons_Precache
 void UI_TouchButtons_Precache( void )
 {
 	EngFuncs::PIC_Load( ART_BANNER );
-	uiTouchButtons.gettingList = false; // prevent filling list before init
+	uiTouchButtons.model.gettingList = false; // prevent filling list before init
 }
 
 /*
@@ -559,12 +545,11 @@ UI_TouchButtons_Menu
 void UI_TouchButtons_Menu( void )
 {
 	UI_TouchButtons_Precache();
-	uiTouchButtons.GetButtonList();
-
+	UI_TouchButtons_GetButtonList();
 	uiTouchButtons.Show();
 }
 
 void UI_TouchButtons_GetButtonList()
 {
-	uiTouchButtons.GetButtonList();
+	uiTouchButtons.model.Update();
 }

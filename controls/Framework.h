@@ -48,7 +48,7 @@ public:
 
 	CMenuBannerBitmap banner;
 
-private:
+protected:
 	CMenuPicButton *m_apBtns[MAX_FRAMEWORK_PICBUTTONS];
 	int m_iBtnsNum;
 };

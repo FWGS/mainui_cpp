@@ -27,10 +27,30 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "SpinControl.h"
 #include "YesNoMessageBox.h"
 #include "PlayerModelView.h"
+#include "StringArrayModel.h"
 
 #define ART_BANNER		"gfx/shell/head_customize"
 
 #define MAX_PLAYERMODELS	100
+
+static struct
+{
+	const char *name;
+	unsigned char r;
+	unsigned char g;
+	unsigned char b;
+} g_LogoColors[] =
+{
+{ "orange", 255, 120, 24  },
+{ "yellow",	225, 180, 24  },
+{ "blue",   0,   60,  255 },
+{ "ltblue", 0,   167, 255 },
+{ "green",  0,   167, 0   },
+{ "red",    255, 43,  0   },
+{ "brown",  123, 73,  0   },
+{ "ltgray", 100, 100, 100 },
+{ "dkgray", 36,  36,  36  },
+};
 
 class CMenuPlayerSetup : public CMenuFramework
 {
@@ -40,15 +60,33 @@ public:
 	CMenuPlayerSetup() : CMenuFramework( "CMenuPlayerSetup" ), msgBox( true ) { }
 
 	void FindModels();
+	void FindLogos();
 	void SetConfig();
 	void UpdateModel();
+	void UpdateLogo();
 	void ApplyColorToImagePreview();
+	void ApplyColorToLogoPreview();
 	void SaveAndPopMenu();
 
-	char	models[MAX_PLAYERMODELS][CS_SIZE];
-	char	*modelsPtr[MAX_PLAYERMODELS];
-	int		num_models;
-	char	currentModel[CS_SIZE];
+	class CModelListModel : public CStringArrayModel
+	{
+	public:
+		CModelListModel() : CStringArrayModel( (const char *)models, CS_SIZE, 0 ) {}
+		void Update();
+
+	private:
+		char models[MAX_PLAYERMODELS][CS_SIZE];
+	} modelsModel;
+
+	class CLogosListModel : public CStringArrayModel
+	{
+	public:
+		CLogosListModel() : CStringArrayModel( (const char *)logos, CS_SIZE, 0 ) {}
+		void Update();
+
+	private:
+		char logos[MAX_PLAYERMODELS][CS_SIZE];
+	} logosModel;
 
 	CMenuPlayerModelView	view;
 
@@ -60,22 +98,56 @@ public:
 	CMenuField	name;
 	CMenuSpinControl	model;
 
+	class CMenuLogoPreview : public CMenuBaseItem
+	{
+	public:
+		virtual void Draw();
+		int r, g, b;
+		HIMAGE hImage;
+	} logoImage;
+
+	CMenuSpinControl	logo;
+	CMenuSpinControl		logoColor;
+
 	CMenuYesNoMessageBox msgBox;
 
 } uiPlayerSetup;
+
+void CMenuPlayerSetup::CMenuLogoPreview::Draw()
+{
+	if( !hImage )
+	{
+		// draw the background
+		UI_FillRect( m_scPos, m_scSize, uiPromptBgColor );
+
+		UI_DrawString( font, m_scPos, m_scSize, "No logo", iColor, 0, m_scChSize, QM_CENTER, true );
+	}
+	else
+	{
+		EngFuncs::PIC_Set( hImage, r, g, b, 255 );
+		EngFuncs::PIC_Draw( m_scPos, m_scSize );
+	}
+
+	// draw the rectangle
+	if( eFocusAnimation == QM_HIGHLIGHTIFFOCUS && IsCurrentSelected() )
+		UI_DrawRectangle( m_scPos, m_scSize, uiInputTextColor );
+	else
+		UI_DrawRectangle( m_scPos, m_scSize, uiInputFgColor );
+
+}
 
 /*
 =================
 UI_PlayerSetup_FindModels
 =================
 */
-void CMenuPlayerSetup::FindModels( void )
+void CMenuPlayerSetup::CModelListModel::Update( void )
 {
 	char	name[256], path[256];
 	char	**filenames;
 	int numFiles, i;
 	
-	num_models = 0;
+	m_iCount = 0;
 
 	// Get file list
 	filenames = EngFuncs::GetFilesList(  "models/player/*", &numFiles, TRUE );
@@ -93,19 +165,52 @@ void CMenuPlayerSetup::FindModels( void )
 	for( i = 0; i < numFiles; i++ )
 	{
 		COM_FileBase( filenames[i], name );
-		snprintf( path, sizeof(path), "models/player/%s/%s.mdl", name, name );
+		snprintf( path, sizeof( path ), "models/player/%s/%s.mdl", name, name );
 		if( !EngFuncs::FileExists( path, TRUE ))
 			continue;
 
-		Q_strncpy( models[num_models], name, sizeof( models[0] ) );
-		modelsPtr[num_models] = models[num_models];
-		num_models++;
+		Q_strncpy( models[m_iCount], name, sizeof( models[0] ) );
+		m_iCount++;
 	}
-
-	for( i = num_models; i < MAX_PLAYERMODELS; i++ )
-		modelsPtr[i] = NULL;
 }
 
+/*
+=================
+CMenuPlayerSetup::FindLogos
+
+=================
+*/
+void CMenuPlayerSetup::CLogosListModel::Update( void )
+{
+	char	**filenames;
+	int numFiles, i;
+
+	m_iCount = 0;
+
+	// Get file list
+	filenames = EngFuncs::GetFilesList( "logos/*.bmp", &numFiles, FALSE );
+
+	if( !filenames || !numFiles )
+	{
+		m_iCount = 0;
+		return;
+	}
+
+	// build the model list
+	for( i = 0; i < numFiles; i++ )
+	{
+		char logoFileName[CS_SIZE];
+
+		Q_strncpy( logoFileName, filenames[i], sizeof( logos[0] ) );
+		COM_FileBase( logoFileName, logos[m_iCount] );
+
+		// ignore remapped.bmp
+		if( !stricmp( logos[m_iCount], "remapped" ) )
+			continue;
+
+		m_iCount++;
+	}
+}
 
 /*
 =================
@@ -163,10 +268,47 @@ void CMenuPlayerSetup::UpdateModel()
 		EngFuncs::SetModel( view.ent, image );
 }
 
+void CMenuPlayerSetup::UpdateLogo()
+{
+	char image[256];
+	const char *mdl = logo.GetCurrentString();
+
+	if( !mdl || !mdl[0] )
+	{
+		return;
+	}
+
+	snprintf( image, 256, "logos/%s.bmp", mdl );
+	logoImage.hImage = EngFuncs::PIC_Load( image, 0 );
+	ApplyColorToLogoPreview();
+
+	EngFuncs::CvarSetString( "cl_logofile", mdl );
+}
+
 void CMenuPlayerSetup::ApplyColorToImagePreview()
 {
 	EngFuncs::ProcessImage( view.hPlayerImage, -1,
 		topColor.GetCurrentValue(), bottomColor.GetCurrentValue() );
+}
+
+void CMenuPlayerSetup::ApplyColorToLogoPreview()
+{
+	const char *logoColorStr = logoColor.GetCurrentString();
+
+	for( size_t i = 0; i < ARRAYSIZE( g_LogoColors ); i++ )
+	{
+		if( !stricmp( logoColorStr, g_LogoColors[i].name ))
+		{
+			logoImage.r = g_LogoColors[i].r;
+			logoImage.g = g_LogoColors[i].g;
+			logoImage.b = g_LogoColors[i].b;
+			return;
+		}
+	}
+
+	logoImage.r = 255;
+	logoImage.g = 255;
+	logoImage.b = 255;
 }
 
 /*
@@ -177,11 +319,17 @@ UI_PlayerSetup_Init
 void CMenuPlayerSetup::_Init( void )
 {
 	bool hideModels = false;
+	bool hideLogos = false;
 	int addFlags = 0;
 
 	// disable playermodel preview for HLRally to prevent crash
 	if( !stricmp( gMenu.m_gameinfo.gamefolder, "hlrally" ))
 		hideModels = true;
+
+	// old engine cannot support logo customization, just don't add them
+#ifndef NEW_ENGINE_INTERFACE
+	hideLogos = true;
+#endif
 
 	if( gMenu.m_gameinfo.flags & GFL_NOMODELS )
 		addFlags |= QMF_INACTIVE;
@@ -193,15 +341,15 @@ void CMenuPlayerSetup::_Init( void )
 	name.LinkCvar( "name" );
 	name.SetRect( 320, 260, 256, 36 );
 
-	FindModels();
-	if( !num_models )
+	modelsModel.Update();
+	if( !modelsModel.GetRows() )
 	{
 		model.SetVisibility( false );
 		hideModels = true;
 	}
 	else
 	{
-		model.Setup( (const char **)modelsPtr, (size_t)num_models );
+		model.Setup( &modelsModel );
 		model.LinkCvar( "model", CMenuEditable::CVAR_STRING );
 		model.onChanged = VoidCb( &CMenuPlayerSetup::UpdateModel );
 		model.SetRect( 660, 580 + UI_OUTLINE_WIDTH, 260, 32 );
@@ -258,7 +406,44 @@ void CMenuPlayerSetup::_Init( void )
 	gameOpt->SetGrayed( !UI_AdvUserOptions_IsAvailable() );
 
 
+	if( !hideLogos )
+	{
+		logosModel.Update();
+		if( !logosModel.GetRows() )
+		{
+			// don't add to framework
+			hideLogos = true;
+		}
+		else
+		{
+			static const char *itemlist[ARRAYSIZE( g_LogoColors )];
+			static CStringArrayModel colors( itemlist, ARRAYSIZE( g_LogoColors ) );
+			for( size_t i = 0; i < ARRAYSIZE( g_LogoColors ); i++ )
+				itemlist[i] = g_LogoColors[i].name;
+
+			logoImage.SetRect( 72, 230 + m_iBtnsNum * 50 + 10, 200, 200 );
+
+			logo.Setup( &logosModel );
+			logo.LinkCvar( "cl_logofile", CMenuEditable::CVAR_STRING );
+			logo.onChanged = VoidCb( &CMenuPlayerSetup::UpdateLogo );
+			logo.SetRect( 72, logoImage.pos.y + logoImage.size.h + UI_OUTLINE_WIDTH, 200, 32 );
+
+			logoColor.Setup( &colors );
+			logoColor.LinkCvar( "cl_logocolor", CMenuEditable::CVAR_STRING );
+			logoColor.onChanged = VoidCb( &CMenuPlayerSetup::ApplyColorToLogoPreview );;
+			logoColor.SetRect( 72, logo.pos.y + logo.size.h + UI_OUTLINE_WIDTH, 200, 32 );
+		}
+	}
+
 	AddItem( name );
+	if( !hideLogos )
+	{
+		AddItem( logo );
+		AddItem( logoColor );
+		AddItem( logoImage );
+		UpdateLogo();
+	}
+
 	if( !(gMenu.m_gameinfo.flags & GFL_NOMODELS) )
 	{
 		AddItem( topColor );
