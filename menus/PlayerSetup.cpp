@@ -59,13 +59,12 @@ private:
 public:
 	CMenuPlayerSetup() : CMenuFramework( "CMenuPlayerSetup" ), msgBox( true ) { }
 
-	void FindModels();
-	void FindLogos();
 	void SetConfig();
 	void UpdateModel();
 	void UpdateLogo();
 	void ApplyColorToImagePreview();
 	void ApplyColorToLogoPreview();
+	void WriteNewLogo();
 	void SaveAndPopMenu();
 
 	class CModelListModel : public CStringArrayModel
@@ -225,6 +224,7 @@ void CMenuPlayerSetup::SetConfig( void )
 	bottomColor.WriteCvar();
 	hiModels.WriteCvar();
 	showModels.WriteCvar();
+	WriteNewLogo();
 }
 
 void CMenuPlayerSetup::SaveAndPopMenu()
@@ -309,6 +309,27 @@ void CMenuPlayerSetup::ApplyColorToLogoPreview()
 	logoImage.r = 255;
 	logoImage.g = 255;
 	logoImage.b = 255;
+}
+
+void CMenuPlayerSetup::WriteNewLogo( void )
+{
+	char filename[1024];
+	CBMP *bmpFile;
+
+	snprintf( filename, sizeof( filename ), "logos/%s.bmp", logo.GetCurrentString() );
+	bmpFile = CBMP::LoadFile( filename );
+
+	// not valid logo BMP file
+	if( !bmpFile )
+		return;
+
+	// remap logo if needed
+	bmpFile->RemapLogo( logoImage.r, logoImage.g, logoImage.b );
+
+	EngFuncs::COM_SaveFile( "logos/remapped.bmp", bmpFile->GetBitmap(), bmpFile->GetBitmapHdr()->fileSize );
+	EngFuncs::DeleteFile( "custom.hpk" );
+
+	delete bmpFile;
 }
 
 /*

@@ -257,6 +257,22 @@ public:
 	{ return engfuncs.pfnCompareFileTime( filename1, filename2, iCompare ); }
 	static inline const char *GetModeString( int mode )
 	{ return engfuncs.pfnGetModeString( mode ); }
+	static inline int COM_SaveFile( const char *filename, const void *buffer, int len )
+	{
+#ifdef NEW_ENGINE_INTERFACE
+		return engfuncs.COM_SaveFile( filename, buffer, len );
+#else
+		return false;
+#endif
+	}
+	static inline int DeleteFile( const char *filename )
+	{
+#ifdef NEW_ENGINE_INTERFACE
+		return engfuncs.pfnDeleteFile( filename );
+#else
+		return false;
+#endif
+	}
 	static ui_enginefuncs_t engfuncs;
 
 	// text funcs
