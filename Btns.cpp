@@ -45,21 +45,21 @@ void UI_LoadBmpButtons( void )
 	}
 
 	bmp_t bhdr;
-	memcpy( &bhdr, &bmp_buffer[sizeof( short )], sizeof( bmp_t ));
+	memcpy( &bhdr, bmp_buffer, sizeof( bmp_t ));
 
-	int pallete_sz = bhdr.bitmapDataOffset - sizeof( bmp_t ) - sizeof( short );
+	int pallete_sz = bhdr.bitmapDataOffset - sizeof( bmp_t );
 
 	uiStatic.buttons_height = ( bhdr.bitsPerPixel == 4 ) ? 80 : 78; // bugstompers issues
 	uiStatic.buttons_width = bhdr.width - 3; // make some offset
 
 	int stride = bhdr.width * bhdr.bitsPerPixel / 8;
 	int cutted_img_sz = ((stride + 3 ) & ~3) * uiStatic.buttons_height;
-	int CuttedBmpSize = sizeof( bmp_t ) + sizeof( short ) + pallete_sz + cutted_img_sz;
+	int CuttedBmpSize = sizeof( bmp_t ) + pallete_sz + cutted_img_sz;
 	byte *img_data = &bmp_buffer[bmp_len_holder-cutted_img_sz];
 
 	if ( bhdr.bitsPerPixel <= 8 )
 	{
-		byte* pallete=&bmp_buffer[sizeof( bmp_t ) + sizeof( short )];
+		byte* pallete=&bmp_buffer[sizeof( bmp_t )];
 		byte* firstpixel_col=&pallete[img_data[0]*4];
 		firstpixel_col[0]=firstpixel_col[1]=firstpixel_col[2]=0;
 	}
@@ -73,11 +73,11 @@ void UI_LoadBmpButtons( void )
 	bhdr.bitmapDataSize = CuttedBmpSize - bhdr.bitmapDataOffset;
 
 	char fname[256];
-	byte *raw_img_buff = (byte *)MALLOC( sizeof( bmp_t ) + sizeof( short ) + pallete_sz + cutted_img_sz );
+	byte *raw_img_buff = (byte *)MALLOC( sizeof( bmp_t ) + pallete_sz + cutted_img_sz );
 
 	for( int i = 0; i < pic_count; i++ )
 	{
-		int offset = sizeof( short );
+		int offset = 0;
 		sprintf( fname, "#btns_%d.bmp", i );
 
 		memcpy( raw_img_buff, bmp_buffer, offset);

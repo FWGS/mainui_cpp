@@ -203,7 +203,7 @@ typedef unsigned short       word;
 #pragma pack( push, 1 )
 struct bmp_t
 {
-	// char id[2];		// bmfh.bfType
+	char id[2];		// bmfh.bfType
 	uint fileSize;		// bmfh.bfSize
 	uint reserved0;	// bmfh.bfReserved1 + bmfh.bfReserved2
 	uint bitmapDataOffset;	// bmfh.bfOffBits
@@ -228,6 +228,11 @@ public:
 	~CBMP() { if( data ) delete []data; }
 
 	void Increase(uint newW, uint newH);
+
+	static CBMP* LoadFile( const char *filename );
+
+	void RemapLogo( int r, int g, int b );
+
 	inline byte *GetBitmap()
 	{
 		return data;
@@ -235,8 +240,9 @@ public:
 
 	inline bmp_t *GetBitmapHdr()
 	{
-		return (bmp_t*)(data + sizeof( short )); // skip BM magic
+		return (bmp_t*)data;
 	}
+
 	inline byte *GetTextureData()
 	{
 		return data + GetBitmapHdr()->bitmapDataOffset;

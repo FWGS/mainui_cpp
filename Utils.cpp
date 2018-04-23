@@ -367,14 +367,15 @@ CBMP::CBMP( uint w, uint h )
 {
 	bmp_t bhdr;
 
-	const char magic[2] = { 'B', 'M' };
 	const size_t cbPalBytes = 0; // UNUSED
 	const uint pixel_size = 4; // Always RGBA
 
+	bhdr.id[0] = 'B';
+	bhdr.id[1] = 'M';
 	bhdr.width = ( w + 3 ) & ~3;
 	bhdr.height = h;
 	bhdr.bitmapHeaderSize = BI_SIZE; // must be 40!
-	bhdr.bitmapDataOffset = sizeof( short ) + sizeof( bmp_t ) + cbPalBytes;
+	bhdr.bitmapDataOffset = sizeof( bmp_t ) + cbPalBytes;
 	bhdr.bitmapDataSize = bhdr.width * bhdr.height * pixel_size;
 	bhdr.fileSize = bhdr.bitmapDataOffset + bhdr.bitmapDataSize;
 
@@ -388,9 +389,66 @@ CBMP::CBMP( uint w, uint h )
 	bhdr.importantColors = 0;
 
 	data = new byte[bhdr.fileSize];
-	memcpy( data, magic, sizeof( magic ));
-	memcpy( data + sizeof(magic), &bhdr, sizeof( bhdr ));
+	memcpy( data, &bhdr, sizeof( bhdr ));
 	memset( data + bhdr.bitmapDataOffset, 0, bhdr.bitmapDataSize );
+}
+
+CBMP* CBMP::LoadFile( const char *filename )
+{
+	int length = 0;
+	bmp_t *bmp = (bmp_t*)EngFuncs::COM_LoadFile( filename, &length );
+
+	// cannot load
+	if( !bmp )
+		return NULL;
+
+	// too small for BMP
+	if( length < sizeof( bmp_t ))
+		return NULL;
+
+	// not a BMP
+	if( bmp->id[0] != 'B' || bmp->id[1] != 'M' )
+		return NULL;
+
+	// bogus data
+	if( !bmp->width || !bmp->height )
+		return NULL;
+
+	CBMP *ret = new CBMP( bmp->width, bmp->height );
+	memcpy( ret->GetBitmap(), bmp, length );
+
+	EngFuncs::COM_FreeFile( bmp );
+
+	return ret;
+}
+
+#pragma pack( push, 1 )
+struct rgbquad_t
+{
+	byte b;
+	byte g;
+	byte r;
+	byte reserved;
+};
+#pragma pack( pop )
+
+void CBMP::RemapLogo(int r, int g, int b)
+{
+	// palette is always right after header
+	rgbquad_t *palette = (rgbquad_t*)(data + sizeof( bmp_t ));
+
+	// no palette
+	if( GetBitmapHdr()->bitsPerPixel > 8 )
+		return;
+
+	for( int i = 0; i < 256; i++ )
+	{
+		float t = (float)i/256.0f;
+
+		palette[i].r = (byte)(r * t);
+		palette[i].g = (byte)(g * t);
+		palette[i].b = (byte)(b * t);
+	}
 }
 
 void CBMP::Increase( uint w, uint h )
@@ -399,7 +457,6 @@ void CBMP::Increase( uint w, uint h )
 	bmp_t bhdr;
 
 	const int pixel_size = 4; // create 32 bit image everytime
-	const char magic[2] = { 'B', 'M' };
 
 	memcpy( &bhdr, hdr, sizeof( bhdr ));
 
@@ -413,8 +470,7 @@ void CBMP::Increase( uint w, uint h )
 	assert( bhdr.height >= hdr->height );
 
 	byte *newData = new byte[bhdr.fileSize];
-	memcpy( newData, magic, sizeof( magic ));
-	memcpy( newData + sizeof( magic ), &bhdr, sizeof( bhdr ));
+	memcpy( newData, &bhdr, sizeof( bhdr ));
 	memset( newData + bhdr.bitmapDataOffset, 0, sizeof( bhdr.bitmapDataSize ));
 
 	// now copy texture
