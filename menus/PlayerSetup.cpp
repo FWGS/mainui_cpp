@@ -326,8 +326,9 @@ void CMenuPlayerSetup::WriteNewLogo( void )
 	// remap logo if needed
 	bmpFile->RemapLogo( logoImage.r, logoImage.g, logoImage.b );
 
-	EngFuncs::COM_SaveFile( "logos/remapped.bmp", bmpFile->GetBitmap(), bmpFile->GetBitmapHdr()->fileSize );
 	EngFuncs::DeleteFile( "custom.hpk" );
+	EngFuncs::DeleteFile( "logos/remapped.bmp" );
+	EngFuncs::COM_SaveFile( "logos/remapped.bmp", bmpFile->GetBitmap(), bmpFile->GetBitmapHdr()->fileSize );
 
 	delete bmpFile;
 }
