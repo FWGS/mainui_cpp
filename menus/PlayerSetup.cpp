@@ -313,6 +313,7 @@ void CMenuPlayerSetup::ApplyColorToLogoPreview()
 
 void CMenuPlayerSetup::WriteNewLogo( void )
 {
+#ifdef NEW_ENGINE_INTERFACE
 	char filename[1024];
 	CBMP *bmpFile;
 
@@ -331,6 +332,7 @@ void CMenuPlayerSetup::WriteNewLogo( void )
 	EngFuncs::COM_SaveFile( "logos/remapped.bmp", bmpFile->GetBitmap(), bmpFile->GetBitmapHdr()->fileSize );
 
 	delete bmpFile;
+#endif
 }
 
 /*
