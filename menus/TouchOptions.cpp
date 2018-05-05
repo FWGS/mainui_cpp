@@ -35,6 +35,7 @@ static class CMenuTouchOptions : public CMenuFramework
 {
 private:
 	void _Init();
+	void _VidInit();
 
 public:
 	CMenuTouchOptions() : CMenuFramework( "CMenuTouchOptions" ) { }
@@ -78,6 +79,10 @@ public:
 	CMenuField	profilename;
 	CMenuTable profiles;
 	CMenuSpinControl gridsize;
+	CMenuCheckBox acceleration;
+	CMenuSlider power;
+	CMenuSlider multiplier;
+	CMenuSlider exponent;
 
 	// prompt dialog
 	CMenuYesNoMessageBox msgBox;
@@ -145,6 +150,10 @@ void CMenuTouchOptions::SaveAndPopMenu( void )
 	moveY.WriteCvar();
 	enable.WriteCvar();
 	nomouse.WriteCvar();
+	acceleration.WriteCvar();
+	power.WriteCvar();
+	multiplier.WriteCvar();
+	exponent.WriteCvar();
 
 	CMenuFramework::SaveAndPopMenu();
 }
@@ -159,11 +168,15 @@ void CMenuTouchOptions::GetConfig( void )
 	moveY.UpdateEditable();
 	enable.UpdateEditable();
 	nomouse.UpdateEditable();
+	acceleration.UpdateEditable();
+	power.UpdateEditable();
+	multiplier.UpdateEditable();
+	exponent.UpdateEditable();
 }
 
 void CMenuTouchOptions::ResetMsgBox()
 {
-	msgBox.SetMessage( "Reset all buttons?");
+	msgBox.SetMessage( "Reset sensitivity options?");
 	msgBox.onPositive = VoidCb( &CMenuTouchOptions::ResetButtonsCb );
 	msgBox.Show();
 }
@@ -278,7 +291,11 @@ void CMenuTouchOptions::ResetButtonsCb()
 	EngFuncs::ClientCmd( FALSE, "touch_forwardzone 0.06\n" );
 	EngFuncs::ClientCmd( FALSE, "touch_sidezone 0.06\n" );
 	EngFuncs::ClientCmd( FALSE, "touch_grid 1\n" );
-	EngFuncs::ClientCmd( TRUE,  "touch_grid_count 50\n" );
+	EngFuncs::ClientCmd( FALSE, "touch_grid_count 50\n" );
+	EngFuncs::ClientCmd( FALSE, "touch_nonlinear_look 0\n" );
+	EngFuncs::ClientCmd( FALSE, "touch_pow_factor 1.3\n" );
+	EngFuncs::ClientCmd( FALSE, "touch_pow_mult 400\n" );
+	EngFuncs::ClientCmd( TRUE,  "touch_exp_mult 0\n" );
 
 	GetConfig();
 }
@@ -295,14 +312,11 @@ void CMenuTouchOptions::_Init( void )
 	done.SetNameAndStatus( "Done", "Go back to the Touch Menu" );
 	done.SetPicture( PC_DONE );
 	done.onActivated = VoidCb( &CMenuTouchOptions::SaveAndPopMenu );
-	done.SetCoord ( 72, 680 );
 
 	lookX.SetNameAndStatus( "Look X", "Horizontal look sensitivity" );
 	lookX.Setup( 50, 500, 5 );
 	lookX.LinkCvar( "touch_yaw" );
-	lookX.SetCoord( 72, 280 );
 
-	lookY.SetCoord( 72, 340 );
 	lookY.SetNameAndStatus( "Look Y", "Vertical look sensitivity" );
 	lookY.Setup( 50, 500, 5 );
 	lookY.LinkCvar( "touch_pitch" );
@@ -310,9 +324,7 @@ void CMenuTouchOptions::_Init( void )
 	moveX.SetNameAndStatus( "Side", "Side move sensitivity" );
 	moveX.Setup( 0.02, 1.0, 0.05 );
 	moveX.LinkCvar( "touch_sidezone" );
-	moveX.SetCoord( 72, 400 );
 
-	moveY.SetCoord( 72, 460 );
 	moveY.SetNameAndStatus( "Forward", "Forward move sensitivity" );
 	moveY.Setup( 0.02, 1.0, 0.05 );
 	moveY.LinkCvar( "touch_forwardzone" );
@@ -320,50 +332,53 @@ void CMenuTouchOptions::_Init( void )
 	gridsize.szStatusText = "Set grid size";
 	gridsize.Setup( 25, 100, 5 );
 	gridsize.LinkCvar( "touch_grid_count", CMenuEditable::CVAR_VALUE );
-	gridsize.SetRect( 72, 580, 210, 30 );
 
 	grid.SetNameAndStatus( "Grid", "Enable/disable grid" );
 	grid.LinkCvar( "touch_grid_enable" );
-	grid.SetCoord( 72, 520 );
 
-	enable.SetNameAndStatus( "Enable", "enable/disable touch controls" );
+	enable.SetNameAndStatus( "Enable touch", "enable/disable touch controls" );
 	enable.LinkCvar( "touch_enable" );
-	enable.SetCoord( 680, 630 );
 
 	nomouse.SetNameAndStatus( "Ignore Mouse", "Ignore mouse input" );
 	nomouse.LinkCvar( "m_ignore" );
-	nomouse.SetCoord( 680, 580 );
 
-	profiles.SetRect( 360, 255, 300, 340 );
+	acceleration.SetNameAndStatus( "Enable acceleration", "Nonlinear looking (touch_nonlinear_look)");
+	acceleration.LinkCvar( "touch_nonlinear_look" );
+
+	power.SetNameAndStatus( "Power factor", "Power acceleration factor (touch_pow_factor)" );
+	power.Setup( 1, 1.7, 0.05 );
+	power.LinkCvar( "touch_pow_factor" );
+
+	multiplier.SetNameAndStatus( "Power multiplier", "Pre-multiplier for pow (touch_pow_mult)" );
+	multiplier.Setup( 100, 1000, 1 );
+	multiplier.LinkCvar( "touch_pow_mult" );
+
+	exponent.SetNameAndStatus( "Exponent", "Exponent factor, more agressive (touch_exp_mult)" );
+	exponent.Setup( 0, 100, 1 );
+	exponent.LinkCvar( "touch_exp_mult" );
+
 	profiles.SetModel( &model );
 	UpdateProfilies();
 	profiles.onChanged = VoidCb( &CMenuTouchOptions::UpdateProfilies );
 
 	profilename.szName = "New Profile:";
 	profilename.iMaxLength = 16;
-	profilename.SetRect( 680, 260, 205, 32 );
 
-	reset.SetNameAndStatus( "Reset", "Reset touch to default state" );
+	reset.SetNameAndStatus( "Reset", "Reset sensitivity settings" );
 	reset.SetPicture("gfx/shell/btn_touch_reset");
-	reset.SetCoord( 72, 630 );
 	reset.onActivated = VoidCb( &CMenuTouchOptions::ResetMsgBox );
 
 	remove.SetNameAndStatus( "Delete", "Delete saved game" );
 	remove.SetPicture( PC_DELETE );
-	remove.SetCoord( 560, 630 );
-	remove.size.w = 100;
 	remove.onActivated = VoidCb( &CMenuTouchOptions::DeleteMsgBox );
 
 	apply.SetNameAndStatus( "Activate", "Apply selected profile" );
 	apply.SetPicture( PC_ACTIVATE );
-	apply.SetCoord( 360, 630 );
-	apply.size.w = 120;
 	apply.onActivated = VoidCb( &CMenuTouchOptions::Apply );
 
 	save.SetNameAndStatus( "Save", "Save new profile" );
 	save.SetPicture("gfx/shell/btn_touch_save");
 	save.onActivated = VoidCb( &CMenuTouchOptions::Save );
-	save.SetCoord( 680, 330 );
 
 	msgBox.SetPositiveButton( "Ok", PC_OK );
 	msgBox.Link( this );
@@ -375,8 +390,6 @@ void CMenuTouchOptions::_Init( void )
 	AddItem( lookY );
 	AddItem( moveX );
 	AddItem( moveY );
-	AddItem( enable );
-	AddItem( nomouse );
 	AddItem( reset );
 	AddItem( profiles );
 	AddItem( save );
@@ -385,6 +398,46 @@ void CMenuTouchOptions::_Init( void )
 	AddItem( apply );
 	AddItem( grid );
 	AddItem( gridsize );
+	AddItem( enable );
+	AddItem( nomouse );
+	AddItem( acceleration );
+	AddItem( power );
+	AddItem( multiplier );
+	AddItem( exponent );
+}
+
+void CMenuTouchOptions::_VidInit( void )
+{
+	int sliders_x = 72;
+	int sliders_w = 210;
+	int profile_x = 330;
+	int profile_w = 320 + uiStatic.width - 1024;
+	int other_x = 680 + uiStatic.width - 1024;
+
+	lookX.SetCoord( sliders_x, 280 );
+	lookY.SetCoord( sliders_x, 340 );
+	moveX.SetCoord( sliders_x, 400 );
+	moveY.SetCoord( sliders_x, 460 );
+	gridsize.SetRect( sliders_x, 580, sliders_w, 30 );
+	grid.SetCoord( sliders_x, 520 );
+	done.SetCoord ( sliders_x, 680 );
+	reset.SetCoord( sliders_x, 630 );
+
+	profiles.SetRect( profile_x, 255, profile_w, 250 );
+	profilename.SetRect( profile_x, 610, 205, 32 );
+	save.SetCoord( profile_x + 220, 610 );
+	remove.SetCoord( profile_x + profile_w - 120, 510 );
+	remove.size.w = 100;
+	apply.SetCoord( profile_x + 30, 510 );
+	apply.size.w = 120;
+
+	enable.SetCoord( other_x, 255 );
+	nomouse.SetCoord( other_x, 305 );
+	acceleration.SetCoord( other_x, 355 );
+	power.SetCoord( other_x, 455 );
+	multiplier.SetCoord( other_x, 555 );
+	exponent.SetCoord( other_x, 655 );
+
 }
 
 /*
