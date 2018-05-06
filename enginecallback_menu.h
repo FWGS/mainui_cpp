@@ -268,7 +268,7 @@ public:
 	static inline int DeleteFile( const char *filename )
 	{
 #ifdef NEW_ENGINE_INTERFACE
-		return engfuncs.pfnDeleteFile( filename );
+		return engfuncs.COM_RemoveFile( filename );
 #else
 		return false;
 #endif

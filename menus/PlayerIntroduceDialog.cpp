@@ -26,8 +26,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Field.h"
 #include "PlayerIntroduceDialog.h"
 
-#define MAX_PROHIBITED_NAMES 32
-
 static class CMenuPlayerIntroduceDialog : public CMenuBaseWindow
 {
 public:
