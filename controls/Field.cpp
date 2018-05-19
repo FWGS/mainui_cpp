@@ -217,14 +217,16 @@ const char *CMenuField::Key( int key, int down )
 
 		if( UI_CursorInRect( m_scPos.x, y, m_scSize.w, m_scSize.h ) )
 		{
-			int x = m_scPos.x, charpos;
+			int x, charpos;
 			char	text[UI_MAX_FIELD_LINE];
 
 			memcpy( text, szBuffer + iScroll, iWidthInChars - iScroll );
 			text[iWidthInChars] = 0;
 
-			int w;
-			charpos = g_FontMgr.CutText(font, szBuffer + iScroll, m_scChSize.h, uiStatic.cursorX - x, w);
+			int w = 0;
+
+			if( !(eTextAlignment & QM_LEFT))
+				w = g_FontMgr.GetTextWide( font, text, m_scChSize.h );
 
 			if( eTextAlignment & QM_LEFT )
 			{
@@ -238,6 +240,8 @@ const char *CMenuField::Key( int key, int down )
 			{
 				x = m_scPos.x + (m_scSize.w - w) / 2;
 			}
+			charpos = g_FontMgr.CutText(font, szBuffer + iScroll, m_scChSize.h, uiStatic.cursorX - x, w);
+
 			//text[charpos] = 0;
 			iCursor = charpos + iScroll;
 			if( iCursor > 0 )
