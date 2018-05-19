@@ -36,11 +36,11 @@ bool CBitmapFont::Create(const char *name, int tall, int weight, int blur, float
 	m_iScanlineOffset = scanlineOffset;
 	m_fScanlineScale = scanlineScale;
 	m_iAscent = 0;
-	m_iHeight = m_iTall;
 	m_iMaxCharWidth = 0;
 
 	hImage = EngFuncs::PIC_Load( "#XASH_SYSTEMFONT_001.bmp", menufont_bmp, sizeof( menufont_bmp ), 0 );
-
+	iImageWidth = EngFuncs::PIC_Width( hImage );
+	iImageHeight = EngFuncs::PIC_Height( hImage );
 	int a, c;
 	GetCharABCWidths( '.', a, m_iEllipsisWide, c );
 	m_iEllipsisWide *= 3;
@@ -58,7 +58,7 @@ void CBitmapFont::GetCharABCWidths(int ch, int &a, int &b, int &c)
 {
 	a = c = 0;
 	if( hImage )
-		b = (0.0625f - (1.0f / 256.0f)) * EngFuncs::PIC_Width( hImage );
+		b = m_iHeight/2;
 	else  b = 0;
 }
 
@@ -122,8 +122,8 @@ int CBitmapFont::DrawCharacter(int ch, Point pt, Size sz, const int color)
 
 	wrect_t rc;
 	int w, h;
-	w = EngFuncs::PIC_Width( hImage );
-	h = EngFuncs::PIC_Height( hImage );
+	w = iImageWidth;
+	h = iImageHeight;
 
 	rc.top    = h * row;
 	rc.left   = w * col;
