@@ -36,6 +36,7 @@ public:
 	virtual int DrawCharacter(int ch, Point pt, Size sz, const int color);
 private:
 	HIMAGE hImage;
+	int iImageWidth, iImageHeight;
 };
 
 #endif // BITMAPFONT_H
