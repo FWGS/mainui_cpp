@@ -108,7 +108,10 @@ void CMenuVidModes::SetConfig( )
 	bool testMode = false;
 	if( prevMode != vidList.GetCurrentIndex() - VID_MODES_POS )
 	{
-		EngFuncs::CvarSetValue( "vid_mode", vidList.GetCurrentIndex() - VID_MODES_POS );
+		char cmd[64];
+
+		snprintf( cmd, sizeof( cmd ), "vid_mode %i", vidList.GetCurrentIndex() - VID_MODES_POS );
+		EngFuncs::ClientCmd( TRUE, cmd );
 
 		// have changed resolution, but enable test mode only in fullscreen
 		testMode |= !windowed.bChecked;
