@@ -45,17 +45,17 @@ void CMenuConnectionWarning::_Init()
 
 	normal.szName = "Normal internet connection";
 	normal.SetCoord( 20, 140 );
-	SET_EVENT( normal.onActivated,
+	SET_EVENT( normal.onChanged,
 		((CMenuConnectionWarning*)pSelf->Parent())->WriteSettings( EPRESET_NORMAL ) );
 
 	dsl.szName = "DSL or PPTP with limited packet size";
 	dsl.SetCoord( 20, 200 );
-	SET_EVENT( dsl.onActivated,
+	SET_EVENT( dsl.onChanged,
 		((CMenuConnectionWarning*)pSelf->Parent())->WriteSettings( EPRESET_DSL ) );
 
 	slowest.szName = "Slow connection mode (64kbps)";
 	slowest.SetCoord( 20, 260 );
-	SET_EVENT( slowest.onActivated,
+	SET_EVENT( slowest.onChanged,
 		((CMenuConnectionWarning*)pSelf->Parent())->WriteSettings( EPRESET_SLOW ) );
 
 	done.SetPicture( PC_DONE );
