@@ -238,11 +238,11 @@ void CMenuTouchOptions::Apply()
 
 void CMenuTouchOptions::Save()
 {
-	char name[256];
+	char name[512];
 
 	if( profilename.GetBuffer()[0] )
 	{
-		snprintf(name, 256, "touch_profiles/%s.cfg", profilename.GetBuffer() );
+		snprintf(name, sizeof( name ), "touch_profiles/%s.cfg", profilename.GetBuffer() );
 		EngFuncs::CvarSetString("touch_config_file", name );
 	}
 	EngFuncs::ClientCmd( 1, "touch_writeconfig\n" );
