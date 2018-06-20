@@ -153,23 +153,11 @@ void CMenuFileDialog::_VidInit()
 
 /*
 =================
-UI_FileDialog_Precache
-=================
-*/
-void UI_FileDialog_Precache( void )
-{
-	//EngFuncs::PIC_Load( ART_BANNER );
-}
-
-/*
-=================
 UI_FileDialog_Menu
 =================
 */
 void UI_FileDialog_Menu( void )
 {
-	UI_FileDialog_Precache();
-
 	uiFileDialog.Show();
 }
-ADD_MENU( menu_filedialog, UI_FileDialog_Precache, UI_FileDialog_Menu );
+ADD_MENU( menu_filedialog, NULL, UI_FileDialog_Menu );

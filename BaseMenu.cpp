@@ -38,7 +38,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "con_nprint.h"
 #include "FontManager.h"
 
-cvar_t		*ui_precache;
 cvar_t		*ui_showmodels;
 cvar_t		*ui_show_window_stack;
 cvar_t		*ui_borderclip;
@@ -1159,9 +1158,6 @@ void UI_Precache( void )
 	if( !uiStatic.initialized )
 		return;
 
-	if( !ui_precache->value )
-		return;
-
 	EngFuncs::PIC_Load( UI_LEFTARROW );
 	EngFuncs::PIC_Load( UI_LEFTARROWFOCUS );
 	EngFuncs::PIC_Load( UI_RIGHTARROW );
@@ -1171,9 +1167,6 @@ void UI_Precache( void )
 	EngFuncs::PIC_Load( UI_DOWNARROW );
 	EngFuncs::PIC_Load( UI_DOWNARROWFOCUS );
 	EngFuncs::PIC_Load( "gfx/shell/splash" );
-
-	if( ui_precache->value == 1 )
-		return;
 
 	for( CMenuEntry *entry = s_pEntries; entry; entry = entry->m_pNext )
 	{
@@ -1453,7 +1446,6 @@ UI_Init
 void UI_Init( void )
 {
 	// register our cvars and commands
-	ui_precache = EngFuncs::CvarRegister( "ui_precache", "2", FCVAR_ARCHIVE );
 	ui_showmodels = EngFuncs::CvarRegister( "ui_showmodels", "0", FCVAR_ARCHIVE );
 	ui_show_window_stack = EngFuncs::CvarRegister( "ui_show_window_stack", 0, FCVAR_ARCHIVE );
 	ui_borderclip = EngFuncs::CvarRegister( "ui_borderclip", "0", FCVAR_ARCHIVE );

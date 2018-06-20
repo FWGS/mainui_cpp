@@ -44,8 +44,6 @@ void UI_Video_Menu( void )
 {
 	static CMenuFramework video("CMenuVideo");
 
-	UI_Video_Precache();
-
 	if( !video.WasInit() )
 	{
 		video.banner.SetPicture(ART_BANNER);

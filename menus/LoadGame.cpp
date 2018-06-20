@@ -385,7 +385,6 @@ void UI_LoadSaveGame_Menu( bool saveMode )
 
 	if( !EngFuncs::CheckGameDll( )) return;
 
-	UI_LoadGame_Precache();
 	uiLoadGame.Show();
 	uiLoadGame.SetSaveMode( saveMode );
 	uiLoadGame.UpdateList();

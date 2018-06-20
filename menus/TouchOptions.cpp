@@ -457,7 +457,6 @@ UI_TouchOptions_Menu
 */
 void UI_TouchOptions_Menu( void )
 {
-	UI_TouchOptions_Precache();
 	uiTouchOptions.Show();
 }
 ADD_MENU( menu_touchoptions, UI_TouchOptions_Precache, UI_TouchOptions_Menu );

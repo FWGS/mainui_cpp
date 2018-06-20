@@ -230,7 +230,6 @@ UI_AdvControls_Menu
 */
 void UI_AdvControls_Menu( void )
 {
-	UI_AdvControls_Precache();
 	uiAdvControls.Show();
 }
 ADD_MENU( menu_advcontrols, UI_AdvControls_Precache, UI_AdvControls_Menu );

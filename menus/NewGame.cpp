@@ -132,7 +132,6 @@ void UI_NewGame_Menu( void )
 	if( gMenu.m_gameinfo.gamemode == GAME_MULTIPLAYER_ONLY || !EngFuncs::CheckGameDll() )
 		return;
 
-	UI_NewGame_Precache();
 	uiNewGame.Show();
 }
 ADD_MENU( menu_newgame, UI_NewGame_Precache, UI_NewGame_Menu );

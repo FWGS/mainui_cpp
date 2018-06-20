@@ -218,21 +218,11 @@ int UI_CreditsActive( void )
 
 /*
 =================
-UI_Credits_Precache
-=================
-*/
-void UI_Credits_Precache( void )
-{
-}
-
-/*
-=================
 UI_Credits_Menu
 =================
 */
 void UI_Credits_Menu( void )
 {
-	UI_Credits_Precache();
 	uiCredits.Show();
 }
 

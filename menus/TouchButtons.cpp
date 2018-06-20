@@ -544,7 +544,6 @@ UI_TouchButtons_Menu
 */
 void UI_TouchButtons_Menu( void )
 {
-	UI_TouchButtons_Precache();
 	UI_TouchButtons_GetButtonList();
 	uiTouchButtons.Show();
 }

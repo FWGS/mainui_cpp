@@ -43,8 +43,6 @@ void UI_Touch_Menu( void )
 {
 	static CMenuFramework touch("CMenuTouch");
 
-	UI_Touch_Precache();
-
 	if( !touch.WasInit() )
 	{
 		touch.banner.SetPicture( ART_BANNER );

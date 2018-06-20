@@ -104,7 +104,6 @@ void UI_MultiPlayer_Menu( void )
 	if ( gMenu.m_gameinfo.gamemode == GAME_SINGLEPLAYER_ONLY )
 		return;
 
-	UI_MultiPlayer_Precache();
 	uiMultiPlayer.Show();
 
 	if( EngFuncs::GetCvarFloat( "menu_mp_firsttime" ) && !EngFuncs::GetCvarFloat( "cl_predict" ) )

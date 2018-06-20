@@ -244,7 +244,6 @@ UI_VidModes_Menu
 */
 void UI_VidModes_Menu( void )
 {
-	UI_VidModes_Precache();
 	uiVidModes.Show();
 }
 ADD_MENU( menu_vidmodes, UI_VidModes_Precache, UI_VidModes_Menu );

@@ -504,7 +504,6 @@ void UI_PlayerSetup_Menu( void )
 	if ( gMenu.m_gameinfo.gamemode == GAME_SINGLEPLAYER_ONLY )
 		return;
 
-	UI_PlayerSetup_Precache();
 	uiPlayerSetup.Show();
 }
 ADD_MENU( menu_playersetup, UI_PlayerSetup_Precache, UI_PlayerSetup_Menu );

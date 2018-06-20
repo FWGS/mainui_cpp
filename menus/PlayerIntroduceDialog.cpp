@@ -113,11 +113,6 @@ void CMenuPlayerIntroduceDialog::_VidInit( void )
 	pos.y += uiStatic.yOffset;
 }
 
-void UI_PlayerIntroduceDialog_Precache()
-{
-
-}
-
 void UI_PlayerIntroduceDialog_Show()
 {
 	uiIntroduceDialog.Show();

@@ -138,21 +138,10 @@ void CMenuInputDevices::_VidInit()
 
 /*
 =================
-UI_AdvControls_Precache
-=================
-*/
-void UI_InputDevices_Precache( void )
-{
-	EngFuncs::PIC_Load( ART_BANNER );
-}
-
-/*
-=================
 UI_AdvControls_Menu
 =================
 */
 void UI_InputDevices_Menu( void )
 {
-	UI_InputDevices_Precache();
 	uiInputDevices.Show();
 }

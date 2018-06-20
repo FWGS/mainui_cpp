@@ -321,8 +321,6 @@ void UI_CreateGame_Menu( void )
 	if ( gMenu.m_gameinfo.gamemode == GAME_SINGLEPLAYER_ONLY )
 		return;
 
-	UI_CreateGame_Precache();
-
 	uiCreateGame.Show();
 }
 ADD_MENU( menu_creategame, UI_CreateGame_Precache, UI_CreateGame_Menu );
