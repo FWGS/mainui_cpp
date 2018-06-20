@@ -290,6 +290,7 @@ public:
 
 
 // built-in memory manager
+// NOTE: not recommeded to use, because object destruction may be after engine halts
 #define MALLOC( x )		EngFuncs::MemAlloc( x, __FILE__, __LINE__ )
 #define CALLOC( x, y )	EngFuncs::MemAlloc((x) * (y), __FILE__, __LINE__ )
 #define FREE( x )		EngFuncs::MemFree( x, __FILE__, __LINE__ )

@@ -73,7 +73,7 @@ void UI_LoadBmpButtons( void )
 	bhdr.bitmapDataSize = CuttedBmpSize - bhdr.bitmapDataOffset;
 
 	char fname[256];
-	byte *raw_img_buff = (byte *)MALLOC( sizeof( bmp_t ) + pallete_sz + cutted_img_sz );
+	byte *raw_img_buff = new byte[sizeof( bmp_t ) + pallete_sz + cutted_img_sz];
 
 	for( int i = 0; i < pic_count; i++ )
 	{
@@ -99,6 +99,6 @@ void UI_LoadBmpButtons( void )
 		img_data -= cutted_img_sz;
 	}
 
-	FREE( raw_img_buff );
+	delete[] raw_img_buff;
 	EngFuncs::COM_FreeFile( bmp_buffer );
 }
