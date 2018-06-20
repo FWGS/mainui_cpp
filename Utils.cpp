@@ -41,22 +41,6 @@ void DBG_AssertFunction( bool fExpr, const char* szExpr, const char* szFile, int
 }
 #endif	// DEBUG
 
-void AddSpaces(char *s, int size, int buffersize)
-{
-	int len = strlen(s);
-
-	size += len - ColorStrlen(s);
-	if( size > buffersize )
-		size = buffersize;
-
-	while( len < size - 1 )
-	{	
-		s[len] = ' ';
-		len++;
-	}
-	s[len] = '\0';
-}
-
 int ColorStrlen( const char *str )
 {
 	const char *p;
@@ -113,43 +97,6 @@ int ColorPrexfixCount( const char *str )
 	//EngFuncs::UtfProcessChar(0);
 
 	return len;
-}
-
-void StringConcat( char *dst, const char *src, size_t size )
-{
-	register char *d = dst;
-	register const char *s = src;
-	register size_t n = size;
-	size_t dlen;
-
-	if( !dst || !src || !size )
-		return;
-
-#if 0
-	// find the end of dst and adjust bytes left but don't go past end
-	while(n-- != 0 && *d != '\0') d++;
-	dlen = d - dst;
-#else
-	// VERY UNSAFE. SURE THAT DST IS BIG
-	dlen = ColorStrlen( dst );
-	d += strlen( dst );
-#endif
-
-	n = size - dlen;
-
-	if ( n == 0 ) return;
-	while ( *s != '\0' )
-	{
-		if ( n != 1 )
-		{
-			*d++ = *s;
-			n--;
-		}
-		s++;
-	}
-
-	*d = '\0';
-	return;
 }
 
 char *StringCopy( const char *input )
