@@ -36,6 +36,7 @@ static class CMenuCredits : public CMenuBaseWindow
 {
 public:
 	CMenuCredits() : CMenuBaseWindow( "Credits" ) { }
+	~CMenuCredits();
 
 	void Draw();
 	const char *Key(int key, int down);
@@ -60,6 +61,10 @@ private:
 	char		*buffer;
 } uiCredits;
 
+CMenuCredits::~CMenuCredits()
+{
+	delete buffer;
+}
 
 void CMenuCredits::Show()
 {
@@ -82,12 +87,9 @@ void CMenuCredits::Draw( void )
 
 	// draw the background first
 	if( CL_IsActive() && !finalCredits )
-	{
 		background.Draw();
-	}
 
 	speed = 32.0f * ( 768.0f / ScreenHeight );	// syncronize with final background track :-)
-
 
 	// now draw the credits
 	UI_ScaleCoords( NULL, NULL, &w, &h );
@@ -117,7 +119,7 @@ void CMenuCredits::Draw( void )
 			EngFuncs::HostEndGame( gMenu.m_gameinfo.title );
 	}
 
-	if( !uiCredits.active )
+	if( !uiCredits.active && !uiCredits.finalCredits ) // for final credits we don't show the window, just drawing
 		Hide();
 }
 
@@ -156,7 +158,7 @@ void CMenuCredits::_Init( void )
 		{
 			if( uiCredits.buffer[count - 1] != '\n' && uiCredits.buffer[count - 1] != '\r' )
 			{
-				char *tmp = (char *)MALLOC( count + 2 );
+				char *tmp = new char[count + 2];
 				memcpy( tmp, uiCredits.buffer, count ); 
 				EngFuncs::COM_FreeFile( uiCredits.buffer );
 				uiCredits.buffer = tmp; 
@@ -205,7 +207,7 @@ void CMenuCredits::_Init( void )
 
 void UI_DrawFinalCredits( void )
 {
-	if( uiCredits.finalCredits && uiCredits.active )
+	if( UI_CreditsActive() )
 		uiCredits.Draw ();
 }
 
@@ -236,6 +238,12 @@ void UI_Credits_Menu( void )
 
 void UI_FinalCredits( void )
 {
+	uiCredits.Init();
+	uiCredits.VidInit();
+	uiCredits.Reload(); // take a chance to reload info for items
+
+	uiCredits.active = true;
 	uiCredits.finalCredits = true;
-	uiCredits.Show();
+	// don't create a window
+	// uiCredits.Show();
 }
