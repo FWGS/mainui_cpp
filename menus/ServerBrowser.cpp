@@ -334,8 +334,8 @@ void CMenuServerBrowser::_Init( void )
 	gameList.SetModel( &gameListModel );
 	gameList.bFramedHintText = true;
 
-	natOrDirect.szLeftName = "Direct";
-	natOrDirect.szRightName = "NAT";
+	natOrDirect.AddSwitch( "Direct" );
+	natOrDirect.AddSwitch( "NAT" );
 	natOrDirect.eTextAlignment = QM_CENTER;
 	natOrDirect.bMouseToggle = false;
 	natOrDirect.LinkCvar( "cl_nat" );
