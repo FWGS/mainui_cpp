@@ -261,12 +261,10 @@ void CMenuItemsHolder::Draw( )
 		if( !item->IsVisible() )
 			continue;
 
-#ifndef NDEBUG
+		item->Draw();
+
 		if( ui_borderclip->value )
 			UI_DrawRectangle( item->m_scPos, item->m_scSize, PackRGBA( 255, 0, 0, 255 ) );
-#endif
-
-		item->Draw();
 	}
 
 	item = ItemAtCursor();
