@@ -22,6 +22,10 @@ GNU General Public License for more details.
 #pragma warning(disable:4244) // float->int
 #endif
 
+#define bound( min, num, max )	((num) >= (min) ? ((num) < (max) ? (num) : (max)) : (min))
+#define Q_min( a, b )	(((a) < (b)) ? (a) : (b))
+#define Q_max( a, b ) (((a) < (b)) ? (b) : (a))
+
 // engine constants
 enum
 {
@@ -98,6 +102,8 @@ enum ELetterCase
 
 typedef int HFont; // handle to a font
 
+struct Size;
+
 struct Point
 {
 	Point() : x(0), y(0) {}
@@ -105,25 +111,35 @@ struct Point
 
 	int x, y;
 	Point Scale();
-	friend Point operator +( Point &a, Point &b ) { return Point( a.x + b.x, a.y + b.y ); }
-	friend Point operator -( Point &a, Point &b ) { return Point( a.x - b.x, a.y - b.y ); }
+	friend Point operator +( const Point &a, const Point &b )
+	{
+		return Point( a.x + b.x, a.y + b.y );
+	}
 
-	Point& operator+=( Point &a )
+	friend Point operator -( const Point &a, const Point &b )
+	{
+		return Point( a.x - b.x, a.y - b.y );
+	}
+
+	Point& operator+=( const Point &a )
 	{
 		x += a.x;
 		y += a.y;
 		return *this;
 	}
 
-	Point& operator-=( Point &a )
+	Point& operator-=( const Point &a )
 	{
 		x -= a.x;
 		y -= a.y;
 		return *this;
 	}
 
-	Point operator *( float scale ) { return Point( (int)(x * scale), (int)(y * scale) ); }
-	Point operator /( float scale ) { return Point( (int)(x / scale), (int)(y / scale) ); }
+	Point& operator +=( const Size &a );
+	Point& operator -=( const Size &b );
+
+	Point operator *( const float scale ) { return Point( (int)(x * scale), (int)(y * scale) ); }
+	Point operator /( const float scale ) { return Point( (int)(x / scale), (int)(y / scale) ); }
 };
 
 struct Size
@@ -131,9 +147,55 @@ struct Size
 	Size() : w(0), h(0) {}
 	Size( int w, int h ) : w(w), h(h) {}
 
+	friend Size operator +( const Size &a, const Size &b )
+	{
+		return Size( a.w + b.w, a.h + b.h );
+	}
+
+	friend Size operator -( const Size &a, const Size &b )
+	{
+		return Size( a.w - b.w, a.h - b.h );
+	}
+
+	Size AddVertical( const Size &a )
+	{
+		return Size( w, a.h + h );
+	}
+
+	Size AddHorizontal( const Size &a )
+	{
+		return Size( w + a.w, h );
+	}
+
 	int w, h;
 	Size Scale();
+
+	Size operator *( const float scale ) { return Size( (int)(w * scale), (int)(h * scale) ); }
+	Size operator /( const float scale ) { return Size( (int)(w / scale), (int)(h / scale) ); }
 };
 
+inline Point operator +(const Point &a, const Size &b)
+{
+	return Point( a.x + b.w, a.y + b.h );
+}
+
+inline Point operator -(const Point &a, const Size &b)
+{
+	return Point( a.x + b.w, a.y + b.h );
+}
+
+inline Point& Point::operator +=(const Size &a)
+{
+	x += a.w;
+	y += a.h;
+	return *this;
+}
+
+inline Point& Point::operator -=(const Size &a)
+{
+	x -= a.w;
+	y -= a.h;
+	return *this;
+}
 
 #endif // PRIMITIVE_H
