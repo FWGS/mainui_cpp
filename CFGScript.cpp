@@ -149,9 +149,9 @@ bool CSCR_ParseSingleCvar( parserstate_t *ps, scrvardef_t *result )
 			if( !szValue[0] )
 				goto error;
 
-			entry = (scrvarlistentry_t*)MALLOC( sizeof( scrvarlistentry_t ) );
+			entry = new scrvarlistentry_t;
 			entry->next = NULL;
-			entry->szName = (char*)MALLOC( strlen( szName ) + 1 );
+			entry->szName = new char[strlen( szName ) + 1];
 			strcpy( entry->szName, szName );
 			entry->flValue = atof( szValue );
 
@@ -187,7 +187,7 @@ bool CSCR_ParseSingleCvar( parserstate_t *ps, scrvardef_t *result )
 	{
 		scrvarlistentry_t *entry = result->list.pEntries;
 
-		result->list.pArray = ( const char ** )MALLOC( result->list.iCount * sizeof( char * ) );
+		result->list.pArray = new const char*[result->list.iCount];
 		result->list.pModel = new CStringArrayModel( result->list.pArray, result->list.iCount );
 
 		for( int i = 0; entry; entry = entry->next, i++ )
@@ -200,15 +200,16 @@ bool CSCR_ParseSingleCvar( parserstate_t *ps, scrvardef_t *result )
 error:
 	if( result->type == T_LIST )
 	{
+		if( result->list.pArray )
+			delete[] result->list.pArray;
+		if( result->list.pModel )
+			delete result->list.pModel;
+
 		while( result->list.pEntries )
 		{
 			scrvarlistentry_s *next = result->list.pEntries->next;
-			if( result->list.pArray )
-				FREE( result->list.pArray );
-			if( result->list.pModel )
-				delete result->list.pModel;
-			FREE( result->list.pEntries->szName );
-			FREE( result->list.pEntries );
+			delete[] result->list.pEntries->szName;
+			delete result->list.pEntries;
 
 			result->list.pEntries = next;
 		}
@@ -301,7 +302,7 @@ scrvardef_t *CSCR_LoadDefaultCVars( const char *scriptfilename, int *count )
 		if( CSCR_ParseSingleCvar( &state, &var ) )
 		{
 			// Cvar_Get( var.name, var.value, var.flags, var.desc );
-			scrvardef_t *entry = (scrvardef_t*)MALLOC( sizeof( scrvardef_t ) );
+			scrvardef_t *entry = new scrvardef_t;
 			*entry = var;
 
 			if( !list )
@@ -350,17 +351,22 @@ void CSCR_FreeList( scrvardef_t *list )
 
 		if( i->type == T_LIST )
 		{
+			if( i->list.pModel )
+				delete i->list.pModel;
+			if( i->list.pArray )
+				delete[] i->list.pArray;
+
 			while( i->list.pEntries )
 			{
 				scrvarlistentry_s *next = i->list.pEntries->next;
-				FREE( i->list.pEntries->szName );
-				FREE( i->list.pEntries );
+				delete[] i->list.pEntries->szName;
+				delete i->list.pEntries;
 
 				i->list.pEntries = next;
 			}
 		}
 
-		FREE( i );
+		delete i;
 		i = next;
 	}
 }
