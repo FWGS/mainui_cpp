@@ -263,7 +263,6 @@ const char *Info_ValueForKey( const char *s, const char *key )
 	
 	valueindex ^= 1;
 	if( *s == '\\' ) s++;
-	printf("I_VFK '%s' '%s'\n", s, key );
 
 	while( 1 )
 	{
