@@ -325,3 +325,4 @@ void UI_CreateGame_Menu( void )
 
 	uiCreateGame.Show();
 }
+ADD_MENU( menu_creategame, UI_CreateGame_Precache, UI_CreateGame_Menu );

@@ -94,3 +94,4 @@ void UI_SaveLoad_Menu( void )
 	UI_SaveLoad_Precache();
 	uiSaveLoad.Show();
 }
+ADD_MENU( menu_saveload, UI_SaveLoad_Precache, UI_SaveLoad_Menu );

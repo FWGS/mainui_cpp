@@ -243,6 +243,6 @@ CMenuVidOptions::Menu
 */
 void UI_VidOptions_Menu( void )
 {
-	UI_VidOptions_Precache();
 	uiVidOptions.Show();
 }
+ADD_MENU( menu_vidoptions, UI_VidOptions_Precache, UI_VidOptions_Menu );

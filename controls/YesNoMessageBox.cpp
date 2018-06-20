@@ -267,3 +267,4 @@ void CMenuYesNoMessageBox::UI_ShowMessageBox( void )
 	msgBox.SetMessage( msg );
 	msgBox.Show();
 }
+ADD_COMMAND( menu_showmessagebox, CMenuYesNoMessageBox::UI_ShowMessageBox );

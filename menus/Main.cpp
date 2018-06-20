@@ -404,3 +404,4 @@ void UI_Main_Menu( void )
 	UI_Main_Precache();
 	uiMain.Show();
 }
+ADD_MENU( menu_main, UI_Main_Precache, UI_Main_Menu );

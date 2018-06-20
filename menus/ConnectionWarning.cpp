@@ -136,3 +136,4 @@ void UI_ConnectionWarning_f()
 		UI_Main_Menu();
 	uiConnectionWarning.Show();
 }
+ADD_COMMAND( menu_connectionwarning, UI_ConnectionWarning_f );

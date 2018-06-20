@@ -388,4 +388,4 @@ void UI_ConnectionProgress_f( void )
 
 	uiConnectionProgress.VidInit();
 }
- 
+ADD_COMMAND( menu_connectionprogress, UI_ConnectionProgress_f );

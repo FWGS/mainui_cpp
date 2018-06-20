@@ -429,3 +429,4 @@ void UI_Controls_Menu( void )
 	UI_Controls_Precache();
 	uiControls.Show();
 }
+ADD_MENU( menu_controls, UI_Controls_Precache, UI_Controls_Menu );

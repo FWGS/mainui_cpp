@@ -318,3 +318,4 @@ void UI_GameOptions_Menu( void )
 
 	uiGameOptions.Show();
 }
+ADD_MENU( menu_gameoptions, UI_GameOptions_Precache, UI_GameOptions_Menu );

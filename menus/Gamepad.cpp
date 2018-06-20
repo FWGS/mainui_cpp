@@ -295,3 +295,4 @@ void UI_GamePad_Menu( void )
 	UI_GamePad_Precache();
 	uiGamePad.Show();
 }
+ADD_MENU( menu_gamepad, UI_GamePad_Precache, UI_GamePad_Menu );

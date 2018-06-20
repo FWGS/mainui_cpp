@@ -507,3 +507,4 @@ void UI_PlayerSetup_Menu( void )
 	UI_PlayerSetup_Precache();
 	uiPlayerSetup.Show();
 }
+ADD_MENU( menu_playersetup, UI_PlayerSetup_Precache, UI_PlayerSetup_Menu );

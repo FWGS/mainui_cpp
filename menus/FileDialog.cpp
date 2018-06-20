@@ -172,3 +172,4 @@ void UI_FileDialog_Menu( void )
 
 	uiFileDialog.Show();
 }
+ADD_MENU( menu_filedialog, UI_FileDialog_Precache, UI_FileDialog_Menu );

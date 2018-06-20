@@ -116,3 +116,4 @@ void UI_MultiPlayer_Menu( void )
 		UI_PlayerIntroduceDialog_Show();
 	}
 }
+ADD_MENU( menu_multiplayer, UI_MultiPlayer_Precache, UI_MultiPlayer_Menu );

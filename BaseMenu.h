@@ -248,36 +248,21 @@ void UI_CloseMenu( void );
 // SCR support
 void UI_LoadScriptConfig( void );
 
-// Precache
-void UI_Main_Precache( void );
-void UI_NewGame_Precache( void );
-void UI_LoadGame_Precache( void );
-void UI_SaveGame_Precache( void );
-void UI_SaveLoad_Precache( void );
-void UI_MultiPlayer_Precache( void );
-void UI_Options_Precache( void );
-void UI_InternetGames_Precache( void );
-void UI_LanGame_Precache( void );
-void UI_PlayerSetup_Precache( void );
-void UI_Controls_Precache( void );
-void UI_AdvControls_Precache( void );
-void UI_GameOptions_Precache( void );
-void UI_CreateGame_Precache( void );
-void UI_Audio_Precache( void );
-void UI_Video_Precache( void );
-void UI_VidOptions_Precache( void );
-void UI_VidModes_Precache( void );
-void UI_CustomGame_Precache( void );
-void UI_Credits_Precache( void );
-void UI_GoToSite_Precache( void );
-void UI_Touch_Precache( void );
-void UI_TouchOptions_Precache( void );
-void UI_TouchButtons_Precache( void );
-void UI_TouchEdit_Precache( void );
-void UI_FileDialog_Precache( void );
-void UI_GamePad_Precache( void );
-void UI_DynamicMenu_Precache( void );
-void UI_Zoo_Precache( void );
+class CMenuEntry
+{
+public:
+	CMenuEntry( const char *cmd, void (*pfnPrecache)( void ), void (*pfnShow)( void ));
+	const char *m_szCommand;
+	void (*m_pfnPrecache)( void );
+	void (*m_pfnShow)( void );
+	CMenuEntry *m_pNext;
+};
+
+#define ADD_MENU( cmd, precachefunc, showfunc ) \
+	static CMenuEntry cmd( #cmd, precachefunc, showfunc )
+
+#define ADD_COMMAND( cmd, showfunc ) \
+	static CMenuEntry cmd( #cmd, NULL, showfunc )
 
 // Menus
 void UI_Main_Menu( void );

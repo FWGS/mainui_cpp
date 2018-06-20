@@ -57,6 +57,6 @@ void UI_Video_Menu( void )
 		video.AddButton( "Done", "Go back to the previous menu", PC_DONE, VoidCb( &CMenuFramework::Hide ), QMF_NOTIFY );
 	}
 
-
 	video.Show();
 }
+ADD_MENU( menu_video, UI_Video_Precache, UI_Video_Menu );

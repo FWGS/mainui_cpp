@@ -216,3 +216,4 @@ void UI_Audio_Menu( void )
 
 	uiAudio.Show();
 }
+ADD_MENU( menu_audio, UI_Audio_Precache, UI_Audio_Menu );

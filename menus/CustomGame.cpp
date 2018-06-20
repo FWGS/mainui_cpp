@@ -213,3 +213,4 @@ void UI_CustomGame_Menu( void )
 	UI_CustomGame_Precache();
 	uiCustomGame.Show();
 }
+ADD_MENU( menu_customgame, UI_CustomGame_Precache, UI_CustomGame_Menu );

@@ -553,3 +553,4 @@ void UI_TouchButtons_GetButtonList()
 {
 	uiTouchButtons.model.Update();
 }
+ADD_MENU( menu_touchbuttons, UI_TouchButtons_Precache, UI_TouchButtons_Menu );

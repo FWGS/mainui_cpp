@@ -62,4 +62,4 @@ void UI_Touch_Menu( void )
 
 	touch.Show();
 }
-
+ADD_MENU( menu_touch, UI_Touch_Precache, UI_Touch_Menu );

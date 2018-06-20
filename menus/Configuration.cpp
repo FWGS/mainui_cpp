@@ -94,3 +94,4 @@ void UI_Options_Menu( void )
 	UI_Options_Precache();
 	uiOptions.Show();
 }
+ADD_MENU( menu_options, UI_Options_Precache, UI_Options_Menu );

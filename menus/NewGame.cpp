@@ -135,3 +135,4 @@ void UI_NewGame_Menu( void )
 	UI_NewGame_Precache();
 	uiNewGame.Show();
 }
+ADD_MENU( menu_newgame, UI_NewGame_Precache, UI_NewGame_Menu );

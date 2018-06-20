@@ -115,3 +115,4 @@ void UI_TouchEdit_Menu( void )
 	UI_TouchEdit_Precache();
 	uiTouchEdit.Show();
 }
+ADD_MENU( menu_touchedit, UI_TouchEdit_Precache, UI_TouchEdit_Menu );

@@ -431,7 +431,7 @@ void CMenuServerBrowser::Show()
 CMenuServerBrowser::Precache
 =================
 */
-void UI_InternetGames_Precache( void )
+void UI_ServerBrowser_Precache( void )
 {
 	EngFuncs::PIC_Load( ART_BANNER_INET );
 	EngFuncs::PIC_Load( ART_BANNER_LAN );
@@ -455,7 +455,6 @@ void UI_ServerBrowser_Menu( void )
 		uiStatic.m_fDemosPlayed = true;
 	}
 
-	UI_InternetGames_Precache();
 	uiServerBrowser.Show();
 }
 
@@ -472,3 +471,5 @@ void UI_LanGame_Menu( void )
 
 	UI_ServerBrowser_Menu();
 }
+ADD_MENU( menu_langame, NULL, UI_LanGame_Menu );
+ADD_MENU( menu_internetgames, UI_ServerBrowser_Precache, UI_InternetGames_Menu );

@@ -405,3 +405,5 @@ void UI_SaveGame_Menu( void )
 {
 	UI_LoadSaveGame_Menu( true );
 }
+ADD_MENU( menu_loadgame, UI_LoadGame_Precache, UI_LoadGame_Menu );
+ADD_MENU( menu_savegame, NULL, UI_SaveGame_Menu );
