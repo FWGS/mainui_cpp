@@ -54,6 +54,27 @@ public:
 	virtual const char *Key( int key, int down );
 	virtual void Draw();
 	virtual void VidInit();
+	bool MoveView( int delta );
+	bool MoveCursor( int delta );
+	int GetCurrentIndex() { return iCurItem; }
+	void SetCurrentIndex( int idx );
+	int GetSortingColumn( void ) { return m_iSortingColumn; }
+	bool IsAscend( void ) { return m_bAscend; }
+	void SetSortingColumn( int column, bool ascend )
+	{
+		m_iSortingColumn = column;
+		m_bAscend = ascend;
+		if( !m_pModel->Sort( column, ascend ) )
+			m_iSortingColumn = -1; // sorting is not supported
+	}
+	void SetSortingColumn( int column )
+	{
+		SetSortingColumn( column, true );
+	}
+	void SwapOrder( )
+	{
+		SetSortingColumn( m_iSortingColumn, !m_bAscend );
+	}
 
 	void SetUpArrowPicture( const char *upArrow, const char *upArrowFocus, const char *upArrowPressed )
 	{
@@ -68,9 +89,6 @@ public:
 		szDownArrowFocus = downArrowFocus;
 		szDownArrowPressed = downArrowPressed;
 	}
-
-	bool MoveView( int delta );
-	bool MoveCursor( int delta );
 
 	void SetModel( CMenuBaseModel *model )
 	{
@@ -104,17 +122,15 @@ public:
 		SetColumnWidth( num, width, fixed );
 	}
 
-	int GetCurrentIndex() { return iCurItem; }
-	void SetCurrentIndex( int idx );
-
-	bool    bFramedHintText;
+	bool bFramedHintText;
+	bool bAllowSorting;
 
 private:
 	void DrawLine(Point p, const char **psz, size_t size, int textColor, bool forceCol, int fillColor = 0);
 	void DrawLine(Point p, int line, int textColor, bool forceCol, int fillColor = 0);
 
 	const char	*szHeaderTexts[MAX_TABLE_COLUMNS];
-	struct column
+	struct
 	{
 		float flWidth;
 		bool fStaticWidth;
@@ -132,17 +148,31 @@ private:
 
 	int		iTopItem;
 	int     iNumRows;
-// scrollbar stuff // ADAMpos.x
-	int		iScrollBarX;
-	int		iScrollBarY;
-	int		iScrollBarWidth;
-	int		iScrollBarHeight;
+// scrollbar stuff // ADAMIX
+	Point	sbarPos;
+	Size	sbarSize;
 	bool	iScrollBarSliding;
 // highlight // mittorn
 	int		iHighlight;
 	int		iCurItem;
 
 	int		m_iLastItemMouseChange;
+
+	// sorting
+	int m_iSortingColumn;
+	bool m_bAscend;
+
+	// header
+	Size headerSize;
+
+	// arrows
+	Point upArrow;
+	Point downArrow;
+	Size arrow;
+
+	// actual table
+	Point boxPos;
+	Size boxSize;
 
 	CMenuBaseModel *m_pModel;
 };

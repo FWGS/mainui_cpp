@@ -44,6 +44,10 @@ public:
 	{ return engfuncs.pfnPIC_Width( hPic ); }
 	static inline int	PIC_Height( HIMAGE hPic )
 	{ return engfuncs.pfnPIC_Height( hPic ); }
+	static inline Size PIC_Size( HIMAGE hPic )
+	{
+		return Size( PIC_Width( hPic ), PIC_Height( hPic ));
+	}
 	static void	PIC_Set( HIMAGE hPic, int r, int g, int b, int a = 255 );
 
 	static inline void	PIC_Draw( int x, int y, int width, int height, const wrect_t *prc = NULL )

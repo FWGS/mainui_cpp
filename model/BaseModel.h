@@ -45,6 +45,9 @@ public:
 	virtual ECellType GetCellType( int line, int column ) { return CELL_TEXT; }
 	virtual bool IsCellTextWrapped( int line, int column ) { return true; }
 	// virtual CMenuBaseItem *GetCellItem( int line, int column ) { return NULL; }
+
+	// sorting
+	virtual bool Sort( int column, bool ascend ) { return false; } // false means no sorting support for column
 };
 
 #endif // BASE_MODEL_H

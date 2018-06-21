@@ -57,10 +57,6 @@ GNU General Public License for more details.
 #undef bound
 #endif
 
-#define bound( min, num, max )	((num) >= (min) ? ((num) < (max) ? (num) : (max)) : (min))
-#define Q_min( a, b )	(((a) < (b)) ? (a) : (b))
-#define Q_max( a, b ) (((a) < (b)) ? (b) : (a))
-
 #ifndef FALSE
 #define FALSE	0
 #endif
