@@ -204,6 +204,9 @@ static CMenuServerBrowser	uiServerBrowser;
 bool CMenuGameListModel::Sort(int column, bool ascend)
 {
 	m_iSortingColumn = column;
+	if( column == -1 )
+		return false; // disabled
+
 	m_bAscend = ascend;
 	switch( column )
 	{
@@ -537,6 +540,7 @@ void CMenuServerBrowser::Show()
 	// clear out server table
 	staticWaitingPassword = false;
 	gameListModel.Flush();
+	gameList.DisableSorting();
 	joinGame->SetGrayed( true );
 }
 

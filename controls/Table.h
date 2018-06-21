@@ -71,9 +71,14 @@ public:
 	{
 		SetSortingColumn( column, true );
 	}
-	void SwapOrder( )
+	void SwapOrder( void )
 	{
 		SetSortingColumn( m_iSortingColumn, !m_bAscend );
+	}
+
+	void DisableSorting( void )
+	{
+		SetSortingColumn( -1 );
 	}
 
 	void SetUpArrowPicture( const char *upArrow, const char *upArrowFocus, const char *upArrowPressed )
