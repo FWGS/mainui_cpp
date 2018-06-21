@@ -178,7 +178,7 @@ void CMenuVidModes::_Init( void )
 {
 	banner.SetPicture(ART_BANNER);
 
-	vidList.SetRect( 360, 255, -20, 340 );
+	vidList.SetRect( 360, 230, -20, 365 );
 	vidList.SetupColumn( 0, MenuStrings[IDS_VIDEO_MODECOL], 1.0f );
 	vidList.SetModel( &vidListModel );
 

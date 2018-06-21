@@ -294,7 +294,7 @@ void CMenuCreateGame::_VidInit()
 	hltv.SetCoord( 72, 635 );
 	dedicatedServer.SetCoord( 72, 685 );
 
-	mapsList.SetRect( 590, 245, -20, 440 );
+	mapsList.SetRect( 590, 230, -20, 465 );
 
 	hostName.SetRect( 350, 260, 205, 32 );
 	maxClients.SetRect( 350, 360, 205, 32 );

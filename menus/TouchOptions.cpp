@@ -423,7 +423,7 @@ void CMenuTouchOptions::_VidInit( void )
 	done.SetCoord ( sliders_x, 680 );
 	reset.SetCoord( sliders_x, 630 );
 
-	profiles.SetRect( profile_x, 255, profile_w, 250 );
+	profiles.SetRect( profile_x, 230, profile_w, 270 );
 	profilename.SetRect( profile_x, 610, 205, 32 );
 	save.SetCoord( profile_x + 220, 610 );
 	remove.SetCoord( profile_x + profile_w - 120, 510 );

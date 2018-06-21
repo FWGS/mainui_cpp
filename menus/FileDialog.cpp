@@ -133,7 +133,7 @@ void CMenuFileDialog::_Init( void )
 	fileList.iFlags |= QMF_DROPSHADOW;
 	fileList.SetModel( &model );
 	fileList.onChanged = VoidCb( &CMenuFileDialog::UpdateExtra );
-	fileList.SetRect( 360, 255, -20, 440 );
+	fileList.SetRect( 360, 230, -20, 465 );
 	UpdateExtra();
 
 	preview.SetRect( 72, 380, 196, 196 );

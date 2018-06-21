@@ -377,7 +377,7 @@ void CMenuControls::_Init( void )
 {
 	banner.SetPicture( ART_BANNER );
 
-	keysList.SetRect( 360, 255, -20, 440 );
+	keysList.SetRect( 360, 230, -20, 465 );
 	keysList.SetModel( &keysListModel );
 	keysList.SetupColumn( 0, "Action", 0.50f );
 	keysList.SetupColumn( 1, "Key/Button", 0.25f );

@@ -510,7 +510,7 @@ void CMenuTouchButtons::_VidInit()
 	hide.SetCoord( 384 - 72 + 400, 420 );
 
 	precision.SetCoord( 400, 470 );
-	buttonList.SetRect( 72, 150, 300, 370 );
+	buttonList.SetRect( 72, 135, 300, 395 );
 
 	save.SetRect( 384 - 42 + 320, 550, 130, 50 );
 	editor.SetRect( 384 - 42 + 320, 600, 130, 50 );

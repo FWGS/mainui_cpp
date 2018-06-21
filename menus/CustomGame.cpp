@@ -169,7 +169,7 @@ void CMenuCustomGame::_Init( void )
 	modList.SetupColumn( 2, "Ver",  0.15f );
 	modList.SetupColumn( 3, "Size", 0.15f );
 	modList.SetModel( &modListModel );
-	modList.SetRect( 360, 255, -20, 440 );
+	modList.SetRect( 360, 230, -20, 465 );
 
 	msgBox.SetMessage( "Leave current game?" );
 	msgBox.onPositive = MenuCb( &CMenuCustomGame::ChangeGame );
