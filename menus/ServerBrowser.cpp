@@ -517,6 +517,9 @@ CMenuServerBrowser::VidInit
 */
 void CMenuServerBrowser::_VidInit()
 {
+	gameList.SetRect( 360, 230, -20, 465 );
+	natOrDirect.SetCoord( -20 - natOrDirect.size.w, gameList.pos.y - UI_OUTLINE_WIDTH - natOrDirect.size.h );
+
 	refreshTime = uiStatic.realTime + 500; // delay before update 0.5 sec
 	refreshTime2 = uiStatic.realTime + 500;
 }
