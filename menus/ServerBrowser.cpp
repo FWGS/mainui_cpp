@@ -291,10 +291,9 @@ void CMenuGameListModel::AddServerToList(netadr_t adr, const char *info)
 
 	server.adr = adr;
 	server.ping = Sys_DoubleTime() - serversRefreshTime;
+	server.ping = bound( 0, server.ping, 9.999 );
 	Q_strncpy( server.info, info, sizeof( server.info ));
 
-	if( server.ping < 0 || server.ping > 9.999f )
-		server.ping = 9.999f;
 
 	Q_strncpy( server.name, Info_ValueForKey( info, "host" ), 64 );
 	Q_strncpy( server.mapname, Info_ValueForKey( info, "map" ), 64 );
