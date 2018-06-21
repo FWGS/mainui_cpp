@@ -131,6 +131,8 @@ inline float RemapVal( float val, float A, float B, float C, float D)
 	return C + (D - C) * (val - A) / (B - A);
 }
 
+int colorstricmp( const char *a, const char *b );
+int colorstrcmp( const char *a, const char *b );
 extern int ColorStrlen( const char *str );	// returns string length without color symbols
 extern int ColorPrexfixCount( const char *str );
 extern const unsigned int g_iColorTable[8];

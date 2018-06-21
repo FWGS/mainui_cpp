@@ -42,7 +42,6 @@ GNU General Public License for more details.
 #define UI_OUTLINE_WIDTH		uiStatic.outlineWidth	// outline thickness
 
 #define UI_MAXGAMES			1024	// slots for savegame/demos
-#define UI_MAX_SERVERS		256
 #define UI_MAX_BGMAPS		32
 
 #define MAX_HINT_TEXT		512
@@ -53,6 +52,8 @@ GNU General Public License for more details.
 #define UI_BUTTONS_HEIGHT		40
 #define UI_BUTTON_CHARWIDTH		14	// empirically determined value
 
+#define UI_DESCEND			"gfx/shell/down"
+#define UI_ASCEND			"gfx/shell/up"
 #define UI_LEFTARROW		"gfx/shell/larrowdefault"
 #define UI_LEFTARROWFOCUS		"gfx/shell/larrowflyover"
 #define UI_LEFTARROWPRESSED		"gfx/shell/larrowpressed"
@@ -85,13 +86,6 @@ typedef struct
 	CMenuBaseWindow *menuStack[UI_MAX_MENUDEPTH];
 	int      menuDepth;
 	int      rootPosition;
-
-	netadr_t serverAddresses[UI_MAX_SERVERS];
-	char	serverNames[UI_MAX_SERVERS][256];
-	float	serverPings[UI_MAX_SERVERS];
-	float		serversRefreshTime;
-	int		numServers;
-	int		updateServers;	// true is receive new info about servers
 
 	char	bgmaps[UI_MAX_BGMAPS][80];
 	int		bgmapcount;
@@ -238,8 +232,6 @@ inline int UI_DrawString( HFont font, Point pos, Size size, const char *str, con
 void UI_StartSound( const char *sound );
 void UI_LoadBmpButtons( void );
 
-void UI_RefreshInternetServerList( void );
-void UI_RefreshServerList( void );
 int UI_CreditsActive( void );
 void UI_DrawFinalCredits( void );
 

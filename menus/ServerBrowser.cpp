@@ -24,20 +24,82 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "keydefs.h"
 #include "Switch.h"
 #include "Field.h"
+#include "utlvector.h"
 
 #define ART_BANNER_INET		"gfx/shell/head_inetgames"
 #define ART_BANNER_LAN		"gfx/shell/head_lan"
 #define ART_BANNER_LOCK		"gfx/shell/lock"
 
-// Server browser
-#define QMSB_GAME_LENGTH	25
-#define QMSB_MAPNAME_LENGTH	20+QMSB_GAME_LENGTH
-#define QMSB_MAXCL_LENGTH	10+QMSB_MAPNAME_LENGTH
-#define QMSB_PING_LENGTH    10+QMSB_MAXCL_LENGTH
+struct server_t
+{
+	netadr_t adr;
+	char info[256];
+	float ping;
+	char name[64];
+	char mapname[64];
+	char clientsstr[64];
+	char pingstr[64];
+	bool havePassword;
+
+	static int NameCmpAscend( const void *_a, const void *_b )
+	{
+		const server_t *a = (const server_t*)_a;
+		const server_t *b = (const server_t*)_b;
+		return colorstricmp( a->name, b->name );
+	}
+	static int NameCmpDescend( const void *a, const void *b )
+	{
+		return NameCmpAscend( b, a );
+	}
+
+	static int MapCmpAscend( const void *_a, const void *_b )
+	{
+		const server_t *a = (const server_t*)_a;
+		const server_t *b = (const server_t*)_b;
+		return stricmp( a->mapname, b->mapname );
+	}
+	static int MapCmpDescend( const void *a, const void *b )
+	{
+		return MapCmpAscend( b, a );
+	}
+
+	static int ClientCmpAscend( const void *_a, const void *_b )
+	{
+		const server_t *a = (const server_t*)_a;
+		const server_t *b = (const server_t*)_b;
+
+		int a_cl = atoi( Info_ValueForKey( a->info, "numcl" ));
+		int b_cl = atoi( Info_ValueForKey( b->info, "numcl" ));
+
+		if( a_cl > b_cl ) return 1;
+		else if( a_cl < b_cl ) return -1;
+		return 0;
+	}
+	static int ClientCmpDescend( const void *a, const void *b )
+	{
+		return ClientCmpAscend( b, a );
+	}
+
+	static int PingCmpAscend( const void *_a, const void *_b )
+	{
+		const server_t *a = (const server_t*)_a;
+		const server_t *b = (const server_t*)_b;
+
+		if( a->ping > b->ping ) return 1;
+		else if( a->ping < b->ping ) return -1;
+		return 0;
+	}
+	static int PingCmpDescend( const void *a, const void *b )
+	{
+		return PingCmpAscend( b, a );
+	}
+};
 
 class CMenuGameListModel : public CMenuBaseModel
 {
 public:
+	CMenuGameListModel() : CMenuBaseModel(), m_iSortingColumn(-1) {}
+
 	void Update();
 	int GetColumns() const
 	{
@@ -45,7 +107,7 @@ public:
 	}
 	int GetRows() const
 	{
-		return m_iNumItems;
+		return servers.Count();
 	}
 	ECellType GetCellType( int line, int column )
 	{
@@ -55,38 +117,38 @@ public:
 	}
 	const char *GetCellText( int line, int column )
 	{
-		if( column == 0 )
+		switch( column )
 		{
-			if( m_bHavePassword[line] )
-				return ART_BANNER_LOCK;
-			else
-				return NULL;
+		case 0: return servers[line].havePassword ? ART_BANNER_LOCK : NULL;
+		case 1: return servers[line].name;
+		case 2: return servers[line].mapname;
+		case 3: return servers[line].clientsstr;
+		case 4: return servers[line].pingstr;
+		default: return NULL;
 		}
-
-		return m_szCells[line][column - 1];
 	}
 	void OnActivateEntry(int line);
 
 	void Flush()
 	{
-		m_iNumItems = 0;
+		servers.RemoveAll();
+		serversRefreshTime = gpGlobals->time;
 	}
 
 	bool IsHavePassword( int line )
 	{
-		return m_bHavePassword[line];
+		return servers[line].havePassword;
 	}
 
-private:
-	char m_szCells[UI_MAX_SERVERS][4][64];
-	bool m_bHavePassword[UI_MAX_SERVERS];
-	int m_iNumItems;
-};
+	void AddServerToList( netadr_t adr, const char *info );
 
-struct serverSelect_t
-{
-	netadr_t adr;
-	bool havePassword;
+	bool Sort(int column, bool ascend);
+
+	float serversRefreshTime;
+	CUtlVector<server_t> servers;
+private:
+	int m_iSortingColumn;
+	bool m_bAscend;
 };
 
 class CMenuServerBrowser: public CMenuFramework
@@ -104,9 +166,14 @@ public:
 	void ClearList( void );
 	void RefreshList( void );
 	void JoinGame( void );
+	void ResetPing( void )
+	{
+		gameListModel.serversRefreshTime = Sys_DoubleTime();
+	}
 
-	static void Connect( netadr_t server, bool havePassword );
-	static void Connect( serverSelect_t server );
+	void AddServerToList( netadr_t adr, const char *info );
+
+	static void Connect( server_t &server );
 
 	CMenuPicButton *joinGame;
 	CMenuPicButton *createGame;
@@ -129,10 +196,38 @@ private:
 	virtual void _VidInit();
 };
 
-static serverSelect_t staticServerSelect;
+static server_t staticServerSelect;
 static bool staticWaitingPassword = false;
 
 static CMenuServerBrowser	uiServerBrowser;
+
+bool CMenuGameListModel::Sort(int column, bool ascend)
+{
+	m_iSortingColumn = column;
+	m_bAscend = ascend;
+	switch( column )
+	{
+	case 0: return false;
+	case 1:
+		qsort( servers.Base(), servers.Count(), sizeof( server_t ),
+			ascend ? server_t::NameCmpAscend : server_t::NameCmpDescend );
+		return true;
+	case 2:
+		qsort( servers.Base(), servers.Count(), sizeof( server_t ),
+			ascend ? server_t::MapCmpAscend : server_t::MapCmpDescend );
+		return true;
+	case 3:
+		qsort( servers.Base(), servers.Count(), sizeof( server_t ),
+			ascend ? server_t::ClientCmpAscend : server_t::ClientCmpDescend );
+		return true;
+	case 4:
+		qsort( servers.Base(), servers.Count(), sizeof( server_t ),
+			ascend ? server_t::PingCmpAscend : server_t::PingCmpDescend );
+		return true;
+	}
+
+	return false;
+}
 
 /*
 =================
@@ -144,50 +239,75 @@ void CMenuGameListModel::Update( void )
 	int		i;
 	const char	*info;
 
-	for( i = 0; i < uiStatic.numServers; i++ )
+	// regenerate table data
+	for( i = 0; i < servers.Count(); i++ )
 	{
-		if( i >= UI_MAX_SERVERS )
-			break;
-		info = uiStatic.serverNames[i];
+		info = servers[i].info;
 
-		Q_strncpy( m_szCells[i][0], Info_ValueForKey( info, "host" ), 64 );
-		Q_strncpy( m_szCells[i][1], Info_ValueForKey( info, "map" ), 64 );
-		snprintf( m_szCells[i][2], 64, "%s\\%s", Info_ValueForKey( info, "numcl" ), Info_ValueForKey( info, "maxcl" ) );
-		snprintf( m_szCells[i][3], 64, "%.f ms", uiStatic.serverPings[i] * 1000 );
-
+		Q_strncpy( servers[i].name, Info_ValueForKey( info, "host" ), 64 );
+		Q_strncpy( servers[i].mapname, Info_ValueForKey( info, "map" ), 64 );
+		snprintf( servers[i].clientsstr, 64, "%s\\%s", Info_ValueForKey( info, "numcl" ), Info_ValueForKey( info, "maxcl" ) );
+		snprintf( servers[i].pingstr, 64, "%.f ms", servers[i].ping * 1000 );
 
 		const char *passwd = Info_ValueForKey( info, "password" );
 		if( passwd[0] && !stricmp( passwd, "1") )
 		{
-			m_bHavePassword[i] = true;
+			servers[i].havePassword = true;
 		}
 		else
 		{
-			m_bHavePassword[i] = false;
+			servers[i].havePassword = false;
 		}
 	}
 
-	m_iNumItems = i;
-
-	if( uiStatic.numServers )
+	if( servers.Count() )
+	{
 		uiServerBrowser.joinGame->SetGrayed( false );
+		if( m_iSortingColumn != -1 )
+			Sort( m_iSortingColumn, m_bAscend );
+	}
 }
 
 void CMenuGameListModel::OnActivateEntry( int line )
 {
-	CMenuServerBrowser::Connect( uiStatic.serverAddresses[line], m_bHavePassword[line] );
+	CMenuServerBrowser::Connect( servers[line] );
 }
 
-void CMenuServerBrowser::Connect( netadr_t server, bool havePassword )
+void CMenuGameListModel::AddServerToList(netadr_t adr, const char *info)
 {
-	serverSelect_t select;
-	select.adr = server;
-	select.havePassword = havePassword;
+	int i;
 
-	Connect( select );
+	// ignore if duplicated
+	for( i = 0; i < servers.Count(); i++ )
+	{
+		if( !stricmp( servers[i].info, info ))
+			return;
+	}
+
+	server_t server;
+
+	server.adr = adr;
+	server.ping = Sys_DoubleTime() - serversRefreshTime;
+	Q_strncpy( server.info, info, sizeof( server.info ));
+
+	if( server.ping < 0 || server.ping > 9.999f )
+		server.ping = 9.999f;
+
+	Q_strncpy( server.name, Info_ValueForKey( info, "host" ), 64 );
+	Q_strncpy( server.mapname, Info_ValueForKey( info, "map" ), 64 );
+	snprintf( server.clientsstr, 64, "%s\\%s", Info_ValueForKey( info, "numcl" ), Info_ValueForKey( info, "maxcl" ) );
+	snprintf( server.pingstr, 64, "%.f ms", server.ping * 1000 );
+
+	const char *passwd = Info_ValueForKey( info, "password" );
+	server.havePassword = passwd[0] && !stricmp( passwd, "1");
+
+	servers.AddToTail( server );
+
+	if( m_iSortingColumn != -1 )
+		Sort( m_iSortingColumn, m_bAscend );
 }
 
-void CMenuServerBrowser::Connect( serverSelect_t server )
+void CMenuServerBrowser::Connect( server_t &server )
 {
 	// prevent refresh during connect
 	uiServerBrowser.refreshTime = uiStatic.realTime + 999999;
@@ -229,35 +349,34 @@ CMenuServerBrowser::JoinGame
 */
 void CMenuServerBrowser::JoinGame()
 {
-	int select = gameList.GetCurrentIndex();
-
-	Connect( uiStatic.serverAddresses[select], gameListModel.IsHavePassword( select ) );
+	gameListModel.OnActivateEntry( gameList.GetCurrentIndex() );
 }
 
 void CMenuServerBrowser::ClearList()
 {
-	uiStatic.numServers = 0;
 	gameListModel.Flush();
+	joinGame->SetGrayed( true );
 }
 
 void CMenuServerBrowser::RefreshList()
 {
+	ClearList();
+
 	if( m_bLanOnly )
 	{
-		UI_RefreshServerList();
+		EngFuncs::ClientCmd( FALSE, "localservers\n" );
 	}
 	else
 	{
 		if( uiStatic.realTime > refreshTime2 )
 		{
-			UI_RefreshInternetServerList();
+			EngFuncs::ClientCmd( FALSE, "internetservers\n" );
 			refreshTime2 = uiStatic.realTime + (EngFuncs::GetCvarFloat("cl_nat") ? 4000:1000);
 			refresh->SetGrayed( true );
 			if( uiStatic.realTime + 20000 < refreshTime )
 				refreshTime = uiStatic.realTime + 20000;
 		}
 	}
-	gameListModel.Flush();
 }
 
 /*
@@ -278,13 +397,6 @@ void CMenuServerBrowser::Draw( void )
 	if( uiStatic.realTime > refreshTime2 )
 	{
 		refresh->SetGrayed( false );
-	}
-
-	// serverinfo has been changed update display
-	if( uiStatic.updateServers )
-	{
-		gameListModel.Update();
-		uiStatic.updateServers = false;
 	}
 }
 
@@ -333,6 +445,7 @@ void CMenuServerBrowser::_Init( void )
 	gameList.SetupColumn( 4, "Ping", 120.0f, true );
 	gameList.SetModel( &gameListModel );
 	gameList.bFramedHintText = true;
+	gameList.bAllowSorting = true;
 
 	natOrDirect.AddSwitch( "Direct" );
 	natOrDirect.AddSwitch( "NAT" );
@@ -410,8 +523,8 @@ void CMenuServerBrowser::_VidInit()
 		natOrDirect.Show();
 	}
 
-	gameList.SetRect( 360, 255, -20, 440 );
-	natOrDirect.SetCoord( -20 - natOrDirect.size.w, 255 - gameList.charSize.h * 1.5 - UI_OUTLINE_WIDTH * 2 - natOrDirect.size.h );
+	gameList.SetRect( 360, 230, -20, 465 );
+	natOrDirect.SetCoord( -20 - natOrDirect.size.w, gameList.pos.y - UI_OUTLINE_WIDTH - natOrDirect.size.h );
 
 	refreshTime = uiStatic.realTime + 500; // delay before update 0.5 sec
 	refreshTime2 = uiStatic.realTime + 500;
@@ -422,8 +535,19 @@ void CMenuServerBrowser::Show()
 	CMenuFramework::Show();
 
 	// clear out server table
+	staticWaitingPassword = false;
 	gameListModel.Flush();
 	joinGame->SetGrayed( true );
+}
+
+void CMenuServerBrowser::AddServerToList(netadr_t adr, const char *info)
+{
+	if( stricmp( gMenu.m_gameinfo.gamefolder, Info_ValueForKey( info, "gamedir" )) != 0 )
+		return;
+
+	gameListModel.AddServerToList( adr, info );
+
+	joinGame->SetGrayed( false );
 }
 
 /*
@@ -473,3 +597,28 @@ void UI_LanGame_Menu( void )
 }
 ADD_MENU( menu_langame, NULL, UI_LanGame_Menu );
 ADD_MENU( menu_internetgames, UI_ServerBrowser_Precache, UI_InternetGames_Menu );
+
+/*
+=================
+UI_AddServerToList
+=================
+*/
+void UI_AddServerToList( netadr_t adr, const char *info )
+{
+	if( !uiStatic.initialized )
+		return;
+
+	uiServerBrowser.AddServerToList( adr, info );
+}
+
+/*
+=================
+UI_MenuResetPing_f
+=================
+*/
+void UI_MenuResetPing_f( void )
+{
+	Con_Printf("UI_MenuResetPing_f\n");
+	uiServerBrowser.ResetPing();
+}
+ADD_COMMAND( menu_resetping, UI_MenuResetPing_f );

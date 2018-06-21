@@ -609,47 +609,6 @@ const char *COM_ExtractExtension( const char *s )
 
 // =====================================================================
 
-
-
-
-
-
-
-
-/*
-=================
-UI_RefreshServerList
-=================
-*/
-void UI_RefreshServerList( void )
-{
-	uiStatic.numServers = 0;
-	uiStatic.serversRefreshTime = gpGlobals->time;
-
-	memset( uiStatic.serverAddresses, 0, sizeof( uiStatic.serverAddresses ));
-	memset( uiStatic.serverNames, 0, sizeof( uiStatic.serverNames ));
-	memset( uiStatic.serverPings, 0, sizeof( uiStatic.serverPings ));
-
-	EngFuncs::ClientCmd( FALSE, "localservers\n" );
-}
-
-/*
-=================
-UI_RefreshInternetServerList
-=================
-*/
-void UI_RefreshInternetServerList( void )
-{
-	uiStatic.numServers = 0;
-	uiStatic.serversRefreshTime = gpGlobals->time;
-
-	memset( uiStatic.serverAddresses, 0, sizeof( uiStatic.serverAddresses ));
-	memset( uiStatic.serverNames, 0, sizeof( uiStatic.serverNames ));
-	memset( uiStatic.serverPings, 0, sizeof( uiStatic.serverPings ));
-
-	EngFuncs::ClientCmd( FALSE, "internetservers\n" );
-}
-
 /*
 =================
 UI_StartBackGroundMap
@@ -692,11 +651,6 @@ void UI_CloseMenu( void )
 	uiStatic.menuDepth = 0;
 	uiStatic.rootPosition = 0;
 	uiStatic.visible = false;
-
-	// clearing serverlist
-	uiStatic.numServers = 0;
-	memset( uiStatic.serverAddresses, 0, sizeof( uiStatic.serverAddresses ));
-	memset( uiStatic.serverNames, 0, sizeof( uiStatic.serverNames ));
 
 	CMenuPicButton::ClearButtonStack();
 
@@ -1063,53 +1017,6 @@ double Sys_DoubleTime( void )
 	return (double) ts.tv_sec + (double) ts.tv_nsec/1000000000.0;
 }
 #endif
-
-/*
-=================
-UI_AddServerToList
-=================
-*/
-void UI_AddServerToList( netadr_t adr, const char *info )
-{
-	int	i;
-
-	if( !uiStatic.initialized )
-		return;
-
-	if( uiStatic.numServers == UI_MAX_SERVERS )
-		return;	// full
-
-	if( stricmp( gMenu.m_gameinfo.gamefolder, Info_ValueForKey( info, "gamedir" )) != 0 )
-		return;
-
-	// ignore if duplicated
-	for( i = 0; i < uiStatic.numServers; i++ )
-	{
-		if( !stricmp( uiStatic.serverNames[i], info ))
-			return;
-	}
-
-	// add it to the list
-	uiStatic.updateServers = true; // info has been updated
-	uiStatic.serverAddresses[uiStatic.numServers] = adr;
-	Q_strncpy( uiStatic.serverNames[uiStatic.numServers], info, sizeof( uiStatic.serverNames[0] ) );
-	uiStatic.serverPings[uiStatic.numServers] = Sys_DoubleTime() - uiStatic.serversRefreshTime;
-	if( uiStatic.serverPings[uiStatic.numServers] < 0 || uiStatic.serverPings[uiStatic.numServers] > 9.999f )
-		uiStatic.serverPings[uiStatic.numServers] = 9.999f;
-	uiStatic.numServers++;
-}
-
-/*
-=================
-UI_MenuResetPing_f
-=================
-*/
-void UI_MenuResetPing_f( void )
-{
-	Con_Printf("UI_MenuResetPing_f\n");
-	uiStatic.serversRefreshTime = Sys_DoubleTime();
-}
-ADD_COMMAND( menu_resetping, UI_MenuResetPing_f );
 
 /*
 =================
