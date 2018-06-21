@@ -37,6 +37,10 @@ option(MAINUI_USE_STB "Use stb_truetype.h for rendering(*nix-only)" OFF)
 option(MAINUI_RENDER_PICBUTTON_TEXT "Use custom font render to render picbuttons(experimental)" OFF)
 option(MAINUI_FONT_SCALE "Scale fonts by height" OFF)
 
+if(NOT XASH_SDK)
+	set(XASH_SDK "../")
+endif()
+
 set(MAINUI_CONTROLS_SOURCES
 	controls/Framework.cpp
 	controls/BaseItem.cpp
@@ -114,6 +118,7 @@ set(MAINUI_SOURCES
 	Utils.cpp
 	Scissor.cpp
 	udll_int.cpp
+	${XASH_SDK}/common/interface.cpp
 )
 
 if(CS16CLIENT)
@@ -158,7 +163,7 @@ if(APPLE)
 	set(MAINUI_USE_STB TRUE)
 endif()
 
-include_directories(${XASH_SDK}/common ${XASH_SDK}/engine ${XASH_SDK}/pm_shared . controls/ menus/ utl/ font/ model/)
+include_directories(${XASH_SDK}/common ${XASH_SDK}/engine ${XASH_SDK}/pm_shared ${XASH_SDK}/public . controls/ menus/ utl/ font/ model/)
 
 if(MSVC)
 	add_definitions(-D_CRT_SECURE_NO_WARNINGS)
@@ -205,5 +210,6 @@ if(XASH_64BIT)
 		OUTPUT_NAME ${MAINUI_NAME}64)
 endif()
 
+target_link_libraries(${MAINUI_LIBRARY} ${CMAKE_DL_LIBS})
 fwgs_set_default_properties(${MAINUI_LIBRARY})
 fwgs_install(${MAINUI_LIBRARY})

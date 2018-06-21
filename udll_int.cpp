@@ -17,12 +17,14 @@ GNU General Public License for more details.
 #include "extdll_menu.h"
 #include "BaseMenu.h"
 #include "Utils.h"
+#include "cl_dll/IGameClientExports.h"
 
 ui_enginefuncs_t EngFuncs::engfuncs;
 #ifndef XASH_DISABLE_FWGS_EXTENSIONS
 ui_textfuncs_t	EngFuncs::textfuncs;
 #endif
 ui_globalvars_t	*gpGlobals;
+IGameClientExports *g_pClient;
 CMenu gMenu;
 
 static UI_FUNCTIONS gFunctionTable = 
@@ -80,3 +82,33 @@ extern "C" EXPORT int GiveTextAPI( ui_textfuncs_t* pTextfuncsFromEngine )
 	return TRUE;
 }
 #endif
+
+class CGameMenuExports : public IGameMenuExports
+{
+public:
+	bool Initialize( CreateInterfaceFn factory )
+	{
+		g_pClient = (IGameClientExports*)factory( GAMECLIENTEXPORTS_INTERFACE_VERSION, NULL );
+
+		return g_pClient ? true : false;
+	}
+
+	int HudFontHeight(float scale)
+	{
+		return g_FontMgr.GetFontTall( uiStatic.hSmallFont ) * scale;
+	}
+
+	int HudCharacterWidth(int num, float scale)
+	{
+		return g_FontMgr.GetCharacterWidthScaled( uiStatic.hSmallFont, num, UI_SMALL_CHAR_HEIGHT * scale );
+	}
+
+	int HudDrawCharacter(int x, int y, int num, int r, int g, int b, float scale)
+	{
+		int color = PackRGBA( r, g, b, 255 );
+
+		return g_FontMgr.DrawCharacter( uiStatic.hSmallFont, num, Point( x, y ), Size( 0, UI_SMALL_CHAR_HEIGHT * scale ), color );
+	}
+} s_Menu;
+
+EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CGameMenuExports, IGameMenuExports, GAMEMENUEXPORTS_INTERFACE_VERSION, s_Menu );
