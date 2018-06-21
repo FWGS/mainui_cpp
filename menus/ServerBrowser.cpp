@@ -176,7 +176,6 @@ public:
 	static void Connect( server_t &server );
 
 	CMenuPicButton *joinGame;
-	CMenuPicButton *createGame;
 	CMenuPicButton *refresh;
 	CMenuSwitch natOrDirect;
 
@@ -416,16 +415,6 @@ void CMenuServerBrowser::_Init( void )
 		VoidCb( &CMenuServerBrowser::JoinGame ), QMF_GRAYED );
 	joinGame->onActivatedClActive = msgBox.MakeOpenEvent();
 
-	createGame = AddButton( "Create game", NULL, PC_CREATE_GAME );
-	SET_EVENT_MULTI( createGame->onActivated,
-	{
-		if( ((CMenuServerBrowser*)pSelf->Parent())->m_bLanOnly )
-			EngFuncs::CvarSetValue( "public", 0.0f );
-		else EngFuncs::CvarSetValue( "public", 1.0f );
-
-		UI_CreateGame_Menu();
-	});
-
 	// TODO: implement!
 	AddButton( "View game info", "Get detail game info", PC_VIEW_GAME_INFO, CEventCallback::NoopCb, QMF_GRAYED );
 
@@ -439,6 +428,7 @@ void CMenuServerBrowser::_Init( void )
 	msgBox.onPositive = VoidCb( &CMenuServerBrowser::JoinGame );
 	msgBox.Link( this );
 
+	gameList.SetRect( 360, 255, -20, 440 );
 	gameList.SetCharSize( QM_SMALLFONT );
 	gameList.SetupColumn( 0, NULL, 32.0f, true );
 	gameList.SetupColumn( 1, "Name", 0.40f );
@@ -449,11 +439,14 @@ void CMenuServerBrowser::_Init( void )
 	gameList.bFramedHintText = true;
 	gameList.bAllowSorting = true;
 
-	natOrDirect.AddSwitch( "Direct" );
-	natOrDirect.AddSwitch( "NAT" );
+	natOrDirect.bKeepToggleWidth = true;
+	natOrDirect.size.w = 400;
+	natOrDirect.SetCoord( -20 - natOrDirect.size.w, 255 - gameList.charSize.h * 1.5 - UI_OUTLINE_WIDTH * 2 - natOrDirect.size.h );
+	natOrDirect.AddSwitch("Direct");
+	natOrDirect.AddSwitch("NAT");
+	natOrDirect.AddSwitch("LAN");
 	natOrDirect.eTextAlignment = QM_CENTER;
 	natOrDirect.bMouseToggle = false;
-	natOrDirect.LinkCvar( "cl_nat" );
 	natOrDirect.iSelectColor = uiInputFgColor;
 	// bit darker
 	natOrDirect.iFgTextColor = uiInputFgColor - 0x00151515;
@@ -462,14 +455,26 @@ void CMenuServerBrowser::_Init( void )
 		CMenuSwitch *self = (CMenuSwitch*)pSelf;
 		CMenuServerBrowser *parent = (CMenuServerBrowser*)self->Parent();
 
-		self->WriteCvar();
+		switch( self->GetState() )
+		{
+		case 0:
+			EngFuncs::CvarSetString("cl_nat", "0");
+			parent->SetLANOnly(false);
+			break;
+		case 1:
+			EngFuncs::CvarSetString("cl_nat", "1");
+			parent->SetLANOnly(false);
+			break;
+		case 2:
+			EngFuncs::CvarSetString("cl_nat", "0");
+			parent->SetLANOnly(true);
+			break;
+		default: break;
+		}
+
 		parent->ClearList();
 		parent->RefreshList();
 	});
-
-	// server.dll needs for reading savefiles or startup newgame
-	if( !EngFuncs::CheckGameDll( ))
-		createGame->SetGrayed( true );	// server.dll is missed - remote servers only
 
 	password.bHideInput = true;
 	password.bAllowColorstrings = false;
@@ -512,22 +517,6 @@ CMenuServerBrowser::VidInit
 */
 void CMenuServerBrowser::_VidInit()
 {
-	if( m_bLanOnly )
-	{
-		banner.SetPicture( ART_BANNER_LAN );
-		createGame->szStatusText = ( "Create new LAN game" );
-		natOrDirect.Hide();
-	}
-	else
-	{
-		banner.SetPicture( ART_BANNER_INET );
-		createGame->szStatusText = ( "Create new Internet game" );
-		natOrDirect.Show();
-	}
-
-	gameList.SetRect( 360, 230, -20, 465 );
-	natOrDirect.SetCoord( -20 - natOrDirect.size.w, gameList.pos.y - UI_OUTLINE_WIDTH - natOrDirect.size.h );
-
 	refreshTime = uiStatic.realTime + 500; // delay before update 0.5 sec
 	refreshTime2 = uiStatic.realTime + 500;
 }
@@ -571,9 +560,6 @@ CMenuServerBrowser::Menu
 */
 void UI_ServerBrowser_Menu( void )
 {
-	if ( gMenu.m_gameinfo.gamemode == GAME_SINGLEPLAYER_ONLY )
-		return;
-
 	// stop demos to allow network sockets to open
 	if ( gpGlobals->demoplayback && EngFuncs::GetCvarFloat( "cl_background" ))
 	{
