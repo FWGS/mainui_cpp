@@ -24,6 +24,7 @@ static void ToggleInactiveInternalCb( CMenuBaseItem *pSelf, void *pExtra );
 
 CMenuYesNoMessageBox::CMenuYesNoMessageBox( bool alert ) : BaseClass( "YesNoMessageBox")
 {
+	bAutoHide = true;
 	m_bIsAlert = alert;
 	iFlags |= QMF_DIALOG;
 	dlgMessage1.iFlags = QMF_INACTIVE|QMF_DROPSHADOW;
@@ -46,7 +47,7 @@ CMenuYesNoMessageBox::CMenuYesNoMessageBox( bool alert ) : BaseClass( "YesNoMess
 	{
 		CMenuYesNoMessageBox *msgBox = (CMenuYesNoMessageBox*)pExtra;
 
-		msgBox->Hide();
+		if( msgBox->bAutoHide ) msgBox->Hide();
 		msgBox->onPositive( msgBox );
 
 	});
@@ -55,7 +56,7 @@ CMenuYesNoMessageBox::CMenuYesNoMessageBox( bool alert ) : BaseClass( "YesNoMess
 	{
 		CMenuYesNoMessageBox *msgBox = (CMenuYesNoMessageBox*)pExtra;
 
-		msgBox->Hide();
+		if( msgBox->bAutoHide ) msgBox->Hide();
 		msgBox->onNegative( msgBox );
 	});
 
@@ -222,12 +223,6 @@ CMenuYesNoMessageBox::ToggleInactiveCb
 static void ToggleInactiveInternalCb( CMenuBaseItem *pSelf, void * )
 {
 	pSelf->ToggleVisibility();
-}
-
-
-void CMenuYesNoMessageBox::Link( CMenuItemsHolder *holder )
-{
-	m_pParent = holder;
 }
 
 void CMenuYesNoMessageBox::UI_ShowMessageBox( void )

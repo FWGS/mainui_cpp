@@ -65,6 +65,12 @@ public:
 
 	void EnableTransition();
 
+	// set parent of window
+	void Link( CMenuItemsHolder *h )
+	{
+		m_pParent = h;
+	}
+
 	bool bAllowDrag;
 	bool bInTransition;
 	EAnimation eTransitionType; // valid only when in transition
@@ -79,8 +85,6 @@ private:
 	friend void UI_UpdateMenu( float flTime );
 
 	virtual bool IsAbsolutePositioned( void ) const { return true; }
-
-
 
 	bool m_bHolding;
 	Point m_bHoldOffset;

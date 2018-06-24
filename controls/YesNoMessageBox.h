@@ -35,24 +35,26 @@ public:
 	void SetMessage( const char *msg );
 	void SetPositiveButton( const char *msg, EDefaultBtns buttonPic, int extrawidth = 0 );
 	void SetNegativeButton( const char *msg, EDefaultBtns buttonPic, int extrawidth = 0 );
-	void Link( CMenuItemsHolder *h );
 	enum EHighlight
 	{
 		NO_HIGHLIGHT = 0,
 		HIGHLIGHT_YES,
 		HIGHLIGHT_NO
 	};
-	void HighlightChoice( EHighlight ch ); // 0 - not hightlight, 1 - yes, 2 - no
+	void HighlightChoice( EHighlight ch );
 
 	// Pass pointer to messagebox to extra of calling object
-	static void OpenCb( CMenuBaseItem *, void *pExtra );
 	CEventCallback MakeOpenEvent();
 
 	CEventCallback onPositive;
 	CEventCallback onNegative;
 
 	static void UI_ShowMessageBox( void );
+
+	bool bAutoHide;
 private:
+	static void OpenCb( CMenuBaseItem *, void *pExtra );
+
 	CMenuAction		dlgMessage1;
 	CMenuPicButton	yes;
 	CMenuPicButton	no;
