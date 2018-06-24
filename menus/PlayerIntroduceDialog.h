@@ -20,4 +20,4 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 // Don't expose class, just few functions
-void UI_PlayerIntroduceDialog_Show();
+void UI_PlayerIntroduceDialog_Show(CMenuBaseWindow *pCaller );
