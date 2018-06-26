@@ -62,6 +62,8 @@ public:
 	CMenuCreateGame() : CMenuFramework("CMenuCreateGame") { }
 	static void Begin( CMenuBaseItem *pSelf, void *pExtra );
 
+	void Reload( void );
+
 	char		*mapsDescriptionPtr[UI_MAXGAMES];
 
 	CMenuField	maxClients;
@@ -169,7 +171,7 @@ void CMenuMapListModel::Update( void )
 {
 	char *afile;
 
-	if( !EngFuncs::CreateMapsList( FALSE ) || (afile = (char *)EngFuncs::COM_LoadFile( "maps.lst", NULL )) == NULL )
+	if( !EngFuncs::CreateMapsList( TRUE ) || (afile = (char *)EngFuncs::COM_LoadFile( "maps.lst", NULL )) == NULL )
 	{
 		uiCreateGame.done->SetGrayed( true );
 		m_iNumItems = 0;
@@ -299,6 +301,11 @@ void CMenuCreateGame::_VidInit()
 	hostName.SetRect( 350, 260, 205, 32 );
 	maxClients.SetRect( 350, 360, 205, 32 );
 	password.SetRect( 350, 460, 205, 32 );
+}
+
+void CMenuCreateGame::Reload( void )
+{
+	mapsListModel.Update();
 }
 
 /*
