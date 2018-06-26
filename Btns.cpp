@@ -23,9 +23,45 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "BaseMenu.h"
 #include "Utils.h"
 #include "BtnsBMPTable.h"
+#include <string.h>
 
 #define ART_BUTTONS_MAIN		"gfx/shell/btns_main.bmp"	// we support bmp only
 
+typedef unsigned char	BYTE;
+typedef short int	    WORD;
+typedef unsigned int    DWORD;
+typedef int				LONG;
+
+#pragma pack(push, 1)
+typedef struct tagBITMAPFILEHEADER {
+  WORD  bfType;
+  DWORD bfSize;
+  WORD  bfReserved1;
+  WORD  bfReserved2;
+  DWORD bfOffBits;
+} BITMAPFILEHEADER, *PBITMAPFILEHEADER;
+
+typedef struct tagBITMAPINFOHEADER {
+  DWORD biSize;
+  LONG  biWidth;
+  LONG  biHeight;
+  WORD  biPlanes;
+  WORD  biBitCount;
+  DWORD biCompression;
+  DWORD biSizeImage;
+  LONG  biXPelsPerMeter;
+  LONG  biYPelsPerMeter;
+  DWORD biClrUsed;
+  DWORD biClrImportant;
+} BITMAPINFOHEADER, *PBITMAPINFOHEADER;
+
+typedef struct tagRGBQUAD {
+  BYTE rgbBlue;
+  BYTE rgbGreen;
+  BYTE rgbRed;
+  BYTE rgbReserved;
+} RGBQUAD;
+#pragma pack(pop)
 /*
 =================
 UI_LoadBmpButtons
@@ -35,70 +71,83 @@ void UI_LoadBmpButtons( void )
 {
 	memset( uiStatic.buttonsPics, 0, sizeof( uiStatic.buttonsPics ));
 
-	int bmp_len_holder;
-	byte *bmp_buffer = (byte*)EngFuncs::COM_LoadFile( ART_BUTTONS_MAIN, &bmp_len_holder );
+	int bmp_filesize, palette_sz = 0;
+	byte *bmp_buffer = EngFuncs::COM_LoadFile( ART_BUTTONS_MAIN, &bmp_filesize );
 
-	if( !bmp_buffer || !bmp_len_holder )
+	if( !bmp_buffer || !bmp_filesize )
 	{
 		Con_Printf( "UI_LoadBmpButtons: btns_main.bmp not found\n" );
 		return;
 	}
 
-	bmp_t bhdr;
-	memcpy( &bhdr, bmp_buffer, sizeof( bmp_t ));
+	BITMAPFILEHEADER *pFileHdr = (BITMAPFILEHEADER *)bmp_buffer;
+	BITMAPINFOHEADER *pInfoHdr = (BITMAPINFOHEADER *)&bmp_buffer[sizeof( BITMAPFILEHEADER )];
 
-	int pallete_sz = bhdr.bitmapDataOffset - sizeof( bmp_t );
+	BITMAPINFOHEADER NewInfoHdr;
+	BITMAPFILEHEADER NewFileHdr;
 
-	uiStatic.buttons_height = ( bhdr.bitsPerPixel == 4 ) ? 80 : 78; // bugstompers issues
-	uiStatic.buttons_width = bhdr.width - 3; // make some offset
+	if( pInfoHdr->biBitCount == 8 && pInfoHdr->biClrUsed == 0 )
+		pInfoHdr->biClrUsed = 256; // all colors used
 
-	int stride = bhdr.width * bhdr.bitsPerPixel / 8;
-	int cutted_img_sz = ((stride + 3 ) & ~3) * uiStatic.buttons_height;
-	int CuttedBmpSize = sizeof( bmp_t ) + pallete_sz + cutted_img_sz;
-	byte *img_data = &bmp_buffer[bmp_len_holder-cutted_img_sz];
+	memcpy( &NewFileHdr, pFileHdr, sizeof( BITMAPFILEHEADER ));
+	memcpy( &NewInfoHdr, pInfoHdr, sizeof( BITMAPINFOHEADER ));
 
-	if ( bhdr.bitsPerPixel <= 8 )
+	byte *palette = bmp_buffer + sizeof( BITMAPFILEHEADER ) + sizeof( BITMAPINFOHEADER );
+	if( pInfoHdr->biBitCount <= 8 )
 	{
-		byte* pallete=&bmp_buffer[sizeof( bmp_t )];
-		byte* firstpixel_col=&pallete[img_data[0]*4];
-		firstpixel_col[0]=firstpixel_col[1]=firstpixel_col[2]=0;
+		// figure out how many entries are actually in the table
+		if( pInfoHdr->biClrUsed == 0 )
+		{
+			pInfoHdr->biClrUsed = 256;
+			palette_sz = (1 << pInfoHdr->biBitCount) * sizeof( RGBQUAD );
+		}
+		else palette_sz = pInfoHdr->biClrUsed * sizeof( RGBQUAD );
 	}
 
-	// determine buttons count by image height...
-	// int EngFuncs::PIC_count = ( pInfoHdr->biHeight == 5538 ) ? PC_BUTTONCOUNT
-	int pic_count = ( bhdr.height / 78 );
+	uiStatic.buttons_width = pInfoHdr->biWidth;
+	uiStatic.buttons_height = 78;	// fixed height (26 * 3)
 
-	bhdr.height = 78;     //uiStatic.buttons_height;
-	bhdr.fileSize = CuttedBmpSize;
-	bhdr.bitmapDataSize = CuttedBmpSize - bhdr.bitmapDataOffset;
+	// determine buttons count by image height...
+	int pic_count = ( pInfoHdr->biHeight / uiStatic.buttons_height );
+
+	int stride = (pInfoHdr->biWidth * pInfoHdr->biBitCount / 8);
+	int cutted_img_sz = ((stride + 3 ) & ~3) * uiStatic.buttons_height;
+	int CuttedBmpSize = sizeof( BITMAPFILEHEADER ) + sizeof( BITMAPINFOHEADER ) + palette_sz + cutted_img_sz;
+	byte *img_data = &bmp_buffer[pFileHdr->bfOffBits + cutted_img_sz * ( pic_count - 1 )];
+
+	NewFileHdr.bfSize = CuttedBmpSize;
+	NewFileHdr.bfOffBits = sizeof( BITMAPFILEHEADER ) + sizeof( BITMAPINFOHEADER ) + palette_sz;
+	NewInfoHdr.biHeight = uiStatic.buttons_height;
+	NewInfoHdr.biSizeImage = cutted_img_sz;
 
 	char fname[256];
-	byte *raw_img_buff = new byte[sizeof( bmp_t ) + pallete_sz + cutted_img_sz];
+	byte *raw_img_buff = (byte *)MALLOC( CuttedBmpSize );
 
 	for( int i = 0; i < pic_count; i++ )
 	{
-		int offset = 0;
 		sprintf( fname, "#btns_%d.bmp", i );
 
-		memcpy( raw_img_buff, bmp_buffer, offset);
+		int offset = 0;
+		memcpy( &raw_img_buff[offset], &NewFileHdr, sizeof( BITMAPFILEHEADER ));
+		offset += sizeof( BITMAPFILEHEADER );
 
-		memcpy( &raw_img_buff[offset], &bhdr, sizeof( bmp_t ));
-		offset += sizeof( bmp_t );
+		memcpy( &raw_img_buff[offset], &NewInfoHdr, NewInfoHdr.biSize );
+		offset += NewInfoHdr.biSize;
 
-		if( bhdr.bitsPerPixel <= 8 )
+		if( NewInfoHdr.biBitCount <= 8 )
 		{
-			memcpy( &raw_img_buff[offset], &bmp_buffer[offset], pallete_sz );
-			offset += pallete_sz;
+			memcpy( &raw_img_buff[offset], palette, palette_sz );
+			offset += palette_sz;
 		}
 
 		memcpy( &raw_img_buff[offset], img_data, cutted_img_sz );
 
-		// upload image into viedo memory
+		// upload image into video memory
 		uiStatic.buttonsPics[i] = EngFuncs::PIC_Load( fname, raw_img_buff, CuttedBmpSize );
 
 		img_data -= cutted_img_sz;
 	}
 
-	delete[] raw_img_buff;
+	FREE( raw_img_buff );
 	EngFuncs::COM_FreeFile( bmp_buffer );
 }

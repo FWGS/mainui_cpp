@@ -442,8 +442,8 @@ void CMenuPicButton::SetupTitleQuad( int x, int y, int w, int h )
 {
 	TitleLerpQuads[1].x  = x * uiStatic.scaleX;
 	TitleLerpQuads[1].y  = y * uiStatic.scaleY;
-	TitleLerpQuads[1].lx = w * uiStatic.scaleX;
-	TitleLerpQuads[1].ly = h * uiStatic.scaleY;
+	TitleLerpQuads[1].lx = w;
+	TitleLerpQuads[1].ly = h;
 
 	s_CurrentLerpQuads[1] = TitleLerpQuads[1];
 }
