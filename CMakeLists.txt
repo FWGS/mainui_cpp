@@ -133,6 +133,10 @@ if(NOT XASH_SDK)
 	set(XASH_SDK "../")
 endif()
 
+if(XASH_SAILFISH)
+	add_definitions(-D__SAILFISH__)
+endif()
+
 # Force stb_truetype for Apple devices, as there is no Apple native font renderer
 # And freetype&fontconfig isn't used on this platform by default
 if(APPLE)

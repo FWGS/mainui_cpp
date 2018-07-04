@@ -93,7 +93,8 @@ void CMenuInputDevices::_Init( void )
 		if( ((CMenuCheckBox*)pSelf)->bChecked )
 		{
 			static CMenuYesNoMessageBox msgbox(false);
-			msgbox.SetMessage("If you do not have touchscreen, or joystick, you will not be able to play withot mouse. Are you sure to disable mouse?");
+			msgbox.SetMessage("If you do not have touchscreen, or joystick, you will not be able to play without mouse."
+				"Are you sure to disable mouse?");
 			SET_EVENT_MULTI( msgbox.onNegative,
 			{
 				uiInputDevices.mouse.bChecked = false;
