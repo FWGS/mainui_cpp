@@ -291,13 +291,16 @@ void CMenuTouchButtons::UpdateMP()
 void CMenuTouchButtons::SaveButton()
 {
 	char command[4096];
+	char cmd[256];
+
+	Com_EscapeCommand( cmd, this->command.GetBuffer(), 256 );
 
 	if( name.GetBuffer()[0] )
 	{
 		snprintf( command, sizeof( command ), "touch_addbutton \"%s\" \"%s\" \"%s\"\n",
 			name.GetBuffer(),
 			texture.GetBuffer(),
-			this->command.GetBuffer() );
+			cmd );
 		EngFuncs::ClientCmd(0, command);
 		snprintf( command, sizeof( command ), "touch_setflags \"%s\" %i\n", name.GetBuffer(), curflags );
 		EngFuncs::ClientCmd(0, command);
@@ -313,7 +316,7 @@ void CMenuTouchButtons::SaveButton()
 	{
 		snprintf( command, sizeof( command ), "touch_settexture \"%s\" \"%s\"\n", selectedName, texture.GetBuffer() );
 		EngFuncs::ClientCmd(0, command);
-		snprintf( command, sizeof( command ), "touch_setcommand \"%s\" \"%s\"\n", selectedName, this->command.GetBuffer() );
+		snprintf( command, sizeof( command ), "touch_setcommand \"%s\" \"%s\"\n", selectedName, cmd );
 		EngFuncs::ClientCmd(0, command);
 		snprintf( command, sizeof( command ), "touch_setflags \"%s\" %i\n", selectedName, curflags );
 		EngFuncs::ClientCmd(0, command);

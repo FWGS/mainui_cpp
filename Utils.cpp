@@ -263,7 +263,6 @@ const char *Info_ValueForKey( const char *s, const char *key )
 	
 	valueindex ^= 1;
 	if( *s == '\\' ) s++;
-	printf("I_VFK '%s' '%s'\n", s, key );
 
 	while( 1 )
 	{
@@ -683,3 +682,31 @@ bool UI::Names::CheckIsNameValid(const char *name)
 
 	return true;
 }
+
+
+void Com_EscapeCommand( char *newCommand, const char *oldCommand, int len )
+{
+	char c;
+	int scripting = (int)EngFuncs::GetCvarFloat( "cmd_scripting" );
+
+	while( (c = *oldCommand++) && len > 1 )
+	{
+		if( c == '"' )
+		{
+			*newCommand++ = '\\';
+			len--;
+		}
+
+		if( scripting && c == '$')
+		{
+			*newCommand++ = '$';
+			len--;
+		}
+
+		*newCommand++ = c;
+		len--;
+	}
+
+	*newCommand++ = 0;
+}
+

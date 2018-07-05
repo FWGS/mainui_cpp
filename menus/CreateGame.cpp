@@ -147,7 +147,7 @@ void CMenuCreateGame::Begin( CMenuBaseItem *pSelf, void *pExtra )
 	{
 		EngFuncs::WriteServerConfig( EngFuncs::GetCvarString( "lservercfgfile" ));
 
-		char cmd[128];
+		char cmd[128], cmd2[256];
 		sprintf( cmd, "exec %s\n", EngFuncs::GetCvarString( "lservercfgfile" ) );
 	
 		EngFuncs::ClientCmd( TRUE, cmd );
@@ -155,8 +155,10 @@ void CMenuCreateGame::Begin( CMenuBaseItem *pSelf, void *pExtra )
 		// dirty listenserver config form old xash may rewrite maxplayers
 		EngFuncs::CvarSetValue( "maxplayers", atoi( menu->maxClients.GetBuffer() ));
 
+		Com_EscapeCommand( cmd2, mapName, 256 );
+
 		// hack: wait three frames allowing server to completely shutdown, reapply maxplayers and start new map
-		sprintf( cmd, "endgame;menu_connectionprogress localserver;wait;wait;wait;maxplayers %i;latch;map %s\n", atoi( menu->maxClients.GetBuffer() ), mapName );
+		sprintf( cmd, "endgame;menu_connectionprogress localserver;wait;wait;wait;maxplayers %i;latch;map %s\n", atoi( menu->maxClients.GetBuffer() ), cmd2 );
 		EngFuncs::ClientCmd( FALSE, cmd );
 
 	}
