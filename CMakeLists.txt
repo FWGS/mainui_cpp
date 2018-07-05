@@ -173,7 +173,10 @@ if(MAINUI_USE_CUSTOM_FONT_RENDER)
 endif()
 
 # Name library as it named in Unkle Mike's Xash3D
-if(WIN32)
+if(MAINUI_NAME)
+	set_target_properties(${MAINUI_LIBRARY} PROPERTIES
+		OUTPUT_NAME ${MAINUI_NAME})
+elseif(WIN32)
 	set_target_properties(${MAINUI_LIBRARY} PROPERTIES
 		OUTPUT_NAME menu PREFIX "")
 endif()
