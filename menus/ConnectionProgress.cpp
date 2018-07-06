@@ -69,6 +69,8 @@ public:
 	}
 	void HandleDownload( const char *pszFileName, const char *pszServerName, int iCurrent, int iTotal, const char *comment )
 	{
+		if( strstr( pszFileName, ".bsp" ) )
+			uiStatic.needMapListUpdate = true;
 		snprintf( sDownloadString, sizeof( sDownloadString ) - 1, "Downloading %s \nfrom %s", pszFileName, pszServerName );
 		snprintf( sCommonString, sizeof( sCommonString ) - 1, "%d of %d %s", iCurrent + 1, iTotal, comment );
 		m_iState = STATE_DOWNLOAD;

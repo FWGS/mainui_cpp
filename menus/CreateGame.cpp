@@ -173,6 +173,9 @@ void CMenuMapListModel::Update( void )
 {
 	char *afile;
 
+	if( !uiStatic.needMapListUpdate )
+		return;
+
 	if( !EngFuncs::CreateMapsList( TRUE ) || (afile = (char *)EngFuncs::COM_LoadFile( "maps.lst", NULL )) == NULL )
 	{
 		uiCreateGame.done->SetGrayed( true );
@@ -205,6 +208,7 @@ void CMenuMapListModel::Update( void )
 	if( !( numMaps - 1) ) uiCreateGame.done->SetGrayed( true );
 	m_iNumItems = numMaps;
 	EngFuncs::COM_FreeFile( afile );
+	uiStatic.needMapListUpdate = false;
 }
 
 /*
@@ -214,6 +218,7 @@ CMenuCreateGame::Init
 */
 void CMenuCreateGame::_Init( void )
 {
+	uiStatic.needMapListUpdate = true;
 	banner.SetPicture( ART_BANNER );
 
 	nat.SetNameAndStatus( "NAT", "Use NAT Bypass instead of direct mode" );
