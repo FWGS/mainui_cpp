@@ -17,14 +17,6 @@ GNU General Public License for more details.
 #include <math.h>
 #include "Utils.h"
 
-#ifndef M_PI
-# define M_PI		3.14159265358979323846	/* pi */
-#endif
-
-#ifndef M_E
-# define M_E		2.7182818284590452354	/* e */
-#endif
-
 bool CBaseFont::GlyphLessFunc( const glyph_t &a, const glyph_t &b )
 {
 	return a.ch < b.ch;
@@ -265,7 +257,7 @@ void CBaseFont::DebugDraw()
 		int x = 0;
 		EngFuncs::PIC_Set( hImage, 255, 255, 255 );
 		if( IsAdditive() )
-			EngFuncs::PIC_DrawAdditive(  Point(x, 0), Size( w, h ) );
+			EngFuncs::PIC_DrawAdditive( Point(x, 0), Size( w, h ) );
 		else
 			EngFuncs::PIC_DrawTrans( Point(x, 0), Size( w, h ) );
 
