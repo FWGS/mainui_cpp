@@ -65,11 +65,9 @@ public:
 		CMenuFramework::SaveAndPopMenu();
 	}
 
-	void FlipMenu( void * );
+	void FlipMenu( void );
 	static void ListItemCvarWriteCb( CMenuBaseItem *pSelf, void *pExtra );
 	static void ListItemCvarGetCb( CMenuBaseItem *pSelf, void *pExtra );
-
-	CMenuBannerBitmap banner;
 
 	scrvardef_t *m_pVars;
 
@@ -290,7 +288,7 @@ void CMenuScriptConfig::_Init( void )
 	pageSelector.SetInactive(false);
 	pageSelector.Setup( 1, m_iPagesCount, 1 );
 	pageSelector.SetCurrentValue( 1 );
-	pageSelector.onChanged = MenuCb( &CMenuScriptConfig::FlipMenu );
+	pageSelector.onChanged = VoidCb( &CMenuScriptConfig::FlipMenu );
 }
 
 void CMenuScriptConfig::SetScriptConfig(const char *path, bool earlyInit)
@@ -305,6 +303,7 @@ void CMenuScriptConfig::SetScriptConfig(const char *path, bool earlyInit)
 
 	m_pVars = CSCR_LoadDefaultCVars( m_szConfig, &m_iVarsCount );
 
+#if 0
 	if( earlyInit ) // create variables if engine does not support SCR
 	{
 		// Xash3D FWGS have internal SCR parser
@@ -317,10 +316,10 @@ void CMenuScriptConfig::SetScriptConfig(const char *path, bool earlyInit)
 			}
 		}
 	}
-
+#endif
 }
 
-void CMenuScriptConfig::FlipMenu( void * )
+void CMenuScriptConfig::FlipMenu( void )
 {
 	int newIndex = (int)pageSelector.GetCurrentValue() - 1;
 
