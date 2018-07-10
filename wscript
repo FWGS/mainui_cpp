@@ -18,21 +18,24 @@ def configure(conf):
 		return
 
 	conf.env.USE_STBTT = conf.options.USE_STBTT
+	conf.env.append_unique('DEFINES', 'MAINUI_USE_CUSTOM_FONT_RENDER');
 	
 	if conf.env.DEST_OS == 'darwin':
 		conf.env.USE_STBTT = True
+		conf.env.append_unique('DEFINES', 'MAINUI_USE_STB');
 	
 	if not conf.env.USE_STBTT and conf.env.DEST_OS != 'win32':
 		errormsg = '{0} not available! Install {0} development package. Also you may need to set PKG_CONFIG_PATH environment variable'
 		
 		try:
-			conf.check_cfg(package='freetype2')
+			conf.check_cfg(package='freetype2', args='--cflags --libs', uselib_store='FT2' )
 		except conf.errors.ConfigurationError:
 			conf.fatal(errormsg.format('freetype2'))
 		try:
-			conf.check_cfg(package='fontconfig')
+			conf.check_cfg(package='fontconfig', args='--cflags --libs', uselib_store='FC')
 		except conf.errors.ConfigurationError:
 			conf.fatal(errormsg.format('fontconfig'))
+		conf.env.append_unique('DEFINES', 'MAINUI_USE_FREETYPE');
 
 def get_subproject_name(ctx):
 	return os.path.basename(os.path.realpath(str(ctx.path)))
@@ -48,7 +51,7 @@ def build(bld):
 
 	# basic build: dedicated only, no dependencies
 	if bld.env.DEST_OS != 'win32' and not bld.env.USE_STBTT:
-		libs += ['FREETYPE2', 'FONTCONFIG']
+		libs += ['FT2', 'FC']
 
 	source = bld.path.ant_glob([
 		'*.cpp', 
@@ -56,13 +59,25 @@ def build(bld):
 		'menus/*.cpp', 
 		'menus/dynamic/*.cpp', 
 		'model/*.cpp',
-		'controls/*.cpp'])
+		'controls/*.cpp'
+	])
 
-	includes = ['.', 'utl/', 'font/', 'controls/', 'menus/', 'model/', '../common', '../engine', '../pm_shared']
+	includes = [
+	    '.',
+		'utl/',
+		'font/',
+		'controls/',
+		'menus/',
+		'model/',
+		'../common',
+		'../engine',
+		'../pm_shared'
+	]
 
 	bld.shlib(
 		source   = source,
 		target   = 'menu',
 		features = 'cxx',
 		includes = includes,
-		use      = libs)
+		use      = libs
+	)
