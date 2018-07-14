@@ -72,7 +72,7 @@ bool CWinAPIFont::Create( const char *name, int tall, int weight, int blur, floa
 	::EnumFontFamiliesExA( m_hDC, &font, &FontEnumProc, (LPARAM)this, 0 );
 	if( !m_bFound )
 	{
-		Host_Error( "Couldn't create windows font %s\n", name );
+		Con_DPrintf( "Couldn't create windows font %s: no font found\n", name );
 		return false;
 	}
 
@@ -85,7 +85,7 @@ bool CWinAPIFont::Create( const char *name, int tall, int weight, int blur, floa
 
 	if( !m_hFont )
 	{
-		Host_Error( "Couldn't create windows font %s\n", name );
+		Con_DPrintf( "Couldn't create windows font %s: CreateFont failed\n", name );
 		return false;
 	}
 
@@ -97,7 +97,7 @@ bool CWinAPIFont::Create( const char *name, int tall, int weight, int blur, floa
 	::TEXTMETRIC tm = { 0 };
 	if( !GetTextMetrics( m_hDC, &tm ) )
 	{
-		Host_Error( "Couldn't create windows font %s\n", name );
+		Con_DPrintf( "Couldn't create windows font %s: GetTextMetrics failed\n", name );
 		return false;
 	}
 
