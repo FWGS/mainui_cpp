@@ -274,26 +274,28 @@ void CFreeTypeFont::GetCharABCWidths(int ch, int &a, int &b, int &c)
 	if( FT_Load_Char( face, ch, FT_LOAD_DEFAULT ) )
 	{
 		find.a = 0;
-		find.b = PIXEL(face->bbox.xMax) - m_iBlur;
+		find.b = PIXEL(face->bbox.xMax);
 		find.c = 0;
 	}
 	else
 	{
-		find.a = PIXEL(face->glyph->metrics.horiBearingX) - m_iBlur - m_iOutlineSize;
-		find.b = PIXEL(face->glyph->metrics.width) + (m_iBlur + m_iOutlineSize) * 2;
+		find.a = PIXEL(face->glyph->metrics.horiBearingX);
+		find.b = PIXEL(face->glyph->metrics.width);
 		find.c = PIXEL(face->glyph->metrics.horiAdvance -
 			 face->glyph->metrics.horiBearingX -
-			 face->glyph->metrics.width) - m_iBlur - m_iOutlineSize;
+			 face->glyph->metrics.width);
+	}
+	
+	find.a -= m_iBlur + m_iOutlineSize;
+	find.b += m_iBlur + m_iOutlineSize;
+	
+	if( m_iOutlineSize )
+	{
+		if( find.a < 0 )
+			find.a += m_iOutlineSize;
 
-		// on't allow extra thicc glyphs with outline effect
-		if( m_iOutlineSize )
-		{
-			if( find.a < 0 )
-				find.a += m_iOutlineSize;
-
-			if( find.c < 0 )
-				find.c += m_iOutlineSize;
-		}
+		if( find.c < 0 )
+			find.c += m_iOutlineSize;
 	}
 
 	a = find.a;

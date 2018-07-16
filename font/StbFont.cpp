@@ -406,16 +406,18 @@ void CStbFont::GetCharABCWidths(int ch, int &a, int &b, int &c)
 	stbtt_GetCodepointHMetrics( &m_fontInfo, ch, &horiAdvance, &horiBearingX );
 	width = x1 - x0;
 
-	find.a = horiBearingX * scale - m_iBlur - m_iOutlineSize;
-	find.b = width * scale + ( m_iBlur + m_iOutlineSize ) * 2;
-	find.c = (horiAdvance - horiBearingX - width) * scale - m_iBlur - m_iOutlineSize;
+	find.a = horiBearingX * scale;
+	find.b = width * scale;
+	find.c = (horiAdvance - horiBearingX - width) * scale;
+	
+	find.a -= m_iBlur + m_iOutlineSize;
+	find.b += m_iBlur + m_iOutlineSize;
 
 	// HACKHACK: stbtt does not support hinting,
 	// so we add 1 pixel margin here and stbtt
 	// won't look bad on too small screen resolutions
 	find.b += 1;
 
-	// don't allow extra thicc glyphs with outline effect
 	if( m_iOutlineSize )
 	{
 		if( find.a < 0 )

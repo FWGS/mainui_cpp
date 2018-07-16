@@ -317,19 +317,21 @@ void CWinAPIFont::GetCharABCWidths( int ch, int &a, int &b, int &c )
 	ABC abc;
 	if( ::GetCharABCWidthsW( m_hDC, ch, ch, &abc ) || ::GetCharABCWidthsA( m_hDC, ch, ch, &abc ) )
 	{
-		finder.a = abc.abcA - m_iBlur - m_iOutlineSize;
-		finder.b = abc.abcB + ( ( m_iBlur + m_iOutlineSize ) * 2 );
-		finder.c = abc.abcC - m_iBlur - m_iOutlineSize;
+		finder.a = abc.abcA;
+		finder.b = abc.abcB;
+		finder.c = abc.abcC;
 	}
 	else
 	{
 		// failed to get width, just use the max width
-		finder.a = 0 - m_iBlur - m_iOutlineSize;
-		finder.b = m_iMaxCharWidth + ( ( m_iBlur + m_iOutlineSize ) * 2 );;
-		finder.c = 0 - m_iBlur - m_iOutlineSize;
+		finder.a = 0;
+		finder.b = m_iMaxCharWidth;
+		finder.c = 0;
 	}
+	
+	finder.a -= m_iBlur + m_iOutlineSize;
+	finder.b += m_iBlur + m_iOutlineSize;
 
-	// don't allow extra thicc glyphs with outline effect
 	if( m_iOutlineSize )
 	{
 		if( finder.a < 0 )
