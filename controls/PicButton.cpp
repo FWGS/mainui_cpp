@@ -144,6 +144,20 @@ void CMenuPicButton::Draw( )
 {
 	int state = BUTTON_NOFOCUS;
 
+	if( UI_CursorInRect( m_scPos, m_scSize ) && m_pParent == uiStatic.menuActive )
+	{
+		if( !bRollOver )
+		{
+			EngFuncs::PlayLocalSound( uiSoundRollOver );
+			bRollOver = true;
+		}
+	}
+	else
+	{
+		if( bRollOver )
+			bRollOver = false;
+	}
+
 	if( iFlags & (QMF_HASMOUSEFOCUS|QMF_HASKEYBOARDFOCUS))
 	{
 		state = BUTTON_FOCUS;
@@ -235,9 +249,6 @@ void CMenuPicButton::Draw( )
 		if( iFlags & QMF_GRAYED )
 		{
 #ifdef MAINUI_RENDER_PICBUTTON_TEXT
-			if( UI_CursorInRect( m_scPos, m_scSize ) )
-				a = 255;
-
 			if( a > 0 )
 			{
 				UI_DrawString( uiStatic.hHeavyBlur, m_scPos, m_scSize, szName,

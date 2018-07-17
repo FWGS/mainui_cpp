@@ -12,7 +12,7 @@ ifeq ($(TARGET_ARCH_ABI),armeabi-v7a-hard)
 endif
 
 LOCAL_MODULE := menu
-LOCAL_CPPFLAGS := -std=gnu++11 -DMAINUI_USE_STB -DMAINUI_USE_CUSTOM_FONT_RENDER -DNO_STL -fno-rtti -fno-exceptions
+LOCAL_CPPFLAGS := -std=gnu++11 -DMAINUI_USE_STB -DMAINUI_USE_CUSTOM_FONT_RENDER -DNO_STL -fno-rtti -fno-exceptions -DMAINUI_RENDER_PICBUTTON_TEXT
 
 LOCAL_C_INCLUDES := \
 	$(SDL_PATH)/include				\
@@ -22,6 +22,7 @@ LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)/../engine 			\
 	$(LOCAL_PATH)/../engine/common 			\
 	$(LOCAL_PATH)/../utils/vgui/include 		\
+	$(LOCAL_PATH)/../public/			\
 	$(LOCAL_PATH)/menus 				\
 	$(LOCAL_PATH)/controls 				\
 	$(LOCAL_PATH)/font 				\
@@ -89,6 +90,7 @@ LOCAL_SRC_FILES := \
 	Scissor.cpp                                     \
 	udll_int.cpp                                    \
 	CFGScript.cpp					\
-	EngineCallback.cpp
+	EngineCallback.cpp				\
+	../common/interface.cpp
 
 include $(BUILD_SHARED_LIBRARY)

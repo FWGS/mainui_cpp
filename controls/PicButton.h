@@ -57,6 +57,8 @@ public:
 
 	static void RootChanged( bool isForward );
 private:
+	bool bRollOver;
+
 	enum animState_e { AS_TO_TITLE = 0, AS_TO_BUTTON };
 	struct Quad
 	{
