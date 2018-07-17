@@ -167,7 +167,7 @@ void CBaseFont::UploadGlyphsForRanges(charRange_t *range, int rangeSize)
 
 			// copy glyph to rgbdata
 
-			for( int y = 0; y < height; y++ )
+			for( int y = 0; y < height - 1; y++ )
 			{
 				byte *dst = &rgbdata[(ystart - y) * hdr->width * 4];
 				byte *src = &temp[y * maxWidth * 4];
