@@ -72,17 +72,12 @@ set(MAINUI_MENUS_SOURCES
 	menus/Controls.cpp
 	menus/CreateGame.cpp
 	menus/Credits.cpp
-	menus/CustomGame.cpp
 	menus/FileDialog.cpp
 	menus/GameOptions.cpp
 	menus/Gamepad.cpp
 	menus/InputDevices.cpp
-	menus/LoadGame.cpp
 	menus/Main.cpp
-	menus/Multiplayer.cpp
-	menus/NewGame.cpp
 	menus/PlayerSetup.cpp
-	menus/SaveLoad.cpp
 	menus/ServerBrowser.cpp
 	menus/TouchButtons.cpp
 	menus/Touch.cpp

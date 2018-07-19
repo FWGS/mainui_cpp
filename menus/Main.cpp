@@ -159,7 +159,7 @@ void CMenuMain::_Init( void )
 	multiPlayer.SetNameAndStatus( "Multiplayer", MenuStrings[IDS_MAIN_MULTIPLAYERHELP] );
 	multiPlayer.SetPicture( PC_MULTIPLAYER );
 	multiPlayer.iFlags |= QMF_NOTIFY;
-	multiPlayer.onActivated = UI_MultiPlayer_Menu;
+	multiPlayer.onActivated = UI_ServerBrowser_Menu;
 
 	configuration.SetNameAndStatus( "Configuration", MenuStrings[IDS_MAIN_CONFIGUREHELP] );
 	configuration.SetPicture( PC_CONFIG );
