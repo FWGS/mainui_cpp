@@ -88,7 +88,7 @@ void CMenuEditable::UpdateCvar()
 	if( onCvarGet )
 	{
 		onCvarGet( this );
-		haveUpdate = true; // FIXME
+		haveUpdate = false; // FIXME: add return values to events
 	}
 	else
 	{
