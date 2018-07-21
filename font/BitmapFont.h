@@ -35,7 +35,7 @@ public:
 	void GetCharABCWidths( int ch, int &a, int &b, int &c ) override;
 	bool HasChar( int ch ) const override;
 	void UploadGlyphsForRanges( charRange_t *range, int rangeSize ) override;
-	int DrawCharacter(int ch, Point pt, int charH, const int color, bool forceAdditive = false) override;
+	int DrawCharacter(int ch, Point pt, int charH, const unsigned int color, bool forceAdditive = false) override;
 private:
 	HIMAGE hImage;
 	int iImageWidth, iImageHeight;

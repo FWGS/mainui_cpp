@@ -31,9 +31,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define ART_BANNER		"gfx/shell/head_creategame"
 
-#define MAPNAME_LENGTH	20
-#define TITLE_LENGTH	20+MAPNAME_LENGTH
-
 class CMenuMapListModel : public CMenuBaseModel
 {
 public:

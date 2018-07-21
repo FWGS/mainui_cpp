@@ -51,7 +51,7 @@ public:
 
 	int GetTextWideScaled( HFont font, const char *text, const int height, int size = -1 );
 
-	int DrawCharacter( HFont font, int ch, Point pt, int charH, const int color, bool forceAdditive = false );
+	int DrawCharacter( HFont font, int ch, Point pt, int charH, const unsigned int color, bool forceAdditive = false );
 
 	void DebugDraw( HFont font );
 	CBaseFont *GetIFontFromHandle( HFont font );

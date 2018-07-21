@@ -425,7 +425,7 @@ CBMP* CBMP::LoadFile( const char *filename )
 		return NULL;
 
 	// too small for BMP
-	if( length < sizeof( bmp_t ))
+	if( (size_t)length < sizeof( bmp_t ))
 		return NULL;
 
 	// not a BMP

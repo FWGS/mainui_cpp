@@ -158,17 +158,16 @@ extern const char		*uiSoundGlow;
 extern const char		*uiSoundMove;
 extern const char		*uiSoundNull;
 
-extern int	uiColorHelp;
-extern int	uiPromptBgColor;
-extern int	uiPromptTextColor;
-extern int	uiPromptFocusColor;
-extern int	uiInputTextColor;
-extern int	uiInputBgColor;
-extern int	uiInputFgColor;
-
-extern int	uiColorWhite;
-extern int	uiColorDkGrey;
-extern int	uiColorBlack;
+extern unsigned int	uiColorHelp;
+extern unsigned int	uiPromptBgColor;
+extern unsigned int	uiPromptTextColor;
+extern unsigned int	uiPromptFocusColor;
+extern unsigned int	uiInputTextColor;
+extern unsigned int	uiInputBgColor;
+extern unsigned int	uiInputFgColor;
+extern unsigned int	uiColorWhite;
+extern unsigned int	uiColorDkGrey;
+extern unsigned int	uiColorBlack;
 
 // TODO: Move it under namespace?
 
@@ -184,14 +183,14 @@ bool UI_CursorInRect( int x, int y, int w, int h );
 void UI_EnableAlphaFactor( float a );
 void UI_DisableAlphaFactor();
 
-void UI_DrawPic( int x, int y, int w, int h, const int color, const char *pic );
-void UI_DrawPicAdditive( int x, int y, int w, int h, const int color, const char *pic );
-void UI_DrawPicTrans( int x, int y, int width, int height, const int color, const char *pic );
-void UI_DrawPicHoles( int x, int y, int width, int height, const int color, const char *pic );
-void UI_FillRect( int x, int y, int w, int h, const int color );
-void UI_DrawRectangleExt(int in_x, int in_y, int in_w, int in_h, const int color, int outlineWidth, int flag  = QM_TOP | QM_BOTTOM | QM_LEFT | QM_RIGHT);
-int UI_DrawString( HFont font, int x, int y, int w, int h, const char *str, const int col, int forceCol, int charH, ETextAlignment justify, bool shadow, bool limitBySize = true );
-inline void UI_DrawRectangle( int x, int y, int w, int h, const int color, int flag  = QM_TOP | QM_BOTTOM | QM_LEFT | QM_RIGHT)
+void UI_DrawPic( int x, int y, int w, int h, const unsigned int color, const char *pic );
+void UI_DrawPicAdditive( int x, int y, int w, int h, const unsigned int color, const char *pic );
+void UI_DrawPicTrans( int x, int y, int width, int height, const unsigned int color, const char *pic );
+void UI_DrawPicHoles( int x, int y, int width, int height, const unsigned int color, const char *pic );
+void UI_FillRect( int x, int y, int w, int h, const unsigned int color );
+void UI_DrawRectangleExt(int in_x, int in_y, int in_w, int in_h, const unsigned int color, int outlineWidth, int flag  = QM_TOP | QM_BOTTOM | QM_LEFT | QM_RIGHT);
+int  UI_DrawString( HFont font, int x, int y, int w, int h, const char *str, const unsigned int col, bool forceCol, int charH, ETextAlignment justify, bool shadow, bool limitBySize = true );
+inline void UI_DrawRectangle( int x, int y, int w, int h, const unsigned int color, int flag  = QM_TOP | QM_BOTTOM | QM_LEFT | QM_RIGHT)
 {
 	UI_DrawRectangleExt( x, y, w, h, color, uiStatic.outlineWidth, flag );
 }
@@ -200,35 +199,35 @@ inline bool UI_CursorInRect( Point pos, Size size )
 {
 	return UI_CursorInRect( pos.x, pos.y, size.w, size.h );
 }
-inline void UI_DrawPic( Point pos, Size size, const int color, const char *pic )
+inline void UI_DrawPic( Point pos, Size size, const unsigned int color, const char *pic )
 {
 	UI_DrawPic( pos.x, pos.y, size.w, size.h, color, pic );
 }
-inline void UI_DrawPicAdditive( Point pos, Size size, const int color, const char *pic )
+inline void UI_DrawPicAdditive( Point pos, Size size, const unsigned int color, const char *pic )
 {
 	UI_DrawPicAdditive( pos.x, pos.y, size.w, size.h, color, pic );
 }
-inline void UI_DrawPicTrans( Point pos, Size size, const int color, const char *pic )
+inline void UI_DrawPicTrans( Point pos, Size size, const unsigned int color, const char *pic )
 {
 	UI_DrawPicTrans( pos.x, pos.y, size.w, size.h, color, pic );
 }
-inline void UI_DrawPicHoles( Point pos, Size size, const int color, const char *pic )
+inline void UI_DrawPicHoles( Point pos, Size size, const unsigned int color, const char *pic )
 {
 	UI_DrawPicHoles( pos.x, pos.y, size.w, size.h, color, pic );
 }
-inline void UI_FillRect( Point pos, Size size, const int color )
+inline void UI_FillRect( Point pos, Size size, const unsigned int color )
 {
 	UI_FillRect( pos.x, pos.y, size.w, size.h, color );
 }
-inline void UI_DrawRectangle( Point pos, Size size, const int color, int flag = QM_TOP | QM_BOTTOM | QM_LEFT | QM_RIGHT )
+inline void UI_DrawRectangle( Point pos, Size size, const unsigned int color, int flag = QM_TOP | QM_BOTTOM | QM_LEFT | QM_RIGHT )
 {
 	UI_DrawRectangleExt( pos.x, pos.y, size.w, size.h, color, uiStatic.outlineWidth, flag );
 }
-inline void UI_DrawRectangleExt( Point pos, Size size, const int color, int outlineWidth, int flag  = QM_TOP | QM_BOTTOM | QM_LEFT | QM_RIGHT )
+inline void UI_DrawRectangleExt( Point pos, Size size, const unsigned int color, int outlineWidth, int flag  = QM_TOP | QM_BOTTOM | QM_LEFT | QM_RIGHT )
 {
 	UI_DrawRectangleExt( pos.x, pos.y, size.w, size.h, color, outlineWidth, flag );
 }
-inline int UI_DrawString( HFont font, Point pos, Size size, const char *str, const int col, int forceCol, Size chSize, ETextAlignment justify, bool shadow, bool limitBySize = true  )
+inline int UI_DrawString( HFont font, Point pos, Size size, const char *str, const unsigned int col, bool forceCol, Size chSize, ETextAlignment justify, bool shadow, bool limitBySize = true  )
 {
 	return UI_DrawString( font, pos.x, pos.y, size.w, size.h, str, col, forceCol, chSize.h, justify, shadow, limitBySize );
 }

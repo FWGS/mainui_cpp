@@ -26,7 +26,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "YesNoMessageBox.h"
 #include "keydefs.h"
 
-
 #define ART_BANNER		"gfx/shell/head_custom"
 
 #define MAX_MODS		512	// engine limit

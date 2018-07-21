@@ -447,13 +447,13 @@ void CBaseFont::ApplyStrikeout(Size rgbaSz, byte *rgba)
 	}
 }
 
-int CBaseFont::DrawCharacter(int ch, Point pt, int charH, const int color, bool forceAdditive)
+int CBaseFont::DrawCharacter(int ch, Point pt, int charH, const unsigned int color, bool forceAdditive)
 {
 	Size charSize;
 	int a, b, c, width;
 
 #ifdef SCALE_FONTS
-	float factor = (float)sz.h / (float)GetTall();
+	float factor = (float)charH / (float)GetTall();
 #endif
 
 	GetCharABCWidths( ch, a, b, c );
@@ -463,7 +463,7 @@ int CBaseFont::DrawCharacter(int ch, Point pt, int charH, const int color, bool 
 	if( ch == ' ' )
 	{
 #ifdef SCALE_FONTS
-		if( sz.h > 0 )
+		if( charH > 0 )
 		{
 			return width * factor + 0.5f;
 		}
@@ -486,7 +486,7 @@ int CBaseFont::DrawCharacter(int ch, Point pt, int charH, const int color, bool 
 		UnpackRGBA(r, g, b, alpha, color );
 
 #ifdef SCALE_FONTS	// Scale font
-		if( sz.h > 0 )
+		if( charH > 0 )
 		{
 			charSize.w = (glyph.rect.right - glyph.rect.left) * factor + 0.5f;
 			charSize.h = GetHeight() * factor + 0.5f;
@@ -508,7 +508,7 @@ int CBaseFont::DrawCharacter(int ch, Point pt, int charH, const int color, bool 
 	}
 
 #ifdef SCALE_FONTS
-	if( sz.h > 0 )
+	if( charH > 0 )
 	{
 		return width * factor + 0.5f;
 	}

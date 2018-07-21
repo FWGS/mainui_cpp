@@ -47,7 +47,7 @@ void EngFuncs::DrawCharacter(int x, int y, int width, int height, int ch, int ul
 	engfuncs.pfnDrawCharacter( x, y, width, height, ch, ulRGBA, hFont );
 }
 
-unsigned int color;
+static unsigned int color;
 
 void EngFuncs::DrawSetTextColor(int r, int g, int b, int alpha)
 {

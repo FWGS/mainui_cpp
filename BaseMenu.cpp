@@ -172,7 +172,7 @@ void UI_DisableAlphaFactor()
 UI_DrawPic
 =================
 */
-void UI_DrawPic( int x, int y, int width, int height, const int color, const char *pic )
+void UI_DrawPic( int x, int y, int width, int height, const unsigned int color, const char *pic )
 {
 	HIMAGE hPic = EngFuncs::PIC_Load( pic );
 
@@ -195,7 +195,7 @@ void UI_DrawPic( int x, int y, int width, int height, const int color, const cha
 UI_DrawPicAdditive
 =================
 */
-void UI_DrawPicAdditive( int x, int y, int width, int height, const int color, const char *pic )
+void UI_DrawPicAdditive( int x, int y, int width, int height, const unsigned int color, const char *pic )
 {
 	HIMAGE hPic = EngFuncs::PIC_Load( pic );
 	if (!hPic)
@@ -213,7 +213,7 @@ void UI_DrawPicAdditive( int x, int y, int width, int height, const int color, c
 UI_DrawPicAdditive
 =================
 */
-void UI_DrawPicTrans( int x, int y, int width, int height, const int color, const char *pic )
+void UI_DrawPicTrans( int x, int y, int width, int height, const unsigned int color, const char *pic )
 {
 	HIMAGE hPic = EngFuncs::PIC_Load( pic );
 	if (!hPic)
@@ -232,7 +232,7 @@ void UI_DrawPicTrans( int x, int y, int width, int height, const int color, cons
 UI_DrawPicAdditive
 =================
 */
-void UI_DrawPicHoles( int x, int y, int width, int height, const int color, const char *pic )
+void UI_DrawPicHoles( int x, int y, int width, int height, const unsigned int color, const char *pic )
 {
 	HIMAGE hPic = EngFuncs::PIC_Load( pic );
 	if (!hPic)
@@ -251,7 +251,7 @@ void UI_DrawPicHoles( int x, int y, int width, int height, const int color, cons
 UI_FillRect
 =================
 */
-void UI_FillRect( int x, int y, int width, int height, const int color )
+void UI_FillRect( int x, int y, int width, int height, const unsigned int color )
 {
 	int r, g, b, a;
 	UnpackRGBA( r, g, b, a, color );
@@ -264,7 +264,7 @@ void UI_FillRect( int x, int y, int width, int height, const int color )
 UI_DrawRectangleExt
 =================
 */
-void UI_DrawRectangleExt( int in_x, int in_y, int in_w, int in_h, const int color, int outlineWidth, int flag )
+void UI_DrawRectangleExt( int in_x, int in_y, int in_w, int in_h, const unsigned int color, int outlineWidth, int flag )
 {
 	int	x, y, w, h;
 
@@ -319,7 +319,7 @@ UI_DrawString
 =================
 */
 int UI_DrawString( HFont font, int x, int y, int w, int h,
-		const char *string, const int color, int forceColor,
+		const char *string, const unsigned int color, bool forceColor,
 		int charH, ETextAlignment justify, bool shadow, bool limitBySize )
 {
 	int	modulate, shadowModulate;

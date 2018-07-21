@@ -49,7 +49,7 @@ public:
 	virtual void GetCharABCWidths( int ch, int &a, int &b, int &c ) = 0;
 	virtual bool HasChar( int ch ) const = 0;
 	virtual void UploadGlyphsForRanges( charRange_t *range, int rangeSize );
-	virtual int DrawCharacter(int ch, Point pt, int charH, const int color, bool forceAdditive = false);
+	virtual int DrawCharacter(int ch, Point pt, int charH, const unsigned int color, bool forceAdditive = false);
 
 	inline int GetHeight() const       { return m_iHeight + GetEfxOffset(); }
 	inline int GetTall() const         { return m_iTall; }

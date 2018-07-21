@@ -28,11 +28,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Table.h"
 
 #define ART_BANNER		"gfx/shell/head_controls"
-
-#define MAX_KEYS		256
-#define CMD_LENGTH		38
-#define KEY1_LENGTH		20+CMD_LENGTH
-#define KEY2_LENGTH		20+KEY1_LENGTH
+#define MAX_KEYS 256
 
 class CMenuKeysModel : public CMenuBaseModel
 {
@@ -70,8 +66,8 @@ public:
 		return keysBind[line][0] != 0;
 	}
 
-	char name[MAX_KEYS][CMD_LENGTH];
-	char keysBind[MAX_KEYS][CMD_LENGTH];
+	char name[MAX_KEYS][64];
+	char keysBind[MAX_KEYS][64];
 	char firstKey[MAX_KEYS][20];
 	char secondKey[MAX_KEYS][20];
 	int m_iNumItems;
@@ -199,7 +195,7 @@ void CMenuKeysModel::Update( void )
 			pfile = EngFuncs::COM_ParseFile( pfile, token );
 			if( !pfile ) break;	// technically an error
 
-			snprintf( name[i], CMD_LENGTH, "^6%s^7", token );
+			snprintf( name[i], sizeof( name[i] ), "^6%s^7", token );
 			keysBind[i][0] = firstKey[i][0] = secondKey[i][0] = 0;
 			i++;
 		}
@@ -214,7 +210,7 @@ void CMenuKeysModel::Update( void )
 			pfile = EngFuncs::COM_ParseFile( pfile, token );
 			if( !pfile ) break; // technically an error
 
-			snprintf( name[i], CMD_LENGTH, "^6%s^7", token );
+			snprintf( name[i], sizeof( name[i] ), "^6%s^7", token );
 
 			const char *firstKeyStr = NULL, *secondKeyStr = NULL;
 

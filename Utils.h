@@ -75,47 +75,45 @@ extern void UI_FinalCredits( void );
 #define Green( x )	( ((x) & 0xFF00 ) >> 8 )
 #define Blue( x )	( ((x) & 0xFF ) >> 0 )
 
-inline unsigned int PackRGB( int r, int g, int b )
-{
-	return ((0xFF)<<24|(r)<<16|(g)<<8|(b));
-}
-
-inline unsigned int PackRGBA( int r, int g, int b, int a )
+inline unsigned int PackRGBA( const unsigned int r, const unsigned int g, const unsigned int b, const unsigned int a )
 {
 	return ((a)<<24|(r)<<16|(g)<<8|(b));
 }
 
-inline void UnpackRGB( int &r, int &g, int &b, unsigned int ulRGB )
+inline unsigned int PackRGB( const unsigned int r, const unsigned int g, const unsigned int b )
+{
+	return PackRGBA( r, g, b, 0xFF );
+}
+
+inline void UnpackRGB( int &r, int &g, int &b, const unsigned int ulRGB )
 {
 	r = (ulRGB & 0xFF0000) >> 16;
 	g = (ulRGB & 0xFF00) >> 8;
 	b = (ulRGB & 0xFF) >> 0;
 }
 
-inline void UnpackRGBA( int &r, int &g, int &b, int &a, unsigned int ulRGBA )
+inline void UnpackRGBA( int &r, int &g, int &b, int &a, const unsigned int ulRGBA )
 {
 	a = (ulRGBA & 0xFF000000) >> 24;
-	r = (ulRGBA & 0xFF0000) >> 16;
-	g = (ulRGBA & 0xFF00) >> 8;
-	b = (ulRGBA & 0xFF) >> 0;
+	UnpackRGB( r, g, b, ulRGBA );
 }
 
-inline int PackAlpha( unsigned int ulRGB, unsigned int ulAlpha )
+inline unsigned int PackAlpha( const unsigned int ulRGB, const unsigned int ulAlpha )
 {
 	return (ulRGB)|(ulAlpha<<24);
 }
 
-inline int UnpackAlpha( unsigned int ulRGBA )
+inline int UnpackAlpha( const unsigned int ulRGBA )
 {
 	return ((ulRGBA & 0xFF000000) >> 24);	
 }
 
-inline float InterpVal( float from, float to, float frac )
+inline float InterpVal( const float from, const float to, const float frac )
 {
 	return from + (to - from) * frac;
 }
 
-inline int InterpColor( int from, int to, float frac )
+inline int InterpColor( const int from, const int to, const float frac )
 {
 	return PackRGBA(
 		InterpVal( Red( from ), Red( to ), frac ),
@@ -124,9 +122,7 @@ inline int InterpColor( int from, int to, float frac )
 		InterpVal( Alpha( from ), Alpha( to ), frac ) );
 }
 
-
-
-inline float RemapVal( float val, float A, float B, float C, float D)
+inline float RemapVal( const float val, const float A, const float B, const float C, const float D)
 {
 	return C + (D - C) * (val - A) / (B - A);
 }

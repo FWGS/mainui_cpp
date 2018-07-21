@@ -33,7 +33,6 @@ GNU General Public License for more details.
 #define DEFAULT_MENUFONT "RobotoCondensed"
 #define DEFAULT_CONFONT  "DroidSans"
 #define DEFAULT_WEIGHT   1000
-#define SCALE_FONTS      // Probably isn't a good idea until I don't have implemented SDF
 #else
 #define DEFAULT_MENUFONT "Trebuchet MS"
 #define DEFAULT_CONFONT  "Tahoma"
@@ -379,7 +378,7 @@ void CFontManager::UploadTextureForFont(CBaseFont *font)
 	font->UploadGlyphsForRanges( range, ARRAYSIZE( range ) );
 }
 
-int CFontManager::DrawCharacter(HFont fontHandle, int ch, Point pt, int charH, const int color, bool forceAdditive )
+int CFontManager::DrawCharacter(HFont fontHandle, int ch, Point pt, int charH, const unsigned int color, bool forceAdditive )
 {
 	CBaseFont *font = GetIFontFromHandle( fontHandle );
 
