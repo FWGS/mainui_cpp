@@ -30,6 +30,9 @@ GNU General Public License for more details.
 #define UI_BLINK_TIME		250
 #define UI_BLINK_MASK		499
 
+#define UI_CONSOLE_CHAR_WIDTH	9
+#define UI_CONSOLE_CHAR_HEIGHT  18
+
 #define UI_SMALL_CHAR_WIDTH		11
 #define UI_SMALL_CHAR_HEIGHT	23
 
@@ -187,7 +190,7 @@ void UI_DrawPicTrans( int x, int y, int width, int height, const int color, cons
 void UI_DrawPicHoles( int x, int y, int width, int height, const int color, const char *pic );
 void UI_FillRect( int x, int y, int w, int h, const int color );
 void UI_DrawRectangleExt(int in_x, int in_y, int in_w, int in_h, const int color, int outlineWidth, int flag  = QM_TOP | QM_BOTTOM | QM_LEFT | QM_RIGHT);
-int UI_DrawString(HFont font, int x, int y, int w, int h, const char *str, const int col, int forceCol, int charW, int charH, ETextAlignment justify, bool shadow, bool limitBySize = true);
+int UI_DrawString( HFont font, int x, int y, int w, int h, const char *str, const int col, int forceCol, int charH, ETextAlignment justify, bool shadow, bool limitBySize = true );
 inline void UI_DrawRectangle( int x, int y, int w, int h, const int color, int flag  = QM_TOP | QM_BOTTOM | QM_LEFT | QM_RIGHT)
 {
 	UI_DrawRectangleExt( x, y, w, h, color, uiStatic.outlineWidth, flag );
@@ -227,7 +230,7 @@ inline void UI_DrawRectangleExt( Point pos, Size size, const int color, int outl
 }
 inline int UI_DrawString( HFont font, Point pos, Size size, const char *str, const int col, int forceCol, Size chSize, ETextAlignment justify, bool shadow, bool limitBySize = true  )
 {
-	return UI_DrawString( font, pos.x, pos.y, size.w, size.h, str, col, forceCol, chSize.w, chSize.h, justify, shadow, limitBySize );
+	return UI_DrawString( font, pos.x, pos.y, size.w, size.h, str, col, forceCol, chSize.h, justify, shadow, limitBySize );
 }
 
 void UI_StartSound( const char *sound );

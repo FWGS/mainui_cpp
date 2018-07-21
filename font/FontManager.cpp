@@ -14,6 +14,7 @@ GNU General Public License for more details.
 */
 #include <locale.h>
 #include "FontManager.h"
+#include "BaseMenu.h"
 #include "Utils.h"
 
 #include "BaseFontBackend.h"
@@ -31,13 +32,12 @@ GNU General Public License for more details.
 #ifdef __ANDROID__
 #define DEFAULT_MENUFONT "RobotoCondensed"
 #define DEFAULT_CONFONT  "DroidSans"
-#define SCALE_FONTS // Probably isn't a good idea until I don't have implemented SDF
-#define DEFAULT_WEIGHT 1000
+#define DEFAULT_WEIGHT   1000
+#define SCALE_FONTS      // Probably isn't a good idea until I don't have implemented SDF
 #else
 #define DEFAULT_MENUFONT "Trebuchet MS"
 #define DEFAULT_CONFONT  "Tahoma"
-#define DEFAULT_WEIGHT 500
-#define MIMIC_MAKEFONT_SCALES
+#define DEFAULT_WEIGHT   500
 #endif
 
 // #define SCALE_FONTS
@@ -65,8 +65,6 @@ void CFontManager::VidInit( void )
 {
 	static float prevScale = 0;
 
-	bool updateConsoleFont = false; // a hint for re-render console font, because it was removed
-
 	float scale = uiStatic.scaleY;
 
 	if( !prevScale
@@ -76,7 +74,6 @@ void CFontManager::VidInit( void )
 	)
 	{
 		DeleteAllFonts();
-		updateConsoleFont = true;
 		uiStatic.hDefaultFont = CFontBuilder( DEFAULT_MENUFONT, UI_MED_CHAR_HEIGHT * scale, DEFAULT_WEIGHT )
 			.SetHandleNum( QM_DEFAULTFONT )
 			.Create();
@@ -86,7 +83,6 @@ void CFontManager::VidInit( void )
 		uiStatic.hBigFont     = CFontBuilder( DEFAULT_MENUFONT, UI_BIG_CHAR_HEIGHT * scale, DEFAULT_WEIGHT )
 			.SetHandleNum( QM_BIGFONT )
 			.Create();
-
 		uiStatic.hBoldFont = CFontBuilder( DEFAULT_MENUFONT, UI_MED_CHAR_HEIGHT * scale, 1000 )
 			.SetHandleNum( QM_BOLDFONT )
 			.Create();
@@ -104,38 +100,11 @@ void CFontManager::VidInit( void )
 			.SetFlags( FONT_ADDITIVE )
 			.Create();
 #endif
-#ifndef MIMIC_MAKEFONT_SCALES
-		uiStatic.hConsoleFont = CFontBuilder( DEFAULT_CONFONT, UI_SMALL_CHAR_HEIGHT * scale, 500 )
+		uiStatic.hConsoleFont = CFontBuilder( DEFAULT_CONFONT, UI_CONSOLE_CHAR_HEIGHT * scale, 500 )
 			.SetOutlineSize()
 			.Create();
-#endif
 		prevScale = scale;
 	}
-
-#ifdef MIMIC_MAKEFONT_SCALES
-	static int prevConsoleFontHeight;
-	int consoleFontHeight;
-
-	// makefont rules
-	if( ScreenHeight < 320 ) consoleFontHeight = 11;
-	else if( ScreenHeight < 640 ) consoleFontHeight = 14;
-	else consoleFontHeight = 18;
-
-	if( consoleFontHeight != prevConsoleFontHeight || updateConsoleFont )
-	{
-		if( uiStatic.hConsoleFont && !updateConsoleFont )
-		{
-			DeleteFont( uiStatic.hConsoleFont );
-			uiStatic.hConsoleFont = 0;
-		}
-
-		uiStatic.hConsoleFont = CFontBuilder( DEFAULT_CONFONT, consoleFontHeight, 500 )
-			.SetOutlineSize()
-			.Create();
-
-		prevConsoleFontHeight = consoleFontHeight;
-	}
-#endif
 }
 
 void CFontManager::DeleteAllFonts()
@@ -152,9 +121,9 @@ void CFontManager::DeleteFont(HFont hFont)
 	CBaseFont *font = GetIFontFromHandle(hFont);
 	if( font )
 	{
-		delete font;
+		m_Fonts[hFont] = NULL;
 
-		m_Fonts.FastRemove( hFont - 1 );
+		delete font;
 	}
 }
 
@@ -410,14 +379,14 @@ void CFontManager::UploadTextureForFont(CBaseFont *font)
 	font->UploadGlyphsForRanges( range, ARRAYSIZE( range ) );
 }
 
-int CFontManager::DrawCharacter(HFont fontHandle, int ch, Point pt, Size sz, const int color )
+int CFontManager::DrawCharacter(HFont fontHandle, int ch, Point pt, int charH, const int color, bool forceAdditive )
 {
 	CBaseFont *font = GetIFontFromHandle( fontHandle );
 
 	if( !font )
 		return 0;
 
-	return font->DrawCharacter( ch, pt, sz, color );
+	return font->DrawCharacter( ch, pt, charH, color, forceAdditive );
 }
 
 void CFontManager::DebugDraw(HFont fontHandle)

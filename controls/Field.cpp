@@ -226,7 +226,7 @@ const char *CMenuField::Key( int key, int down )
 			int w = 0;
 
 			if( !(eTextAlignment & QM_LEFT))
-				w = g_FontMgr.GetTextWide( font, text, m_scChSize.h );
+				w = g_FontMgr.GetTextWideScaled( font, text, m_scChSize.h );
 
 			if( eTextAlignment & QM_LEFT )
 			{
@@ -464,7 +464,7 @@ void CMenuField::Draw( void )
 	}
 
 	textHeight = y - (m_scChSize.h * 1.5f);
-	UI_DrawString( font, m_scPos.x, textHeight, m_scSize.w, m_scChSize.h, szName, uiColorHelp, true, m_scChSize.w, m_scChSize.h, QM_LEFT, shadow, limitBySize );
+	UI_DrawString( font, m_scPos.x, textHeight, m_scSize.w, m_scChSize.h, szName, uiColorHelp, true, m_scChSize.h, QM_LEFT, shadow, limitBySize );
 
 	if( iFlags & QMF_GRAYED )
 	{
@@ -498,7 +498,7 @@ void CMenuField::Draw( void )
 	// int cursorOffset = 0;
 
 	if(( uiStatic.realTime & 499 ) < 250 )
-		UI_DrawString( font, x + cursorOffset, y, m_scChSize.w, m_scSize.h, cursor_char, iColor, true, m_scChSize.w, m_scChSize.h, QM_LEFT, shadow, limitBySize );
+		UI_DrawString( font, x + cursorOffset, y, m_scChSize.w, m_scSize.h, cursor_char, iColor, true, m_scChSize.h, QM_LEFT, shadow, limitBySize );
 
 
 	switch( eFocusAnimation )
@@ -507,7 +507,7 @@ void CMenuField::Draw( void )
 		UI_DrawString( font, newPos, m_scSize, text, iFocusColor, false, m_scChSize, eTextAlignment, shadow, limitBySize );
 
 		if(( uiStatic.realTime & 499 ) < 250 )
-			UI_DrawString( font, x + cursorOffset, y, m_scChSize.w, m_scSize.h, cursor_char, iFocusColor, true, m_scChSize.w, m_scChSize.h, QM_LEFT, shadow, limitBySize );
+			UI_DrawString( font, x + cursorOffset, y, m_scChSize.w, m_scSize.h, cursor_char, iFocusColor, true, m_scChSize.h, QM_LEFT, shadow, limitBySize );
 		break;
 	case QM_PULSEIFFOCUS:
 	{
@@ -517,7 +517,7 @@ void CMenuField::Draw( void )
 		UI_DrawString( font, newPos, m_scSize, text, color, false, m_scChSize, eTextAlignment, shadow, limitBySize );
 
 		if(( uiStatic.realTime & 499 ) < 250 )
-			UI_DrawString( font, x + cursorOffset, y, m_scChSize.w, m_scSize.h, cursor_char, color, true, m_scChSize.w, m_scChSize.h, QM_LEFT, shadow, limitBySize );
+			UI_DrawString( font, x + cursorOffset, y, m_scChSize.w, m_scSize.h, cursor_char, color, true, m_scChSize.h, QM_LEFT, shadow, limitBySize );
 
 		break;
 	}

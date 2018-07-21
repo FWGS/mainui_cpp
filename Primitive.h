@@ -74,18 +74,6 @@ enum ETextAlignment
 	QM_BOTTOMRIGHT   = QM_BOTTOM  | QM_RIGHT,
 };
 
-enum EFontSizes
-{
-	QM_DEFAULTFONT = 0, // medium size font
-	QM_SMALLFONT,       // small
-	QM_BIGFONT,         // big
-	QM_BOLDFONT,
-#ifdef MAINUI_RENDER_PICBUTTON_TEXT
-	QM_LIGHTBLUR,
-	QM_HEAVYBLUR
-#endif
-};
-
 enum EFocusAnimation
 {
 	QM_NOFOCUSANIMATION = 0,
@@ -99,8 +87,6 @@ enum ELetterCase
 	QM_LOWERCASE,
 	QM_UPPERCASE
 };
-
-typedef int HFont; // handle to a font
 
 struct Size;
 

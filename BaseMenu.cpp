@@ -320,7 +320,7 @@ UI_DrawString
 */
 int UI_DrawString( HFont font, int x, int y, int w, int h,
 		const char *string, const int color, int forceColor,
-		int charW, int charH, ETextAlignment justify, bool shadow, bool limitBySize )
+		int charH, ETextAlignment justify, bool shadow, bool limitBySize )
 {
 	int	modulate, shadowModulate;
 	int	xx = 0, yy, ofsX = 0, ofsY = 0, ch;
@@ -333,8 +333,7 @@ int UI_DrawString( HFont font, int x, int y, int w, int h,
 	{
 		shadowModulate = PackAlpha( uiColorBlack, UnpackAlpha( color ));
 
-		ofsX = charW / 8;
-		ofsY = charH / 8;
+		ofsX = ofsY = charH / 8;
 	}
 
 	modulate = color;
@@ -510,23 +509,19 @@ int UI_DrawString( HFont font, int x, int y, int w, int h,
 			if( !ch )
 				continue;
 
-
 			if( shadow )
-			{
-				g_FontMgr.DrawCharacter( font, ch, Point( xx + ofsX, yy + ofsY ), Size( charW, charH ), shadowModulate );
-			}
+				g_FontMgr.DrawCharacter( font, ch, Point( xx + ofsX, yy + ofsY ), charH, shadowModulate );
 
-// #define DEBUG_WHITESPACE
 #ifdef DEBUG_WHITESPACE
 			if( ch == ' ' )
 			{
-				g_FontMgr.DrawCharacter( font, '_', Point( xx, yy ), Size( charW, charH ), modulate );
-				xx += g_FontMgr.GetCharacterWidth( font, ch );
+				g_FontMgr.DrawCharacter( font, '_', Point( xx, yy ), charH, modulate );
+				xx += g_FontMgr.GetCharacterWidthScaled( font, ch, charH );
 				continue;
 			}
 #endif
 
-			xx += g_FontMgr.DrawCharacter( font, ch, Point( xx, yy ), Size( charW, charH ), modulate );
+			xx += g_FontMgr.DrawCharacter( font, ch, Point( xx, yy ), charH, modulate );
 
 			maxX = Q_max( xx, maxX );
 		}

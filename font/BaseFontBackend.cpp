@@ -447,7 +447,7 @@ void CBaseFont::ApplyStrikeout(Size rgbaSz, byte *rgba)
 	}
 }
 
-int CBaseFont::DrawCharacter(int ch, Point pt, Size sz, const int color)
+int CBaseFont::DrawCharacter(int ch, Point pt, int charH, const int color, bool forceAdditive)
 {
 	Size charSize;
 	int a, b, c, width;
@@ -501,7 +501,7 @@ int CBaseFont::DrawCharacter(int ch, Point pt, Size sz, const int color)
 		pt.x += a;
 
 		EngFuncs::PIC_Set( glyph.texture, r, g, b, alpha );
-		if( IsAdditive() )
+		if( IsAdditive() || forceAdditive )
 			EngFuncs::PIC_DrawAdditive( pt, charSize, &glyph.rect );
 		else
 			EngFuncs::PIC_DrawTrans( pt, charSize, &glyph.rect );

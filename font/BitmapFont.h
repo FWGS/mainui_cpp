@@ -16,6 +16,8 @@ GNU General Public License for more details.
 #ifndef BITMAPFONT_H
 #define BITMAPFONT_H
 
+#include "BaseFontBackend.h"
+
 class CBitmapFont : public CBaseFont
 {
 public:
@@ -33,7 +35,7 @@ public:
 	virtual void GetCharABCWidths( int ch, int &a, int &b, int &c ) ;
 	virtual bool HasChar( int ch ) const;
 	virtual void UploadGlyphsForRanges( charRange_t *range, int rangeSize );
-	virtual int DrawCharacter(int ch, Point pt, Size sz, const int color);
+	virtual int DrawCharacter(int ch, Point pt, int charH, const int color, bool forceAdditive = false);
 private:
 	HIMAGE hImage;
 	int iImageWidth, iImageHeight;

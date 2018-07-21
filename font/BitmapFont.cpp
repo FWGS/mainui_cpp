@@ -94,7 +94,7 @@ int table_cp1251[64] = {
 	0x0451, 0x2116, 0x0454, 0x00BB, 0x0458, 0x0405, 0x0455, 0x0457
 };
 
-int CBitmapFont::DrawCharacter(int ch, Point pt, Size sz, const int color)
+int CBitmapFont::DrawCharacter(int ch, Point pt, int charH, const int color, bool forceAdditive)
 {
 	// let's say we have twice lower width from height
 	// cp1251 now
@@ -130,7 +130,10 @@ int CBitmapFont::DrawCharacter(int ch, Point pt, Size sz, const int color)
 	rc.bottom = rc.top + h * size;
 	rc.right  = rc.left + w * size;
 
-	EngFuncs::PIC_DrawTrans( pt.x, pt.y, sz.h / 2, sz.h, &rc );
+	if( forceAdditive )
+		EngFuncs::PIC_DrawAdditive( pt.x, pt.y, charH / 2, charH, &rc );
+	else
+		EngFuncs::PIC_DrawTrans( pt.x, pt.y, charH / 2, charH, &rc );
 
-	return sz.h / 2;
+	return charH / 2;
 }

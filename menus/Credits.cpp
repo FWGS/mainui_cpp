@@ -81,7 +81,6 @@ void CMenuCredits::Draw( void )
 {
 	int	i, y;
 	float	speed;
-	int	w = UI_MED_CHAR_WIDTH;
 	int	h = UI_MED_CHAR_HEIGHT;
 	int	color = 0;
 
@@ -92,7 +91,7 @@ void CMenuCredits::Draw( void )
 	speed = 32.0f * ( 768.0f / ScreenHeight );	// syncronize with final background track :-)
 
 	// now draw the credits
-	UI_ScaleCoords( NULL, NULL, &w, &h );
+	UI_ScaleCoords( NULL, NULL, NULL, &h );
 
 	y = ScreenHeight - (((gpGlobals->time * 1000) - uiCredits.startTime ) / speed );
 
@@ -107,9 +106,9 @@ void CMenuCredits::Draw( void )
 			if( !uiCredits.fadeTime ) uiCredits.fadeTime = (gpGlobals->time * 1000);
 			color = UI_FadeAlpha( uiCredits.fadeTime, uiCredits.showTime );
 			if( UnpackAlpha( color ))
-				UI_DrawString( uiStatic.hDefaultFont, 0, ( ScreenHeight - h ) / 2, ScreenWidth, h, uiCredits.credits[i], color, true, w, h, QM_CENTER, true );
+				UI_DrawString( uiStatic.hDefaultFont, 0, ( ScreenHeight - h ) / 2, ScreenWidth, h, uiCredits.credits[i], color, true, h, QM_CENTER, true );
 		}
-		else UI_DrawString( uiStatic.hDefaultFont, 0, y, ScreenWidth, h, uiCredits.credits[i], uiColorWhite, false, w, h, QM_CENTER, true );
+		else UI_DrawString( uiStatic.hDefaultFont, 0, y, ScreenWidth, h, uiCredits.credits[i], uiColorWhite, false, h, QM_CENTER, true );
 	}
 
 	if( y < 0 && UnpackAlpha( color ) == 0 )
