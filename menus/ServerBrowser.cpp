@@ -100,22 +100,22 @@ class CMenuGameListModel : public CMenuBaseModel
 public:
 	CMenuGameListModel() : CMenuBaseModel(), m_iSortingColumn(-1) {}
 
-	void Update();
-	int GetColumns() const
+	void Update() override;
+	int GetColumns() const override
 	{
 		return 5; // havePassword, game, mapname, maxcl, ping
 	}
-	int GetRows() const
+	int GetRows() const override
 	{
 		return servers.Count();
 	}
-	ECellType GetCellType( int line, int column )
+	ECellType GetCellType( int line, int column ) override
 	{
 		if( column == 0 )
 			return CELL_IMAGE_ADDITIVE;
 		return CELL_TEXT;
 	}
-	const char *GetCellText( int line, int column )
+	const char *GetCellText( int line, int column ) override
 	{
 		switch( column )
 		{
@@ -127,7 +127,7 @@ public:
 		default: return NULL;
 		}
 	}
-	void OnActivateEntry(int line);
+	void OnActivateEntry(int line) override;
 
 	void Flush()
 	{
@@ -142,7 +142,7 @@ public:
 
 	void AddServerToList( netadr_t adr, const char *info );
 
-	bool Sort(int column, bool ascend);
+	bool Sort(int column, bool ascend) override;
 
 	float serversRefreshTime;
 	CUtlVector<server_t> servers;
@@ -155,8 +155,8 @@ class CMenuServerBrowser: public CMenuFramework
 {
 public:
 	CMenuServerBrowser() : CMenuFramework( "CMenuServerBrowser" ) { }
-	virtual void Draw();
-	virtual void Show();
+	void Draw() override;
+	void Show() override;
 
 	void SetLANOnly( bool lanOnly )
 	{
@@ -192,8 +192,8 @@ public:
 
 	bool m_bLanOnly;
 private:
-	virtual void _Init();
-	virtual void _VidInit();
+	void _Init() override;
+	void _VidInit() override;
 };
 
 static server_t staticServerSelect;

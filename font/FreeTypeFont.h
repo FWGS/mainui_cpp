@@ -40,18 +40,18 @@ class CFreeTypeFont : public CBaseFont
 {
 public:
 	CFreeTypeFont();
-	~CFreeTypeFont();
+	~CFreeTypeFont() override;
 
 	bool Create(const char *name,
 		int tall, int weight,
 		int blur, float brighten,
 		int outlineSize,
 		int scanlineOffset, float scanlineScale,
-		int flags);
-	void GetCharRGBA(int ch, Point pt, Size sz, unsigned char *rgba, Size &drawSize);
-	bool IsValid() const;
-	void GetCharABCWidths( int ch, int &a, int &b, int &c );
-	bool HasChar( int ch ) const;
+		int flags) override;
+	void GetCharRGBA(int ch, Point pt, Size sz, unsigned char *rgba, Size &drawSize) override;
+	bool IsValid() const override;
+	void GetCharABCWidths( int ch, int &a, int &b, int &c ) override;
+	bool HasChar( int ch ) const override;
 private:
 	CUtlRBTree<abc_t, int> m_ABCCache;
 

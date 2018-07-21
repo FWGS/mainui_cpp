@@ -22,20 +22,20 @@ class CBitmapFont : public CBaseFont
 {
 public:
 	CBitmapFont();
-	~CBitmapFont();
+	~CBitmapFont() override;
 
-	virtual bool Create( const char *name,
+	bool Create( const char *name,
 						 int tall, int weight,
 						 int blur, float brighten,
 						 int outlineSize,
 						 int scanlineOffset, float scanlineScale,
-						 int flags );
-	virtual void GetCharRGBA( int ch, Point pt, Size sz, byte *rgba, Size &drawSize );
-	virtual bool IsValid() const;
-	virtual void GetCharABCWidths( int ch, int &a, int &b, int &c ) ;
-	virtual bool HasChar( int ch ) const;
-	virtual void UploadGlyphsForRanges( charRange_t *range, int rangeSize );
-	virtual int DrawCharacter(int ch, Point pt, int charH, const int color, bool forceAdditive = false);
+						 int flags ) override;
+	void GetCharRGBA( int ch, Point pt, Size sz, byte *rgba, Size &drawSize ) override;
+	bool IsValid() const override;
+	void GetCharABCWidths( int ch, int &a, int &b, int &c ) override;
+	bool HasChar( int ch ) const override;
+	void UploadGlyphsForRanges( charRange_t *range, int rangeSize ) override;
+	int DrawCharacter(int ch, Point pt, int charH, const int color, bool forceAdditive = false) override;
 private:
 	HIMAGE hImage;
 	int iImageWidth, iImageHeight;

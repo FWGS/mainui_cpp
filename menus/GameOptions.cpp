@@ -33,10 +33,10 @@ class CMenuGameOptions : public CMenuFramework
 public:
 	CMenuGameOptions() : CMenuFramework("CMenuGameOptions") { }
 
-	virtual const char *Key(int key, int down);
+	const char *Key(int key, int down) override;
 	void SetNetworkMode( int maxpacket, int maxpayload, int cmdrate, int updaterate, int rate );
 private:
-	virtual void _Init();
+	void _Init() override;
 	void SaveCb( );
 	void RestoreCb( );
 	void Restore();

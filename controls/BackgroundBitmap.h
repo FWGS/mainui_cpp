@@ -30,17 +30,16 @@ class CMenuBackgroundBitmap: public CMenuBitmap
 public:
 	CMenuBackgroundBitmap();
 
-	void VidInit( void );
-	void Draw( void );
-	void SetInactive(bool) { }
-	void ToggleInactive() { }
-	static bool ShouldDrawLogoMovie() { return s_bEnableLogoMovie; }
+	void VidInit( void ) override;
+	void Draw( void ) override;
+	void SetInactive(bool) override { }
+	void ToggleInactive() override { }
 
 	bool bForceWON; // if true, szPic will be drawn, instead of Steam-background
 	bool bForceColor; // dialogs should set this
 
 	static void LoadBackground();
-
+	static bool ShouldDrawLogoMovie() { return s_bEnableLogoMovie; }
 private:
 	void DrawBackgroundLayout( Point p, float xScale, float yScale );
 	// void DrawSplash( Point p, float xScale, float yScale );

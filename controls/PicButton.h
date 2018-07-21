@@ -36,8 +36,8 @@ public:
 	typedef CMenuBaseItem BaseClass;
 
 	CMenuPicButton();
-	virtual const char * Key( int key, int down );
-	virtual void Draw( void );
+	const char * Key( int key, int down ) override;
+	void Draw( void ) override;
 
 	void SetPicture( EDefaultBtns ID );
 	void SetPicture( const char *filename );

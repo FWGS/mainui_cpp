@@ -36,9 +36,9 @@ public:
 	CMenuFileDialog() : CMenuFramework("CMenuFileDialog") { }
 
 private:
-	virtual void _Init( void );
-	virtual void _VidInit( void );
-	virtual void SaveAndPopMenu();
+	void _Init( void ) override;
+	void _VidInit( void ) override;
+	void SaveAndPopMenu() override;
 	void RejectChanges();
 	void ApplyChanges( const char *fileName );
 	void UpdateExtra();
@@ -47,7 +47,7 @@ private:
 	{
 	public:
 		CFileListModel() : CStringArrayModel( (const char*)filePath, 95, UI_MAXGAMES ) {}
-		void Update();
+		void Update() override;
 
 	private:
 		char		filePath[UI_MAXGAMES][95];
@@ -57,8 +57,8 @@ private:
 
 	class CPreview : public CMenuAction
 	{
-		public:
-		virtual void Draw();
+	public:
+		void Draw() override;
 		HIMAGE image;
 	} preview;
 };

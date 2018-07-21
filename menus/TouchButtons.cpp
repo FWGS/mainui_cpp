@@ -38,8 +38,8 @@ public:
 	CMenuTouchButtons() : CMenuFramework( "CMenuTouchButtons" ) { }
 
 private:
-	void _Init();
-	void _VidInit();
+	void _Init() override;
+	void _VidInit() override;
 public:
 	void DeleteButton();
 	void ResetButtons();
@@ -86,12 +86,12 @@ public:
 	class CMenuColor : public CMenuBaseItem
 	{
 	public:
-		virtual void Draw();
+		void Draw() override;
 	} color;
 	class CMenuButtonPreview : public CMenuBaseItem
 	{
 	public:
-		virtual void Draw();
+		void Draw() override;
 		HIMAGE textureId;
 	} preview;
 
@@ -100,7 +100,7 @@ public:
 	public:
 		CButtonListModel() : CStringArrayModel( (const char*)&buttons, sizeof( buttons[0] ), 0 ) {}
 
-		void Update();
+		void Update() override;
 		void AddButtonToList( const char *name, const char *texture, const char *command, unsigned char *color, int flags );
 
 		struct

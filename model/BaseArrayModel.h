@@ -11,12 +11,12 @@ public:
 	virtual const char *GetText( int line ) = 0;
 
 	// final methods
-	int GetColumns() const FINAL
+	int GetColumns() const final override
 	{
 		return 1;
 	}
 
-	const char *GetCellText( int line, int ) FINAL
+	const char *GetCellText( int line, int ) final override
 	{
 		return GetText( line );
 	}

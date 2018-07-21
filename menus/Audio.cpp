@@ -36,11 +36,11 @@ public:
 	CMenuAudio() : CMenuFramework("CMenuAudio") { }
 
 private:
-	virtual void _Init();
-	virtual void _VidInit();
+	void _Init() override;
+	void _VidInit() override;
 	void GetConfig();
 	void VibrateChanged();
-	void SaveAndPopMenu();
+	void SaveAndPopMenu() override;
 
 	void LerpingCvarWrite();
 

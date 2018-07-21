@@ -51,9 +51,9 @@ public:
 	CMenuTable();
 
 
-	virtual const char *Key( int key, int down );
-	virtual void Draw();
-	virtual void VidInit();
+	const char *Key( int key, int down ) override;
+	void Draw() override;
+	void VidInit() override;
 	bool MoveView( int delta );
 	bool MoveCursor( int delta );
 	int GetCurrentIndex() { return iCurItem; }

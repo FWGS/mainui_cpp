@@ -23,10 +23,10 @@ public:
 	typedef CMenuItemsHolder BaseClass;
 	CMenuTabView();
 
-	virtual void VidInit();
-	virtual const char *Key( int key, int down );
-	virtual void Draw();
-	virtual Point GetPositionOffset() const;
+	void VidInit() override;
+	const char *Key( int key, int down ) override;
+	void Draw() override;
+	Point GetPositionOffset() const override;
 
 	inline void SetTabName( int idx, const char *name )
 	{

@@ -36,19 +36,19 @@ static class CMenuCredits : public CMenuBaseWindow
 {
 public:
 	CMenuCredits() : CMenuBaseWindow( "Credits" ) { }
-	~CMenuCredits();
+	~CMenuCredits() override;
 
-	void Draw();
-	const char *Key(int key, int down);
-	bool DrawAnimation(EAnimation anim) { return false; }
-	void Show();
+	void Draw() override;
+	const char *Key(int key, int down) override;
+	bool DrawAnimation(EAnimation anim) override { return false; }
+	void Show() override;
 
 	friend void UI_DrawFinalCredits( void );
 	friend void UI_FinalCredits( void );
 	friend int UI_CreditsActive( void );
 
 private:
-	virtual void _Init();
+	void _Init() override;
 
 	const char	**credits;
 	int		startTime;

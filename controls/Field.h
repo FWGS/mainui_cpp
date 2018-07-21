@@ -28,15 +28,15 @@ public:
 	typedef CMenuEditable BaseClass;
 
 	CMenuField();
-	virtual void Init( void );
-	virtual void VidInit( void );
-	virtual const char * Key( int key, int down );
-	virtual void Draw( void );
-	virtual void Char( int key );
-	virtual void UpdateEditable();
+	void Init( void ) override;
+	void VidInit( void ) override;
+	const char * Key( int key, int down ) override;
+	void Draw( void ) override;
+	void Char( int key ) override;
+	void UpdateEditable() override;
 
-	virtual bool KeyValueData(const char *key, const char *data);
-	void LinkCvar(const char *name)
+	bool KeyValueData(const char *key, const char *data) override;
+	void LinkCvar(const char *name) override
 	{
 		CMenuEditable::LinkCvar( name, CVAR_STRING );
 	}
@@ -66,7 +66,7 @@ public:
 	int		iMaxLength;		// can't be more than UI_MAX_FIELD_LINE
 
 protected:
-	virtual void _Event( int ev );
+	void _Event( int ev ) override;
 private:
 	char	szBuffer[UI_MAX_FIELD_LINE];
 	int		iCursor;

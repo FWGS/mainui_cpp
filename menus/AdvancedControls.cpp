@@ -37,12 +37,12 @@ public:
 	void ToggleLookCheckboxes( bool write );
 
 private:
-	virtual void _Init( void );
-	virtual void _VidInit( void );
+	void _Init( void ) override;
+	void _VidInit( void ) override;
+	void SaveAndPopMenu() override;
 
 	void GetConfig( void );
 	void PitchInvert( void );
-	void SaveAndPopMenu();
 
 	CMenuPicButton done, inputDev;
 

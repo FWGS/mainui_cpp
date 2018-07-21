@@ -40,12 +40,12 @@ class CMenuMain: public CMenuFramework
 public:
 	CMenuMain() : CMenuFramework( "CMenuMain" ) { }
 
-	virtual const char *Key( int key, int down );
-	virtual const char *Activate( );
+	const char *Key( int key, int down ) override;
+	const char *Activate( ) override;
 
 private:
-	virtual void _Init();
-	virtual void _VidInit( );
+	void _Init() override;
+	void _VidInit( ) override;
 
 	void QuitDialog( void *pExtra = NULL );
 	void DisconnectDialogCb();

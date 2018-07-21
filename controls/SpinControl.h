@@ -28,10 +28,10 @@ public:
 
 	CMenuSpinControl();
 
-	virtual void VidInit( void );
-	virtual const char * Key( int key, int down );
-	virtual void Draw( void );
-	virtual void UpdateEditable();
+	void VidInit( void ) override;
+	const char * Key( int key, int down ) override;
+	void Draw( void ) override;
+	void UpdateEditable() override;
 
 	void Setup( CMenuBaseArrayModel *model );
 	void Setup( float minValue, float maxValue, float range );

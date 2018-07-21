@@ -57,11 +57,10 @@ public:
 	CMenuGamePad() : CMenuFramework("CMenuGamePad") { }
 
 private:
-
-	virtual void _Init();
-	virtual void _VidInit();
+	void _Init() override;
+	void _VidInit() override;
 	void GetConfig();
-	void SaveAndPopMenu();
+	void SaveAndPopMenu() override;
 
 	CMenuSlider side, forward, pitch, yaw;
 	CMenuCheckBox invSide, invFwd, invPitch, invYaw;

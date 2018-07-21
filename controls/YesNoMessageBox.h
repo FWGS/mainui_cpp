@@ -28,10 +28,10 @@ public:
 	typedef CMenuBaseWindow BaseClass;
 	CMenuYesNoMessageBox( bool alert = false );
 
-	virtual void _Init();
-	virtual void _VidInit();
-	virtual void Draw();
-	virtual const char *Key( int key, int down );
+	void _Init() override;
+	void _VidInit() override;
+	void Draw() override;
+	const char *Key( int key, int down ) override;
 	void SetMessage( const char *msg );
 	void SetPositiveButton( const char *msg, EDefaultBtns buttonPic, int extrawidth = 0 );
 	void SetNegativeButton( const char *msg, EDefaultBtns buttonPic, int extrawidth = 0 );

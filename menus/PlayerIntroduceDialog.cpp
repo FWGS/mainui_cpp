@@ -34,8 +34,8 @@ public:
 	}
 
 	void WriteOrDiscard();
-	virtual void _Init();
-	virtual const char *Key( int key, int down );
+	void _Init() override;
+	const char *Key( int key, int down ) override;
 
 	CMenuBaseWindow *pCaller;
 

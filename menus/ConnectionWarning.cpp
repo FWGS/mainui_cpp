@@ -13,9 +13,9 @@ public:
 	{
 
 	}
-	virtual void _Init();
-	virtual void _VidInit();
-	virtual const char *Key( int key, int down );
+	void _Init() override;
+	void _VidInit() override;
+	const char *Key( int key, int down ) override;
 
 	void WriteSettings(const EPresets preset );
 

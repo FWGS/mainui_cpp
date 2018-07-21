@@ -37,10 +37,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 class CMenuMapListModel : public CMenuBaseModel
 {
 public:
-	void Update();
-	int GetColumns() const { return 2; }
-	int GetRows() const { return m_iNumItems; }
-	const char *GetCellText( int line, int column )
+	void Update() override;
+	int GetColumns() const override { return 2; }
+	int GetRows() const override { return m_iNumItems; }
+	const char *GetCellText( int line, int column ) override
 	{
 		switch( column )
 		{
@@ -62,7 +62,7 @@ public:
 	CMenuCreateGame() : CMenuFramework("CMenuCreateGame") { }
 	static void Begin( CMenuBaseItem *pSelf, void *pExtra );
 
-	void Reload( void );
+	void Reload( void ) override;
 
 	char		*mapsDescriptionPtr[UI_MAXGAMES];
 
@@ -81,8 +81,8 @@ public:
 
 	CMenuPicButton *done;
 private:
-	virtual void _Init();
-	virtual void _VidInit();
+	void _Init() override;
+	void _VidInit() override;
 };
 
 static CMenuCreateGame	uiCreateGame;

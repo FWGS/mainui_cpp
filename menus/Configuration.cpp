@@ -30,7 +30,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 class CMenuOptions: public CMenuFramework
 {
 private:
-	virtual void _Init( void );
+	void _Init( void ) override;
 
 public:
 	typedef CMenuFramework BaseClass;

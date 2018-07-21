@@ -30,11 +30,11 @@ public:
 
 	CMenuSwitch();
 
-	const char *Key(int key, int down);
-	void VidInit();
-	void Draw();
-	void UpdateEditable();
-	void LinkCvar( const char *name )
+	const char *Key(int key, int down) override;
+	void VidInit() override;
+	void Draw() override;
+	void UpdateEditable() override;
+	void LinkCvar( const char *name ) override
 	{
 		CMenuEditable::LinkCvar( name, CMenuEditable::CVAR_VALUE );
 	}

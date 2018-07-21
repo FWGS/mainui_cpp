@@ -52,10 +52,10 @@ static struct
 { "dkgray", 36,  36,  36  },
 };
 
-class CMenuPlayerSetup : public CMenuFramework
+static class CMenuPlayerSetup : public CMenuFramework
 {
 private:
-	void _Init();
+	void _Init() override;
 public:
 	CMenuPlayerSetup() : CMenuFramework( "CMenuPlayerSetup" ), msgBox( true ) { }
 
@@ -65,7 +65,7 @@ public:
 	void ApplyColorToImagePreview();
 	void ApplyColorToLogoPreview();
 	void WriteNewLogo();
-	void SaveAndPopMenu();
+	void SaveAndPopMenu() override;
 
 	class CModelListModel : public CStringArrayModel
 	{

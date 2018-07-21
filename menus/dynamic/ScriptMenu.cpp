@@ -38,7 +38,7 @@ class CMenuScriptConfigPage : public CMenuItemsHolder
 {
 public:
 	CMenuScriptConfigPage();
-	~CMenuScriptConfigPage();
+	~CMenuScriptConfigPage() override;
 
 	bool IsItemFits( CMenuEditable &item );
 	void PrepareItem( CMenuEditable &item );
@@ -53,11 +53,11 @@ class CMenuScriptConfig : public CMenuFramework
 {
 public:
 	CMenuScriptConfig();
-	~CMenuScriptConfig();
+	~CMenuScriptConfig() override;
 
 	void SetScriptConfig( const char *path, bool earlyInit = false );
 
-	virtual void SaveAndPopMenu()
+	void SaveAndPopMenu() override
 	{
 		for( int i = m_iPagesIndex, j = 0; j < m_iPagesCount; i++, j++ )
 			((CMenuScriptConfigPage*)m_pItems[i])->Save();
@@ -77,7 +77,7 @@ private:
 
 	void FreeItems( void );
 
-	virtual void _Init();
+	void _Init() override;
 
 	const char *m_szConfig;
 	int m_iVarsCount;

@@ -34,10 +34,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define LEVELSHOT_W		192
 #define LEVELSHOT_H		160
 
-#define TIME_LENGTH		20
-#define NAME_LENGTH		32+TIME_LENGTH
-#define GAMETIME_LENGTH	15+NAME_LENGTH
-
 #define MAX_CELLSTRING 32
 
 class CMenuSavePreview : public CMenuBaseItem
@@ -48,33 +44,33 @@ public:
 		iFlags = QMF_INACTIVE;
 	}
 
-	virtual void Draw();
+	void Draw() override;
 };
 
 class CMenuSavesListModel : public CMenuBaseModel
 {
 public:
-	void Update();
-	int GetColumns() const
+	void Update() override;
+	int GetColumns() const override
 	{
 		// time, name, gametime
 		return 3;
 	}
-	int GetRows() const
+	int GetRows() const override
 	{
 		return m_iNumItems;
 	}
-	const char *GetCellText( int line, int column )
+	const char *GetCellText( int line, int column ) override
 	{
 		return m_szCells[line][column];
 	}
-	ETextAlignment GetAlignmentForColumn(int column) const
+	ETextAlignment GetAlignmentForColumn(int column) const override
 	{
 		if( column == 2 )
 			return QM_RIGHT;
 		return QM_LEFT;
 	}
-	void OnDeleteEntry( int line );
+	void OnDeleteEntry( int line ) override;
 
 	char		saveName[UI_MAXGAMES][CS_SIZE];
 	char		delName[UI_MAXGAMES][CS_SIZE];
@@ -95,7 +91,7 @@ public:
 	void UpdateList() { savesListModel.Update(); }
 
 private:
-	virtual void _Init( void );
+	void _Init( void );
 
 	void LoadGame();
 	void SaveGame();

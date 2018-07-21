@@ -25,7 +25,7 @@ public:
 	typedef CMenuBaseItem BaseClass;
 
 	CMenuEditable();
-	virtual void Reload();
+	void Reload() override;
 
 	// Every derived class can define how it will work with cvars
 	virtual void UpdateEditable() = 0;

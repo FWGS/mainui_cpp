@@ -16,6 +16,7 @@ GNU General Public License for more details.
 #define MESSAGEBOX_H
 
 #include "BaseWindow.h"
+#include "Action.h"
 
 class CMenuMessageBox : public CMenuBaseWindow
 {
@@ -26,7 +27,7 @@ public:
 
 	void SetMessage( const char *sz );
 private:
-	void _Init();
+	void _Init() override;
 
 	CMenuAction dlgMessage;
 };

@@ -56,17 +56,17 @@ const char	*uiSoundMove        = "";		// Xash3D not use movesound
 const char	*uiSoundNull        = "";
 
 // they match default WON colors.lst now, except alpha
-int		uiColorHelp         = 0xFF7F7F7F;	// 127, 127, 127, 255	// hint letters color
-int		uiPromptBgColor     = 0xFF383838;	// 56,  56,  56,  255	// dialog background color
-int		uiPromptTextColor   = 0xFFF0B418;	// 240, 180, 24,  255	// dialog or button letters color
-int		uiPromptFocusColor  = 0xFFFFFF00;	// 255, 255,  0,  255	// dialog or button focus letters color
-int		uiInputTextColor    = 0xFFF0B418;	// 240, 180, 24, 255
-int		uiInputBgColor      = 0x80383838;	// 56,  56,  56,  255	// field, scrollist, checkbox background color
-int		uiInputFgColor      = 0xFF555555;	// 85,  85,  85,  255	// field, scrollist, checkbox foreground color
-int		uiColorWhite        = 0xFFFFFFFF;	// 255, 255, 255, 255	// useful for bitmaps
-int		uiColorDkGrey       = 0x80404040;	// 64,  64,  64,  255	// shadow and grayed items
-int		uiColorBlack        = 0x80000000;	//  0,   0,   0,  255	// some controls background
-int		uiColorConsole      = 0xFFF0B418;	// just for reference
+unsigned int		uiColorHelp         = 0xFF7F7F7F;	// 127, 127, 127, 255	// hint letters color
+unsigned int		uiPromptBgColor     = 0xFF383838;	// 56,  56,  56,  255	// dialog background color
+unsigned int		uiPromptTextColor   = 0xFFF0B418;	// 240, 180, 24,  255	// dialog or button letters color
+unsigned int		uiPromptFocusColor  = 0xFFFFFF00;	// 255, 255,  0,  255	// dialog or button focus letters color
+unsigned int		uiInputTextColor    = 0xFFF0B418;	// 240, 180, 24, 255
+unsigned int		uiInputBgColor      = 0x80383838;	// 56,  56,  56,  255	// field, scrollist, checkbox background color
+unsigned int		uiInputFgColor      = 0xFF555555;	// 85,  85,  85,  255	// field, scrollist, checkbox foreground color
+unsigned int		uiColorWhite        = 0xFFFFFFFF;	// 255, 255, 255, 255	// useful for bitmaps
+unsigned int		uiColorDkGrey       = 0x80404040;	// 64,  64,  64,  255	// shadow and grayed items
+unsigned int		uiColorBlack        = 0x80000000;	//  0,   0,   0,  255	// some controls background
+unsigned int		uiColorConsole      = 0xFFF0B418;	// just for reference
 
 // color presets (this is nasty hack to allow color presets to part of text)
 const unsigned int g_iColorTable[8] =
@@ -1077,7 +1077,7 @@ void UI_Precache( void )
 	}
 }
 
-void UI_ParseColor( char *&pfile, int *outColor )
+void UI_ParseColor( char *&pfile, unsigned int *outColor )
 {
 	int	i, color[3];
 	char	token[1024];

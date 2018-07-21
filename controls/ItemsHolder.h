@@ -26,24 +26,24 @@ public:
 	CMenuItemsHolder();
 
 	// Overload _Init, _VidInit instead of these methods
-	void Init();
-	void VidInit();
+	void Init() override;
+	void VidInit() override;
 
-	virtual void Reload();
-	virtual const char *Key( int key, int down );
-	virtual void Char( int key );
-	virtual const char *Activate( void );
-	virtual void ToggleInactive( void );
-	virtual void SetInactive( bool visible );
-	virtual void Draw( void );
+	void Reload() override;
+	const char *Key( int key, int down ) override;
+	void Char( int key ) override;
+	const char *Activate( void ) override;
+	void ToggleInactive( void ) override;
+	void SetInactive( bool visible ) override;
+	void Draw( void ) override;
 
-	virtual bool MouseMove( int x, int y );
-	virtual bool IsWindow() { return false; }
+	bool MouseMove( int x, int y ) override;
 
-	virtual bool KeyValueData(const char *key, const char *data);
+	bool KeyValueData(const char *key, const char *data) override;
 
 	// returns a position where actual items holder is located
 	virtual Point GetPositionOffset() const;
+	virtual bool IsWindow() { return false; }
 
 	void CursorMoved( void );
 	void SetCursor( int newCursor, bool notify = true );

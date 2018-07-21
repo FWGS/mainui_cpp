@@ -29,14 +29,14 @@ public:
 
 	// Overloaded functions
 	// Window visibility is switched through window stack
-	virtual void Hide();
-	virtual void Show();
-	virtual bool IsVisible() const;
+	void Hide() override;
+	void Show() override;
+	bool IsVisible() const override;
 
-	virtual const char *Key( int key, int down );
-	virtual void Draw();
+	const char *Key( int key, int down ) override;
+	void Draw() override;
 
-	virtual bool KeyValueData(const char *key, const char *data);
+	bool KeyValueData(const char *key, const char *data) override;
 
 	enum EAnimation
 	{
@@ -61,7 +61,7 @@ public:
 	// Hide current window and save changes
 	virtual void SaveAndPopMenu();
 
-	virtual bool IsWindow() { return true; }
+	bool IsWindow() override { return true; }
 
 	void EnableTransition();
 
@@ -84,7 +84,7 @@ private:
 	friend void UI_DrawMouseCursor( void ); // HACKHACK: Cursor should be set by menu item
 	friend void UI_UpdateMenu( float flTime );
 
-	virtual bool IsAbsolutePositioned( void ) const { return true; }
+	bool IsAbsolutePositioned( void ) const override { return true; }
 
 	bool m_bHolding;
 	Point m_bHoldOffset;

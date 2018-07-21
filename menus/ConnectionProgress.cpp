@@ -48,11 +48,11 @@ class CMenuConnectionProgress : public CMenuBaseWindow
 {
 public:
 	CMenuConnectionProgress();
-	virtual void _Init();
-	virtual void _VidInit();
-	virtual void Draw();
-	virtual bool DrawAnimation(EAnimation anim);
-	virtual const char *Key( int key, int down );
+	void _Init() override;
+	void _VidInit() override;
+	void Draw() override;
+	bool DrawAnimation(EAnimation anim) override;
+	const char *Key( int key, int down ) override;
 	void Disconnect();
 	void HandleDisconnect( void );
 	void HandlePrecache( void )

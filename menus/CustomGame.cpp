@@ -31,19 +31,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define MAX_MODS		512	// engine limit
 
-#define TYPE_LENGTH		16
-#define NAME_SPACE		4
-#define NAME_LENGTH		32+TYPE_LENGTH
-#define VER_LENGTH		6+NAME_LENGTH
-#define SIZE_LENGTH		10+VER_LENGTH
-
 class CMenuModListModel : public CMenuBaseModel
 {
 public:
-	void Update();
-	int GetColumns() const { return 4; }
-	int GetRows() const { return m_iNumItems; }
-	const char *GetCellText( int line, int column )
+	void Update() override;
+	int GetColumns() const override { return 4; }
+	int GetRows() const override { return m_iNumItems; }
+	const char *GetCellText( int line, int column ) override
 	{
 		return modsDescription[line][column];
 	}
@@ -64,7 +58,7 @@ private:
 	void ChangeGame( void *pExtra );
 	void Go2Site( void *pExtra );
 	void UpdateExtras( );
-	virtual void _Init( );
+	virtual void _Init( ) override;
 
 	CMenuPicButton	*load;
 	CMenuPicButton	*go2url;

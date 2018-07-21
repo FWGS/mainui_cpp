@@ -30,9 +30,9 @@ class CMenuPlayerModelView : public CMenuBaseItem
 {
 public:
 	CMenuPlayerModelView();
-	virtual void VidInit();
-	virtual void Draw();
-	virtual const char *Key(int key, int down);
+	void VidInit() override;
+	void Draw() override;
+	const char *Key(int key, int down) override;
 	void CalcFov();
 
 	HIMAGE hPlayerImage;

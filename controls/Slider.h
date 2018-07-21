@@ -27,11 +27,11 @@ public:
 	typedef CMenuEditable BaseClass;
 
 	CMenuSlider();
-	virtual void VidInit( void );
-	virtual const char * Key( int key, int down );
-	virtual void Draw( void );
-	virtual void UpdateEditable();
-	void LinkCvar(const char *name)
+	void VidInit( void ) override;
+	const char * Key( int key, int down ) override;
+	void Draw( void ) override;
+	void UpdateEditable() override;
+	void LinkCvar(const char *name) override
 	{
 		CMenuEditable::LinkCvar(name, CVAR_VALUE);
 	}

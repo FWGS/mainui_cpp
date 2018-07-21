@@ -23,7 +23,7 @@ CMenuEditable::CMenuEditable() : BaseClass(),
 
 }
 
-void CMenuEditable::LinkCvar(const char *name)
+void CMenuEditable::LinkCvar(const char *)
 {
 	assert(("Derivative class does not implement LinkCvar(const char*) method. You need to specify types."));
 }

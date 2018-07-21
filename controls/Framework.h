@@ -30,13 +30,13 @@ public:
 	typedef CMenuBaseWindow BaseClass;
 
 	CMenuFramework( const char *name = "Unnamed Framework" );
-	virtual ~CMenuFramework();
+	virtual ~CMenuFramework() override;
 
-	void Show();
-	void Init() FINAL;
-	void VidInit() FINAL;
-	void Hide();
-	bool IsRoot() { return true; }
+	void Show() override;
+	void Init() final override;
+	void VidInit() final override;
+	void Hide() override;
+	bool IsRoot() override { return true; }
 
 	CMenuPicButton *AddButton( const char *szName, const char *szStatus,
 		EDefaultBtns iButton, CEventCallback onActivated = CEventCallback(), int iFlags = 0 );
@@ -44,7 +44,7 @@ public:
 	CMenuPicButton *AddButton( const char *szName, const char *szStatus,
 		const char *szButtonPath, CEventCallback onActivated = CEventCallback(), int iFlags = 0 );
 
-	bool DrawAnimation(EAnimation anim);
+	bool DrawAnimation(EAnimation anim) override;
 
 	CMenuBannerBitmap banner;
 

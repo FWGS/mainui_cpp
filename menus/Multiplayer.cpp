@@ -34,7 +34,7 @@ public:
 	void AskPredictEnable() { msgBox.Show(); }
 
 private:
-	virtual void _Init();
+	void _Init() override;
 
 	// prompt dialog
 	CMenuYesNoMessageBox msgBox;

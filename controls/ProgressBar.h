@@ -23,7 +23,7 @@ public:
 	typedef CMenuBaseItem BaseClass;
 
     CMenuProgressBar();
-	void Draw( void );
+	void Draw( void ) override;
 	void LinkCvar( const char *cvName, float flMin, float flMax );
 	void SetValue( float flValue );
 

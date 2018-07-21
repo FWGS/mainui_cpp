@@ -39,20 +39,13 @@ GNU General Public License for more details.
 #include <math.h>
 #include <ctype.h>
 
-// C++11 stuff
-#ifndef MY_COMPILER_SUCKS
-
-#define FINAL final
-#define CONSTEXPR constexpr
-
-// Not needed anymore
-// #include <functional>
-#else
-
-#define FINAL
-#define CONSTEXPR
-
+#ifdef MY_COMPILER_SUCKS
+// C++11 keywords
+#define final
+#define constexpr
+#define override
 #endif
+
 #ifdef bound
 #undef bound
 #endif

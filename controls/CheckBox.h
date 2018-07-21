@@ -32,11 +32,11 @@ public:
 	typedef CMenuEditable BaseClass;
 
 	CMenuCheckBox();
-	virtual void VidInit();
-	virtual const char * Key( int key, int down );
-	virtual void Draw( void );
-	virtual void UpdateEditable();
-	void LinkCvar( const char *name )
+	void VidInit() override;
+	const char * Key( int key, int down ) override;
+	void Draw( void ) override;
+	void UpdateEditable() override;
+	void LinkCvar( const char *name ) override
 	{
 		CMenuEditable::LinkCvar( name, CMenuEditable::CVAR_VALUE );
 	}

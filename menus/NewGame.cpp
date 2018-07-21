@@ -33,7 +33,7 @@ public:
 	CMenuNewGame() : CMenuFramework( "CMenuNewGame" ) { }
 	static void StartGameCb( float skill );
 private:
-	virtual void _Init();
+	void _Init() override;
 
 	static void ShowDialogCb( CMenuBaseItem *pSelf, void *pExtra  );
 

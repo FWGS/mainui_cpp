@@ -44,11 +44,11 @@ public:
 		int blur, float brighten,
 		int outlineSize,
 		int scanlineOffset, float scanlineScale,
-		int flags );
-	void GetCharRGBA( int ch, Point pt, Size sz, unsigned char *rgba, Size &drawSize );
-	bool IsValid( ) const;
-	void GetCharABCWidths( int ch, int &a, int &b, int &c );
-	bool HasChar( int ch ) const;
+		int flags ) override;
+	void GetCharRGBA( int ch, Point pt, Size sz, unsigned char *rgba, Size &drawSize ) override;
+	bool IsValid( ) const override;
+	void GetCharABCWidths( int ch, int &a, int &b, int &c ) override;
+	bool HasChar( int ch ) const override;
 
 	bool m_bFound;
 

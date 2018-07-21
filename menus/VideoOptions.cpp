@@ -30,12 +30,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 class CMenuVidOptions : public CMenuFramework
 {
 private:
-	void _Init();
-	void _VidInit();
+	void _Init() override;
+	void _VidInit() override;
 
 public:
 	CMenuVidOptions() : CMenuFramework( "CMenuVidOptions" ) { }
-	void SaveAndPopMenu();
+	void SaveAndPopMenu() override;
 	void GammaUpdate();
 	void GammaGet();
 
@@ -43,7 +43,7 @@ public:
 
 	class CMenuVidPreview : public CMenuBitmap
 	{
-		virtual void Draw();
+		void Draw() override;
 	} testImage;
 
 	CMenuPicButton	done;

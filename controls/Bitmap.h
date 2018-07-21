@@ -27,9 +27,9 @@ public:
 
 	CMenuBitmap();
 
-	virtual void VidInit( void );
-	virtual const char * Key( int key, int down );
-	virtual void Draw( void );
+	void VidInit( void ) override;
+	const char * Key( int key, int down ) override;
+	void Draw( void ) override;
 	void SetPicture( const char *pic, const char *focusPic = NULL, const char *pressPic = NULL)
 	{
 		szPic = pic;
@@ -60,10 +60,10 @@ public:
 		SetRect( UI_BANNER_POSX, UI_BANNER_POSY, UI_BANNER_WIDTH, UI_BANNER_HEIGHT );
 		bDrawAdditive = true;
 	}
-	void Draw( void );
-	void VidInit( void );
-	void SetInactive(bool) { }
-	void ToggleInactive() { }
+	void Draw( void ) override;
+	void VidInit( void ) override;
+	void SetInactive(bool) override { }
+	void ToggleInactive() override { }
 };
 
 
