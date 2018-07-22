@@ -183,13 +183,27 @@ bool UI_CursorInRect( int x, int y, int w, int h );
 void UI_EnableAlphaFactor( float a );
 void UI_DisableAlphaFactor();
 
+enum ETextFlags
+{
+	ETF_FORCECOL    = BIT( 0 ),
+	ETF_SHADOW      = BIT( 1 ),
+	ETF_NOSIZELIMIT = BIT( 2 ),
+	ETF_ADDITIVE    = BIT( 3 )
+};
+
+int  UI_DrawString( HFont font, int x, int y, int w, int h, const char *str, const unsigned int col, int charH, ETextAlignment justify, uint flags = 0 );
+inline int UI_DrawString( HFont font, Point pos, Size size, const char *str, const unsigned int col, int charH, ETextAlignment justify, uint flags = 0 )
+{
+	return UI_DrawString( font, pos.x, pos.y, size.w, size.h, str, col, charH, justify, flags );
+}
+
 void UI_DrawPic( int x, int y, int w, int h, const unsigned int color, const char *pic );
 void UI_DrawPicAdditive( int x, int y, int w, int h, const unsigned int color, const char *pic );
 void UI_DrawPicTrans( int x, int y, int width, int height, const unsigned int color, const char *pic );
 void UI_DrawPicHoles( int x, int y, int width, int height, const unsigned int color, const char *pic );
 void UI_FillRect( int x, int y, int w, int h, const unsigned int color );
 void UI_DrawRectangleExt(int in_x, int in_y, int in_w, int in_h, const unsigned int color, int outlineWidth, int flag  = QM_TOP | QM_BOTTOM | QM_LEFT | QM_RIGHT);
-int  UI_DrawString( HFont font, int x, int y, int w, int h, const char *str, const unsigned int col, bool forceCol, int charH, ETextAlignment justify, bool shadow, bool limitBySize = true );
+
 inline void UI_DrawRectangle( int x, int y, int w, int h, const unsigned int color, int flag  = QM_TOP | QM_BOTTOM | QM_LEFT | QM_RIGHT)
 {
 	UI_DrawRectangleExt( x, y, w, h, color, uiStatic.outlineWidth, flag );
@@ -226,10 +240,6 @@ inline void UI_DrawRectangle( Point pos, Size size, const unsigned int color, in
 inline void UI_DrawRectangleExt( Point pos, Size size, const unsigned int color, int outlineWidth, int flag  = QM_TOP | QM_BOTTOM | QM_LEFT | QM_RIGHT )
 {
 	UI_DrawRectangleExt( pos.x, pos.y, size.w, size.h, color, outlineWidth, flag );
-}
-inline int UI_DrawString( HFont font, Point pos, Size size, const char *str, const unsigned int col, bool forceCol, Size chSize, ETextAlignment justify, bool shadow, bool limitBySize = true  )
-{
-	return UI_DrawString( font, pos.x, pos.y, size.w, size.h, str, col, forceCol, chSize.h, justify, shadow, limitBySize );
 }
 
 void UI_StartSound( const char *sound );

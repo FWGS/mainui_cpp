@@ -119,7 +119,7 @@ void CMenuPlayerSetup::CMenuLogoPreview::Draw()
 		// draw the background
 		UI_FillRect( m_scPos, m_scSize, uiPromptBgColor );
 
-		UI_DrawString( font, m_scPos, m_scSize, "No logo", iColor, 0, m_scChSize, QM_CENTER, true );
+		UI_DrawString( font, m_scPos, m_scSize, "No logo", iColor, m_scChSize, QM_CENTER, ETF_SHADOW );
 	}
 	else
 	{

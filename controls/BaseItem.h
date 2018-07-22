@@ -134,7 +134,6 @@ public:
 	inline void SetCoord( int x, int y )                { pos.x = x; pos.y = y; }
 	inline void SetSize( int w, int h )                 { size.w = w; size.h = h; }
 	inline void SetRect( int x, int y, int w, int h )   { SetCoord( x, y ); SetSize( w, h ); }
-	// inline void SetCharSize( int w, int h )             { charSize.w = w; charSize.h = h; }
 	inline Point GetRenderPosition() const { return m_scPos; }
 	inline Size  GetRenderSize()     const { return m_scSize; }
 
@@ -144,7 +143,7 @@ public:
 	{
 		szName = name;
 		szStatusText = status;
-		if( tag ) szTag = tag;
+		szTag = tag;
 	}
 
 	CMenuItemsHolder* Parent() const			{ return m_pParent; }
@@ -156,7 +155,7 @@ public:
 
 	Point pos;
 	Size size;
-	Size charSize;
+	int charSize;
 
 	const char *szName;
 	const char *szStatusText;
@@ -189,7 +188,7 @@ protected:
 
 	Point m_scPos;
 	Size m_scSize;
-	Size m_scChSize;
+	int m_scChSize;
 };
 
 #include "ItemsHolder.h"

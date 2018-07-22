@@ -44,7 +44,7 @@ void CMenuTable::VidInit()
 {
 	BaseClass::VidInit();
 
-	iNumRows = ( m_scSize.h - UI_OUTLINE_WIDTH * 2 ) / m_scChSize.h - 1;
+	iNumRows = ( m_scSize.h - UI_OUTLINE_WIDTH * 2 ) / m_scChSize - 1;
 
 	if( !iCurItem )
 	{
@@ -79,12 +79,12 @@ void CMenuTable::VidInit()
 	flFixedSumm *= uiStatic.scaleX;
 
 	// at first, determine header height
-	headerSize.h = m_scChSize.h * HEADER_HEIGHT_FRAC;
+	headerSize.h = m_scChSize * HEADER_HEIGHT_FRAC;
 
 	// then determine arrow position and sizes
 	arrow.w = arrow.h = 24;
 	arrow = arrow.Scale();
-	downArrow.x = upArrow.x = m_scPos.x + m_scSize.w - arrow.w;
+	downArrow.x = upArrow.x = m_scPos.x + m_scSize.w - arrow.w + UI_OUTLINE_WIDTH * 1;
 	upArrow.y = m_scPos.y - UI_OUTLINE_WIDTH;
 	downArrow.y = upArrow.y + m_scSize.h - arrow.h + UI_OUTLINE_WIDTH * 2;
 	if( !bFramedHintText )
@@ -93,7 +93,7 @@ void CMenuTable::VidInit()
 	}
 
 	// calculate header size(position is table position)
-	headerSize.w = m_scSize.w - arrow.w;
+	headerSize.w = m_scSize.w - arrow.w + UI_OUTLINE_WIDTH;
 
 	// box is lower than header
 	boxPos.x = m_scPos.x;
@@ -199,11 +199,11 @@ const char *CMenuTable::Key( int key, int down )
 		{
 			// test for item select
 			int starty = boxPos.y + UI_OUTLINE_WIDTH;
-			int endy = starty + iNumRows * m_scChSize.h;
+			int endy = starty + iNumRows * m_scChSize;
 			if( uiStatic.cursorY > starty && uiStatic.cursorY < endy )
 			{
 				int offsety = uiStatic.cursorY - starty;
-				int newCur = iTopItem + offsety / m_scChSize.h;
+				int newCur = iTopItem + offsety / m_scChSize;
 
 				if( newCur < m_pModel->GetRows() )
 				{
@@ -343,11 +343,14 @@ const char *CMenuTable::Key( int key, int down )
 	return sound;
 }
 
-void CMenuTable::DrawLine( Point p, const char **psz, size_t size, int textColor, bool forceCol, int fillColor )
+void CMenuTable::DrawLine( Point p, const char **psz, size_t size, uint textColor, bool forceCol, int fillColor )
 {
 	size_t i;
 	Size sz;
-	bool shadow = iFlags & QMF_DROPSHADOW;
+	uint textflags = 0;
+
+	textflags |= iFlags & QMF_DROPSHADOW ? ETF_SHADOW : 0;
+	textflags |= forceCol ? ETF_FORCECOL : 0;
 
 	sz.h = headerSize.h;
 
@@ -393,18 +396,21 @@ void CMenuTable::DrawLine( Point p, const char **psz, size_t size, int textColor
 			}
 		}
 
-		UI_DrawString( font, pt, sz, psz[i], textColor, forceCol, m_scChSize,
-			m_pModel->GetAlignmentForColumn( i ), shadow, false );
+		UI_DrawString( font, pt, sz, psz[i], textColor, m_scChSize,
+			m_pModel->GetAlignmentForColumn( i ), textflags );
 	}
 }
 
-void CMenuTable::DrawLine( Point p, int line, int textColor, bool forceCol, int fillColor )
+void CMenuTable::DrawLine( Point p, int line, uint textColor, bool forceCol, int fillColor )
 {
 	int i;
 	Size sz;
-	bool shadow = iFlags & QMF_DROPSHADOW;
+	uint textflags = 0;
 
-	sz.h = m_scChSize.h;
+	textflags |= iFlags & QMF_DROPSHADOW ? ETF_SHADOW : 0;
+	textflags |= forceCol ? ETF_FORCECOL : 0;
+
+	sz.h = m_scChSize;
 
 	if( fillColor )
 	{
@@ -428,8 +434,8 @@ void CMenuTable::DrawLine( Point p, int line, int textColor, bool forceCol, int 
 		switch( type )
 		{
 		case CELL_TEXT:
-			UI_DrawString( font, p, sz, str, textColor, forceCol, m_scChSize, m_pModel->GetAlignmentForColumn( i ), shadow,
-				m_pModel->IsCellTextWrapped( line, i ) );
+			UI_DrawString( font, p, sz, str, textColor, m_scChSize, m_pModel->GetAlignmentForColumn( i ),
+				textflags | ( m_pModel->IsCellTextWrapped( line, i ) ? 0 : ETF_NOSIZELIMIT ) );
 			break;
 		case CELL_IMAGE_ADDITIVE:
 		case CELL_IMAGE_DEFAULT:
@@ -443,7 +449,7 @@ void CMenuTable::DrawLine( Point p, int line, int textColor, bool forceCol, int 
 
 			Point picPos = p;
 			Size picSize = EngFuncs::PIC_Size( pic );
-			float scale = (float)m_scChSize.h/(float)picSize.h;
+			float scale = (float)m_scChSize/(float)picSize.h;
 
 			picSize = picSize * scale;
 
@@ -486,13 +492,13 @@ void CMenuTable::Draw()
 	int upFocus, downFocus, scrollbarFocus;
 
 	// HACKHACK: recalc iNumRows, to be not greater than iNumItems
-	iNumRows = ( m_scSize.h - UI_OUTLINE_WIDTH * 2 ) / m_scChSize.h - 1;
+	iNumRows = ( m_scSize.h - UI_OUTLINE_WIDTH * 2 ) / m_scChSize - 1;
 	if( iNumRows > m_pModel->GetRows() )
 		iNumRows = m_pModel->GetRows();
 
 	if( UI_CursorInRect( boxPos, boxSize ) )
 	{
-		int newCur = iTopItem + ( uiStatic.cursorY - boxPos.y ) / m_scChSize.h;
+		int newCur = iTopItem + ( uiStatic.cursorY - boxPos.y ) / m_scChSize;
 
 		if( newCur < m_pModel->GetRows() )
 			iHighlight = newCur;
@@ -543,15 +549,15 @@ void CMenuTable::Draw()
 	sbarPos.x = upArrow.x + arrow.w * 0.125f;
 	sbarSize.w = arrow.w * 0.75f;
 
-	if(((downArrow.y - upArrow.y - arrow.h) - (((m_pModel->GetRows()-1)*m_scChSize.h)/2)) < 2)
+	if(((downArrow.y - upArrow.y - arrow.h) - (((m_pModel->GetRows()-1)*m_scChSize)/2)) < 2)
 	{
 		sbarSize.h = (downArrow.y - upArrow.y - arrow.h) - (step * (m_pModel->GetRows() - iNumRows));
 		sbarPos.y = upArrow.y + arrow.h + (step*iTopItem);
 	}
 	else
 	{
-		sbarSize.h = downArrow.y - upArrow.y - arrow.h - (((m_pModel->GetRows()- iNumRows) * m_scChSize.h) / 2);
-		sbarPos.y = upArrow.y + arrow.h + (((iTopItem) * m_scChSize.h)/2);
+		sbarSize.h = downArrow.y - upArrow.y - arrow.h - (((m_pModel->GetRows()- iNumRows) * m_scChSize) / 2);
+		sbarPos.y = upArrow.y + arrow.h + (((iTopItem) * m_scChSize)/2);
 	}
 
 	if( g_bCursorDown && !iScrollBarSliding && ( iFlags & QMF_HASMOUSEFOCUS ) )
@@ -561,16 +567,16 @@ void CMenuTable::Draw()
 			static float ac_y = 0;
 			ac_y += cursorDY;
 			cursorDY = 0;
-			if( ac_y > m_scChSize.h / 2.0f )
+			if( ac_y > m_scChSize / 2.0f )
 			{
-				iTopItem -= ac_y/ m_scChSize.h - 0.5;
+				iTopItem -= ac_y/ m_scChSize - 0.5;
 				if( iTopItem < 0 )
 					iTopItem = 0;
 				ac_y = 0;
 			}
-			if( ac_y < -m_scChSize.h / 2.0f )
+			if( ac_y < -m_scChSize / 2.0f )
 			{
-				iTopItem -= ac_y/ m_scChSize.h - 0.5 ;
+				iTopItem -= ac_y/ m_scChSize - 0.5 ;
 				if( iTopItem > m_pModel->GetRows() - iNumRows )
 					iTopItem = m_pModel->GetRows() - iNumRows;
 				ac_y = 0;
@@ -608,16 +614,16 @@ void CMenuTable::Draw()
 	{
 		int dist = uiStatic.cursorY - sbarPos.y - (sbarSize.h>>1);
 
-		if((((dist / 2) > (m_scChSize.h / 2)) || ((dist / 2) < (m_scChSize.h / 2))) && iTopItem <= (m_pModel->GetRows() - iNumRows ) && iTopItem >= 0)
+		if((((dist / 2) > (m_scChSize / 2)) || ((dist / 2) < (m_scChSize / 2))) && iTopItem <= (m_pModel->GetRows() - iNumRows ) && iTopItem >= 0)
 		{
 			//_Event( QM_CHANGED );
 
-			if((dist / 2) > ( m_scChSize.h / 2 ) && iTopItem < ( m_pModel->GetRows() - iNumRows - 1 ))
+			if((dist / 2) > ( m_scChSize / 2 ) && iTopItem < ( m_pModel->GetRows() - iNumRows - 1 ))
 			{
 				iTopItem++;
 			}
 
-			if((dist / 2) < -(m_scChSize.h / 2) && iTopItem > 0 )
+			if((dist / 2) < -(m_scChSize / 2) && iTopItem > 0 )
 			{
 				iTopItem--;
 			}
@@ -685,7 +691,7 @@ void CMenuTable::Draw()
 	UI::Scissor::PushScissor( boxPos, boxSize );
 	y = boxPos.y;
 
-	for( i = iTopItem; i < m_pModel->GetRows() && i < iNumRows + iTopItem; i++, y += m_scChSize.h )
+	for( i = iTopItem; i < m_pModel->GetRows() && i < iNumRows + iTopItem; i++, y += m_scChSize )
 	{
 		int color = iColor; // predict state
 		bool forceCol = false;

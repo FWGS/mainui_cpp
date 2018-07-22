@@ -131,8 +131,8 @@ public:
 	bool bAllowSorting;
 
 private:
-	void DrawLine(Point p, const char **psz, size_t size, int textColor, bool forceCol, int fillColor = 0);
-	void DrawLine(Point p, int line, int textColor, bool forceCol, int fillColor = 0);
+	void DrawLine(Point p, const char **psz, size_t size, uint textColor, bool forceCol, int fillColor = 0);
+	void DrawLine(Point p, int line, uint textColor, bool forceCol, int fillColor = 0);
 
 	const char	*szHeaderTexts[MAX_TABLE_COLUMNS];
 	struct

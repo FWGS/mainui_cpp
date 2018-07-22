@@ -63,7 +63,7 @@ void CMenuSwitch::VidInit()
 	for( int i = 0; i < m_iSwitches; i++ )
 	{
 		if( m_szNames[i] != NULL && !bKeepToggleWidth )
-			sizes[i] = g_FontMgr.GetTextWideScaled( font, m_szNames[i], m_scChSize.h );
+			sizes[i] = g_FontMgr.GetTextWideScaled( font, m_szNames[i], m_scChSize );
 		else sizes[i] = (float)m_scSize.w / (float)m_iSwitches;
 
 		sum += sizes[i];
@@ -85,8 +85,8 @@ void CMenuSwitch::VidInit()
 	m_scTextPos.x = m_scPos.x + (m_scSize.w * 1.5f );
 	m_scTextPos.y = m_scPos.y;
 
-	m_scTextSize.w = g_FontMgr.GetTextWideScaled( font, szName, m_scChSize.h );
-	m_scTextSize.h = m_scChSize.h;
+	m_scTextSize.w = g_FontMgr.GetTextWideScaled( font, szName, m_scChSize );
+	m_scTextSize.h = m_scChSize;
 }
 
 const char * CMenuSwitch::Key(int key, int down)
@@ -163,10 +163,10 @@ const char * CMenuSwitch::Key(int key, int down)
 
 void CMenuSwitch::Draw( void )
 {
-	bool shadow = (iFlags & QMF_DROPSHADOW);
+	uint textflags = (iFlags & QMF_DROPSHADOW) ? ETF_SHADOW : 0;
 
-	int selectColor = iSelectColor;
-	UI_DrawString( font, m_scTextPos, m_scTextSize, szName, uiColorHelp, true, m_scChSize, eTextAlignment, shadow );
+	uint selectColor = iSelectColor;
+	UI_DrawString( font, m_scTextPos, m_scTextSize, szName, uiColorHelp, m_scChSize, eTextAlignment, textflags | ETF_FORCECOL );
 
 	if( szStatusText && iFlags & QMF_NOTIFY )
 	{
@@ -204,24 +204,27 @@ void CMenuSwitch::Draw( void )
 		// draw toggle rectangles
 		if( m_iState == i )
 		{
+			uint tempflags = textflags;
+			tempflags |= ETF_FORCECOL;
+
 			UI_FillRect( m_Points[i], m_Sizes[i], selectColor );
-			UI_DrawString( font, pt, m_Sizes[i], m_szNames[i], iFgTextColor, 1, m_scChSize, eTextAlignment, shadow);
+			UI_DrawString( font, pt, m_Sizes[i], m_szNames[i], iFgTextColor, m_scChSize, eTextAlignment, tempflags);
 		}
 		else
 		{
-			int bgColor = iBackgroundColor;
-			int textColor = iBgTextColor;
-			bool haveFocus = false;
+			uint bgColor = iBackgroundColor;
+			uint textColor = iBgTextColor;
+			uint tempflags = textflags;
 
 			if( UI_CursorInRect( m_Points[i], m_Sizes[i] ) && !(iFlags & (QMF_GRAYED|QMF_INACTIVE)))
 			{
 				bgColor = iFocusColor;
-				haveFocus = true;
+				tempflags |= ETF_FORCECOL;
 			}
 
 			UI_FillRect( m_Points[i], m_Sizes[i], bgColor );
 			UI_DrawString( font, pt, m_Sizes[i], m_szNames[i],
-				textColor, haveFocus, m_scChSize, eTextAlignment, shadow );
+				textColor, m_scChSize, eTextAlignment, tempflags );
 		}
 	}
 

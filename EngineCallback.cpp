@@ -58,15 +58,14 @@ int EngFuncs::DrawConsoleString(int x, int y, const char *string)
 {
 	Point pt( x, y );
 	Size sz;
-	Size charSz;
+	int charSz;
 
 	sz.w = ScreenWidth - pt.x;
 	sz.h = ScreenHeight - pt.y;
 
-	charSz.w = 0;
-	charSz.h = g_FontMgr.GetFontTall( uiStatic.hConsoleFont );
+	charSz = g_FontMgr.GetFontTall( uiStatic.hConsoleFont );
 
-	return UI_DrawString( uiStatic.hConsoleFont, pt, sz, string, color, false, charSz, QM_TOPLEFT, false );
+	return UI_DrawString( uiStatic.hConsoleFont, pt, sz, string, color, charSz, QM_TOPLEFT );
 }
 
 void EngFuncs::ConsoleStringLen(const char *string, int *length, int *height)

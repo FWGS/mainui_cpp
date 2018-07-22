@@ -56,7 +56,7 @@ void CMenuField::VidInit( void )
 	BaseClass::VidInit();
 
 	// calculate number of visible characters
-	iWidthInChars = (size.w / charSize.w);
+	iWidthInChars = (size.w / (charSize * 0.5f));
 
 	iCursor = strlen( szBuffer );
 }
@@ -226,7 +226,7 @@ const char *CMenuField::Key( int key, int down )
 			int w = 0;
 
 			if( !(eTextAlignment & QM_LEFT))
-				w = g_FontMgr.GetTextWideScaled( font, text, m_scChSize.h );
+				w = g_FontMgr.GetTextWideScaled( font, text, m_scChSize );
 
 			if( eTextAlignment & QM_LEFT )
 			{
@@ -240,7 +240,7 @@ const char *CMenuField::Key( int key, int down )
 			{
 				x = m_scPos.x + (m_scSize.w - w) / 2;
 			}
-			charpos = g_FontMgr.CutText(font, szBuffer + iScroll, m_scChSize.h, uiStatic.cursorX - x, w);
+			charpos = g_FontMgr.CutText(font, szBuffer + iScroll, m_scChSize, uiStatic.cursorX - x, w);
 
 			//text[charpos] = 0;
 			iCursor = charpos + iScroll;
@@ -359,14 +359,12 @@ CMenuField::Draw
 */
 void CMenuField::Draw( void )
 {
-	bool	shadow;
 	char	text[UI_MAX_FIELD_LINE];
 	int	len, drawLen, prestep;
 	int	cursor, x, textHeight;
 	char	cursor_char[3];
 	float y = m_scPos.y;
-	const bool limitBySize = false; // Field have own control about size limit
-
+	uint textflags = ( iFlags & QMF_DROPSHADOW ) ? ETF_SHADOW : 0;
 	Point newPos = m_scPos;
 
 	if( szStatusText && iFlags & QMF_NOTIFY )
@@ -389,8 +387,6 @@ void CMenuField::Draw( void )
 		else
 			return;
 	}
-
-	shadow = (iFlags & QMF_DROPSHADOW);
 
 	cursor_char[1] = '\0';
 	if( EngFuncs::KEY_GetOverstrike( ))
@@ -463,18 +459,18 @@ void CMenuField::Draw( void )
 		UI_DrawRectangle( newPos, m_scSize, uiInputFgColor );
 	}
 
-	textHeight = y - (m_scChSize.h * 1.5f);
-	UI_DrawString( font, m_scPos.x, textHeight, m_scSize.w, m_scChSize.h, szName, uiColorHelp, true, m_scChSize.h, QM_LEFT, shadow, limitBySize );
+	textHeight = y - (m_scChSize * 1.5f);
+	UI_DrawString( font, m_scPos.x, textHeight, m_scSize.w, m_scChSize, szName, uiColorHelp, m_scChSize, QM_LEFT, textflags | ETF_FORCECOL );
 
 	if( iFlags & QMF_GRAYED )
 	{
-		UI_DrawString( font, newPos, m_scSize, text, uiColorDkGrey, true, m_scChSize, eTextAlignment, shadow, limitBySize );
+		UI_DrawString( font, newPos, m_scSize, text, uiColorDkGrey, m_scChSize, eTextAlignment, textflags | ETF_FORCECOL );
 		return; // grayed
 	}
 
 	if(this != m_pParent->ItemAtCursor())
 	{
-		UI_DrawString( font, newPos, m_scSize, text, iColor, false, m_scChSize, eTextAlignment, shadow, limitBySize );
+		UI_DrawString( font, newPos, m_scSize, text, iColor, m_scChSize, eTextAlignment, textflags );
 		return; // no focus
 	}
 
@@ -484,40 +480,42 @@ void CMenuField::Draw( void )
 	}
 	else if( eTextAlignment & QM_RIGHT )
 	{
-		x = newPos.x + (m_scSize.w - g_FontMgr.GetTextWideScaled( font, text, m_scChSize.h ) );
+		x = newPos.x + (m_scSize.w - g_FontMgr.GetTextWideScaled( font, text, m_scChSize ) );
 	}
 	else
 	{
-		x = newPos.x + (m_scSize.w - g_FontMgr.GetTextWideScaled( font, text, m_scChSize.h )) / 2;
+		x = newPos.x + (m_scSize.w - g_FontMgr.GetTextWideScaled( font, text, m_scChSize )) / 2;
 	}
 
-	UI_DrawString( font, newPos, m_scSize, text, iColor, false, m_scChSize, eTextAlignment, shadow, limitBySize );
+	UI_DrawString( font, newPos, m_scSize, text, iColor, m_scChSize, eTextAlignment, textflags );
 
-	int cursorOffset = cursor? g_FontMgr.GetTextWideScaled( font, text, m_scChSize.h, cursor ):0;
+	int cursorOffset = cursor? g_FontMgr.GetTextWideScaled( font, text, m_scChSize, cursor ):0;
 
 	// int cursorOffset = 0;
 
+	int cursor_char_width = g_FontMgr.GetTextWideScaled( font, cursor_char, m_scChSize );
+
 	if(( uiStatic.realTime & 499 ) < 250 )
-		UI_DrawString( font, x + cursorOffset, y, m_scChSize.w, m_scSize.h, cursor_char, iColor, true, m_scChSize.h, QM_LEFT, shadow, limitBySize );
+		UI_DrawString( font, x + cursorOffset, y, cursor_char_width, m_scSize.h, cursor_char, iColor, m_scChSize, QM_LEFT, textflags | ETF_FORCECOL );
 
 
 	switch( eFocusAnimation )
 	{
 	case QM_HIGHLIGHTIFFOCUS:
-		UI_DrawString( font, newPos, m_scSize, text, iFocusColor, false, m_scChSize, eTextAlignment, shadow, limitBySize );
+		UI_DrawString( font, newPos, m_scSize, text, iFocusColor, m_scChSize, eTextAlignment, textflags );
 
 		if(( uiStatic.realTime & 499 ) < 250 )
-			UI_DrawString( font, x + cursorOffset, y, m_scChSize.w, m_scSize.h, cursor_char, iFocusColor, true, m_scChSize.h, QM_LEFT, shadow, limitBySize );
+			UI_DrawString( font, x + cursorOffset, y, cursor_char_width, m_scSize.h, cursor_char, iFocusColor, m_scChSize, QM_LEFT, textflags | ETF_FORCECOL );
 		break;
 	case QM_PULSEIFFOCUS:
 	{
-		int	color;
+		uint	color;
 
 		color = PackAlpha( iColor, 255 * (0.5 + 0.5 * sin( (float)uiStatic.realTime / UI_PULSE_DIVISOR )));
-		UI_DrawString( font, newPos, m_scSize, text, color, false, m_scChSize, eTextAlignment, shadow, limitBySize );
+		UI_DrawString( font, newPos, m_scSize, text, color, m_scChSize, eTextAlignment, textflags );
 
 		if(( uiStatic.realTime & 499 ) < 250 )
-			UI_DrawString( font, x + cursorOffset, y, m_scChSize.w, m_scSize.h, cursor_char, color, true, m_scChSize.h, QM_LEFT, shadow, limitBySize );
+			UI_DrawString( font, x + cursorOffset, y, cursor_char_width, m_scSize.h, cursor_char, color, m_scChSize, QM_LEFT, textflags | ETF_FORCECOL );
 
 		break;
 	}

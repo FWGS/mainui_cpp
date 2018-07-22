@@ -106,9 +106,9 @@ void CMenuCredits::Draw( void )
 			if( !uiCredits.fadeTime ) uiCredits.fadeTime = (gpGlobals->time * 1000);
 			color = UI_FadeAlpha( uiCredits.fadeTime, uiCredits.showTime );
 			if( UnpackAlpha( color ))
-				UI_DrawString( uiStatic.hDefaultFont, 0, ( ScreenHeight - h ) / 2, ScreenWidth, h, uiCredits.credits[i], color, true, h, QM_CENTER, true );
+				UI_DrawString( uiStatic.hDefaultFont, 0, ( ScreenHeight - h ) / 2, ScreenWidth, h, uiCredits.credits[i], color, h, QM_CENTER, ETF_SHADOW | ETF_FORCECOL );
 		}
-		else UI_DrawString( uiStatic.hDefaultFont, 0, y, ScreenWidth, h, uiCredits.credits[i], uiColorWhite, false, h, QM_CENTER, true );
+		else UI_DrawString( uiStatic.hDefaultFont, 0, y, ScreenWidth, h, uiCredits.credits[i], uiColorWhite, h, QM_CENTER, ETF_SHADOW );
 	}
 
 	if( y < 0 && UnpackAlpha( color ) == 0 )

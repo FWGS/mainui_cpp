@@ -46,10 +46,10 @@ void CMenuAction::VidInit( )
 		else
 		{
 			if( size.w < 1 )
-				size.w = g_FontMgr.GetTextWideScaled( font, szName, charSize.h ) / uiStatic.scaleX;
+				size.w = g_FontMgr.GetTextWideScaled( font, szName, charSize ) / uiStatic.scaleX;
 
 			if( size.h < 1 )
-				size.h = charSize.h * 1.5;
+				size.h = charSize * 1.5;
 		}
 
 		m_bLimitBySize = false;
@@ -119,7 +119,7 @@ CMenuAction::Draw
 */
 void CMenuAction::Draw( )
 {
-	bool	shadow = (iFlags & QMF_DROPSHADOW);
+	uint textflags = ( iFlags & QMF_DROPSHADOW ? ETF_SHADOW : 0 ) | ( m_bLimitBySize ? 0 : ETF_NOSIZELIMIT );
 
 	if( m_szBackground )
 		UI_DrawPic( m_scPos, m_scSize, m_iBackcolor, m_szBackground );
@@ -142,19 +142,19 @@ void CMenuAction::Draw( )
 
 	if( iFlags & QMF_GRAYED )
 	{
-		UI_DrawString( font, m_scPos, m_scSize, szName, uiColorDkGrey, true, m_scChSize, eTextAlignment, shadow, m_bLimitBySize );
+		UI_DrawString( font, m_scPos, m_scSize, szName, uiColorDkGrey, m_scChSize, eTextAlignment, textflags | ETF_FORCECOL );
 		return; // grayed
 	}
 
 	if( this != m_pParent->ItemAtCursor() )
 	{
-		UI_DrawString( font, m_scPos, m_scSize, szName, iColor, false, m_scChSize, eTextAlignment, shadow, m_bLimitBySize );
+		UI_DrawString( font, m_scPos, m_scSize, szName, iColor, m_scChSize, eTextAlignment, textflags );
 		return; // no focus
 	}
 
 	if( eFocusAnimation == QM_HIGHLIGHTIFFOCUS )
 	{
-		UI_DrawString( font, m_scPos, m_scSize, szName, iFocusColor, false, m_scChSize, eTextAlignment, shadow, m_bLimitBySize );
+		UI_DrawString( font, m_scPos, m_scSize, szName, iFocusColor, m_scChSize, eTextAlignment, textflags );
 	}
 	else if( eFocusAnimation == QM_PULSEIFFOCUS )
 	{
@@ -162,7 +162,7 @@ void CMenuAction::Draw( )
 
 		color = PackAlpha( iColor, 255 * (0.5 + 0.5 * sin( (float)uiStatic.realTime / UI_PULSE_DIVISOR )));
 
-		UI_DrawString( font, m_scPos, m_scSize, szName, color, false, m_scChSize, eTextAlignment, shadow, m_bLimitBySize );
+		UI_DrawString( font, m_scPos, m_scSize, szName, color, m_scChSize, eTextAlignment, textflags );
 	}
 }
 

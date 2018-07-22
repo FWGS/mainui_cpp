@@ -319,17 +319,17 @@ UI_DrawString
 =================
 */
 int UI_DrawString( HFont font, int x, int y, int w, int h,
-		const char *string, const unsigned int color, bool forceColor,
-		int charH, ETextAlignment justify, bool shadow, bool limitBySize )
+		const char *string, const unsigned int color,
+		int charH, ETextAlignment justify, uint flags )
 {
-	int	modulate, shadowModulate;
+	uint	modulate, shadowModulate = 0;
 	int	xx = 0, yy, ofsX = 0, ofsY = 0, ch;
 	int maxX = x;
 
 	if( !string || !string[0] )
 		return x;
 
-	if( shadow )
+	if( flags & ETF_SHADOW )
 	{
 		shadowModulate = PackAlpha( uiColorBlack, UnpackAlpha( color ));
 
@@ -415,9 +415,9 @@ int UI_DrawString( HFont font, int x, int y, int w, int h,
 
 				charWide = g_FontMgr.GetCharacterWidthScaled( font, uch, charH );
 
-				if( limitBySize && pixelWide + charWide >= w )
+				if( !(flags & ETF_NOSIZELIMIT) && pixelWide + charWide > w )
 				{
-					// does we have free space for new line?
+					// do we have free space for new line?
 					if( yy < (yy + h) - charH )
 					{
 						// try to word wrap
@@ -492,7 +492,7 @@ int UI_DrawString( HFont font, int x, int y, int w, int h,
 				{
 					modulate = color;
 				}
-				else if( !forceColor )
+				else if( !(flags & ETF_FORCECOL) )
 				{
 					modulate = PackAlpha( g_iColorTable[colorNum], UnpackAlpha( color ));
 				}
@@ -509,19 +509,19 @@ int UI_DrawString( HFont font, int x, int y, int w, int h,
 			if( !ch )
 				continue;
 
-			if( shadow )
-				g_FontMgr.DrawCharacter( font, ch, Point( xx + ofsX, yy + ofsY ), charH, shadowModulate );
+			if( flags & ETF_SHADOW )
+				g_FontMgr.DrawCharacter( font, ch, Point( xx + ofsX, yy + ofsY ), charH, shadowModulate, flags & ETF_ADDITIVE );
 
 #ifdef DEBUG_WHITESPACE
 			if( ch == ' ' )
 			{
-				g_FontMgr.DrawCharacter( font, '_', Point( xx, yy ), charH, modulate );
+				g_FontMgr.DrawCharacter( font, '_', Point( xx, yy ), charH, modulate, flags & ETF_ADDITIVE );
 				xx += g_FontMgr.GetCharacterWidthScaled( font, ch, charH );
 				continue;
 			}
 #endif
 
-			xx += g_FontMgr.DrawCharacter( font, ch, Point( xx, yy ), charH, modulate );
+			xx += g_FontMgr.DrawCharacter( font, ch, Point( xx, yy ), charH, modulate, flags & ETF_ADDITIVE );
 
 			maxX = Q_max( xx, maxX );
 		}

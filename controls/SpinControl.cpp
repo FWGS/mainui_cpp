@@ -125,14 +125,12 @@ CMenuSpinControl::Draw
 */
 void CMenuSpinControl::Draw( void )
 {
-	bool	shadow;
 	int	leftFocus, rightFocus;
 	Size arrow;
 	Point left, right;
 	Point scCenterPos;
 	Size scCenterBox;
-
-	shadow = (iFlags & QMF_DROPSHADOW);
+	uint textflags = ( iFlags & QMF_DROPSHADOW ) ? ETF_SHADOW : 0;
 
 	if( szStatusText && iFlags & QMF_NOTIFY )
 	{
@@ -148,8 +146,8 @@ void CMenuSpinControl::Draw( void )
 		EngFuncs::DrawConsoleString( coord, szStatusText );
 	}
 
-	int textHeight = m_scPos.y - (m_scChSize.h * 1.5f);
-	UI_DrawString( font, m_scPos.x - UI_OUTLINE_WIDTH, textHeight, m_scSize.w + UI_OUTLINE_WIDTH * 2, m_scChSize.h, szName, uiColorHelp, true, m_scChSize.h, QM_LEFT, shadow, false );
+	int textHeight = m_scPos.y - (m_scChSize * 1.5f);
+	UI_DrawString( font, m_scPos.x - UI_OUTLINE_WIDTH, textHeight, m_scSize.w + UI_OUTLINE_WIDTH * 2, m_scChSize, szName, uiColorHelp, m_scChSize, QM_LEFT, textflags | ETF_FORCECOL );
 
 	// calculate size and position for the arrows
 	arrow.w = m_scSize.h + UI_OUTLINE_WIDTH * 2;
@@ -183,7 +181,7 @@ void CMenuSpinControl::Draw( void )
 	if( iFlags & QMF_GRAYED )
 	{
 		UI::Scissor::PushScissor( scCenterPos, scCenterBox );
-		UI_DrawString( font, scCenterPos, scCenterBox, m_szDisplay, uiColorDkGrey, true, m_scChSize, eTextAlignment, shadow );
+		UI_DrawString( font, scCenterPos, scCenterBox, m_szDisplay, uiColorDkGrey, m_scChSize, eTextAlignment, textflags | ETF_FORCECOL );
 		UI::Scissor::PopScissor();
 		UI_DrawPic( left, arrow, uiColorDkGrey, m_szLeftArrow );
 		UI_DrawPic( right, arrow, uiColorDkGrey, m_szRightArrow );
@@ -193,7 +191,7 @@ void CMenuSpinControl::Draw( void )
 	if(this != m_pParent->ItemAtCursor())
 	{
 		UI::Scissor::PushScissor( scCenterPos, scCenterBox );
-		UI_DrawString( font, scCenterPos, scCenterBox, m_szDisplay, iColor, false, m_scChSize, eTextAlignment, shadow );
+		UI_DrawString( font, scCenterPos, scCenterBox, m_szDisplay, iColor, m_scChSize, eTextAlignment, textflags );
 		UI::Scissor::PopScissor();
 		UI_DrawPic(left, arrow, iColor, m_szLeftArrow);
 		UI_DrawPic(right, arrow, iColor, m_szRightArrow);
@@ -207,7 +205,7 @@ void CMenuSpinControl::Draw( void )
 	if( eFocusAnimation == QM_HIGHLIGHTIFFOCUS )
 	{
 		UI::Scissor::PushScissor( scCenterPos, scCenterBox );
-		UI_DrawString( font, scCenterPos, scCenterBox, m_szDisplay, iFocusColor, false, m_scChSize, eTextAlignment, shadow );
+		UI_DrawString( font, scCenterPos, scCenterBox, m_szDisplay, iFocusColor, m_scChSize, eTextAlignment, textflags );
 		UI::Scissor::PopScissor();
 		UI_DrawPic( left, arrow, iColor, (leftFocus) ? m_szLeftArrowFocus : m_szLeftArrow );
 		UI_DrawPic( right, arrow, iColor, (rightFocus) ? m_szRightArrowFocus : m_szRightArrow );
@@ -219,7 +217,7 @@ void CMenuSpinControl::Draw( void )
 		color = PackAlpha( iColor, 255 * (0.5 + 0.5 * sin( (float)uiStatic.realTime / UI_PULSE_DIVISOR )));
 
 		UI::Scissor::PushScissor( scCenterPos, scCenterBox );
-		UI_DrawString( font, scCenterPos, scCenterBox, m_szDisplay, color, false, m_scChSize, eTextAlignment, shadow );
+		UI_DrawString( font, scCenterPos, scCenterBox, m_szDisplay, color, m_scChSize, eTextAlignment, textflags );
 		UI::Scissor::PopScissor();
 		UI_DrawPic( left, arrow, (leftFocus) ? color : (int)iColor, (leftFocus) ? m_szLeftArrowFocus : m_szLeftArrow );
 		UI_DrawPic( right, arrow, (rightFocus) ? color : (int)iColor, (rightFocus) ? m_szRightArrowFocus : m_szRightArrow );

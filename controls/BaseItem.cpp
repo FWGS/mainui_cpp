@@ -95,16 +95,13 @@ void CMenuBaseItem::SetCharSize(EFontSizes fs)
 	case QM_LIGHTBLUR:
 	case QM_HEAVYBLUR:
 #endif
-		charSize.w = UI_MED_CHAR_WIDTH;
-		charSize.h = UI_MED_CHAR_HEIGHT;
+		charSize = UI_MED_CHAR_HEIGHT;
 		break;
 	case QM_SMALLFONT:
-		charSize.w = UI_SMALL_CHAR_WIDTH;
-		charSize.h = UI_SMALL_CHAR_HEIGHT;
+		charSize = UI_SMALL_CHAR_HEIGHT;
 		break;
 	case QM_BIGFONT:
-		charSize.w = UI_BIG_CHAR_WIDTH;
-		charSize.h = UI_BIG_CHAR_HEIGHT;
+		charSize = UI_BIG_CHAR_HEIGHT;
 		break;
 	}
 }
@@ -187,15 +184,15 @@ void CMenuBaseItem::CalcPosition()
 
 void CMenuBaseItem::CalcSizes()
 {
+	m_scChSize = charSize;
 	if( iFlags & QMF_DISABLESCAILING )
 	{
 		m_scSize = size;
-		m_scChSize = charSize;
 	}
 	else
 	{
 		m_scSize = size.Scale();
-		m_scChSize = charSize.Scale();
+		m_scChSize *= uiStatic.scaleY;
 	}
 
 	if( m_scSize.w < 0 )

@@ -151,7 +151,7 @@ void CMenuPlayerModelView::Draw()
 		}
 		else
 		{
-			UI_DrawString( font, m_scPos, m_scSize, "No preview", iColor, 0, m_scChSize, QM_CENTER, true );
+			UI_DrawString( font, m_scPos, m_scSize, "No preview", iColor, m_scChSize, QM_CENTER, ETF_SHADOW );
 		}
 	}
 	else

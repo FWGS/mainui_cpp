@@ -103,7 +103,7 @@ inline unsigned int PackAlpha( const unsigned int ulRGB, const unsigned int ulAl
 	return (ulRGB)|(ulAlpha<<24);
 }
 
-inline int UnpackAlpha( const unsigned int ulRGBA )
+inline unsigned int UnpackAlpha( const unsigned int ulRGBA )
 {
 	return ((ulRGBA & 0xFF000000) >> 24);	
 }
@@ -113,7 +113,7 @@ inline float InterpVal( const float from, const float to, const float frac )
 	return from + (to - from) * frac;
 }
 
-inline int InterpColor( const int from, const int to, const float frac )
+inline unsigned int InterpColor( const unsigned int from, const unsigned int to, const float frac )
 {
 	return PackRGBA(
 		InterpVal( Red( from ), Red( to ), frac ),

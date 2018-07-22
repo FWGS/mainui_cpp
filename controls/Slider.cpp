@@ -146,11 +146,8 @@ CMenuSlider::Draw
 */
 void CMenuSlider::Draw( void )
 {
-	bool	shadow;
 	int	textHeight, sliderX;
-
-
-	shadow = (iFlags & QMF_DROPSHADOW);
+	uint textflags = ( iFlags & QMF_DROPSHADOW ) ? ETF_SHADOW : 0;
 
 	if( szStatusText && iFlags & QMF_NOTIFY )
 	{
@@ -202,8 +199,8 @@ void CMenuSlider::Draw( void )
 		UI_DrawPic( sliderX, m_scPos.y, m_scCenterBox.w, m_scSize.h, uiColorWhite, UI_SLIDER_MAIN );
 
 
-	textHeight = m_scPos.y - (m_scChSize.h * 1.5f);
-	UI_DrawString( font, m_scPos.x, textHeight, m_scSize.w, m_scChSize.h, szName, uiColorHelp, true, m_scChSize.h, eTextAlignment, shadow, false );
+	textHeight = m_scPos.y - (m_scChSize * 1.5f);
+	UI_DrawString( font, m_scPos.x, textHeight, m_scSize.w, m_scChSize, szName, uiColorHelp, m_scChSize, eTextAlignment, textflags | ETF_FORCECOL );
 }
 
 void CMenuSlider::UpdateEditable()

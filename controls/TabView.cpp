@@ -26,7 +26,7 @@ CMenuTabView::CMenuTabView() : BaseClass(),
 Point CMenuTabView::GetPositionOffset() const
 {
 	Point ret = m_scPos;
-	ret.y += m_scChSize.h * 1.5f;
+	ret.y += m_scChSize * 1.5f;
 
 	return ret;
 }
@@ -40,7 +40,7 @@ void CMenuTabView::VidInit()
 	VidInitItems();
 
 	m_szTab.w = m_scSize.w / m_numItems;
-	m_szTab.h = m_scChSize.h * 1.5f;
+	m_szTab.h = m_scChSize * 1.5f;
 }
 
 const char *CMenuTabView::Key(int key, int down)
@@ -50,8 +50,9 @@ const char *CMenuTabView::Key(int key, int down)
 
 void CMenuTabView::DrawTab(Point pt, const char *name, bool isEnd, bool isSelected, bool isHighlighted)
 {
-	int textColor = uiInputTextColor;
-	int fillColor = uiColorBlack;
+	uint textColor = uiInputTextColor;
+	uint fillColor = uiColorBlack;
+	uint textflags = ( iFlags & QMF_DROPSHADOW ) ? ETF_SHADOW : 0;
 
 	if( isSelected && !isHighlighted )
 	{
@@ -64,7 +65,7 @@ void CMenuTabView::DrawTab(Point pt, const char *name, bool isEnd, bool isSelect
 	}
 
 	UI_FillRect( pt, m_szTab, fillColor );
-	UI_DrawString( font, pt, m_szTab, name, textColor, 0, m_scChSize, eTextAlignment, true );
+	UI_DrawString( font, pt, m_szTab, name, textColor, m_scChSize, eTextAlignment, textflags );
 
 	if( !isEnd )
 	{
@@ -95,8 +96,8 @@ void CMenuTabView::Draw()
 		tabOffset.x += m_szTab.w;
 	}
 
-	Point contentOffset = Point( m_scPos.x, m_scPos.y + m_scChSize.h * 1.5f );
-	Size contentSize = Size( m_scSize.w, m_scSize.h - m_scChSize.h * 1.5f );
+	Point contentOffset = Point( m_scPos.x, m_scPos.y + m_scChSize * 1.5f );
+	Size contentSize = Size( m_scSize.w, m_scSize.h - m_scChSize * 1.5f );
 
 	// draw line after tab
 	UI_FillRect( contentOffset.x, contentOffset.y,
