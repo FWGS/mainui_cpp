@@ -210,8 +210,6 @@ void CFreeTypeFont::GetCharRGBA(int ch, Point pt, Size sz, unsigned char *rgba, 
 	buf = &slot->bitmap.buffer[ ystart * slot->bitmap.width ];
 	dst = rgba + 4 * sz.w * ( ystart + pushDown );
 
-	bool additive = IsAdditive();
-
 	// iterate through copying the generated dib into the texture
 	for (int j = ystart; j < yend; j++, dst += 4 * sz.w, buf += slot->bitmap.width )
 	{
@@ -221,20 +219,12 @@ void CFreeTypeFont::GetCharRGBA(int ch, Point pt, Size sz, unsigned char *rgba, 
 			if( buf[i] > 0 )
 			{
 				// paint white and alpha
-				if( !additive )
-				{
-					// paint white and alpha
-					*xdst = PackRGBA( 0xFF, 0xFF, 0xFF, buf[i] );
-				}
-				else
-				{
-					*xdst = PackRGBA( buf[i], buf[i], buf[i], 0xFF );
-				}
+				*xdst = PackRGBA( 0xFF, 0xFF, 0xFF, buf[i] );
 			}
 			else
 			{
 				// paint black and null alpha
-				*xdst = PackRGBA( 0x00, 0x00, 0x00, additive ? 0xFF : 0x00 );
+				*xdst = 0;
 			}
 		}
 	}
@@ -248,15 +238,8 @@ void CFreeTypeFont::GetCharRGBA(int ch, Point pt, Size sz, unsigned char *rgba, 
 	ApplyStrikeout( sz, rgba );
 }
 
-bool CFreeTypeFont::IsValid()  const
-{
-	return (bool)m_szName[0];
-}
-
 void CFreeTypeFont::GetCharABCWidths(int ch, int &a, int &b, int &c)
 {
-	assert( IsValid() );
-
 	abc_t find;
 	find.ch = ch;
 

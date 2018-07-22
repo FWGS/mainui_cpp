@@ -336,8 +336,6 @@ void CStbFont::GetCharRGBA(int ch, Point pt, Size sz, unsigned char *rgba, Size 
 	buf = &buf[ ystart * bm_width ];
 	dst = rgba + 4 * sz.w * ( ystart + pushDown );
 
-	bool additive = IsAdditive();
-
 	// iterate through copying the generated dib into the texture
 	for (int j = ystart; j < yend; j++, dst += 4 * sz.w, buf += bm_width )
 	{
@@ -347,20 +345,12 @@ void CStbFont::GetCharRGBA(int ch, Point pt, Size sz, unsigned char *rgba, Size 
 			if( buf[i] > 0 )
 			{
 				// paint white and alpha
-				if( !additive )
-				{
-					// paint white and alpha
-					*xdst = PackRGBA( 0xFF, 0xFF, 0xFF, buf[i] );
-				}
-				else
-				{
-					*xdst = PackRGBA( buf[i], buf[i], buf[i], 0xFF );
-				}
+				*xdst = PackRGBA( 0xFF, 0xFF, 0xFF, buf[i] );
 			}
 			else
 			{
 				// paint black and null alpha
-				*xdst = PackRGBA( 0x00, 0x00, 0x00, additive ? 0xFF : 0x00 );
+				*xdst = 0;
 			}
 		}
 	}
@@ -374,15 +364,8 @@ void CStbFont::GetCharRGBA(int ch, Point pt, Size sz, unsigned char *rgba, Size 
 	ApplyStrikeout( sz, rgba );
 }
 
-bool CStbFont::IsValid()  const
-{
-	return (bool)m_szName[0];
-}
-
 void CStbFont::GetCharABCWidths(int ch, int &a, int &b, int &c)
 {
-	assert( IsValid() );
-
 	abc_t find;
 	find.ch = ch;
 

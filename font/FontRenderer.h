@@ -9,8 +9,7 @@ enum EFontFlags
 	FONT_NONE      = 0,
 	FONT_ITALIC    = 1 << 0,
 	FONT_UNDERLINE = 1 << 1,
-	FONT_STRIKEOUT = 1 << 2,
-	FONT_ADDITIVE  = 1 << 3
+	FONT_STRIKEOUT = 1 << 2
 };
 
 enum EFontSizes

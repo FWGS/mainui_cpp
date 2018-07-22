@@ -45,7 +45,6 @@ void CBaseFont::GetTextureName(char *dst, size_t len) const
 	int i = 0;
 	if( GetFlags() & FONT_ITALIC ) attribs[i++] = 'i'; // 1 parameter
 	if( GetFlags() & FONT_UNDERLINE ) attribs[i++] = 'u'; // 1 parameter
-	if( IsAdditive() ) attribs[i++] = 'a'; // 1
 	if( m_iBlur )
 	{
 		int chars = snprintf( attribs + i, sizeof( attribs ) - 1 - i, "g%i%.2f", m_iBlur, m_fBrighten );
@@ -256,10 +255,7 @@ void CBaseFont::DebugDraw()
 		h = EngFuncs::PIC_Height( hImage );
 		int x = 0;
 		EngFuncs::PIC_Set( hImage, 255, 255, 255 );
-		if( IsAdditive() )
-			EngFuncs::PIC_DrawAdditive( Point(x, 0), Size( w, h ) );
-		else
-			EngFuncs::PIC_DrawTrans( Point(x, 0), Size( w, h ) );
+		EngFuncs::PIC_DrawTrans( Point(x, 0), Size( w, h ) );
 
 		for( int i = m_glyphs.FirstInorder();; i = m_glyphs.NextInorder( i ) )
 		{
@@ -336,7 +332,6 @@ void CBaseFont::ApplyBlur(Size rgbaSz, byte *rgba)
 void CBaseFont::GetBlurValueForPixel(float *distribution, byte *src, Point srcPt, Size srcSz, byte *dest)
 {
 	float accum = 0.0f;
-	bool additive = IsAdditive();
 
 	// scan the positive x direction
 	int maxX = Q_min( srcPt.x + m_iBlur, srcSz.w );
@@ -352,21 +347,13 @@ void CBaseFont::GetBlurValueForPixel(float *distribution, byte *src, Point srcPt
 			// muliply by the value matrix
 			float weight = distribution[(x - srcPt.x) + m_iBlur];
 			float weight2 = distribution[(y - srcPt.y) + m_iBlur];
-			accum += ( additive ? srcPos[0] : srcPos[3] ) * (weight * weight2);
+			accum += ( srcPos[3] ) * (weight * weight2);
 		}
 	}
 
 	// all the values are the same for fonts, just use the calculated alpha
-	if( !additive )
-	{
-		dest[0] = dest[1] = dest[2] = 255;
-		dest[3] = Q_min( (int)(accum + 0.5f), 255);
-	}
-	else
-	{
-		dest[0] = dest[1] = dest[2] = Q_min( (int)(accum + 0.5f), 255 );
-		dest[3] = 255;
-	}
+	dest[0] = dest[1] = dest[2] = 255;
+	dest[3] = Q_min( (int)(accum + 0.5f), 255);
 }
 
 void CBaseFont::ApplyOutline(Point pt, Size rgbaSz, byte *rgba)
@@ -501,7 +488,7 @@ int CBaseFont::DrawCharacter(int ch, Point pt, int charH, const unsigned int col
 		pt.x += a;
 
 		EngFuncs::PIC_Set( glyph.texture, r, g, b, alpha );
-		if( IsAdditive() || forceAdditive )
+		if( forceAdditive )
 			EngFuncs::PIC_DrawAdditive( pt, charSize, &glyph.rect );
 		else
 			EngFuncs::PIC_DrawTrans( pt, charSize, &glyph.rect );

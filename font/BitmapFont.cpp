@@ -64,17 +64,10 @@ void CBitmapFont::GetCharABCWidths(int ch, int &a, int &b, int &c)
 
 bool CBitmapFont::HasChar(int ch) const
 {
-	if( ch >= 33 || ch <= 126 // ascii
-		|| ch >= 0x0400 || ch <= 0x045F ) // cyrillic
+	if( ( ch >= 33 && ch <= 126 ) // ascii
+		|| ( ch >= 0x0400 && ch <= 0x045F ) ) // cyrillic
 		return true;
 	return false;
-}
-
-bool CBitmapFont::IsValid() const
-{
-	// stub!
-	Con_DPrintf( "CBitmapFont::IsValid\n" );
-	return true;
 }
 
 void CBitmapFont::UploadGlyphsForRanges(charRange_t *range, int rangeSize)

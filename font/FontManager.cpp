@@ -90,13 +90,11 @@ void CFontManager::VidInit( void )
 		uiStatic.hLightBlur = CFontBuilder( DEFAULT_MENUFONT, UI_MED_CHAR_HEIGHT * scale, 1000 )
 			.SetHandleNum( QM_LIGHTBLUR )
 			.SetBlurParams( 2, 1.0f )
-			.SetFlags( FONT_ADDITIVE )
 			.Create();
 
 		uiStatic.hHeavyBlur = CFontBuilder( DEFAULT_MENUFONT, UI_MED_CHAR_HEIGHT * scale, 1000 )
 			.SetHandleNum( QM_HEAVYBLUR )
 			.SetBlurParams( 8, 1.75f )
-			.SetFlags( FONT_ADDITIVE )
 			.Create();
 #endif
 		uiStatic.hConsoleFont = CFontBuilder( DEFAULT_CONFONT, UI_CONSOLE_CHAR_HEIGHT * scale, 500 )

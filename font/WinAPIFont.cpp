@@ -171,8 +171,6 @@ void CWinAPIFont::GetCharRGBA( int ch, Point pt, Size sz, unsigned char *rgba, S
 			xstart = ( glyphMetrics.gmBlackBoxX - b ) / 2;
 		}
 
-		bool additive = IsAdditive();
-
 		// iterate through copying the generated dib into the texture
 		for( unsigned int j = 0; j < glyphMetrics.gmBlackBoxY; j++ )
 		{
@@ -187,26 +185,14 @@ void CWinAPIFont::GetCharRGBA( int ch, Point pt, Size sz, unsigned char *rgba, S
 					float r, g, b, a;
 					if( grayscale )
 					{
-						if( !additive )
-						{
-							r = g = b = 1.0f;
-							a = ( grayscale + 0 ) / 64.0f;
-							if( a > 1.0f ) a = 1.0f;
-						}
-						else
-						{
-							a = ( grayscale + 0 ) / 64.0f;
-							if( a > 1.0f ) a = 1.0f;
-							r = g = b = a;
-							a = 1.0f;
-						}
+						r = g = b = 1.0f;
+						a = ( grayscale + 0 ) / 64.0f;
+						if( a > 1.0f ) a = 1.0f;
 					}
 					else
 					{
 						r = g = b = 0.0f;
-						if( additive )
-							a = 1.0f;
-						else a = 0.0f;
+						a = 0.0f;
 					}
 
 					unsigned char *dst = &rgba[( y*sz.w + x ) * 4];
@@ -292,11 +278,6 @@ void CWinAPIFont::GetCharRGBA( int ch, Point pt, Size sz, unsigned char *rgba, S
 	ApplyOutline( Point( 0, 0 ), sz, rgba );
 	ApplyScanline( sz, rgba );
 	ApplyStrikeout( sz, rgba );
-}
-
-bool CWinAPIFont::IsValid( ) const
-{
-	return ( bool )m_szName[0];
 }
 
 void CWinAPIFont::GetCharABCWidths( int ch, int &a, int &b, int &c )

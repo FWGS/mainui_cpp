@@ -45,7 +45,6 @@ public:
 		int scanlineOffset, float scanlineScale,
 		int flags ) = 0;
 	virtual void GetCharRGBA( int ch, Point pt, Size sz, byte *rgba, Size &drawSize ) = 0;
-	virtual bool IsValid() const = 0;
 	virtual void GetCharABCWidths( int ch, int &a, int &b, int &c ) = 0;
 	virtual bool HasChar( int ch ) const = 0;
 	virtual void UploadGlyphsForRanges( charRange_t *range, int rangeSize );
@@ -59,7 +58,6 @@ public:
 	inline int GetFlags() const        { return m_iFlags; }
 	inline int GetWeight() const       { return m_iWeight; }
 	inline int GetEfxOffset() const    { return m_iBlur + m_iOutlineSize; }
-	inline bool IsAdditive() const     { return GetFlags() & FONT_ADDITIVE; }
 
 	bool IsEqualTo( const char *name, int tall, int weight, int blur, int flags ) const;
 
