@@ -84,12 +84,12 @@ int EngFuncs::UtfProcessChar(int ch)
 	return Con_UtfProcessChar( ch );
 }
 
-int EngFuncs::UtfMoveLeft(char *str, int pos)
+int EngFuncs::UtfMoveLeft(const char *str, int pos)
 {
 	return Con_UtfMoveLeft( str, pos );
 }
 
-int EngFuncs::UtfMoveRight(char *str, int pos, int length)
+int EngFuncs::UtfMoveRight(const char *str, int pos, int length)
 {
 	return Con_UtfMoveRight( str, pos, length );
 }

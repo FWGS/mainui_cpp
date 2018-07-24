@@ -606,7 +606,7 @@ Con_UtfMoveLeft
 get position of previous printful char
 =================
 */
-int Con_UtfMoveLeft( char *str, int pos )
+int Con_UtfMoveLeft( const char *str, int pos )
 {
 	int i, k = 0;
 	// int j;
@@ -626,7 +626,7 @@ Con_UtfMoveRight
 get next of previous printful char
 =================
 */
-int Con_UtfMoveRight( char *str, int pos, int length )
+int Con_UtfMoveRight( const char *str, int pos, int length )
 {
 	int i;
 	Con_UtfProcessChar( 0 );

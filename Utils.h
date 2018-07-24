@@ -278,7 +278,7 @@ bool CheckIsNameValid( const char *name );
 }
 }
 int Con_UtfProcessChar(int in );
-int Con_UtfMoveLeft( char *str, int pos );
-int Con_UtfMoveRight( char *str, int pos, int length );
+int Con_UtfMoveLeft( const char *str, int pos );
+int Con_UtfMoveRight( const char *str, int pos, int length );
 
 #endif//UTILS_H
