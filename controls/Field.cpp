@@ -186,6 +186,7 @@ const char *CMenuField::Key( int key, int down )
 	if( key == K_HOME )
 	{
 		iCursor = 0;
+		iScroll = 0;
 		return uiSoundNull;
 	}
 
@@ -193,6 +194,7 @@ const char *CMenuField::Key( int key, int down )
 	if( key == K_END )
 	{
 		iCursor = len;
+		iScroll = g_FontMgr.CutText( font, szBuffer, m_scChSize, iRealWidth, true );
 		return uiSoundNull;
 	}
 
@@ -230,6 +232,7 @@ const char *CMenuField::Key( int key, int down )
 			int x, charpos;
 			char	text[UI_MAX_FIELD_LINE];
 			int w = 0;
+			bool remaining;
 			bool dummy;
 
 			int iWidthInChars = g_FontMgr.CutText( font, szBuffer + iScroll, m_scChSize, iRealWidth, false, &w );
@@ -249,7 +252,7 @@ const char *CMenuField::Key( int key, int down )
 			{
 				x = m_scPos.x + (m_scSize.w - w) / 2;
 			}
-			charpos = g_FontMgr.CutText(font, szBuffer + iScroll, m_scChSize, uiStatic.cursorX - x, false, &w);
+			charpos = g_FontMgr.CutText(font, szBuffer + iScroll, m_scChSize, uiStatic.cursorX - x, false, &w, &remaining );
 
 			//text[charpos] = 0;
 			iCursor = charpos + iScroll;
@@ -260,7 +263,7 @@ const char *CMenuField::Key( int key, int down )
 			}
 			if( charpos == 0 && iScroll )
 				iScroll = EngFuncs::UtfMoveLeft( szBuffer, iScroll );
-			if( charpos == iWidthInChars && iScroll < len - 1 )
+			if( charpos == iWidthInChars && remaining )
 				iScroll = EngFuncs::UtfMoveRight( szBuffer, iScroll, len );
 			if( iScroll > len )
 				iScroll = len;
