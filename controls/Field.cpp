@@ -34,7 +34,7 @@ CMenuField::CMenuField() : BaseClass(), szBuffer()
 	iMaxLength = 0;
 	iCursor = 0;
 	iScroll = 0;
-	iWidthInChars = 0;
+	iRealWidth = 0;
 	szBackground = NULL;
 }
 
@@ -55,10 +55,10 @@ void CMenuField::VidInit( void )
 {
 	BaseClass::VidInit();
 
-	// calculate number of visible characters
-	iWidthInChars = (size.w / (charSize * 0.5f));
-
 	iCursor = strlen( szBuffer );
+	iScroll = g_FontMgr.CutText( font, szBuffer, m_scChSize, iRealWidth, true );
+
+	iRealWidth = m_scSize.w - UI_OUTLINE_WIDTH * 2;
 }
 
 /*
@@ -141,6 +141,7 @@ CMenuField::Key
 const char *CMenuField::Key( int key, int down )
 {
 	int	len;
+	int dummy;
 
 	if( !down ) return 0;
 
@@ -171,9 +172,13 @@ const char *CMenuField::Key( int key, int down )
 	// next character
 	if( key == K_RIGHTARROW )
 	{
+		bool remaining;
+
+		int maxIdx = g_FontMgr.CutText( font, szBuffer + iScroll, m_scChSize, iRealWidth, false, NULL, &remaining );
+
 		if( iCursor < len ) iCursor = EngFuncs::UtfMoveRight( szBuffer, iCursor, len );
-		if( iCursor >= iScroll + iWidthInChars && iCursor <= len )
-			iScroll = EngFuncs::UtfMoveRight( szBuffer, iScroll, len );
+		if( remaining && iCursor > maxIdx ) iScroll = EngFuncs::UtfMoveRight( szBuffer, iScroll, len );
+
 		return uiSoundNull;
 	}
 
@@ -205,7 +210,12 @@ const char *CMenuField::Key( int key, int down )
 	if( key == K_DEL )
 	{
 		if( iCursor < len )
-			memmove( szBuffer + iCursor, szBuffer + iCursor + 1, len - iCursor );
+		{
+			int pos = EngFuncs::UtfMoveRight( szBuffer, iCursor, len );
+			memmove( szBuffer + iCursor, szBuffer + pos, len - pos + 1 );
+
+			iScroll = g_FontMgr.CutText( font, szBuffer, m_scChSize, iRealWidth, true );
+		}
 	}
 
 	if( key == K_MOUSE1 )
@@ -219,14 +229,13 @@ const char *CMenuField::Key( int key, int down )
 		{
 			int x, charpos;
 			char	text[UI_MAX_FIELD_LINE];
+			int w = 0;
+			bool dummy;
+
+			int iWidthInChars = g_FontMgr.CutText( font, szBuffer + iScroll, m_scChSize, iRealWidth, false, &w );
 
 			memcpy( text, szBuffer + iScroll, iWidthInChars - iScroll );
 			text[iWidthInChars] = 0;
-
-			int w = 0;
-
-			if( !(eTextAlignment & QM_LEFT))
-				w = g_FontMgr.GetTextWideScaled( font, text, m_scChSize );
 
 			if( eTextAlignment & QM_LEFT )
 			{
@@ -240,7 +249,7 @@ const char *CMenuField::Key( int key, int down )
 			{
 				x = m_scPos.x + (m_scSize.w - w) / 2;
 			}
-			charpos = g_FontMgr.CutText(font, szBuffer + iScroll, m_scChSize, uiStatic.cursorX - x, w);
+			charpos = g_FontMgr.CutText(font, szBuffer + iScroll, m_scChSize, uiStatic.cursorX - x, false, &w);
 
 			//text[charpos] = 0;
 			iCursor = charpos + iScroll;
@@ -262,7 +271,7 @@ const char *CMenuField::Key( int key, int down )
 
 	SetCvarString( szBuffer );
 	_Event( QM_CHANGED );
-	return 0;
+	return uiSoundNull;
 }
 
 /*
@@ -302,7 +311,7 @@ void CMenuField::Char( int key )
 	{
 		// ctrl-e is end
 		iCursor = len;
-		iScroll = iCursor - iWidthInChars;
+		iScroll = g_FontMgr.CutText( font, szBuffer, m_scChSize, iRealWidth, true );
 		return;
 	}
 
@@ -330,9 +339,21 @@ void CMenuField::Char( int key )
 	else if( eLetterCase == QM_UPPERCASE )
 		key = toupper( key );
 
-	if( EngFuncs::KEY_GetOverstrike( ))
+	if( EngFuncs::KEY_GetOverstrike( ) && !m_bOverrideOverstrike )
 	{
 		if( iCursor == iMaxLength - 1 ) return;
+
+		// in case a character with X bytes replaced by character with Y bytes
+		// where Y < X, e.g. russian replaced by latin
+		int pos = EngFuncs::UtfMoveRight( szBuffer, iCursor, len );
+		if( pos != iCursor + 1 )
+			memmove( szBuffer + iCursor + 1, szBuffer + pos, len - pos + 1 );
+
+		// in case a character with X bytes replaced by character with Y bytes
+		// where Y > X, e.g. latin replaced by russian
+		// m_bOverrideOverstrike = EngFuncs::UtfProcessChar( key ) == false;
+		// TODO ???
+
 		szBuffer[iCursor] = key;
 		iCursor++;
 	}
@@ -345,8 +366,11 @@ void CMenuField::Char( int key )
 		iCursor++;
 	}
 
-	if( iCursor >= iWidthInChars ) iScroll = EngFuncs::UtfMoveRight(szBuffer, iScroll, len);
-	if( iCursor == len + 1 ) szBuffer[iCursor] = 0;
+	if( iCursor > len )
+	{
+		szBuffer[iCursor] = 0;
+		iScroll = g_FontMgr.CutText( font, szBuffer, m_scChSize, iRealWidth, true );
+	}
 
 	SetCvarString( szBuffer );
 	_Event( QM_CHANGED );
@@ -366,6 +390,8 @@ void CMenuField::Draw( void )
 	float y = m_scPos.y;
 	uint textflags = ( iFlags & QMF_DROPSHADOW ) ? ETF_SHADOW : 0;
 	Point newPos = m_scPos;
+
+	textflags |= ETF_NOSIZELIMIT;
 
 	if( szStatusText && iFlags & QMF_NOTIFY )
 	{
@@ -393,7 +419,7 @@ void CMenuField::Draw( void )
 		cursor_char[0] = 11;
 	else cursor_char[0] = '_';
 
-	drawLen = iWidthInChars;
+	drawLen = g_FontMgr.CutText( font, szBuffer + iScroll, m_scChSize, m_scSize.w, false );
 	len = strlen( szBuffer ) + 1;
 
 	// guarantee that cursor will be visible
@@ -505,7 +531,7 @@ void CMenuField::Draw( void )
 		UI_DrawString( font, newPos, m_scSize, text, iFocusColor, m_scChSize, eTextAlignment, textflags );
 
 		if(( uiStatic.realTime & 499 ) < 250 )
-			UI_DrawString( font, x + cursorOffset, y, cursor_char_width, m_scSize.h, cursor_char, iFocusColor, m_scChSize, QM_LEFT, textflags | ETF_FORCECOL );
+			UI_DrawString( font, x + cursorOffset, y, cursor_char_width, m_scSize.h, cursor_char, iFocusColor, m_scChSize, QM_LEFT, textflags | ETF_FORCECOL  );
 		break;
 	case QM_PULSEIFFOCUS:
 	{

@@ -254,18 +254,15 @@ void CFontManager::GetTextSize(HFont fontHandle, const char *text, int *wide, in
 	if( wide ) *wide = _wide;
 }
 
-int CFontManager::CutText(HFont fontHandle, const char *text, int height, int visibleSize, int &_wide )
+int CFontManager::CutText(HFont fontHandle, const char *text, int height, int visibleSize, bool reverse, int *wide, bool *remaining )
 {
 	CBaseFont *font = GetIFontFromHandle( fontHandle );
 
-	if( !font || !text || !text[0] )
+	if( !font || !text || !text[0] || visibleSize <= 0 )
 		return 0;
 
-	_wide = 0;
+	int _wide = 0;
 	const char *ch = text;
-	int i = 0, x = 0, len = 0, lastlen = 0;
-	if( visibleSize <= 0 )
-		return 0;
 
 #ifdef SCALE_FONTS
 	visibleSize  = (float)visibleSize / (float)height * (float)font->GetTall();
@@ -273,47 +270,79 @@ int CFontManager::CutText(HFont fontHandle, const char *text, int height, int vi
 
 	EngFuncs::UtfProcessChar( 0 );
 
-	while( *ch && _wide < ( visibleSize ) )
+	// calculate full text wide
+	while( *ch )
 	{
-		// Skip colorcodes
+		// skip colorcodes
 		if( IsColorString( ch ) )
 		{
 			ch += 2;
-			len += 2;
 			continue;
 		}
 
-		int uch;
-
-		uch = EngFuncs::UtfProcessChar( (unsigned char)*ch );
+		int uch = EngFuncs::UtfProcessChar( (unsigned char)*ch );
+		int x = 0;
 		if( uch )
 		{
-			if( uch == '\n' )
-			{
-				x = 0;
-			}
-			else
-			{
-				int a, b, c;
-				font->GetCharABCWidths( uch, a, b, c );
-				x += a + b + c;
-				if( x > _wide )
-					_wide = x;
-			}
-			lastlen = len;
-			len = i+1;
+			// we don't need check for newlines here, it's only done for oneline Field widget
+			int a, b, c;
+			font->GetCharABCWidths( uch, a, b, c );
+			x = a + b + c;
 		}
-		i++;
+
+		if( !reverse && _wide + x >= visibleSize )
+			break;
+
 		ch++;
+		_wide += x;
 	}
+
 	EngFuncs::UtfProcessChar( 0 );
 
-	if( !*ch && _wide < ( visibleSize ) )
-		return len;
+	if( !reverse )
+	{
+		if( *ch && remaining ) *remaining = true;
+		if( wide ) *wide = _wide;
+		return ch - text;
+	}
 
-	return lastlen;
+	if( _wide < visibleSize )
+	{
+		if( remaining ) *remaining = false;
+		if( wide ) *wide = _wide;
+		return 0;
+	}
+
+	ch = text;
+
+	// now remove character one by one to fit
+	while( *ch && _wide > visibleSize )
+	{
+		// skip colorcodes
+		if( IsColorString( ch ) )
+		{
+			ch += 2;
+			continue;
+		}
+
+		int uch = EngFuncs::UtfProcessChar( (unsigned char)*ch );
+		if( uch )
+		{
+			// we don't need check for newlines here, it's only done for oneline Field widget
+			int a, b, c;
+			font->GetCharABCWidths( uch, a, b, c );
+			_wide -= a + b + c;
+		}
+		ch++;
+	}
+
+	EngFuncs::UtfProcessChar( 0 );
+
+	if( remaining ) *remaining = true;
+	if( wide ) *wide = _wide;
+	return ch - text;
+
 }
-
 
 int CFontManager::GetTextWide(HFont font, const char *text, int size)
 {

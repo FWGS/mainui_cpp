@@ -47,7 +47,14 @@ public:
 	void  GetTextSize( HFont font, const char *text, int *wide, int *tall = NULL, int size = -1 );
 	int   GetTextHeight( HFont font, const char *text, int size = -1 );
 
-	int   CutText( HFont fontHandle, const char *text, int height, int visibleSize , int &width);
+	/*
+	 * Determine how text should be cut, to fit in "visibleWidth"
+	 * NOTE: this function DOES NOT work with multi-line strings
+	 *
+	 * If reverse is set, return value will indicate starting index, because ending index is always at string index
+	 * If reverse is NOT set, return value will indicate ending index, because starting index is always at 0
+	 */
+	int	  CutText(HFont fontHandle, const char *text, int height, int visibleSize, bool reverse, int *width = NULL, bool *remaining = NULL );
 
 	int GetTextWideScaled( HFont font, const char *text, const int height, int size = -1 );
 

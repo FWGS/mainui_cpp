@@ -48,10 +48,7 @@ public:
 	{
 		Q_strncpy( szBuffer, buffer, UI_MAX_FIELD_LINE );
 		iCursor = strlen( szBuffer );
-		if( iCursor > iWidthInChars )
-			iScroll = iCursor;
-		else
-			iScroll = 0;
+		iScroll = g_FontMgr.CutText( font, szBuffer, m_scChSize, iRealWidth, true );
 	}
 
 	const char *GetBuffer()
@@ -67,12 +64,15 @@ public:
 
 protected:
 	void _Event( int ev ) override;
+
 private:
 	char	szBuffer[UI_MAX_FIELD_LINE];
 	int		iCursor;
 	int		iScroll;
-	int		iWidthInChars;
 
+	int		iRealWidth;
+
+	bool	m_bOverrideOverstrike;
 };
 
 #endif // MENU_FIELD_H
