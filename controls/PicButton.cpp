@@ -225,7 +225,7 @@ void CMenuPicButton::Draw( )
 	{
 		uint textflags = 0;
 #ifndef MAINUI_RENDER_PICBUTTON_TEXT
-		textflags |= ((iFlags & QMF_DROPSHADOW) ? ETF_SHADOW : 0 )
+		textflags |= ((iFlags & QMF_DROPSHADOW) ? ETF_SHADOW : 0 );
 #else
 		textflags |= ETF_ADDITIVE;
 #endif
