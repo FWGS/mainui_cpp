@@ -258,6 +258,9 @@ int CFontManager::CutText(HFont fontHandle, const char *text, int height, int vi
 {
 	CBaseFont *font = GetIFontFromHandle( fontHandle );
 
+	if( remaining )
+		*remaining = false;
+
 	if( !font || !text || !text[0] || visibleSize <= 0 )
 		return 0;
 
