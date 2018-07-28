@@ -49,7 +49,7 @@ CStbFont::CStbFont() : CBaseFont(),
 
 CStbFont::~CStbFont()
 {
-	delete m_pFontData;
+	delete [] m_pFontData;
 }
 
 bool CStbFont::FindFontDataFile(const char *name, int tall, int weight, int flags, char *dataFile, int dataFileChars)
