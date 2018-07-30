@@ -27,20 +27,6 @@ GNU General Public License for more details.
 #define UI_MAX_MENUITEMS		64
 
 #define UI_PULSE_DIVISOR		75.0f
-#define UI_BLINK_TIME		250
-#define UI_BLINK_MASK		499
-
-#define UI_CONSOLE_CHAR_WIDTH	9
-#define UI_CONSOLE_CHAR_HEIGHT  18
-
-#define UI_SMALL_CHAR_WIDTH		11
-#define UI_SMALL_CHAR_HEIGHT	23
-
-#define UI_MED_CHAR_WIDTH		13
-#define UI_MED_CHAR_HEIGHT		26
-
-#define UI_BIG_CHAR_WIDTH		20
-#define UI_BIG_CHAR_HEIGHT		40
 
 #define UI_OUTLINE_WIDTH		uiStatic.outlineWidth	// outline thickness
 
@@ -49,11 +35,9 @@ GNU General Public License for more details.
 
 #define MAX_HINT_TEXT		512
 
-
 // menu buttons dims
 #define UI_BUTTONS_WIDTH		240
 #define UI_BUTTONS_HEIGHT		40
-#define UI_BUTTON_CHARWIDTH		14	// empirically determined value
 
 #define UI_DESCEND			"gfx/shell/down"
 #define UI_ASCEND			"gfx/shell/up"

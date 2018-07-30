@@ -12,6 +12,18 @@ enum EFontFlags
 	FONT_STRIKEOUT = 1 << 2
 };
 
+#define UI_CONSOLE_CHAR_WIDTH	9
+#define UI_CONSOLE_CHAR_HEIGHT  18
+
+#define UI_SMALL_CHAR_WIDTH		11
+#define UI_SMALL_CHAR_HEIGHT	23
+
+#define UI_MED_CHAR_WIDTH		13
+#define UI_MED_CHAR_HEIGHT		26
+
+#define UI_BIG_CHAR_WIDTH		20
+#define UI_BIG_CHAR_HEIGHT		40
+
 enum EFontSizes
 {
 	QM_DEFAULTFONT = 0, // medium size font
