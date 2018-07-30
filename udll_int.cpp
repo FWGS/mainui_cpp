@@ -83,7 +83,7 @@ extern "C" EXPORT int GiveTextAPI( ui_textfuncs_t* pTextfuncsFromEngine )
 }
 #endif
 
-class CGameMenuExports : public IGameMenuExports
+static class CGameMenuExports : public IGameMenuExports
 {
 public:
 	bool Initialize( CreateInterfaceFn factory )
@@ -93,21 +93,69 @@ public:
 		return g_pClient ? true : false;
 	}
 
-	int HudFontHeight(float scale)
+	bool IsActive()
 	{
-		return g_FontMgr.GetFontTall( uiStatic.hSmallFont ) * scale;
+		return UI_IsVisible();
 	}
 
-	int HudCharacterWidth(int num, float scale)
+	void  Key( int key, int down )
 	{
-		return g_FontMgr.GetCharacterWidthScaled( uiStatic.hSmallFont, num, UI_SMALL_CHAR_HEIGHT * scale );
+		UI_KeyEvent( key, down );
 	}
 
-	int HudDrawCharacter(int x, int y, int num, int r, int g, int b, float scale)
+	void  MouseMove( int x, int y )
 	{
-		int color = PackRGBA( r, g, b, 255 );
+		UI_MouseMove( x, y );
+	}
 
-		return g_FontMgr.DrawCharacter( uiStatic.hSmallFont, num, Point( x, y ), Size( 0, UI_SMALL_CHAR_HEIGHT * scale ), color );
+	HFont BuildFont( CFontBuilder &builder )
+	{
+		return builder.Create();
+	}
+
+	void  GetCharABCWide( HFont font, int ch, int &a, int &b, int &c )
+	{
+		g_FontMgr.GetCharABCWide( font, ch, a, b, c );
+	}
+
+	int   GetFontTall( HFont font )
+	{
+		return g_FontMgr.GetFontTall( font );
+	}
+
+	int   GetCharacterWidth(HFont font, int ch, int charH )
+	{
+		return g_FontMgr.GetCharacterWidthScaled( font, ch, charH );
+	}
+
+	void  GetTextSize( HFont font, const char *text, int *wide, int *height = 0, int size = -1 )
+	{
+		g_FontMgr.GetTextSize( font, text, wide, height, size );
+	}
+
+	int	  GetTextHeight( HFont font, const char *text, int size = -1 )
+	{
+		return g_FontMgr.GetTextHeight( font, text, size );
+	}
+
+	int   DrawCharacter( HFont font, int ch, int x, int y, int charH, const unsigned int color, bool forceAdditive = false )
+	{
+		return g_FontMgr.DrawCharacter( font, ch, Point( x, y ), charH, color, forceAdditive );
+	}
+
+	void  DrawScoreboard( void )
+	{
+
+	}
+
+	void  DrawSpectatorMenu( void )
+	{
+
+	}
+
+	void  ShowVGUIMenu( int )
+	{
+
 	}
 } s_Menu;
 

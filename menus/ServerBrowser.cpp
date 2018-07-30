@@ -441,7 +441,7 @@ void CMenuServerBrowser::_Init( void )
 
 	natOrDirect.bKeepToggleWidth = true;
 	natOrDirect.size.w = 400;
-	natOrDirect.SetCoord( -20 - natOrDirect.size.w, 255 - gameList.charSize.h * 1.5 - UI_OUTLINE_WIDTH * 2 - natOrDirect.size.h );
+	natOrDirect.SetCoord( -20 - natOrDirect.size.w, 255 - gameList.charSize * 1.5 - UI_OUTLINE_WIDTH * 2 - natOrDirect.size.h );
 	natOrDirect.AddSwitch("Direct");
 	natOrDirect.AddSwitch("NAT");
 	natOrDirect.AddSwitch("LAN");

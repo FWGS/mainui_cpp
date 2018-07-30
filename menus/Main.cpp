@@ -27,6 +27,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "keydefs.h"
 #include "MenuStrings.h"
 #include "PlayerIntroduceDialog.h"
+#include "Switch.h"
 
 #define ART_MINIMIZE_N	"gfx/shell/min_n"
 #define ART_MINIMIZE_F	"gfx/shell/min_f"
@@ -58,6 +59,7 @@ private:
 	CMenuPicButton	multiPlayer;
 	CMenuPicButton	previews;
 	CMenuPicButton	quit;
+	CMenuSwitch		renderworld;
 
 	// quit dialog
 	CMenuYesNoMessageBox dialog;
@@ -176,6 +178,15 @@ void CMenuMain::_Init( void )
 	quit.iFlags |= QMF_NOTIFY;
 	quit.onActivated = MenuCb( &CMenuMain::QuitDialog );
 
+	renderworld.bKeepToggleWidth = true;
+	renderworld.bUpdateImmediately = true;
+	renderworld.szName = "";
+	renderworld.AddSwitch( "O" );
+	renderworld.AddSwitch( "I" );
+	renderworld.LinkCvar( "ui_renderworld" );
+	renderworld.SetSize( renderworld.size.w * 0.75f, renderworld.size.h );
+	renderworld.SetCoord( -renderworld.size.w - renderworld.size.h, renderworld.size.h );
+
 	dialog.Link( this );
 
 	AddItem( background );
@@ -187,6 +198,7 @@ void CMenuMain::_Init( void )
 	AddItem( configuration );
 	AddItem( previews );
 	AddItem( quit );
+	AddItem( renderworld );
 }
 
 /*
@@ -196,8 +208,6 @@ UI_Main_Init
 */
 void CMenuMain::_VidInit( void )
 {
-	Activate();
-
 	if( CL_IsActive() )
 	{
 		console.SetCoord( 72, 280 );
