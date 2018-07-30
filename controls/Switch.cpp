@@ -93,7 +93,7 @@ const char * CMenuSwitch::Key(int key, int down)
 {
 	const char *sound = NULL;
 	bool haveNewState = false;
-	int state;
+	int state = m_iState;
 
 	switch( key )
 	{
@@ -103,6 +103,11 @@ const char * CMenuSwitch::Key(int key, int down)
 		if( bMouseToggle )
 		{
 			sound = uiSoundGlow;
+			haveNewState = true;
+			state++;
+
+			if( state >= m_iSwitches )
+				state = 0;
 		}
 		else
 		{
@@ -185,13 +190,6 @@ void CMenuSwitch::Draw( void )
 	if( iFlags & QMF_GRAYED )
 	{
 		selectColor = uiColorDkGrey;
-	}
-	else if( bMouseToggle )
-	{
-		if( UI_CursorInRect( m_scPos, m_scSize ) )
-		{
-			selectColor = iFocusColor;
-		}
 	}
 
 	for( int i = 0; i < m_iSwitches; i++ )

@@ -76,6 +76,8 @@ public:
 	DECLARE_EVENT_TO_ITEM_METHOD( CMenuEditable, ResetCvar )
 	DECLARE_EVENT_TO_ITEM_METHOD( CMenuEditable, UpdateCvar )
 
+	bool bUpdateImmediately;
+
 protected:
 	const char *m_szCvarName;
 	cvarType_e  m_eType;

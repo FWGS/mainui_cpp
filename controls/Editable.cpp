@@ -52,6 +52,7 @@ void CMenuEditable::SetCvarValue( float value )
 	m_flValue = value;
 
 	if( onCvarChange ) onCvarChange( this );
+	if( bUpdateImmediately ) WriteCvar();
 }
 
 void CMenuEditable::SetCvarString(const char *string)
@@ -63,6 +64,7 @@ void CMenuEditable::SetCvarString(const char *string)
 	}
 
 	if( onCvarChange ) onCvarChange( this );
+	if( bUpdateImmediately ) WriteCvar();
 }
 
 void CMenuEditable::SetOriginalString( const char *psz )
