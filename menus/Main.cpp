@@ -119,11 +119,13 @@ const char *CMenuMain::Activate( void )
 	{
 		resumeGame.Show();
 		disconnect.Show();
+		renderworld.Show();
 	}
 	else
 	{
 		resumeGame.Hide();
 		disconnect.Hide();
+		renderworld.Hide();
 	}
 
 	CMenuPicButton::ClearButtonStack();
