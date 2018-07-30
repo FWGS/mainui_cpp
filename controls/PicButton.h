@@ -70,6 +70,7 @@ private:
 	void TACheckMenuDepth( void );
 	void PushPButtonStack( void );
 	static void PopPButtonStack( void );
+	static const char *GetLastButtonText( void );
 
 	void DrawButton( int r, int g, int b, int a, wrect_t *rects, int state );
 

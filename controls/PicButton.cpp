@@ -335,6 +335,18 @@ void CMenuPicButton::PopPButtonStack()
 	}
 }
 
+const char *CMenuPicButton::GetLastButtonText()
+{
+	if( ButtonStackDepth )
+	{
+		if( ButtonStack[ButtonStackDepth-1] )
+		{
+			return ButtonStack[ButtonStackDepth-1]->szName;
+		}
+	}
+	return NULL;
+}
+
 // Opened new menu, awaiting Quad from Banner
 void CMenuPicButton::PushPButtonStack()
 {
