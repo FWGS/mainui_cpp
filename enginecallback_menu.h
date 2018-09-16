@@ -248,7 +248,7 @@ public:
 	// new functions starts here
 	static inline float	RandomFloat( float flLow, float flHigh )
 	{ return engfuncs.pfnRandomFloat( flLow, flHigh ); }
-	static inline long	RandomLong( long lLow, long lHigh )
+	static inline int	RandomLong( int lLow, int lHigh )
 	{ return engfuncs.pfnRandomLong( lLow, lHigh ); }
 
 	static inline void	SetCursor( void *hCursor ) // change cursor
