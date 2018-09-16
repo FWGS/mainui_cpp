@@ -61,6 +61,11 @@ void CMenuBackgroundBitmap::DrawInGameBackground()
 
 void CMenuBackgroundBitmap::DrawColor()
 {
+	if( bDrawStroke )
+	{
+		UI_DrawRectangleExt( m_scPos, m_scSize, iStrokeColor, 1 );
+	}
+
 	UI_FillRect( m_scPos, m_scSize, iColor );
 }
 
