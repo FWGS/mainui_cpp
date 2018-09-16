@@ -155,7 +155,7 @@ void CMenuConnectionProgress::HandleDisconnect( void )
 		return;
 	}
 
-	if( UI_IsVisible() && uiStatic.menuActive == this )
+	if( UI_IsVisible() && m_pStack->menuActive == this )
 	{
 		Hide();
 		if( m_iSource != SOURCE_CONSOLE && m_iState != STATE_MENU )
@@ -163,7 +163,6 @@ void CMenuConnectionProgress::HandleDisconnect( void )
 			UI_CloseMenu();
 			UI_SetActiveMenu( true );
 			UI_Main_Menu();
-			UI_MultiPlayer_Menu();
 			UI_ServerBrowser_Menu();
 			if( m_iSource == SOURCE_CREATEGAME )
 				UI_CreateGame_Menu();
@@ -307,7 +306,7 @@ bool CMenuConnectionProgress::DrawAnimation(EAnimation anim)
 
 void CMenuConnectionProgress::Draw( void )
 {
-	if( ( m_iState != STATE_MENU && CL_IsActive() ) || ( m_iState == STATE_NONE && uiStatic.menuActive == this ) )
+	if( ( m_iState != STATE_MENU && CL_IsActive() ) || ( m_iState == STATE_NONE && m_pStack->menuActive == this ) )
 	{
 		m_iState = STATE_NONE;
 		Hide();

@@ -36,8 +36,45 @@ void CMenuFramework::Show()
 	CMenuPicButton::RootChanged( true );
 	BaseClass::Show();
 
-	uiStatic.rootActive = this;
-	uiStatic.rootPosition = uiStatic.menuDepth-1;
+	m_pStack->rootActive = this;
+	m_pStack->rootPosition = m_pStack->menuDepth-1;
+}
+
+void CMenuFramework::Draw()
+{
+	static int statusFadeTime;
+	static CMenuBaseItem *lastItem;
+	CMenuBaseItem *item;
+	const char *statusText;
+
+	BaseClass::Draw();
+
+	item = ItemAtCursor();
+	// a1ba: maybe this should be somewhere else?
+	if( item != lastItem )
+	{
+		if( item ) item->m_iLastFocusTime = uiStatic.realTime;
+		statusFadeTime = uiStatic.realTime;
+
+		lastItem = item;
+	}
+
+	// todo: move to framework?
+	// draw status text
+	if( item && item == lastItem && ( ( statusText = item->szStatusText ) != NULL ) )
+	{
+		float alpha = bound( 0, ((( uiStatic.realTime - statusFadeTime ) - 100 ) * 0.01f ), 1 );
+		int r, g, b, x, len;
+
+		EngFuncs::ConsoleStringLen( statusText, &len, NULL );
+
+		UnpackRGB( r, g, b, uiColorHelp );
+		EngFuncs::DrawSetTextColor( r, g, b, alpha * 255 );
+		x = ( ScreenWidth - len ) * 0.5; // centering
+
+		EngFuncs::DrawConsoleString( x, uiStatic.yOffset + 720 * uiStatic.scaleY, statusText );
+	}
+	else statusFadeTime = uiStatic.realTime;
 }
 
 void CMenuFramework::Hide()
@@ -45,12 +82,12 @@ void CMenuFramework::Hide()
 	int i;
 	BaseClass::Hide();
 
-	for( i = uiStatic.menuDepth-1; i >= 0; i-- )
+	for( i = m_pStack->menuDepth-1; i >= 0; i-- )
 	{
-		if( uiStatic.menuStack[i]->IsRoot() )
+		if( m_pStack->menuStack[i]->IsRoot() )
 		{
-			uiStatic.rootActive = uiStatic.menuStack[i];
-			uiStatic.rootPosition = i;
+			m_pStack->rootActive = m_pStack->menuStack[i];
+			m_pStack->rootPosition = i;
 			CMenuPicButton::RootChanged( false );
 			return;
 		}
@@ -58,8 +95,8 @@ void CMenuFramework::Hide()
 
 
 	// looks like we are have a modal or some window over game
-	uiStatic.rootActive = NULL;
-	uiStatic.rootPosition = 0;
+	m_pStack->rootActive = NULL;
+	m_pStack->rootPosition = 0;
 }
 
 void CMenuFramework::Init()

@@ -577,7 +577,7 @@ void UI_ServerBrowser_Menu( void )
 	// stop demos to allow network sockets to open
 	if ( gpGlobals->demoplayback && EngFuncs::GetCvarFloat( "cl_background" ))
 	{
-		uiStatic.m_iOldMenuDepth = uiStatic.menuDepth;
+		uiStatic.m_iOldMenuDepth = uiStatic.menu.menuDepth;
 		EngFuncs::ClientCmd( FALSE, "stop\n" );
 		uiStatic.m_fDemosPlayed = true;
 	}

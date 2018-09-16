@@ -75,8 +75,18 @@ public:
 	bool bInTransition;
 	EAnimation eTransitionType; // valid only when in transition
 	CMenuBackgroundBitmap background;
+
+	const windowStack_t *WindowStack() const
+	{
+		return m_pStack;
+	}
+
 protected:
 	int m_iTransitionStartTime;
+
+	void PushMenu( windowStack_t &stack );
+	void PopMenu( windowStack_t &stack );
+	windowStack_t *m_pStack;
 
 private:
 	CMenuBaseWindow(); // remove
@@ -88,9 +98,6 @@ private:
 
 	bool m_bHolding;
 	Point m_bHoldOffset;
-
-	void PushMenu();
-	void PopMenu();
 };
 
 #endif // BASEWINDOW_H

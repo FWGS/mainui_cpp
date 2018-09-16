@@ -33,6 +33,7 @@ public:
 	virtual ~CMenuFramework() override;
 
 	void Show() override;
+	void Draw() override;
 	void Init() final override;
 	void VidInit() final override;
 	void Hide() override;

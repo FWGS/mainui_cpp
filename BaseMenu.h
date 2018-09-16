@@ -15,6 +15,9 @@ GNU General Public License for more details.
 
 #ifndef BASEMENU_H
 #define BASEMENU_H
+#ifdef CS16CLIENT
+#include "../public/cl_dll/IGameClientExports.h"
+#endif
 #include "enginecallback_menu.h"
 #include "keydefs.h"
 #include "Primitive.h"
@@ -58,6 +61,9 @@ GNU General Public License for more details.
 // =====================================================================
 // Main menu interface
 
+#ifdef CS16CLIENT
+extern IGameClientExports *g_pClient;
+#endif
 extern cvar_t	*ui_precache;
 extern cvar_t	*ui_showmodels;
 extern cvar_t   *ui_show_window_stack;
@@ -65,15 +71,37 @@ extern cvar_t	*ui_borderclip;
 
 class CMenuBaseWindow;
 
-typedef struct
+class windowStack_t
 {
+public:
 	CMenuBaseWindow *rootActive; // current active fullscreen holder(menu framework)
 	CMenuBaseWindow *menuActive; // current active window
 	CMenuBaseWindow *prevMenu;   // previous active window
 	CMenuBaseWindow *menuStack[UI_MAX_MENUDEPTH];
-	int      menuDepth;
-	int      rootPosition;
+	int menuDepth;
+	int rootPosition;
 
+	bool IsActive( void ) { return menuDepth > 0; }
+	void VidInit( bool firstTime );
+	void Update( void );
+	void KeyEvent( int key, int down );
+	void CharEvent( int ch );
+	void MouseEvent( int x, int y );
+
+	void InputMethodResized( void );
+
+	void Close( void )
+	{
+		menuActive = NULL;
+		menuDepth = 0;
+		rootPosition = 0;
+	}
+};
+
+typedef struct
+{
+	windowStack_t menu;
+	windowStack_t client; // separate window stack for client windows
 	char	bgmaps[UI_MAX_BGMAPS][80];
 	int		bgmapcount;
 
@@ -89,8 +117,8 @@ typedef struct
 	HFont hHeavyBlur;
 #endif
 	bool	m_fDemosPlayed;
-	int		m_iOldMenuDepth;
 	bool	m_fNoOldBackground;
+	int 	m_iOldMenuDepth;
 
 	float	scaleX;
 	float	scaleY;
@@ -103,7 +131,6 @@ typedef struct
 	float	enterSound;
 	int		mouseInRect;
 	int		hideCursor;
-	int		visible;
 	int		framecount;	// how many frames menu visible
 	int		initialized;
 
@@ -116,8 +143,7 @@ typedef struct
 	int		buttons_draw_width;	// scaled image what we drawing
 	int		buttons_draw_height;
 	int		width;
-	bool		textInput;
-
+	bool	textInput;
 	bool	enableAlphaFactor;
 	float	alphaFactor;
 	int xOffset, yOffset;
@@ -133,6 +159,7 @@ extern uiStatic_t		uiStatic;
 #define DLG_X ((uiStatic.width - 640) / 2 - 192) // Dialogs are 640px in width
 
 extern const char		*uiSoundIn;
+extern const char		*uiSoundRollOver;
 extern const char		*uiSoundOut;
 extern const char		*uiSoundKey;
 extern const char		*uiSoundRemoveKey;
@@ -175,8 +202,8 @@ enum ETextFlags
 	ETF_ADDITIVE    = BIT( 3 )
 };
 
-int  UI_DrawString( HFont font, int x, int y, int w, int h, const char *str, const unsigned int col, int charH, ETextAlignment justify, uint flags = 0 );
-inline int UI_DrawString( HFont font, Point pos, Size size, const char *str, const unsigned int col, int charH, ETextAlignment justify, uint flags = 0 )
+int  UI_DrawString( HFont font, int x, int y, int w, int h, const char *str, const unsigned int col, int charH, uint justify, uint flags = 0 );
+inline int UI_DrawString( HFont font, Point pos, Size size, const char *str, const unsigned int col, int charH, uint justify, uint flags = 0 )
 {
 	return UI_DrawString( font, pos.x, pos.y, size.w, size.h, str, col, charH, justify, flags );
 }

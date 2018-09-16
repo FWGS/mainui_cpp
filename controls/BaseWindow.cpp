@@ -25,6 +25,7 @@ CMenuBaseWindow::CMenuBaseWindow(const char *name) : BaseClass()
 	m_bHolding = false;
 	bInTransition = false;
 	szName = name;
+	m_pStack = &uiStatic.menu;
 }
 
 void CMenuBaseWindow::Show()
@@ -32,70 +33,71 @@ void CMenuBaseWindow::Show()
 	Init();
 	VidInit();
 	Reload(); // take a chance to reload info for items
-	PushMenu();
+	PushMenu( *m_pStack );
 	EnableTransition();
 }
 
 void CMenuBaseWindow::Hide()
 {
-	PopMenu();
+	PopMenu( *m_pStack );
 	EnableTransition();
 }
 
 bool CMenuBaseWindow::IsVisible() const
 {
 	// slow!
-	for( int i = uiStatic.rootPosition; i < uiStatic.menuDepth; i++  )
+	for( int i = m_pStack->rootPosition; i < m_pStack->menuDepth; i++  )
 	{
-		if( uiStatic.menuStack[i] == this )
+		if( m_pStack->menuStack[i] == this )
 			return true;
 	}
 	return false;
 }
 
-void CMenuBaseWindow::PushMenu()
+void CMenuBaseWindow::PushMenu( windowStack_t &stack )
 {
 	int		i;
 	CMenuBaseItem	*item;
 
 	// if this menu is already present, drop back to that level to avoid stacking menus by hotkeys
-	for( i = 0; i < uiStatic.menuDepth; i++ )
+	for( i = 0; i < stack.menuDepth; i++ )
 	{
-		if( uiStatic.menuStack[i] == this )
+		if( stack.menuStack[i] == this )
 		{
 			if( IsRoot() )
-				uiStatic.menuDepth = i;
+				stack.menuDepth = i;
 			else
 			{
-				if( i != uiStatic.menuDepth - 1 )
+				if( i != stack.menuDepth - 1 )
 				{
 					// swap windows
-					uiStatic.menuStack[i] = uiStatic.menuActive;
-					uiStatic.menuStack[uiStatic.menuDepth] = this;
+					stack.menuStack[i] = stack.menuActive;
+					stack.menuStack[stack.menuDepth] = this;
 				}
 			}
 			break;
 		}
 	}
 
-	if( i == uiStatic.menuDepth )
+	if( i == stack.menuDepth )
 	{
-		if( uiStatic.menuDepth >= UI_MAX_MENUDEPTH )
+		if( stack.menuDepth >= UI_MAX_MENUDEPTH )
 			Host_Error( "UI_PushMenu: menu stack overflow\n" );
-		uiStatic.menuStack[uiStatic.menuDepth++] = this;
+		stack.menuStack[stack.menuDepth++] = this;
 	}
 
-	uiStatic.prevMenu = uiStatic.menuActive;
-	if( this->IsRoot() && uiStatic.prevMenu && uiStatic.prevMenu->IsRoot() )
-		uiStatic.prevMenu->EnableTransition();
-	uiStatic.menuActive = this;
+	stack.prevMenu = stack.menuActive;
+	if( this->IsRoot() && stack.prevMenu && stack.prevMenu->IsRoot() )
+		stack.prevMenu->EnableTransition();
+	stack.menuActive = this;
 
-	uiStatic.firstDraw = true;
-	uiStatic.enterSound = gpGlobals->time + 0.15f;	// make some delay
-	uiStatic.visible = true;
+	if( &stack == &uiStatic.menu ) // hack!
+	{
+		uiStatic.firstDraw = true;
+		uiStatic.enterSound = gpGlobals->time + 0.15f;	// make some delay
 
-	EngFuncs::KEY_SetDest ( KEY_MENU );
-
+		EngFuncs::KEY_SetDest ( KEY_MENU );
+	}
 
 	m_iCursor = 0;
 
@@ -123,38 +125,44 @@ void CMenuBaseWindow::PushMenu()
 #endif
 }
 
-void CMenuBaseWindow::PopMenu()
+void CMenuBaseWindow::PopMenu( windowStack_t &stack )
 {
-	EngFuncs::PlayLocalSound( uiSoundOut );
+	if( &stack == &uiStatic.menu ) // hack!
+	{
+		EngFuncs::PlayLocalSound( uiSoundOut );
+	}
 
-	uiStatic.menuDepth--;
+	stack.menuDepth--;
 
-	if( uiStatic.menuDepth < 0 )
+	if( stack.menuDepth < 0 )
 		Host_Error( "UI_PopMenu: menu stack underflow\n" );
 
-	if( uiStatic.menuDepth )
+	if( stack.menuDepth )
 	{
-		uiStatic.prevMenu = this;
-		uiStatic.menuActive = uiStatic.menuStack[uiStatic.menuDepth-1];
-		if( this->IsRoot() && uiStatic.menuActive->IsRoot() )
-			uiStatic.menuActive->EnableTransition();
+		stack.prevMenu = this;
+		stack.menuActive = stack.menuStack[stack.menuDepth-1];
+		if( this->IsRoot() && stack.menuActive->IsRoot() )
+			stack.menuActive->EnableTransition();
 
 		uiStatic.firstDraw = true;
 	}
-	else if ( CL_IsActive( ))
+	else if( &stack == &uiStatic.menu ) // hack!
 	{
-		UI_CloseMenu();
-	}
-	else
-	{
-		// a1ba: not needed anymore?
+		if ( CL_IsActive( ))
+		{
+			UI_CloseMenu();
+		}
+		else
+		{
+			// a1ba: not needed anymore?
 
-		// never trying the close menu when client isn't connected
-		EngFuncs::KEY_SetDest( KEY_MENU );
-		UI_Main_Menu();
+			// never trying the close menu when client isn't connected
+			EngFuncs::KEY_SetDest( KEY_MENU );
+			UI_Main_Menu();
+		}
 	}
 
-	if( uiStatic.m_fDemosPlayed && uiStatic.m_iOldMenuDepth == uiStatic.menuDepth )
+	if( &stack == &uiStatic.menu && uiStatic.m_fDemosPlayed && uiStatic.m_iOldMenuDepth == stack.menuDepth )
 	{
 		EngFuncs::ClientCmd( FALSE, "demos\n" );
 		uiStatic.m_fDemosPlayed = false;
@@ -224,8 +232,6 @@ bool CMenuBaseWindow::DrawAnimation(EAnimation anim)
 
 		UI_DisableAlphaFactor();
 
-		if( IsRoot() )
-			CMenuPicButton::DrawTitleAnim( anim );
 		return false;
 	}
 
@@ -256,7 +262,7 @@ bool CMenuBaseWindow::KeyValueData(const char *key, const char *data)
 
 void CMenuBaseWindow::EnableTransition()
 {
-	if( uiStatic.prevMenu )
+	if( m_pStack->prevMenu )
 	{
 		bInTransition = true;
 		m_iTransitionStartTime = uiStatic.realTime;
