@@ -61,6 +61,7 @@ void CMenuBaseItem::VidInit()
 
 	iColor.SetDefault( uiPromptTextColor );
 	iFocusColor.SetDefault( uiPromptFocusColor );
+	iStrokeColor.SetDefault( uiPromptTextColor );
 }
 
 void CMenuBaseItem::Reload()

@@ -164,12 +164,16 @@ public:
 	CColor iColor;
 	CColor iFocusColor;
 
-	ETextAlignment eTextAlignment;
+	unsigned int eTextAlignment;
 	EFocusAnimation eFocusAnimation;
 	ELetterCase eLetterCase;
 
 	HFont font;
 
+	bool bDrawStroke;
+	CColor iStrokeColor;
+
+	int		m_iLastFocusTime;
 protected:
 	// calls specific EventCallback
 	virtual void _Event( int ev );
@@ -179,10 +183,10 @@ protected:
 	virtual bool IsAbsolutePositioned( void ) const { return false; }
 
 	friend int UI_VidInit( void );
+	friend class windowStack_t;
 
 	CMenuItemsHolder	*m_pParent;
 	bool	m_bPressed;
-	int		m_iLastFocusTime;
 
 	bool	m_bAllocName;
 
