@@ -15,18 +15,27 @@ enum EFontFlags
 #define UI_CONSOLE_CHAR_WIDTH	9
 #define UI_CONSOLE_CHAR_HEIGHT  18
 
-#define UI_SMALL_CHAR_WIDTH		11
-#define UI_SMALL_CHAR_HEIGHT	23
+#define UI_SMALL_CHAR_WIDTH		10
+#define UI_SMALL_CHAR_HEIGHT	20
 
 #define UI_MED_CHAR_WIDTH		13
 #define UI_MED_CHAR_HEIGHT		26
 
+#ifdef CS16CLIENT
+#define UI_BIG_CHAR_WIDTH		25
+#define UI_BIG_CHAR_HEIGHT		50
+#else
 #define UI_BIG_CHAR_WIDTH		20
 #define UI_BIG_CHAR_HEIGHT		40
+#endif
 
 enum EFontSizes
 {
+#ifdef CLIENT_DLL // hack!
+	QM_DEFAULTFONT = 1, // medium size font
+#else
 	QM_DEFAULTFONT = 0, // medium size font
+#endif
 	QM_SMALLFONT,       // small
 	QM_BIGFONT,         // big
 	QM_BOLDFONT,
