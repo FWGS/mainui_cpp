@@ -31,13 +31,16 @@ public:
 	void Draw( void ) override;
 
 	void SetBackground( const char *path, unsigned int color = uiColorWhite );
-	void SetBackground( unsigned int color );
+	void SetBackground( unsigned int color, unsigned int focused = 0 );
+
+	bool m_bLimitBySize;
+	bool bIgnoreColorstring;
 
 private:
 	CColor m_iBackcolor;
+	CColor m_iBackColorFocused;
 	const char *m_szBackground;
 	bool m_bfillBackground;
-	bool m_bLimitBySize;
 };
 
 #endif // MENU_ACTION_H
