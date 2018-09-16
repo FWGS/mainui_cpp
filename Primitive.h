@@ -22,8 +22,12 @@ GNU General Public License for more details.
 #pragma warning(disable:4244) // float->int
 #endif
 
+template<class T>
+inline bool isrange( T min, T value, T max )
+{ return (((value) >= (min))) && (((value) <= (max))); };
+
 #define bound( min, num, max )	((num) >= (min) ? ((num) < (max) ? (num) : (max)) : (min))
-#define Q_min( a, b )	(((a) < (b)) ? (a) : (b))
+#define Q_min( a, b ) (((a) < (b)) ? (a) : (b))
 #define Q_max( a, b ) (((a) < (b)) ? (b) : (a))
 
 // engine constants
@@ -54,8 +58,9 @@ enum
 	QMF_HASKEYBOARDFOCUS   = BIT( 11 ),
 	QMF_DIALOG             = BIT( 12 ), // modal windows. Will grab key, char and mousemove events
 	QMF_DISABLESCAILING    = BIT( 13 ), // disables CalcPosition and CalcSizes
+	QMF_EVENTSIGNOREFOCUS  = BIT( 14 ), // don't care if item have focus, it must get events anyway. NOTE: they cannot issue sounds
 
-	QMF_HIDDENBYPARENT     = BIT( 30 ), // parent set this flag and don't want to draw this control
+	QMF_HIDDENBYPARENT     = BIT( 30 ), // INTERNAL USE ONLY: parent set this flag and don't want to draw this control
 	QMF_HIDDEN             = BIT( 31 ), // INTERNAL USE ONLY: Use Show/Hide/SetVisibility/ToggleVisibility
 };
 

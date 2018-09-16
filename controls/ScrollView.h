@@ -5,6 +5,7 @@
 
 class CMenuScrollView : public CMenuItemsHolder
 {
+	typedef CMenuItemsHolder BaseClass;
 public:
 	CMenuScrollView();
 
@@ -22,6 +23,8 @@ private:
 	Size  m_scScrollBarSize;
 	bool  m_bScrollBarSliding;
 	bool  m_bDisableScrolling; // can't actually scroll due to item placement
+	bool  m_bHoldingMouse1;
+	Point m_HoldingPoint;
 
 	int m_iPos;
 	int m_iMax;
