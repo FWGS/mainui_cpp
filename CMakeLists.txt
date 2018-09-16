@@ -104,6 +104,7 @@ set(MAINUI_FONT_RENDER_SOURCES
 )
 
 set(MAINUI_SOURCES
+	utl/unicode_strtools.cpp
 	EventSystem.cpp
 	EngineCallback.cpp
 	BaseMenu.cpp
