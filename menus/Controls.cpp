@@ -195,7 +195,11 @@ void CMenuKeysModel::Update( void )
 			pfile = EngFuncs::COM_ParseFile( pfile, token );
 			if( !pfile ) break;	// technically an error
 
-			snprintf( name[i], sizeof( name[i] ), "^6%s^7", token );
+			if( token[0] == '#' )
+				snprintf( name[i], sizeof( name[i] ), "^6%s^7", L( token ));
+			else
+				snprintf( name[i], sizeof( name[i] ), "^6%s^7", token );
+
 			keysBind[i][0] = firstKey[i][0] = secondKey[i][0] = 0;
 			i++;
 		}
@@ -210,7 +214,10 @@ void CMenuKeysModel::Update( void )
 			pfile = EngFuncs::COM_ParseFile( pfile, token );
 			if( !pfile ) break; // technically an error
 
-			snprintf( name[i], sizeof( name[i] ), "^6%s^7", token );
+			if( token[0] == '#' )
+				snprintf( name[i], sizeof( name[i] ), "^6%s^7", L( token ));
+			else
+				snprintf( name[i], sizeof( name[i] ), "^6%s^7", token );
 
 			const char *firstKeyStr = NULL, *secondKeyStr = NULL;
 
