@@ -35,6 +35,7 @@ fwgs_fix_default_msvc_settings()
 option(MAINUI_USE_CUSTOM_FONT_RENDER "Use custom font rendering" ON)
 option(MAINUI_USE_STB "Use stb_truetype.h for rendering(*nix-only)" OFF)
 option(MAINUI_RENDER_PICBUTTON_TEXT "Use custom font render to render picbuttons(experimental)" OFF)
+option(MAINUI_FONT_SCALE "Scale fonts by height" OFF)
 
 set(MAINUI_CONTROLS_SOURCES
 	controls/Framework.cpp
@@ -57,8 +58,7 @@ set(MAINUI_CONTROLS_SOURCES
 	controls/Table.cpp
 	controls/TabView.cpp
 	controls/PlayerModelView.cpp
-	#controls/VideoPlayer.cpp
-	# controls/ScrollView.cpp
+	controls/ScrollView.cpp
 )
 
 set(MAINUI_MENUS_SOURCES
@@ -88,7 +88,6 @@ set(MAINUI_MENUS_SOURCES
 	menus/VideoModes.cpp
 	menus/VideoOptions.cpp
 	menus/PlayerIntroduceDialog.cpp
-	# menus/Zoo.cpp
 	menus/ConnectionProgress.cpp
 	menus/ConnectionWarning.cpp
 	menus/dynamic/ScriptMenu.cpp
@@ -117,6 +116,17 @@ set(MAINUI_SOURCES
 	udll_int.cpp
 )
 
+if(CS16CLIENT)
+	add_definitions(-DCS16CLIENT)
+	list(APPEND MAINUI_SOURCES
+		${XASH_SDK}/common/interface.cpp
+		menus/Scoreboard.cpp
+		menus/client/JoinGame.cpp
+		menus/client/JoinClass.cpp
+		menus/client/ClientWindow.cpp
+		)
+endif()
+
 list(APPEND MAINUI_SOURCES ${MAINUI_CONTROLS_SOURCES})
 list(APPEND MAINUI_SOURCES ${MAINUI_MENUS_SOURCES})
 list(APPEND MAINUI_SOURCES ${MAINUI_FONT_RENDER_SOURCES})
@@ -136,6 +146,10 @@ endif()
 
 if(XASH_SAILFISH)
 	add_definitions(-D__SAILFISH__)
+endif()
+
+if(MAINUI_FONT_SCALE)
+	add_definitions(-DMAINUI_FONT_SCALE)
 endif()
 
 # Force stb_truetype for Apple devices, as there is no Apple native font renderer
