@@ -615,3 +615,5 @@ GNU General Public License for more details.
 #define IDS_LAST                        600
 
 extern const char *MenuStrings[IDS_LAST];
+
+

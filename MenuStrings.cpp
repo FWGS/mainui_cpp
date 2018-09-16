@@ -13,11 +13,12 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 
-
+#include <ctype.h>
 #include "extdll_menu.h"
 #include "BaseMenu.h"
 #include "Utils.h"
 #include "MenuStrings.h"
+#include "unicode_strtools.h"
 
 #define EMPTY_STRINGS_1 ""
 #define EMPTY_STRINGS_2 EMPTY_STRINGS_1, EMPTY_STRINGS_1
@@ -26,6 +27,14 @@ GNU General Public License for more details.
 #define EMPTY_STRINGS_20 EMPTY_STRINGS_10, EMPTY_STRINGS_10
 #define EMPTY_STRINGS_50 EMPTY_STRINGS_20, EMPTY_STRINGS_20, EMPTY_STRINGS_10
 #define EMPTY_STRINGS_100 EMPTY_STRINGS_50, EMPTY_STRINGS_50
+
+#define HASH_SIZE 256 // 256 * 4 * 4 == 4096 bytes
+static struct dictionary_t
+{
+	const char *name;
+	const char *value;
+	dictionary_t *next;
+} *hashed_cmds[HASH_SIZE];
 
 const char *MenuStrings[IDS_LAST] =
 {
@@ -79,7 +88,52 @@ EMPTY_STRINGS_50, // 540..589
 EMPTY_STRINGS_10, // 590..599
 };
 
-void UI_InitAliasStrings( void )
+/*
+=================
+Com_HashKey
+
+returns hash key for string
+=================
+*/
+static uint Com_HashKey( const char *string, uint hashSize )
+{
+	uint	i, hashKey = 0;
+
+	for( i = 0; string[i]; i++ )
+	{
+		hashKey = (hashKey + i) * 37 + tolower( string[i] );
+	}
+
+	return (hashKey % hashSize);
+}
+
+static inline dictionary_t *Dictionary_FindInBucket( dictionary_t *bucket, const char *name )
+{
+	dictionary_t *i = bucket;
+	for( ; i && strcasecmp( name, i->name ); // filter out
+		 i = i->next );
+
+	return i;
+}
+
+static void Dictionary_Insert( const char *name, const char *second )
+{
+	uint hash = Com_HashKey( name, HASH_SIZE );
+	dictionary_t *elem;
+
+	elem = new dictionary_t;
+	elem->name = StringCopy(name);
+	elem->value = StringCopy(second);
+	elem->next   = hashed_cmds[hash];
+	hashed_cmds[hash] = elem;
+}
+
+static inline dictionary_t *Dictionary_GetBucket( const char *name )
+{
+	return hashed_cmds[ Com_HashKey( name, HASH_SIZE ) ];
+}
+
+static void UI_InitAliasStrings( void )
 {
 	char token[1024];
 
@@ -106,6 +160,137 @@ void UI_InitAliasStrings( void )
 	MenuStrings[IDS_MAIN_MULTIPLAYERHELP] = StringCopy( token );
 }
 
+static void Localize_AddToDictionary( const char *name, const char *lang )
+{
+	char filename[64];
+	snprintf( filename, sizeof( filename ), "resource/%s_%s.txt", name, lang );
+
+	int unicodeLength;
+	uchar16 *unicodeBuf = (uchar16*)EngFuncs::COM_LoadFile( filename, &unicodeLength );
+
+	if( unicodeBuf ) // no problem, so read it.
+	{
+		int ansiLength = unicodeLength / 2;
+		char *afile = new char[ansiLength]; // save original pointer, so we can free it later
+		char *pfile = afile;
+		char token[4096];
+		int i = 0;
+
+		Q_UTF16ToUTF8( unicodeBuf + 1, afile, ansiLength, STRINGCONVERT_ASSERT_REPLACE );
+
+		pfile = EngFuncs::COM_ParseFile( pfile, token );
+
+		if( stricmp( token, "lang" ))
+		{
+			Con_Printf( "Localize_AddToDict( %s, %s ): invalid header, got %s", name, lang, token );
+			goto error;
+		}
+
+		pfile = EngFuncs::COM_ParseFile( pfile, token );
+
+		if( strcmp( token, "{" ))
+		{
+			Con_Printf( "Localize_AddToDict( %s, %s ): want {, got %s", name, lang, token );
+			goto error;
+		}
+
+		pfile = EngFuncs::COM_ParseFile( pfile, token );
+
+		if( stricmp( token, "Language" ))
+		{
+			Con_Printf( "Localize_AddToDict( %s, %s ): want Language, got %s", name, lang, token );
+			goto error;
+		}
+
+		// skip language actual name
+		pfile = EngFuncs::COM_ParseFile( pfile, token );
+
+		pfile = EngFuncs::COM_ParseFile( pfile, token );
+
+		if( stricmp( token, "Tokens" ))
+		{
+			Con_Printf( "Localize_AddToDict( %s, %s ): want Tokens, got %s", name, lang, token );
+			goto error;
+		}
+
+		pfile = EngFuncs::COM_ParseFile( pfile, token );
+
+		if( strcmp( token, "{" ))
+		{
+			Con_Printf( "Localize_AddToDict( %s, %s ): want { after Tokens, got %s", name, lang, token );
+			goto error;
+		}
+
+		while( (pfile = EngFuncs::COM_ParseFile( pfile, token )))
+		{
+			if( !strcmp( token, "}" ))
+				break;
+
+			char szLocString[4096];
+			pfile = EngFuncs::COM_ParseFile( pfile, szLocString );
+
+			if( !strcmp( szLocString, "}" ))
+				break;
+
+
+			if( pfile )
+			{
+				Dictionary_Insert( token, szLocString );
+				i++;
+			}
+		}
+
+		Con_Printf( "Localize_AddToDict: loaded %i words from %s\n", i, filename );
+
+error:
+		delete[] afile;
+
+		EngFuncs::COM_FreeFile( unicodeBuf );
+	}
+	else
+	{
+		Con_Printf( "Couldn't open file %s. Strings will not be localized!.\n", filename );
+	}
+}
+
+static void Localize_Init( void )
+{
+	char gamedir[256];
+
+	EngFuncs::GetGameDir( gamedir );
+
+	memset( hashed_cmds, 0, sizeof( hashed_cmds ) );
+
+	// first is lowest in priority
+	if( strcmp( gamedir, "gameui" )) // just for case
+		Localize_AddToDictionary( "gameui", "english" );
+
+	Localize_AddToDictionary( "valve",  "english" );
+
+	if( strcmp( gamedir, "valve" ))
+		Localize_AddToDictionary( gamedir,  "english" );
+}
+
+static void Localize_Free( void )
+{
+	for( int i = 0; i < HASH_SIZE; i++ )
+	{
+		dictionary_t *base = hashed_cmds[i];
+		while( base )
+		{
+			dictionary_t *next = base->next;
+
+			delete [] base->value;
+			delete [] base->name;
+			delete base;
+
+			base = next;
+		}
+	}
+
+	return;
+}
+
 void UI_LoadCustomStrings( void )
 {
 	char *afile = (char *)EngFuncs::COM_LoadFile( "gfx/shell/strings.lst", NULL );
@@ -114,6 +299,7 @@ void UI_LoadCustomStrings( void )
 	int string_num;
 
 	UI_InitAliasStrings ();
+	Localize_Init();
 
 	if( !afile )
 		return;
@@ -131,10 +317,32 @@ void UI_LoadCustomStrings( void )
 		}
 		else continue; // invalid declaration ?
 
-		// parse new string 
+		// parse new string
 		pfile = EngFuncs::COM_ParseFile( pfile, token );
 		MenuStrings[string_num] = StringCopy( token ); // replace default string with custom
 	}
 
 	EngFuncs::COM_FreeFile( afile );
+}
+
+const char *L( const char *szStr ) // L means Localize!
+{
+	if( szStr )
+	{
+		if( *szStr == '#' )
+			szStr++;
+
+		dictionary_t *base = Dictionary_GetBucket( szStr );
+		dictionary_t *found = Dictionary_FindInBucket( base, szStr );
+
+		if( found )
+			return found->value;
+	}
+
+	return szStr;
+}
+
+void UI_FreeCustomStrings( void )
+{
+	Localize_Free();
 }

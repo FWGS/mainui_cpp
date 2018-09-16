@@ -139,8 +139,11 @@ extern int KEY_GetKey( const char *binding );			// ripped out from engine
 extern char *StringCopy( const char *input );			// copy string into new memory
 extern int COM_CompareSaves( const void **a, const void **b );
 extern void Com_EscapeCommand( char *newCommand, const char *oldCommand, int len );
-extern void UI_LoadCustomStrings( void );
 extern void UI_EnableTextInput( bool enable );
+
+void UI_LoadCustomStrings( void );
+const char *L( const char *szStr ); // L means Localize!
+void UI_FreeCustomStrings( void );
 
 #ifdef __APPLE__
 #define register
