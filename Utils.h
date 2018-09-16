@@ -22,6 +22,7 @@ GNU General Public License for more details.
 #include "enginecallback_menu.h"
 #include "gameinfo.h"
 #include "FontManager.h"
+#include "BMPUtils.h"
 
 #define FILE_GLOBAL	static
 #define DLL_GLOBAL
@@ -196,60 +197,6 @@ inline size_t Q_strncpy( char *dst, const char *src, size_t size )
 // stringize utilites
 #define STR( x ) #x
 #define STR2( x ) STR( x )
-
-typedef unsigned short       word;
-
-#pragma pack( push, 1 )
-struct bmp_t
-{
-	char id[2];		// bmfh.bfType
-	uint fileSize;		// bmfh.bfSize
-	uint reserved0;	// bmfh.bfReserved1 + bmfh.bfReserved2
-	uint bitmapDataOffset;	// bmfh.bfOffBits
-	uint bitmapHeaderSize;	// bmih.biSize
-	uint width;		// bmih.biWidth
-	int	 height;		// bmih.biHeight
-	word planes;		// bmih.biPlanes
-	word bitsPerPixel;	// bmih.biBitCount
-	uint compression;	// bmih.biCompression
-	uint bitmapDataSize;	// bmih.biSizeImage
-	uint hRes;		// bmih.biXPelsPerMeter
-	uint vRes;		// bmih.biYPelsPerMeter
-	uint colors;		// bmih.biClrUsed
-	uint importantColors;	// bmih.biClrImportant
-};
-#pragma pack( pop )
-
-class CBMP
-{
-public:
-	CBMP( uint w, uint h );
-	~CBMP() { if( data ) delete []data; }
-
-	void Increase(uint newW, uint newH);
-
-	static CBMP* LoadFile( const char *filename );
-
-	void RemapLogo( int r, int g, int b );
-
-	inline byte *GetBitmap()
-	{
-		return data;
-	}
-
-	inline bmp_t *GetBitmapHdr()
-	{
-		return (bmp_t*)data;
-	}
-
-	inline byte *GetTextureData()
-	{
-		return data + GetBitmapHdr()->bitmapDataOffset;
-	}
-
-private:
-	byte    *data;
-};
 
 namespace UI
 {
