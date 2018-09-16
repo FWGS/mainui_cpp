@@ -174,7 +174,7 @@ const char *CMenuField::Key( int key, int down )
 	{
 		bool remaining;
 
-		int maxIdx = g_FontMgr.CutText( font, szBuffer + iScroll, m_scChSize, iRealWidth, false, NULL, &remaining );
+		int maxIdx = g_FontMgr.CutText( font, szBuffer + iScroll, m_scChSize, iRealWidth, false, false, NULL, &remaining );
 
 		if( iCursor < len ) iCursor = EngFuncs::UtfMoveRight( szBuffer, iCursor, len );
 		if( remaining && iCursor > maxIdx ) iScroll = EngFuncs::UtfMoveRight( szBuffer, iScroll, len );
@@ -234,7 +234,7 @@ const char *CMenuField::Key( int key, int down )
 			bool remaining;
 			int newScroll = iScroll;
 
-			int iWidthInChars = g_FontMgr.CutText( font, szBuffer + iScroll, m_scChSize, iRealWidth, false, &w, &remaining );
+			int iWidthInChars = g_FontMgr.CutText( font, szBuffer + iScroll, m_scChSize, iRealWidth, false, false, &w, &remaining );
 
 			if( eTextAlignment & QM_LEFT )
 			{
@@ -256,7 +256,7 @@ const char *CMenuField::Key( int key, int down )
 			{
 				x = m_scPos.x + (m_scSize.w - w) / 2;
 			}
-			charpos = g_FontMgr.CutText(font, szBuffer + newScroll, m_scChSize, uiStatic.cursorX - x, false, &w, &remaining );
+			charpos = g_FontMgr.CutText(font, szBuffer + newScroll, m_scChSize, uiStatic.cursorX - x, false, false, &w, &remaining );
 
 			iCursor = charpos + iScroll;
 			if( iCursor > 0 )

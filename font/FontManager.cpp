@@ -30,7 +30,11 @@ GNU General Public License for more details.
 #include "BitmapFont.h"
 
 #ifdef __ANDROID__
+#ifdef CS16CLIENT
+#define DEFAULT_MENUFONT "DroidSans"
+#else
 #define DEFAULT_MENUFONT "RobotoCondensed"
+#endif
 #define DEFAULT_CONFONT  "DroidSans"
 #define DEFAULT_WEIGHT   1000
 #else
@@ -38,8 +42,6 @@ GNU General Public License for more details.
 #define DEFAULT_CONFONT  "Tahoma"
 #define DEFAULT_WEIGHT   500
 #endif
-
-// #define SCALE_FONTS
 
 CFontManager g_FontMgr;
 
@@ -231,7 +233,7 @@ void CFontManager::GetTextSize(HFont fontHandle, const char *text, int *wide, in
 		uch = EngFuncs::UtfProcessChar( (unsigned char)*ch );
 		if( uch )
 		{
-			if( uch == '\n' )
+			if( uch == '\n' && *( ch + 1 ) != '\0' )
 			{
 				_tall += fontTall;
 				x = 0;
@@ -254,7 +256,7 @@ void CFontManager::GetTextSize(HFont fontHandle, const char *text, int *wide, in
 	if( wide ) *wide = _wide;
 }
 
-int CFontManager::CutText(HFont fontHandle, const char *text, int height, int visibleSize, bool reverse, int *wide, bool *remaining )
+int CFontManager::CutText(HFont fontHandle, const char *text, int height, int visibleSize, bool reverse, bool stopAtWhitespace, int *wide, bool *remaining )
 {
 	CBaseFont *font = GetIFontFromHandle( fontHandle );
 
@@ -273,6 +275,8 @@ int CFontManager::CutText(HFont fontHandle, const char *text, int height, int vi
 
 	EngFuncs::UtfProcessChar( 0 );
 
+	int whiteSpacePos = 0;
+
 	// calculate full text wide
 	while( *ch )
 	{
@@ -287,10 +291,20 @@ int CFontManager::CutText(HFont fontHandle, const char *text, int height, int vi
 		int x = 0;
 		if( uch )
 		{
-			// we don't need check for newlines here, it's only done for oneline Field widget
+			if( uch == '\n' )
+			{
+				ch++;
+				break; //
+			}
+
 			int a, b, c;
 			font->GetCharABCWidths( uch, a, b, c );
 			x = a + b + c;
+
+			if( uch == ' ' )
+			{
+				whiteSpacePos = ch - text;
+			}
 		}
 
 		if( !reverse && _wide + x >= visibleSize )
@@ -306,6 +320,8 @@ int CFontManager::CutText(HFont fontHandle, const char *text, int height, int vi
 	{
 		if( *ch && remaining ) *remaining = true;
 		if( wide ) *wide = _wide;
+		if( stopAtWhitespace && whiteSpacePos )
+			return whiteSpacePos;
 		return ch - text;
 	}
 
@@ -317,6 +333,8 @@ int CFontManager::CutText(HFont fontHandle, const char *text, int height, int vi
 	}
 
 	ch = text;
+
+	whiteSpacePos = 0;
 
 	// now remove character one by one to fit
 	while( *ch && _wide > visibleSize )
@@ -335,6 +353,11 @@ int CFontManager::CutText(HFont fontHandle, const char *text, int height, int vi
 			int a, b, c;
 			font->GetCharABCWidths( uch, a, b, c );
 			_wide -= a + b + c;
+
+			if( uch == ' ' )
+			{
+				whiteSpacePos = ch - text;
+			}
 		}
 		ch++;
 	}
@@ -343,6 +366,7 @@ int CFontManager::CutText(HFont fontHandle, const char *text, int height, int vi
 
 	if( remaining ) *remaining = true;
 	if( wide ) *wide = _wide;
+	if( stopAtWhitespace && whiteSpacePos ) return whiteSpacePos;
 	return ch - text;
 
 }
@@ -377,6 +401,31 @@ int CFontManager::GetTextHeight(HFont fontHandle, const char *text, int size )
 		i++;
 	}
 	return height;
+}
+
+int CFontManager::GetTextHeightExt( HFont fontHandle, const char *text, int height, int w, int size )
+{
+	CBaseFont *font = GetIFontFromHandle( fontHandle );
+	if( !font || !text || !text[0] || !w )
+	{
+		return 0;
+	}
+
+	const char *text2 = text;
+	int y = 0;
+
+	while( *text2 && ( size < 0 || text2 - text < size ) )
+	{
+		int pos = CutText( fontHandle, text2, height, w, false, true );
+		if( pos == 0 )
+			break;
+
+		y += height;
+		text2 += pos;
+	}
+
+	return y;
+
 }
 
 int CFontManager::GetTextWideScaled(HFont font, const char *text, const int height, int size)

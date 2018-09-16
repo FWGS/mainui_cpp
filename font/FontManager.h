@@ -45,7 +45,10 @@ public:
 	int   GetCharacterWidthScaled(HFont font, int ch, int charH );
 
 	void  GetTextSize( HFont font, const char *text, int *wide, int *tall = NULL, int size = -1 );
+
+	// simplified version, counts only newlines
 	int   GetTextHeight( HFont font, const char *text, int size = -1 );
+	int   GetTextHeightExt( HFont font, const char *text, int height, int visibleWidth, int size = -1 );
 
 	/*
 	 * Determine how text should be cut, to fit in "visibleWidth"
@@ -54,7 +57,7 @@ public:
 	 * If reverse is set, return value will indicate starting index, because ending index is always at string index
 	 * If reverse is NOT set, return value will indicate ending index, because starting index is always at 0
 	 */
-	int	  CutText(HFont fontHandle, const char *text, int height, int visibleSize, bool reverse, int *width = NULL, bool *remaining = NULL );
+	int	  CutText(HFont fontHandle, const char *text, int height, int visibleSize, bool reverse, bool stopAtWhitespace = false, int *width = NULL, bool *remaining = NULL );
 
 	int GetTextWideScaled( HFont font, const char *text, const int height, int size = -1 );
 
