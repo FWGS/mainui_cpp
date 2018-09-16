@@ -179,7 +179,7 @@ char *StringCopy( const char *input )
 {
 	if( !input ) return NULL;
 
-	char *out = (char *)MALLOC( strlen( input ) + 1 );
+	char *out = new char[strlen( input ) + 1];
 	strcpy( out, input );
 
 	return out;
