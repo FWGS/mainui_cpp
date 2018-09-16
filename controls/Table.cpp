@@ -25,6 +25,9 @@ GNU General Public License for more details.
 CMenuTable::CMenuTable() : BaseClass(),
 	bFramedHintText( false ),
 	bAllowSorting( false ),
+	bShowScrollBar( true ),
+	bDrawStroke( true ),
+	iOutlineWidth( 0 ),
 	szHeaderTexts(),
 	szBackground(),
 	szUpArrow( UI_UPARROW ), szUpArrowFocus( UI_UPARROWFOCUS ), szUpArrowPressed( UI_UPARROWPRESSED ),
@@ -44,7 +47,17 @@ void CMenuTable::VidInit()
 {
 	BaseClass::VidInit();
 
-	iNumRows = ( m_scSize.h - UI_OUTLINE_WIDTH * 2 ) / m_scChSize - 1;
+	iBackgroundColor.SetDefault( uiColorBlack );
+	iHeaderColor.SetDefault( uiColorHelp );
+	iStrokeColor.SetDefault( uiInputFgColor );
+	iStrokeFocusedColor.SetDefault( uiInputTextColor );
+
+	if( !iOutlineWidth )
+	{
+		iOutlineWidth = uiStatic.outlineWidth;
+	}
+
+	iNumRows = ( m_scSize.h - iOutlineWidth * 2 ) / m_scChSize - 1;
 
 	if( !iCurItem )
 	{
@@ -82,18 +95,21 @@ void CMenuTable::VidInit()
 	headerSize.h = m_scChSize * HEADER_HEIGHT_FRAC;
 
 	// then determine arrow position and sizes
-	arrow.w = arrow.h = 24;
+	if( bShowScrollBar )
+		arrow.w = arrow.h = 24;
+	else
+		arrow.w = arrow.h = 0;
 	arrow = arrow.Scale();
-	downArrow.x = upArrow.x = m_scPos.x + m_scSize.w - arrow.w + UI_OUTLINE_WIDTH * 1;
-	upArrow.y = m_scPos.y - UI_OUTLINE_WIDTH;
-	downArrow.y = upArrow.y + m_scSize.h - arrow.h + UI_OUTLINE_WIDTH * 2;
+	downArrow.x = upArrow.x = m_scPos.x + m_scSize.w - arrow.w + iOutlineWidth * 1;
+	upArrow.y = m_scPos.y - iOutlineWidth;
+	downArrow.y = upArrow.y + m_scSize.h - arrow.h + iOutlineWidth * 2;
 	if( !bFramedHintText )
 	{
 		upArrow.y += headerSize.h;
 	}
 
 	// calculate header size(position is table position)
-	headerSize.w = m_scSize.w - arrow.w + UI_OUTLINE_WIDTH;
+	headerSize.w = m_scSize.w - arrow.w + iOutlineWidth;
 
 	// box is lower than header
 	boxPos.x = m_scPos.x;
@@ -198,7 +214,7 @@ const char *CMenuTable::Key( int key, int down )
 		else if( UI_CursorInRect( boxPos, boxSize ))
 		{
 			// test for item select
-			int starty = boxPos.y + UI_OUTLINE_WIDTH;
+			int starty = boxPos.y + iOutlineWidth;
 			int endy = starty + iNumRows * m_scChSize;
 			if( uiStatic.cursorY > starty && uiStatic.cursorY < endy )
 			{
@@ -343,7 +359,7 @@ const char *CMenuTable::Key( int key, int down )
 	return sound;
 }
 
-void CMenuTable::DrawLine( Point p, const char **psz, size_t size, uint textColor, bool forceCol, int fillColor )
+void CMenuTable::DrawLine( Point p, const char **psz, size_t size, uint textColor, bool forceCol, uint fillColor )
 {
 	size_t i;
 	Size sz;
@@ -401,25 +417,33 @@ void CMenuTable::DrawLine( Point p, const char **psz, size_t size, uint textColo
 	}
 }
 
-void CMenuTable::DrawLine( Point p, int line, uint textColor, bool forceCol, int fillColor )
+void CMenuTable::DrawLine( Point p, int line, uint textColor, bool forceCol, uint fillColor )
 {
 	int i;
 	Size sz;
-	uint textflags = 0;
-
-	textflags |= iFlags & QMF_DROPSHADOW ? ETF_SHADOW : 0;
-	textflags |= forceCol ? ETF_FORCECOL : 0;
 
 	sz.h = m_scChSize;
 
+	unsigned int newFillColor;
+	bool forceFillColor;
+	if( m_pModel->GetLineColor( line, newFillColor, forceFillColor ))
+	{
+		if( !fillColor || forceFillColor )
+			fillColor = newFillColor;
+	}
+
 	if( fillColor )
 	{
-		sz.w = boxSize.w;
+		sz.w = headerSize.w;
 		UI_FillRect( p, sz, fillColor );
 	}
 
 	for( i = 0; i < m_pModel->GetColumns(); i++, p.x += sz.w )
 	{
+		uint textflags = 0;
+
+		textflags |= iFlags & QMF_DROPSHADOW ? ETF_SHADOW : 0;
+
 		if( columns[i].fStaticWidth )
 			sz.w = columns[i].flWidth * uiStatic.scaleX;
 		else
@@ -430,6 +454,17 @@ void CMenuTable::DrawLine( Point p, int line, uint textColor, bool forceCol, int
 
 		if( !str /* && type != CELL_ITEM  */) // headers may be null, cells too
 			continue;
+
+		bool useCustomColors = m_pModel->GetCellColors( line, i, newFillColor, forceFillColor );
+
+		if( useCustomColors )
+		{
+			if( forceFillColor || forceCol )
+			{
+				textflags |= ETF_FORCECOL;
+			}
+			textColor = newFillColor;
+		}
 
 		switch( type )
 		{
@@ -460,7 +495,16 @@ void CMenuTable::DrawLine( Point p, int line, uint textColor, bool forceCol, int
 			default: break;
 			}
 
-			EngFuncs::PIC_Set( pic, 255, 255, 255 );
+			if( useCustomColors )
+			{
+				int r, g, b, a;
+				UnpackRGBA( r, g, b, a, newFillColor );
+				EngFuncs::PIC_Set( pic, r, g, b, a );
+			}
+			else
+			{
+				EngFuncs::PIC_Set( pic, 255, 255, 255 );
+			}
 
 			switch( type )
 			{
@@ -492,7 +536,7 @@ void CMenuTable::Draw()
 	int upFocus, downFocus, scrollbarFocus;
 
 	// HACKHACK: recalc iNumRows, to be not greater than iNumItems
-	iNumRows = ( m_scSize.h - UI_OUTLINE_WIDTH * 2 ) / m_scChSize - 1;
+	iNumRows = ( m_scSize.h - iOutlineWidth * 2 ) / m_scChSize - 1;
 	if( iNumRows > m_pModel->GetRows() )
 		iNumRows = m_pModel->GetRows();
 
@@ -515,33 +559,34 @@ void CMenuTable::Draw()
 		// draw the opaque outlinebox first
 		if( bFramedHintText )
 		{
-			UI_FillRect( m_scPos, headerSize.AddVertical( boxSize ), uiColorBlack );
+			UI_FillRect( m_scPos, headerSize.AddVertical( boxSize ), iBackgroundColor );
 		}
 		else
 		{
-			UI_FillRect( boxPos, boxSize, uiColorBlack );
+			UI_FillRect( boxPos, boxSize, iBackgroundColor );
 		}
 	}
 
 	int columns = Q_min( m_pModel->GetColumns(), MAX_TABLE_COLUMNS );
 
-	DrawLine( m_scPos, szHeaderTexts, columns, uiColorHelp, true );
+	DrawLine( m_scPos, szHeaderTexts, columns, iHeaderColor, true );
 
 	if( !szBackground )
 	{
 		int color;
 
 		if( eFocusAnimation == QM_HIGHLIGHTIFFOCUS && iFlags & QMF_HASKEYBOARDFOCUS )
-			color = uiInputTextColor;
+			color = iStrokeFocusedColor;
 		else
-			color = uiInputFgColor;
+			color = iStrokeColor;
 
 		if( bFramedHintText )
 		{
-			UI_DrawRectangle( m_scPos, headerSize, color, QM_LEFT | QM_TOP | QM_RIGHT );
+			UI_DrawRectangleExt( m_scPos, headerSize, color, iOutlineWidth, QM_LEFT | QM_TOP | QM_RIGHT );
 		}
 
-		UI_DrawRectangle( boxPos, boxSize, color );
+		if( bDrawStroke )
+			UI_DrawRectangleExt( boxPos, boxSize, color, iOutlineWidth );
 	}
 
 	float step = (m_pModel->GetRows() <= 1 ) ? 1 : (downArrow.y - upArrow.y - arrow.h) / (float)(m_pModel->GetRows() - 1);
@@ -702,18 +747,21 @@ void CMenuTable::Draw()
 			color = uiColorDkGrey;
 			forceCol = true;
 		}
-		else if( i == iCurItem )
+		else if( !(iFlags & QMF_INACTIVE) )
 		{
-			if( eFocusAnimation == QM_HIGHLIGHTIFFOCUS )
-				color = iFocusColor;
-			else if( eFocusAnimation == QM_PULSEIFFOCUS )
-				color = PackAlpha( iColor, 255 * (0.5 + 0.5 * sin( (float)uiStatic.realTime / UI_PULSE_DIVISOR )));
+			if( i == iCurItem )
+			{
+				if( eFocusAnimation == QM_HIGHLIGHTIFFOCUS )
+					color = iFocusColor;
+				else if( eFocusAnimation == QM_PULSEIFFOCUS )
+					color = PackAlpha( iColor, 255 * (0.5 + 0.5 * sin( (float)uiStatic.realTime / UI_PULSE_DIVISOR )));
 
-			fillColor = selColor;
-		}
-		else if( i == iHighlight )
-		{
-			fillColor = 0x80383838;
+				fillColor = selColor;
+			}
+			else if( i == iHighlight )
+			{
+				fillColor = 0x80383838;
+			}
 		}
 
 		DrawLine( Point( boxPos.x, y ), i, color, forceCol, fillColor );

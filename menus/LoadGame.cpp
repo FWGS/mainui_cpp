@@ -64,7 +64,7 @@ public:
 	{
 		return m_szCells[line][column];
 	}
-	ETextAlignment GetAlignmentForColumn(int column) const override
+	unsigned int GetAlignmentForColumn(int column) const override
 	{
 		if( column == 2 )
 			return QM_RIGHT;

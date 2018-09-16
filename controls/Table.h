@@ -129,10 +129,20 @@ public:
 
 	bool bFramedHintText;
 	bool bAllowSorting;
+	bool bShowScrollBar;
+	bool bDrawStroke;
+
+	CColor iStrokeFocusedColor;
+	CColor iStrokeColor;
+
+	int iOutlineWidth;
+
+	CColor iBackgroundColor;
+	CColor iHeaderColor;
 
 private:
-	void DrawLine(Point p, const char **psz, size_t size, uint textColor, bool forceCol, int fillColor = 0);
-	void DrawLine(Point p, int line, uint textColor, bool forceCol, int fillColor = 0);
+	void DrawLine(Point p, const char **psz, size_t size, uint textColor, bool forceCol, uint fillColor = 0);
+	void DrawLine(Point p, int line, uint textColor, bool forceCol, uint fillColor = 0);
 
 	const char	*szHeaderTexts[MAX_TABLE_COLUMNS];
 	struct

@@ -41,8 +41,10 @@ public:
 	// customization
 	virtual void OnDeleteEntry( int line ) { }
 	virtual void OnActivateEntry( int line ) { }
-	virtual ETextAlignment GetAlignmentForColumn( int column ) const { return QM_LEFT; }
+	virtual unsigned int GetAlignmentForColumn( int column ) const { return QM_LEFT; }
 	virtual ECellType GetCellType( int line, int column ) { return CELL_TEXT; }
+	virtual bool GetLineColor( int line, unsigned int &fillColor, bool &force ) const { return false; }
+	virtual bool GetCellColors( int line, int column, unsigned int &textColor, bool &force ) const { return false; }
 	virtual bool IsCellTextWrapped( int line, int column ) { return true; }
 	// virtual CMenuBaseItem *GetCellItem( int line, int column ) { return NULL; }
 
