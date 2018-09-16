@@ -51,6 +51,28 @@ const char *CMenuItemsHolder::Key( int key, int down )
 			}
 		}
 
+		for( int i = 0; i < m_numItems; i++ )
+		{
+			item = m_pItems[i];
+
+			if( !item )
+				continue;
+
+			if( !(item->iFlags & QMF_EVENTSIGNOREFOCUS) )
+				continue; // predict state: such items are rare
+
+			if( item == ItemAtCursor() )
+				continue;
+
+			if( item->iFlags & (QMF_GRAYED|QMF_INACTIVE) )
+				continue;
+
+			if( !item->IsVisible() )
+				continue;
+
+			item->Key( key, down );
+		}
+
 		// system keys are always wait for keys down and never keys up
 		if( !down )
 			return 0;
@@ -121,6 +143,28 @@ void CMenuItemsHolder::Char( int ch )
 
 	if( item && item->IsVisible() && !(item->iFlags & (QMF_GRAYED|QMF_INACTIVE)) )
 		item->Char( ch );
+
+	for( int i = 0; i < m_numItems; i++ )
+	{
+		item = m_pItems[i];
+
+		if( !item )
+			continue;
+
+		if( !(item->iFlags & QMF_EVENTSIGNOREFOCUS) )
+			continue; // predict state: such items are rare
+
+		if( item == ItemAtCursor() )
+			continue;
+
+		if( item->iFlags & (QMF_GRAYED|QMF_INACTIVE) )
+			continue;
+
+		if( !item->IsVisible() )
+			continue;
+
+		item->Char( ch );
+	}
 }
 
 const char *CMenuItemsHolder::Activate()
@@ -244,11 +288,7 @@ void CMenuItemsHolder::SetInactive( bool inactive )
 
 void CMenuItemsHolder::Draw( )
 {
-	static int statusFadeTime;
-	static CMenuBaseItem *lastItem;
 	CMenuBaseItem *item;
-
-	const char *statusText;
 
 	// draw contents
 	for( int i = 0; i < m_numItems; i++ )
@@ -266,33 +306,6 @@ void CMenuItemsHolder::Draw( )
 		if( ui_borderclip->value )
 			UI_DrawRectangle( item->m_scPos, item->m_scSize, PackRGBA( 255, 0, 0, 255 ) );
 	}
-
-	item = ItemAtCursor();
-	// a1ba: maybe this should be somewhere else?
-	if( item != lastItem )
-	{
-		if( item ) item->m_iLastFocusTime = uiStatic.realTime;
-		statusFadeTime = uiStatic.realTime;
-
-		lastItem = item;
-	}
-
-	// todo: move to framework?
-	// draw status text
-	if( item && item == lastItem && ( ( statusText = item->szStatusText ) != NULL ) )
-	{
-		float alpha = bound( 0, ((( uiStatic.realTime - statusFadeTime ) - 100 ) * 0.01f ), 1 );
-		int r, g, b, x, len;
-
-		EngFuncs::ConsoleStringLen( statusText, &len, NULL );
-
-		UnpackRGB( r, g, b, uiColorHelp );
-		EngFuncs::DrawSetTextColor( r, g, b, alpha * 255 );
-		x = ( ScreenWidth - len ) * 0.5; // centering
-
-		EngFuncs::DrawConsoleString( x, uiStatic.yOffset + 720 * uiStatic.scaleY, statusText );
-	}
-	else statusFadeTime = uiStatic.realTime;
 }
 
 /*
