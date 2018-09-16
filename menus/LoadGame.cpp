@@ -34,7 +34,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define LEVELSHOT_W		192
 #define LEVELSHOT_H		160
 
-#define MAX_CELLSTRING 32
+#define MAX_CELLSTRING 64
 
 class CMenuSavePreview : public CMenuBaseItem
 {
