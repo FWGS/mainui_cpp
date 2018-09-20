@@ -18,6 +18,7 @@ GNU General Public License for more details.
 #include "BaseMenu.h"
 #include "Utils.h"
 #include "cl_dll/IGameClientExports.h"
+#include "Scoreboard.h"
 
 ui_enginefuncs_t EngFuncs::engfuncs;
 #ifndef XASH_DISABLE_FWGS_EXTENSIONS
@@ -83,79 +84,106 @@ extern "C" EXPORT int GiveTextAPI( ui_textfuncs_t* pTextfuncsFromEngine )
 }
 #endif
 
+void UI_JoinGame_Show( int param1, int param2 );
+void UI_JoinClassT_Show( int param1, int param2 );
+void UI_JoinClassCT_Show( int param1, int param2 );
+void UI_BuyMenu_Show( int param1, int param2 );
+void UI_BuyMenu_Pistol_Show( int param1, int param2 );
+void UI_BuyMenu_Shotgun_Show( int param1, int param2 );
+void UI_BuyMenu_Submachine_Show( int param1, int param2 );
+void UI_BuyMenu_Rifle_Show( int param1, int param2 );
+void UI_BuyMenu_Machinegun_Show( int param1, int param2 );
+void UI_BuyMenu_Item_Show( int param1, int param2 );
+
 static class CGameMenuExports : public IGameMenuExports
 {
 public:
-	bool Initialize( CreateInterfaceFn factory )
+	bool Initialize( CreateInterfaceFn factory ) override
 	{
 		g_pClient = (IGameClientExports*)factory( GAMECLIENTEXPORTS_INTERFACE_VERSION, NULL );
 
 		return g_pClient ? true : false;
 	}
 
-	bool IsActive()
+	bool IsActive() override
 	{
-		return UI_IsVisible();
+		return uiStatic.client.IsActive() && !uiStatic.menu.IsActive();
 	}
 
-	void  Key( int key, int down )
+	bool IsMainMenuActive() override
 	{
-		UI_KeyEvent( key, down );
+		return uiStatic.menu.IsActive();
 	}
 
-	void  MouseMove( int x, int y )
+	void  Key( int key, int down ) override
 	{
-		UI_MouseMove( x, y );
+		uiStatic.client.KeyEvent( key, down );
 	}
 
-	HFont BuildFont( CFontBuilder &builder )
+	void  MouseMove( int x, int y ) override
+	{
+		uiStatic.cursorX = x;
+		uiStatic.cursorY = y;
+		uiStatic.client.MouseEvent( x, y );
+	}
+
+	HFont BuildFont( CFontBuilder &builder ) override
 	{
 		return builder.Create();
 	}
 
-	void  GetCharABCWide( HFont font, int ch, int &a, int &b, int &c )
+	void  GetCharABCWide( HFont font, int ch, int &a, int &b, int &c ) override
 	{
 		g_FontMgr.GetCharABCWide( font, ch, a, b, c );
 	}
 
-	int   GetFontTall( HFont font )
+	int   GetFontTall( HFont font ) override
 	{
 		return g_FontMgr.GetFontTall( font );
 	}
 
-	int   GetCharacterWidth(HFont font, int ch, int charH )
+	int   GetCharacterWidth(HFont font, int ch, int charH ) override
 	{
 		return g_FontMgr.GetCharacterWidthScaled( font, ch, charH );
 	}
 
-	void  GetTextSize( HFont font, const char *text, int *wide, int *height = 0, int size = -1 )
+	void  GetTextSize( HFont font, const char *text, int *wide, int *height = 0, int size = -1 ) override
 	{
 		g_FontMgr.GetTextSize( font, text, wide, height, size );
 	}
 
-	int	  GetTextHeight( HFont font, const char *text, int size = -1 )
+	int	  GetTextHeight( HFont font, const char *text, int size = -1 ) override
 	{
 		return g_FontMgr.GetTextHeight( font, text, size );
 	}
 
-	int   DrawCharacter( HFont font, int ch, int x, int y, int charH, const unsigned int color, bool forceAdditive = false )
+	int   DrawCharacter( HFont font, int ch, int x, int y, int charH, const unsigned int color, bool forceAdditive = false ) override
 	{
 		return g_FontMgr.DrawCharacter( font, ch, Point( x, y ), charH, color, forceAdditive );
 	}
 
-	void  DrawScoreboard( void )
+	void  SetupScoreboard( int xstart, int xend, int ystart, int yend, unsigned int color, bool drawStroke ) override
 	{
-
+		UI_SetupScoreboard( xstart, xend, ystart, yend, color, drawStroke );
 	}
 
-	void  DrawSpectatorMenu( void )
+	void  DrawScoreboard( void ) override
 	{
-
+		UI_DrawScoreboard();
 	}
 
-	void  ShowVGUIMenu( int )
+	void  DrawSpectatorMenu( void ) override
 	{
+	}
 
+	void  ShowVGUIMenu( int menuType, int param1, int param2 ) override
+	{
+		switch( menuType )
+		{
+		case MENU_TEAM: UI_JoinGame_Show( param1, param2 ); break;
+		case MENU_CLASS_T: UI_JoinClassT_Show( param1, param2 ); break;
+		case MENU_CLASS_CT: UI_JoinClassCT_Show( param1, param2 ); break;
+		}
 	}
 } s_Menu;
 
