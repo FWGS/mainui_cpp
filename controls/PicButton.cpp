@@ -144,7 +144,8 @@ void CMenuPicButton::Draw( )
 {
 	int state = BUTTON_NOFOCUS;
 
-	if( UI_CursorInRect( m_scPos, m_scSize ) && m_pParent == uiStatic.menuActive )
+	if( UI_CursorInRect( m_scPos, m_scSize ) &&
+		m_pParent && m_pParent->IsVisible() )
 	{
 		if( !bRollOver )
 		{

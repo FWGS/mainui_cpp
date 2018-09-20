@@ -27,31 +27,31 @@ CMenuPlayerModelView::CMenuPlayerModelView() : CMenuBaseItem()
 	prevCursorY = 0;
 	hPlayerImage = 0;
 	eFocusAnimation = QM_HIGHLIGHTIFFOCUS;
+
+	eOverrideMode = PMV_DONTCARE;
+	iOutlineWidth = -1;
 }
 
 void CMenuPlayerModelView::VidInit()
 {
+	backgroundColor.SetDefault( uiColorHelp );
+	outlineColor.SetDefault( uiInputFgColor );
+	outlineFocusColor.SetDefault( uiInputTextColor );
+
+	if( iOutlineWidth == -1 )
+		iOutlineWidth = uiStatic.outlineWidth;
+
 	CMenuBaseItem::VidInit();
 
-	ent = EngFuncs::GetPlayerModel();
+	ent = &ent2;
 
-	if( !ent )
-		return;
+	memset( ent, 0, sizeof( cl_entity_t ));
 
 	EngFuncs::SetModel( ent, "models/player.mdl" );
 
-	// setup render and actor
-	refdef.fov_x = 40;
-
-	refdef.viewport[0] = m_scPos.x;
-	refdef.viewport[1] = m_scPos.y;
-	refdef.viewport[2] = m_scSize.w;
-	refdef.viewport[3] = m_scSize.h;
-
-	CalcFov();
-
 	// adjust entity params
-	ent->curstate.number = 1;	// IMPORTANT: always set playerindex to 1
+	ent->index = 0;
+	ent->curstate.number = 700;	// IMPORTANT: always set playerindex to 1
 	ent->curstate.animtime = gpGlobals->time;	// start animation
 	ent->curstate.sequence = 1;
 	ent->curstate.scale = 1.0f;
@@ -70,7 +70,7 @@ void CMenuPlayerModelView::VidInit()
 	ent->origin[2] = ent->curstate.origin[2] = 2.0f;
 	ent->angles[1] = ent->curstate.angles[1] = 180.0f;
 
-	ent->player = true; // yes, draw me as playermodel
+	ent->player = false; // yes, draw me as playermodel
 }
 
 const char *CMenuPlayerModelView::Key(int key, int down)
@@ -134,15 +134,16 @@ const char *CMenuPlayerModelView::Key(int key, int down)
 void CMenuPlayerModelView::Draw()
 {
 	// draw the background
-	UI_FillRect( m_scPos, m_scSize, uiPromptBgColor );
+	UI_FillRect( m_scPos, m_scSize, backgroundColor );
 
 	// draw the rectangle
 	if( eFocusAnimation == QM_HIGHLIGHTIFFOCUS && IsCurrentSelected() )
-		UI_DrawRectangle( m_scPos, m_scSize, uiInputTextColor );
+		UI_DrawRectangleExt( m_scPos, m_scSize, outlineFocusColor, iOutlineWidth );
 	else
-		UI_DrawRectangle( m_scPos, m_scSize, uiInputFgColor );
+		UI_DrawRectangleExt( m_scPos, m_scSize, outlineColor, iOutlineWidth );
 
-	if( !ui_showmodels->value )
+	if( ( eOverrideMode == PMV_DONTCARE && !ui_showmodels->value ) || // controlled by engine cvar
+		( eOverrideMode == PMV_SHOWIMAGE ) ) // controlled by menucode
 	{
 		if( hPlayerImage )
 		{
@@ -163,6 +164,16 @@ void CMenuPlayerModelView::Draw()
 		refdef.time = gpGlobals->time;
 		refdef.frametime = gpGlobals->frametime;
 #endif
+		// setup render and actor
+		refdef.fov_x = 40;
+
+		refdef.viewport[0] = m_scPos.x;
+		refdef.viewport[1] = m_scPos.y;
+		refdef.viewport[2] = m_scSize.w;
+		refdef.viewport[3] = m_scSize.h;
+
+		CalcFov();
+
 		ent->curstate.body = 0;
 
 		if( uiStatic.enableAlphaFactor )

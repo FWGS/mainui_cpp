@@ -39,7 +39,22 @@ public:
 
 	ref_menu_params_t refdef;
 	cl_entity_t *ent;
+
+	enum
+	{
+		PMV_DONTCARE = 0,
+		PMV_SHOWMODEL,
+		PMV_SHOWIMAGE
+	} eOverrideMode;
+
+
+	CColor backgroundColor;
+	CColor outlineColor;
+	CColor outlineFocusColor;
+	int iOutlineWidth;
 private:
+	cl_entity_t ent2;
+
 	bool mouseYawControl;
 
 	int prevCursorX, prevCursorY;

@@ -57,6 +57,7 @@ public:
 	CMenuBannerBitmap() : BaseClass()
 	{
 		iFlags = QMF_INACTIVE;
+		SetCharSize( QM_BIGFONT );
 		SetRect( UI_BANNER_POSX, UI_BANNER_POSY, UI_BANNER_WIDTH, UI_BANNER_HEIGHT );
 		bDrawAdditive = true;
 	}
