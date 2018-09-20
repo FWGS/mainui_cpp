@@ -106,7 +106,7 @@ public:
 	} logoImage;
 
 	CMenuSpinControl	logo;
-	CMenuSpinControl		logoColor;
+	CMenuSpinControl	logoColor;
 
 	CMenuYesNoMessageBox msgBox;
 
@@ -119,12 +119,21 @@ void CMenuPlayerSetup::CMenuLogoPreview::Draw()
 		// draw the background
 		UI_FillRect( m_scPos, m_scSize, uiPromptBgColor );
 
+#ifdef NEW_ENGINE_INTERFACE
 		UI_DrawString( font, m_scPos, m_scSize, "No logo", iColor, m_scChSize, QM_CENTER, ETF_SHADOW );
+#else
+		UI_DrawString( font, m_scPos, m_scSize, "Coming soon!", iColor, m_scChSize, QM_CENTER, ETF_SHADOW );
+#endif
 	}
 	else
 	{
 		EngFuncs::PIC_Set( hImage, r, g, b, 255 );
 		EngFuncs::PIC_Draw( m_scPos, m_scSize );
+
+#ifndef NEW_ENGINE_INTERFACE
+		UI_FillRect( m_scPos, m_scSize, uiColorBlack );
+		UI_DrawString( font, m_scPos, m_scSize, "Coming soon!", iColor, m_scChSize, QM_CENTER, ETF_SHADOW );
+#endif
 	}
 
 	// draw the rectangle
@@ -282,7 +291,9 @@ void CMenuPlayerSetup::UpdateLogo()
 	logoImage.hImage = EngFuncs::PIC_Load( image, 0 );
 	ApplyColorToLogoPreview();
 
+#ifdef NEW_ENGINE_INTERFACE
 	EngFuncs::CvarSetString( "cl_logofile", mdl );
+#endif
 }
 
 void CMenuPlayerSetup::ApplyColorToImagePreview()
@@ -351,9 +362,9 @@ void CMenuPlayerSetup::_Init( void )
 		hideModels = true;
 
 	// old engine cannot support logo customization, just don't add them
-#ifndef NEW_ENGINE_INTERFACE
+/*#ifndef NEW_ENGINE_INTERFACE
 	hideLogos = true;
-#endif
+#endif*/
 
 	if( gMenu.m_gameinfo.flags & GFL_NOMODELS )
 		addFlags |= QMF_INACTIVE;
@@ -448,12 +459,20 @@ void CMenuPlayerSetup::_Init( void )
 			logoImage.SetRect( 72, 230 + m_iBtnsNum * 50 + 10, 200, 200 );
 
 			logo.Setup( &logosModel );
+#ifdef NEW_ENGINE_INTERFACE
 			logo.LinkCvar( "cl_logofile", CMenuEditable::CVAR_STRING );
+#else // NEW_ENGINE_INTERFACE
+			logo.SetCurrentValue( 0.0f );
+#endif
 			logo.onChanged = VoidCb( &CMenuPlayerSetup::UpdateLogo );
 			logo.SetRect( 72, logoImage.pos.y + logoImage.size.h + UI_OUTLINE_WIDTH, 200, 32 );
 
 			logoColor.Setup( &colors );
+#ifdef NEW_ENGINE_INTERFACE
 			logoColor.LinkCvar( "cl_logocolor", CMenuEditable::CVAR_STRING );
+#else // NEW_ENGINE_INTERFACE
+			logoColor.SetCurrentValue( 0.0f );
+#endif
 			logoColor.onChanged = VoidCb( &CMenuPlayerSetup::ApplyColorToLogoPreview );;
 			logoColor.SetRect( 72, logo.pos.y + logo.size.h + UI_OUTLINE_WIDTH, 200, 32 );
 		}
