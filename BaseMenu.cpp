@@ -562,8 +562,8 @@ void UI_DrawMouseCursor( void )
 
 	if( uiStatic.hideCursor || UI_IsXashFWGS() ) return;
 
-	int cursor = uiStatic.menuActive->GetCursor();
-	item = uiStatic.menuActive->m_pItems[cursor];
+	int cursor = uiStatic.menu.menuActive->GetCursor();
+	item = uiStatic.menu.menuActive->m_pItems[cursor];
 
 	if( item->iFlags & QMF_HASMOUSEFOCUS ) 	// fast approach
 	{
@@ -574,9 +574,9 @@ void UI_DrawMouseCursor( void )
 	}
 	else
 	{
-		for( i = 0; i < uiStatic.menuActive->m_numItems; i++ )
+		for( i = 0; i < uiStatic.menu.menuActive->m_numItems; i++ )
 		{
-			item = (CMenuBaseItem *)uiStatic.menuActive->m_pItems[i];
+			item = (CMenuBaseItem *)uiStatic.menu.menuActive->m_pItems[i];
 
 			if ( !item->IsVisible() )
 				continue;
