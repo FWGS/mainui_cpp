@@ -110,7 +110,7 @@ static uint Com_HashKey( const char *string, uint hashSize )
 static inline dictionary_t *Dictionary_FindInBucket( dictionary_t *bucket, const char *name )
 {
 	dictionary_t *i = bucket;
-	for( ; i && strcasecmp( name, i->name ); // filter out
+	for( ; i && stricmp( name, i->name ); // filter out
 		 i = i->next );
 
 	return i;
