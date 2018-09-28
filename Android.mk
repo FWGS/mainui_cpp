@@ -47,7 +47,9 @@ LOCAL_SRC_FILES := \
 	controls/BaseWindow.cpp                         \
 	controls/BackgroundBitmap.cpp                   \
 	controls/Table.cpp                              \
+	controls/TabView.cpp				\
 	controls/PlayerModelView.cpp                    \
+	controls/ScrollView.cpp				\
 	menus/AdvancedControls.cpp                      \
 	menus/Audio.cpp                                 \
 	menus/Configuration.cpp                         \
@@ -81,6 +83,7 @@ LOCAL_SRC_FILES := \
 	font/BaseFontBackend.cpp			\
 	font/StbFont.cpp				\
 	font/BitmapFont.cpp				\
+	utl/unicode_strtools.cpp			\
 	EventSystem.cpp                                 \
 	BaseMenu.cpp                                    \
 	Btns.cpp                                        \
