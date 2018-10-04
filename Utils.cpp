@@ -381,6 +381,36 @@ void operator delete[]( void *ptr )
 }
 */
 
+CBMP* CBMP::LoadFile( const char *filename )
+{
+	int length = 0;
+	bmp_t *bmp = (bmp_t*)EngFuncs::COM_LoadFile( filename, &length );
+
+	// cannot load
+	if( !bmp )
+		return NULL;
+
+	// too small for BMP
+	if( (size_t)length < sizeof( bmp_t ))
+		return NULL;
+
+	// not a BMP
+	if( bmp->id[0] != 'B' || bmp->id[1] != 'M' )
+		return NULL;
+
+	// bogus data
+	if( !bmp->width || !bmp->height )
+		return NULL;
+
+	CBMP *ret = new CBMP( bmp->width, bmp->height );
+	memcpy( ret->GetBitmap(), bmp, length );
+
+	EngFuncs::COM_FreeFile( bmp );
+
+	return ret;
+}
+
+
 /*
 ============================
 Con_UtfProcessChar
