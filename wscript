@@ -59,7 +59,8 @@ def build(bld):
 		'menus/*.cpp', 
 		'menus/dynamic/*.cpp', 
 		'model/*.cpp',
-		'controls/*.cpp'
+		'controls/*.cpp',
+		'utl/*.cpp'
 	])
 
 	includes = [
