@@ -59,7 +59,7 @@ extern "C" EXPORT int GetMenuAPI(UI_FUNCTIONS *pFunctionTable, ui_enginefuncs_t*
 	memcpy( pFunctionTable, &gFunctionTable, sizeof( UI_FUNCTIONS ));
 	memcpy( &EngFuncs::engfuncs, pEngfuncsFromEngine, sizeof( ui_enginefuncs_t ));
 #ifndef XASH_DISABLE_FWGS_EXTENSIONS
-	memset( &EngFuncs::textfuncs, 0, sizeof( ui_textfuncs_t ));
+	//memset( &EngFuncs::textfuncs, 0, sizeof( ui_textfuncs_t ));
 #endif
 	gpGlobals = pGlobals;
 
