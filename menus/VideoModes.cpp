@@ -47,7 +47,7 @@ public:
 	const char *GetCellText(int line, int column) { return m_szModes[line]; }
 private:
 	int m_iNumModes;
-	const char *m_szModes[32];
+	const char *m_szModes[64];
 };
 
 class CMenuVidModes : public CMenuFramework
@@ -89,7 +89,7 @@ void CMenuVidModesModel::Update( void )
 	m_szModes[0] = "<Current window size>";
 	m_szModes[1] = "<Desktop size>";
 
-	for( i = VID_MODES_POS; i < 64; i++ )
+	for( i = VID_MODES_POS; i < 64 - VID_MODES_POS; i++ )
 	{
 		const char *mode = EngFuncs::GetModeString( i - VID_MODES_POS );
 		if( !mode ) break;
@@ -110,8 +110,22 @@ void CMenuVidModes::SetConfig( )
 	{
 		char cmd[64];
 
-		snprintf( cmd, sizeof( cmd ), "vid_mode %i", vidList.GetCurrentIndex() - VID_MODES_POS );
+		// vid_setmode is a new command, which does not depends on 
+		// static resolution list but instead uses dynamic resolution
+		// list provided by video backend
+#ifdef NEW_ENGINE_INTERFACE
+		if( UI_IsXashFWGS() )
+		{
+			snprintf( cmd, sizeof( cmd ), "vid_setmode %i\n", vidList.GetCurrentIndex() - VID_MODES_POS );
+		}
+		else
+#else
+		{
+			snprintf( cmd, sizeof( cmd ), "vid_mode %i\n", vidList.GetCurrentIndex() - VID_MODES_POS );
+		}
+#endif
 		EngFuncs::ClientCmd( TRUE, cmd );
+		
 
 		// have changed resolution, but enable test mode only in fullscreen
 		testMode |= !windowed.bChecked;

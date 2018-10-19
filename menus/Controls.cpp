@@ -303,30 +303,28 @@ const char *CMenuControls::Key( int key, int down )
 {
 	char	cmd[128];
 
-	if( msgBox1.IsVisible() && down )
+	if( msgBox1.IsVisible() && bind_grab ) // assume we are in grab-mode
 	{
-		if( bind_grab )	// assume we are in grab-mode
+		// defining a key
+		if( key == '`' || key == '~' )
 		{
-			// defining a key
-			if( key == '`' || key == '~' )
-			{
-				return uiSoundBuzz;
-			}
-			else if( key != K_ESCAPE )
-			{
-				const char *bindName = keysListModel.keysBind[keysList.GetCurrentIndex()];
-				sprintf( cmd, "bind \"%s\" \"%s\"\n", EngFuncs::KeynumToString( key ), bindName );
-				EngFuncs::ClientCmd( TRUE, cmd );
-			}
-
-			bind_grab = false;
-			keysListModel.Update();
-
-			PromptDialog();
-
-			return uiSoundLaunch;
+			return uiSoundBuzz;
 		}
+		else if( key != K_ESCAPE )
+		{
+			const char *bindName = keysListModel.keysBind[keysList.GetCurrentIndex()];
+			sprintf( cmd, "bind \"%s\" \"%s\"\n", EngFuncs::KeynumToString( key ), bindName );
+			EngFuncs::ClientCmd( TRUE, cmd );
+		}
+
+		bind_grab = false;
+		keysListModel.Update();
+
+		PromptDialog();
+
+		return uiSoundLaunch;
 	}
+	
 	return CMenuFramework::Key( key, down );
 }
 

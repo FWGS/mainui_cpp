@@ -30,6 +30,7 @@ CMenuPlayerModelView::CMenuPlayerModelView() : CMenuBaseItem()
 
 	eOverrideMode = PMV_DONTCARE;
 	iOutlineWidth = -1;
+	refdef.fov_x = 40.0f;
 }
 
 void CMenuPlayerModelView::VidInit()
@@ -43,15 +44,20 @@ void CMenuPlayerModelView::VidInit()
 
 	CMenuBaseItem::VidInit();
 
-	ent = &ent2;
+	refdef.viewport[0] = m_scPos.x;
+	refdef.viewport[1] = m_scPos.y;
+	refdef.viewport[2] = m_scSize.w;
+	refdef.viewport[3] = m_scSize.h;
+	CalcFov();
+
+	ent = EngFuncs::GetPlayerModel();
 
 	memset( ent, 0, sizeof( cl_entity_t ));
 
-	EngFuncs::SetModel( ent, "models/player.mdl" );
-
 	// adjust entity params
 	ent->index = 0;
-	ent->curstate.number = 700;	// IMPORTANT: always set playerindex to 1
+	ent->curstate.body = 0;
+	ent->curstate.number = 1;	// IMPORTANT: always set playerindex to 1
 	ent->curstate.animtime = gpGlobals->time;	// start animation
 	ent->curstate.sequence = 1;
 	ent->curstate.scale = 1.0f;
@@ -70,7 +76,7 @@ void CMenuPlayerModelView::VidInit()
 	ent->origin[2] = ent->curstate.origin[2] = 2.0f;
 	ent->angles[1] = ent->curstate.angles[1] = 180.0f;
 
-	ent->player = false; // yes, draw me as playermodel
+	ent->player = true; // yes, draw me as playermodel
 }
 
 const char *CMenuPlayerModelView::Key(int key, int down)
@@ -84,7 +90,6 @@ const char *CMenuPlayerModelView::Key(int key, int down)
 		mouseYawControl = true;
 		prevCursorX =  uiStatic.cursorX;
 		prevCursorY =  uiStatic.cursorY;
-
 	}
 	else if( key == K_MOUSE1 && !down && mouseYawControl )
 	{
@@ -164,18 +169,6 @@ void CMenuPlayerModelView::Draw()
 		refdef.time = gpGlobals->time;
 		refdef.frametime = gpGlobals->frametime;
 #endif
-		// setup render and actor
-		refdef.fov_x = 40;
-
-		refdef.viewport[0] = m_scPos.x;
-		refdef.viewport[1] = m_scPos.y;
-		refdef.viewport[2] = m_scSize.w;
-		refdef.viewport[3] = m_scSize.h;
-
-		CalcFov();
-
-		ent->curstate.body = 0;
-
 		if( uiStatic.enableAlphaFactor )
 		{
 			ent->curstate.rendermode = kRenderTransTexture;
