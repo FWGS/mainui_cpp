@@ -244,31 +244,21 @@ void CMenuCreateGame::_Init( void )
 	hostName.iMaxLength = 28;
 	hostName.LinkCvar( "hostname" );
 
-	maxClients.iMaxLength = 2;
+	maxClients.iMaxLength = 3;
 	maxClients.bNumbersOnly = true;
 	maxClients.szName = "Max Players:";
+	SET_EVENT_MULTI( maxClients.onChanged,
+	{
+		CMenuField *self = (CMenuField*)pSelf;
+		const char *buf = self->GetBuffer();
+		int players = atoi( buf );
+		if( players <= 1 )
+			self->SetBuffer( "2" );
+		else if( players > 32 )
+			self->SetBuffer( "32" );
+	});
+	maxClients.onCvarGet = maxClients.onChanged;
 	maxClients.LinkCvar( "maxplayers" );
-	SET_EVENT_MULTI( maxClients.onCvarChange,
-	{
-		CMenuField *self = (CMenuField*)pSelf;
-		if( !self->GetBuffer()[0] )
-			return;
-		int players = atoi( self->GetBuffer() );
-		if( players <= 1 )
-			self->SetBuffer( "2" );
-		else if( players > 32 )
-			self->SetBuffer( "32" );
-	});
-
-	SET_EVENT_MULTI( maxClients.onLostFocus,
-	{
-		CMenuField *self = (CMenuField*)pSelf;
-		int players = atoi( self->GetBuffer() );
-		if( players <= 1 )
-			self->SetBuffer( "2" );
-		else if( players > 32 )
-			self->SetBuffer( "32" );
-	});
 
 	password.szName = "Password:";
 	password.iMaxLength = 16;
