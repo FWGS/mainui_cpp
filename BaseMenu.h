@@ -189,6 +189,10 @@ void UI_ScaleCoords( int &x, int &y, int &w, int &h );
 void UI_ScaleCoords( int &x, int &y );
 
 bool UI_CursorInRect( int x, int y, int w, int h );
+inline bool UI_CursorInRect( Point pos, Size size )
+{
+	return UI_CursorInRect( pos.x, pos.y, size.w, size.h );
+}
 
 // temporarily override alpha by multiplying given alpha and factor
 void UI_EnableAlphaFactor( float a );
@@ -208,41 +212,21 @@ inline int UI_DrawString( HFont font, Point pos, Size size, const char *str, con
 	return UI_DrawString( font, pos.x, pos.y, size.w, size.h, str, col, charH, justify, flags );
 }
 
-void UI_DrawPic( int x, int y, int w, int h, const unsigned int color, const char *pic );
-void UI_DrawPicAdditive( int x, int y, int w, int h, const unsigned int color, const char *pic );
-void UI_DrawPicTrans( int x, int y, int width, int height, const unsigned int color, const char *pic );
-void UI_DrawPicHoles( int x, int y, int width, int height, const unsigned int color, const char *pic );
+void UI_DrawPic(int x, int y, int w, int h, const unsigned int color, const char *pic, const ERenderMode eRenderMode = QM_DRAWNORMAL );
+inline void UI_DrawPic( Point pos, Size size, const unsigned int color, const char *pic, const ERenderMode eRenderMode = QM_DRAWNORMAL )
+{
+	UI_DrawPic( pos.x, pos.y, size.w, size.h, color, pic, eRenderMode );
+}
 void UI_FillRect( int x, int y, int w, int h, const unsigned int color );
-void UI_DrawRectangleExt(int in_x, int in_y, int in_w, int in_h, const unsigned int color, int outlineWidth, int flag  = QM_TOP | QM_BOTTOM | QM_LEFT | QM_RIGHT);
-
-inline void UI_DrawRectangle( int x, int y, int w, int h, const unsigned int color, int flag  = QM_TOP | QM_BOTTOM | QM_LEFT | QM_RIGHT)
-{
-	UI_DrawRectangleExt( x, y, w, h, color, uiStatic.outlineWidth, flag );
-}
-
-inline bool UI_CursorInRect( Point pos, Size size )
-{
-	return UI_CursorInRect( pos.x, pos.y, size.w, size.h );
-}
-inline void UI_DrawPic( Point pos, Size size, const unsigned int color, const char *pic )
-{
-	UI_DrawPic( pos.x, pos.y, size.w, size.h, color, pic );
-}
-inline void UI_DrawPicAdditive( Point pos, Size size, const unsigned int color, const char *pic )
-{
-	UI_DrawPicAdditive( pos.x, pos.y, size.w, size.h, color, pic );
-}
-inline void UI_DrawPicTrans( Point pos, Size size, const unsigned int color, const char *pic )
-{
-	UI_DrawPicTrans( pos.x, pos.y, size.w, size.h, color, pic );
-}
-inline void UI_DrawPicHoles( Point pos, Size size, const unsigned int color, const char *pic )
-{
-	UI_DrawPicHoles( pos.x, pos.y, size.w, size.h, color, pic );
-}
 inline void UI_FillRect( Point pos, Size size, const unsigned int color )
 {
 	UI_FillRect( pos.x, pos.y, size.w, size.h, color );
+}
+
+void UI_DrawRectangleExt(int in_x, int in_y, int in_w, int in_h, const unsigned int color, int outlineWidth, int flag  = QM_TOP | QM_BOTTOM | QM_LEFT | QM_RIGHT);
+inline void UI_DrawRectangle( int x, int y, int w, int h, const unsigned int color, int flag  = QM_TOP | QM_BOTTOM | QM_LEFT | QM_RIGHT)
+{
+	UI_DrawRectangleExt( x, y, w, h, color, uiStatic.outlineWidth, flag );
 }
 inline void UI_DrawRectangle( Point pos, Size size, const unsigned int color, int flag = QM_TOP | QM_BOTTOM | QM_LEFT | QM_RIGHT )
 {

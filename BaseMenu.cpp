@@ -181,7 +181,7 @@ void UI_DisableAlphaFactor()
 UI_DrawPic
 =================
 */
-void UI_DrawPic( int x, int y, int width, int height, const unsigned int color, const char *pic )
+void UI_DrawPic( int x, int y, int width, int height, const unsigned int color, const char *pic, const ERenderMode eRenderMode )
 {
 	HIMAGE hPic = EngFuncs::PIC_Load( pic );
 
@@ -192,68 +192,26 @@ void UI_DrawPic( int x, int y, int width, int height, const unsigned int color, 
 	UnpackRGBA( r, g, b, a, color );
 
 	EngFuncs::PIC_Set( hPic, r, g, b, a );
-	// a1ba: should be just PIC_Draw, but we need alpha here
-	if( uiStatic.enableAlphaFactor )
+	switch( eRenderMode )
+	{
+	case QM_DRAWNORMAL:
+		if( !uiStatic.enableAlphaFactor )
+		{
+			EngFuncs::PIC_Draw( x, y, width, height );
+			break;
+		}
+		// intentional fallthrough
+	case QM_DRAWTRANS:
 		EngFuncs::PIC_DrawTrans( x, y, width, height );
-	else
-		EngFuncs::PIC_Draw( x, y, width, height );
+		break;
+	case QM_DRAWADDITIVE:
+		EngFuncs::PIC_DrawAdditive( x, y, width, height );
+		break;
+	case QM_DRAWHOLES:
+		EngFuncs::PIC_DrawHoles( x, y, width, height );
+		break;
+	}
 }
-
-/*
-=================
-UI_DrawPicAdditive
-=================
-*/
-void UI_DrawPicAdditive( int x, int y, int width, int height, const unsigned int color, const char *pic )
-{
-	HIMAGE hPic = EngFuncs::PIC_Load( pic );
-	if (!hPic)
-		return;
-
-	int r, g, b, a;
-	UnpackRGBA( r, g, b, a, color );
-
-	EngFuncs::PIC_Set( hPic, r, g, b, a );
-	EngFuncs::PIC_DrawAdditive( x, y, width, height );
-}
-
-/*
-=================
-UI_DrawPicAdditive
-=================
-*/
-void UI_DrawPicTrans( int x, int y, int width, int height, const unsigned int color, const char *pic )
-{
-	HIMAGE hPic = EngFuncs::PIC_Load( pic );
-	if (!hPic)
-		return;
-
-	int r, g, b, a;
-	UnpackRGBA( r, g, b, a, color );
-
-	EngFuncs::PIC_Set( hPic, r, g, b, a );
-	EngFuncs::PIC_DrawTrans( x, y, width, height );
-}
-
-
-/*
-=================
-UI_DrawPicAdditive
-=================
-*/
-void UI_DrawPicHoles( int x, int y, int width, int height, const unsigned int color, const char *pic )
-{
-	HIMAGE hPic = EngFuncs::PIC_Load( pic );
-	if (!hPic)
-		return;
-
-	int r, g, b, a;
-	UnpackRGBA( r, g, b, a, color );
-
-	EngFuncs::PIC_Set( hPic, r, g, b, a );
-	EngFuncs::PIC_DrawHoles( x, y, width, height );
-}
-
 
 /*
 =================
@@ -276,6 +234,8 @@ UI_DrawRectangleExt
 void UI_DrawRectangleExt( int in_x, int in_y, int in_w, int in_h, const unsigned int color, int outlineWidth, int flag )
 {
 	int	x, y, w, h;
+
+	if( outlineWidth == 0 ) outlineWidth = uiStatic.outlineWidth;
 
 	if( flag & QM_LEFT )
 	{
@@ -1377,6 +1337,10 @@ void UI_Init( void )
 	ui_showmodels = EngFuncs::CvarRegister( "ui_showmodels", "0", FCVAR_ARCHIVE );
 	ui_show_window_stack = EngFuncs::CvarRegister( "ui_show_window_stack", "0", FCVAR_ARCHIVE );
 	ui_borderclip = EngFuncs::CvarRegister( "ui_borderclip", "0", FCVAR_ARCHIVE );
+#ifdef CS16CLIENT
+	// autofill ammo after bought weapon
+	EngFuncs::CvarRegister( "ui_cs_autofill", "0", FCVAR_ARCHIVE );
+#endif // CS16CLIENT
 
 	// show cl_predict dialog
 	EngFuncs::CvarRegister( "menu_mp_firsttime", "1", FCVAR_ARCHIVE );
