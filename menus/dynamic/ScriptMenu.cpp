@@ -262,7 +262,7 @@ void CMenuScriptConfig::_Init( void )
 
 		editable->iFlags |= QMF_NOTIFY;
 		// editable->szName = var->name;
-		editable->szStatusText = var->desc;
+		editable->szStatusText = L( var->desc );
 		editable->SetCharSize( QM_SMALLFONT );
 		editable->LinkCvar( var->name, cvarType );
 		editable->iFlags &= ~(QMF_GRAYED|QMF_INACTIVE|QMF_MOUSEONLY);
