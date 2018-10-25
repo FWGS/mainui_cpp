@@ -130,10 +130,10 @@ void CMenuSavePreview::Draw()
 		if( EngFuncs::FileExists( saveshot ))
 			UI_DrawPic( m_scPos, m_scSize, uiColorWhite, saveshot );
 		else
-			UI_DrawPicAdditive( m_scPos, m_scSize, uiColorWhite, fallback );
+			UI_DrawPic( m_scPos, m_scSize, uiColorWhite, fallback, QM_DRAWADDITIVE );
 	}
 	else
-		UI_DrawPicAdditive( m_scPos, m_scSize, uiColorWhite, fallback );
+		UI_DrawPic( m_scPos, m_scSize, uiColorWhite, fallback, QM_DRAWADDITIVE );
 
 	// draw the rectangle
 	UI_DrawRectangle( m_scPos, m_scSize, uiInputFgColor );
