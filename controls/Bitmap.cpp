@@ -152,17 +152,54 @@ void CMenuBitmap::Draw( void )
 
 void CMenuBannerBitmap::Draw()
 {
+#ifdef CS16CLIENT
 	const char *text = CMenuPicButton::GetLastButtonText();
 
 	if( !text )
 		return;
 
 	UI_DrawString( uiStatic.hBigFont, m_scPos, m_scSize, text, uiPromptTextColor, m_scChSize, QM_LEFT, ETF_SHADOW | ETF_NOSIZELIMIT );
-
+#else
+	// don't draw banners until transition is done
+#ifdef TA_ALT_MODE
 	return;
+#endif
+	CMenuBaseWindow *window = NULL;
+
+	if( m_pParent->IsWindow() )
+		window = (CMenuBaseWindow*) m_pParent;
+
+	if( CMenuPicButton::GetTitleTransFraction() < 1.0f )
+		return;
+
+	if( window && window->IsRoot() && window->bInTransition &&
+		window->eTransitionType == CMenuBaseWindow::ANIM_OUT )
+		return;
+
+	BaseClass::Draw();
+#endif
 }
 
 void CMenuBannerBitmap::VidInit()
 {
 	BaseClass::VidInit();
+#ifndef CS16CLIENT
+	if( !szPic )
+		return;
+
+	HIMAGE hPic = EngFuncs::PIC_Load( szPic );
+
+	if( !hPic )
+		return;
+
+	Size sz = EngFuncs::PIC_Size( hPic );
+	float factor = (float)m_scSize.h / (float)sz.h;
+	m_scSize.w = sz.w * factor;
+
+	// CMenuPicButton::SetTitleAnim( CMenuPicButton::AS_TO_TITLE );
+	CMenuPicButton::SetupTitleQuadForLast( uiStatic.xOffset + pos.x, uiStatic.yOffset + pos.y, m_scSize.w, m_scSize.h );
+#if defined(TA_ALT_MODE2) && !defined(TA_ALT_MODE)
+	CMenuPicButton::SetTransPicForLast( EngFuncs::PIC_Load( szPic ) );
+#endif
+#endif // CS16CLIENT
 }

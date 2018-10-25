@@ -164,6 +164,13 @@ CMenuPicButton * CMenuFramework::AddButton(const char *szName, const char *szSta
 
 bool CMenuFramework::DrawAnimation(EAnimation anim)
 {
-	return CMenuBaseWindow::DrawAnimation( anim );
+	bool b = CMenuBaseWindow::DrawAnimation( anim );
+
+#ifndef CS16CLIENT
+	if( IsRoot() )
+		b = CMenuPicButton::DrawTitleAnim( anim );
+#endif
+
+	return b;
 }
 
