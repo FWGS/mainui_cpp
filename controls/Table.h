@@ -130,12 +130,8 @@ public:
 	bool bFramedHintText;
 	bool bAllowSorting;
 	bool bShowScrollBar;
-	bool bDrawStroke;
 
 	CColor iStrokeFocusedColor;
-	CColor iStrokeColor;
-
-	int iOutlineWidth;
 
 	CColor iBackgroundColor;
 	CColor iHeaderColor;
