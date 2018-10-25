@@ -41,6 +41,7 @@ private:
 	CColor m_iBackColorFocused;
 	const char *m_szBackground;
 	bool m_bfillBackground;
+	bool forceCalcW, forceCalcY;
 };
 
 #endif // MENU_ACTION_H

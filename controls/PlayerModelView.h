@@ -40,6 +40,8 @@ public:
 	ref_menu_params_t refdef;
 	cl_entity_t *ent;
 
+	bool bDrawAsPlayer;
+
 	enum
 	{
 		PMV_DONTCARE = 0,

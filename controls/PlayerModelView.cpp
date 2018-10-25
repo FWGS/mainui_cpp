@@ -30,6 +30,7 @@ CMenuPlayerModelView::CMenuPlayerModelView() : CMenuBaseItem()
 
 	eOverrideMode = PMV_DONTCARE;
 	refdef.fov_x = 40.0f;
+	bDrawAsPlayer = true;
 }
 
 void CMenuPlayerModelView::VidInit()
@@ -75,7 +76,7 @@ void CMenuPlayerModelView::VidInit()
 	ent->origin[2] = ent->curstate.origin[2] = 2.0f;
 	ent->angles[1] = ent->curstate.angles[1] = 180.0f;
 
-	ent->player = true; // yes, draw me as playermodel
+	ent->player = bDrawAsPlayer; // yes, draw me as playermodel
 }
 
 const char *CMenuPlayerModelView::Key(int key, int down)

@@ -24,6 +24,7 @@ CMenuAction::CMenuAction() : BaseClass()
 {
 	m_szBackground = NULL;
 	m_bfillBackground = false;
+	forceCalcW = forceCalcY = false;
 }
 
 /*
@@ -35,7 +36,13 @@ void CMenuAction::VidInit( )
 {
 	m_iBackcolor.SetDefault( 0 );
 
-	if( size.w < 1 || size.h < 1 )
+	if( !forceCalcW )
+		forceCalcW = size.w < 1;
+
+	if( !forceCalcY )
+		forceCalcY = size.h < 1;
+
+	if( forceCalcW || forceCalcY )
 	{
 		if( m_szBackground )
 		{
@@ -45,10 +52,10 @@ void CMenuAction::VidInit( )
 		}
 		else
 		{
-			if( size.w < 1 )
+			if( forceCalcW )
 				size.w = g_FontMgr.GetTextWideScaled( font, szName, charSize ) / uiStatic.scaleX;
 
-			if( size.h < 1 )
+			if( forceCalcY )
 				size.h = g_FontMgr.GetTextHeightExt( font, szName, charSize, size.w ) / uiStatic.scaleX;
 		}
 
@@ -126,7 +133,7 @@ void CMenuAction::Draw( )
 
 	if( bDrawStroke )
 	{
-		UI_DrawRectangleExt( m_scPos, m_scSize, iStrokeColor, 1 );
+		UI_DrawRectangleExt( m_scPos, m_scSize, iStrokeColor, iStrokeWidth );
 	}
 
 	if( m_szBackground )
