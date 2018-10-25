@@ -24,7 +24,7 @@ CMenuAction::CMenuAction() : BaseClass()
 {
 	m_szBackground = NULL;
 	m_bfillBackground = false;
-	m_bLimitBySize = false;
+	forceCalcW = forceCalcY = false;
 }
 
 /*
@@ -34,44 +34,39 @@ CMenuAction::Init
 */
 void CMenuAction::VidInit( )
 {
-	bool calcSizes = true;
-
 	m_iBackcolor.SetDefault( 0 );
 
-	if( size.w < 1 || size.h < 1 )
-	{
-		// no need to check for scailing, already in physical units
+	if( !forceCalcW )
+		forceCalcW = size.w < 1;
 
+	if( !forceCalcY )
+		forceCalcY = size.h < 1;
+
+	if( forceCalcW || forceCalcY )
+	{
 		if( m_szBackground )
 		{
 			HIMAGE handle = EngFuncs::PIC_Load( m_szBackground );
-			m_scSize.w = EngFuncs::PIC_Width( handle );
-			m_scSize.h = EngFuncs::PIC_Height( handle );
+			size.w = EngFuncs::PIC_Width( handle );
+			size.h = EngFuncs::PIC_Height( handle );
 		}
 		else
 		{
-			if( size.w < 1 )
-				m_scSize.w = g_FontMgr.GetTextWideScaled( font, szName, charSize );
+			if( forceCalcW )
+				size.w = g_FontMgr.GetTextWideScaled( font, szName, charSize ) / uiStatic.scaleX;
 
-			if( size.h < 1 )
-				m_scSize.h = g_FontMgr.GetTextHeightExt( font, szName, charSize, m_scSize.w / uiStatic.scaleX );
+			if( forceCalcY )
+				size.h = g_FontMgr.GetTextHeightExt( font, szName, charSize, size.w ) / uiStatic.scaleX;
 		}
 
 		m_bLimitBySize = false;
-
-		calcSizes = false;
 	}
 	else
 	{
 		m_bLimitBySize = true;
 	}
 
-	CalcPosition();
-	if( calcSizes ) CalcSizes();
-
-	iColor.SetDefault( uiPromptTextColor );
-	iFocusColor.SetDefault( uiPromptFocusColor );
-	iStrokeColor.SetDefault( uiInputFgColor );
+	BaseClass::VidInit();
 }
 
 /*
