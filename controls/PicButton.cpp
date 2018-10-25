@@ -144,6 +144,23 @@ void CMenuPicButton::Draw( )
 {
 	int state = BUTTON_NOFOCUS;
 
+#ifdef CS16CLIENT
+	if( UI_CursorInRect( m_scPos, m_scSize ) &&
+		m_pParent && m_pParent->IsVisible() )
+	{
+		if( !bRollOver )
+		{
+			EngFuncs::PlayLocalSound( uiSoundRollOver );
+			bRollOver = true;
+		}
+	}
+	else
+	{
+		if( bRollOver )
+			bRollOver = false;
+	}
+#endif // CS16CLIENT
+
 	if( iFlags & (QMF_HASMOUSEFOCUS|QMF_HASKEYBOARDFOCUS))
 	{
 		state = BUTTON_FOCUS;
@@ -235,9 +252,6 @@ void CMenuPicButton::Draw( )
 		if( iFlags & QMF_GRAYED )
 		{
 #ifdef MAINUI_RENDER_PICBUTTON_TEXT
-			if( UI_CursorInRect( m_scPos, m_scSize ) )
-				a = 255;
-
 			if( a > 0 )
 			{
 				UI_DrawString( uiStatic.hHeavyBlur, m_scPos, m_scSize, szName,
@@ -322,6 +336,18 @@ void CMenuPicButton::PopPButtonStack()
 
 		ButtonStackDepth--;
 	}
+}
+
+const char *CMenuPicButton::GetLastButtonText()
+{
+	if( ButtonStackDepth )
+	{
+		if( ButtonStack[ButtonStackDepth-1] )
+		{
+			return ButtonStack[ButtonStackDepth-1]->szName;
+		}
+	}
+	return NULL;
 }
 
 // Opened new menu, awaiting Quad from Banner

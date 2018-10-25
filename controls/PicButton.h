@@ -57,6 +57,8 @@ public:
 
 	static void RootChanged( bool isForward );
 private:
+	bool bRollOver;
+
 	enum animState_e { AS_TO_TITLE = 0, AS_TO_BUTTON };
 	struct Quad
 	{
@@ -68,6 +70,7 @@ private:
 	void TACheckMenuDepth( void );
 	void PushPButtonStack( void );
 	static void PopPButtonStack( void );
+	static const char *GetLastButtonText( void );
 
 	void DrawButton( int r, int g, int b, int a, wrect_t *rects, int state );
 
