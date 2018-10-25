@@ -33,6 +33,9 @@ CMenuBaseItem::CMenuBaseItem()
 	eFocusAnimation = QM_NOFOCUSANIMATION;
 	eLetterCase = QM_NOLETTERCASE;
 
+	bDrawStroke = false;
+	iStrokeWidth = 0;
+
 	m_iLastFocusTime = 0;
 	m_bPressed = false;
 
@@ -61,7 +64,7 @@ void CMenuBaseItem::VidInit()
 
 	iColor.SetDefault( uiPromptTextColor );
 	iFocusColor.SetDefault( uiPromptFocusColor );
-	iStrokeColor.SetDefault( uiPromptTextColor );
+	iStrokeColor.SetDefault( uiInputFgColor );
 }
 
 void CMenuBaseItem::Reload()

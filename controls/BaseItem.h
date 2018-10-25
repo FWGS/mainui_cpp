@@ -170,8 +170,9 @@ public:
 
 	HFont font;
 
-	bool bDrawStroke;
+	bool   bDrawStroke;
 	CColor iStrokeColor;
+	int    iStrokeWidth;
 
 	int		m_iLastFocusTime;
 protected:
