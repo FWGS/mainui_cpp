@@ -23,8 +23,8 @@ GNU General Public License for more details.
 
 CMenuBitmap::CMenuBitmap() : BaseClass()
 {
-	SetPicture( NULL, NULL, NULL );
-	bDrawAdditive = false;
+	SetPicture( NULL );
+	SetRenderMode( QM_DRAWNORMAL );
 }
 
 /*
@@ -110,83 +110,59 @@ void CMenuBitmap::Draw( void )
 
 	if( iFlags & QMF_GRAYED )
 	{
-		UI_DrawPic( m_scPos, m_scSize, uiColorDkGrey, szPic );
+		UI_DrawPic( m_scPos, m_scSize, uiColorDkGrey, szPic, eRenderMode );
 		return; // grayed
 	}
 
 	if(( iFlags & QMF_MOUSEONLY ) && !( iFlags & QMF_HASMOUSEFOCUS ))
 	{
-		UI_DrawPic( m_scPos, m_scSize, iColor, szPic );
+		UI_DrawPic( m_scPos, m_scSize, iColor, szPic, eRenderMode );
 		return; // no focus
 	}
 
 	if( this != m_pParent->ItemAtCursor() )
 	{
-		// UNDONE: only inactive bitmaps supported
-		if( bDrawAdditive )
-			UI_DrawPicAdditive( m_scPos, m_scSize, iColor, szPic );
-		else UI_DrawPic( m_scPos, m_scSize, iColor, szPic );
+		UI_DrawPic( m_scPos, m_scSize, iColor, szPic, eRenderMode );
 		return; // no focus
 	}
 
 	if( this->m_bPressed )
 	{
-		UI_DrawPic( m_scPos, m_scSize, iColor, szPressPic );
+		UI_DrawPic( m_scPos, m_scSize, iColor, szPressPic, ePressRenderMode );
 	}
 
-	if( eFocusAnimation == QM_HIGHLIGHTIFFOCUS )
+	switch( eFocusAnimation )
 	{
-		UI_DrawPic( m_scPos, m_scSize, iColor, szFocusPic );
-	}
-	else if( eFocusAnimation == QM_PULSEIFFOCUS )
+	case QM_HIGHLIGHTIFFOCUS:
+		UI_DrawPic( m_scPos, m_scSize, iColor, szFocusPic, eFocusRenderMode );
+		break;
+	case QM_PULSEIFFOCUS:
 	{
 		int	color;
 
 		color = PackAlpha( iColor, 255 * (0.5 + 0.5 * sin( (float)uiStatic.realTime / UI_PULSE_DIVISOR )));
-		UI_DrawPic( m_scPos, m_scSize, color, szFocusPic );
+		UI_DrawPic( m_scPos, m_scSize, color, szFocusPic, eFocusRenderMode );
+		break;
+	}
+	default:
+		UI_DrawPic( m_scPos, m_scSize, iColor, szPic, eRenderMode ); // ignore focus
+		break;
 	}
 }
 
 void CMenuBannerBitmap::Draw()
 {
-	// don't draw banners until transition is done
-#ifdef TA_ALT_MODE
+	const char *text = CMenuPicButton::GetLastButtonText();
+
+	if( !text )
+		return;
+
+	UI_DrawString( uiStatic.hBigFont, m_scPos, m_scSize, text, uiPromptTextColor, m_scChSize, QM_LEFT, ETF_SHADOW | ETF_NOSIZELIMIT );
+
 	return;
-#endif
-	CMenuBaseWindow *window = NULL;
-
-	if( m_pParent->IsWindow() )
-		window = (CMenuBaseWindow*) m_pParent;
-
-	if( CMenuPicButton::GetTitleTransFraction() < 1.0f )
-		return;
-
-	if( window && window->IsRoot() && window->bInTransition &&
-		window->eTransitionType == CMenuBaseWindow::ANIM_OUT )
-		return;
-
-	BaseClass::Draw();
 }
 
 void CMenuBannerBitmap::VidInit()
 {
 	BaseClass::VidInit();
-	if( !szPic )
-		return;
-
-	HIMAGE hPic = EngFuncs::PIC_Load( szPic );
-
-	if( !hPic )
-		return;
-
-	Size sz = EngFuncs::PIC_Size( hPic );
-	float factor = (float)m_scSize.h / (float)sz.h;
-	m_scSize.w = sz.w * factor;
-
-	// CMenuPicButton::SetTitleAnim( CMenuPicButton::AS_TO_TITLE );
-	CMenuPicButton::SetupTitleQuadForLast( uiStatic.xOffset + pos.x, uiStatic.yOffset + pos.y, m_scSize.w, m_scSize.h );
-#if defined(TA_ALT_MODE2) && !defined(TA_ALT_MODE)
-	CMenuPicButton::SetTransPicForLast( EngFuncs::PIC_Load( szPic ) );
-#endif
-
 }
