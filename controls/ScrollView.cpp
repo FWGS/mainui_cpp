@@ -8,7 +8,7 @@ CMenuScrollView::CMenuScrollView() : CMenuItemsHolder (),
 
 void CMenuScrollView::VidInit()
 {
-	iStrokeColor.SetDefault( uiPromptTextColor );
+	iStrokeColor.SetDefault( uiInputFgColor );
 
 	BaseClass::VidInit();
 
@@ -141,7 +141,7 @@ void CMenuScrollView::Draw()
 
 	if( bDrawStroke )
 	{
-		UI_DrawRectangleExt( m_scPos, m_scSize, iStrokeColor, 1 );
+		UI_DrawRectangleExt( m_scPos, m_scSize, iStrokeColor, iStrokeWidth );
 	}
 
 	int drawn = 0, skipped = 0;
