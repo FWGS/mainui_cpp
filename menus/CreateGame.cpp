@@ -274,8 +274,11 @@ void CMenuCreateGame::_Init( void )
 	AddItem( maxClients );
 	AddItem( hostName );
 	AddItem( password );
+#if defined(__ANDROID__) || TARGET_OS_IPHONE || defined(__SAILFISH__)
 	AddItem( dedicatedServer );
-	AddItem( hltv );
+#endif
+	// HLTV not yet supported
+	//AddItem( hltv );
 	AddItem( nat );
 	AddItem( mapsList );
 }
