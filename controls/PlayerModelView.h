@@ -49,10 +49,10 @@ public:
 
 
 	CColor backgroundColor;
-	CColor outlineColor;
 	CColor outlineFocusColor;
-	int iOutlineWidth;
 private:
+	cl_entity_t ent2;
+
 	bool mouseYawControl;
 
 	int prevCursorX, prevCursorY;
