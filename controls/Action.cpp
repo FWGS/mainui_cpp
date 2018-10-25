@@ -24,6 +24,7 @@ CMenuAction::CMenuAction() : BaseClass()
 {
 	m_szBackground = NULL;
 	m_bfillBackground = false;
+	m_bLimitBySize = false;
 }
 
 /*
@@ -33,33 +34,44 @@ CMenuAction::Init
 */
 void CMenuAction::VidInit( )
 {
+	bool calcSizes = true;
+
 	m_iBackcolor.SetDefault( 0 );
 
 	if( size.w < 1 || size.h < 1 )
 	{
+		// no need to check for scailing, already in physical units
+
 		if( m_szBackground )
 		{
 			HIMAGE handle = EngFuncs::PIC_Load( m_szBackground );
-			size.w = EngFuncs::PIC_Width( handle );
-			size.h = EngFuncs::PIC_Height( handle );
+			m_scSize.w = EngFuncs::PIC_Width( handle );
+			m_scSize.h = EngFuncs::PIC_Height( handle );
 		}
 		else
 		{
 			if( size.w < 1 )
-				size.w = g_FontMgr.GetTextWideScaled( font, szName, charSize ) / uiStatic.scaleX;
+				m_scSize.w = g_FontMgr.GetTextWideScaled( font, szName, charSize );
 
 			if( size.h < 1 )
-				size.h = g_FontMgr.GetTextHeightExt( font, szName, charSize, size.w ) / uiStatic.scaleX;
+				m_scSize.h = g_FontMgr.GetTextHeightExt( font, szName, charSize, m_scSize.w / uiStatic.scaleX );
 		}
 
 		m_bLimitBySize = false;
+
+		calcSizes = false;
 	}
 	else
 	{
 		m_bLimitBySize = true;
 	}
 
-	BaseClass::VidInit();
+	CalcPosition();
+	if( calcSizes ) CalcSizes();
+
+	iColor.SetDefault( uiPromptTextColor );
+	iFocusColor.SetDefault( uiPromptFocusColor );
+	iStrokeColor.SetDefault( uiInputFgColor );
 }
 
 /*
@@ -126,7 +138,7 @@ void CMenuAction::Draw( )
 
 	if( bDrawStroke )
 	{
-		UI_DrawRectangleExt( m_scPos, m_scSize, iStrokeColor, 1 );
+		UI_DrawRectangleExt( m_scPos, m_scSize, iStrokeColor, iStrokeWidth );
 	}
 
 	if( m_szBackground )
