@@ -30,11 +30,7 @@ GNU General Public License for more details.
 #include "BitmapFont.h"
 
 #ifdef __ANDROID__
-#ifdef CS16CLIENT
-#define DEFAULT_MENUFONT "DroidSans"
-#else
 #define DEFAULT_MENUFONT "RobotoCondensed"
-#endif
 #define DEFAULT_CONFONT  "DroidSans"
 #define DEFAULT_WEIGHT   1000
 #else

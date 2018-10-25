@@ -29,18 +29,17 @@ CMenuPlayerModelView::CMenuPlayerModelView() : CMenuBaseItem()
 	eFocusAnimation = QM_HIGHLIGHTIFFOCUS;
 
 	eOverrideMode = PMV_DONTCARE;
-	iOutlineWidth = -1;
 	refdef.fov_x = 40.0f;
 }
 
 void CMenuPlayerModelView::VidInit()
 {
 	backgroundColor.SetDefault( uiColorHelp );
-	outlineColor.SetDefault( uiInputFgColor );
-	outlineFocusColor.SetDefault( uiInputTextColor );
+	iStrokeColor.SetDefault( uiInputFgColor );
+	iFocusColor.SetDefault( uiInputTextColor );
 
-	if( iOutlineWidth == -1 )
-		iOutlineWidth = uiStatic.outlineWidth;
+	if( iStrokeWidth == 0 )
+		iStrokeWidth = uiStatic.outlineWidth;
 
 	CMenuBaseItem::VidInit();
 
@@ -143,9 +142,9 @@ void CMenuPlayerModelView::Draw()
 
 	// draw the rectangle
 	if( eFocusAnimation == QM_HIGHLIGHTIFFOCUS && IsCurrentSelected() )
-		UI_DrawRectangleExt( m_scPos, m_scSize, outlineFocusColor, iOutlineWidth );
+		UI_DrawRectangleExt( m_scPos, m_scSize, iFocusColor, iStrokeWidth );
 	else
-		UI_DrawRectangleExt( m_scPos, m_scSize, outlineColor, iOutlineWidth );
+		UI_DrawRectangleExt( m_scPos, m_scSize, iStrokeColor, iStrokeWidth );
 
 	if( ( eOverrideMode == PMV_DONTCARE && !ui_showmodels->value ) || // controlled by engine cvar
 		( eOverrideMode == PMV_SHOWIMAGE ) ) // controlled by menucode

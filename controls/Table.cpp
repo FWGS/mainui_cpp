@@ -26,8 +26,6 @@ CMenuTable::CMenuTable() : BaseClass(),
 	bFramedHintText( false ),
 	bAllowSorting( false ),
 	bShowScrollBar( true ),
-	bDrawStroke( true ),
-	iOutlineWidth( 0 ),
 	szHeaderTexts(),
 	szBackground(),
 	szUpArrow( UI_UPARROW ), szUpArrowFocus( UI_UPARROWFOCUS ), szUpArrowPressed( UI_UPARROWPRESSED ),
@@ -41,6 +39,7 @@ CMenuTable::CMenuTable() : BaseClass(),
 {
 	eFocusAnimation = QM_HIGHLIGHTIFFOCUS;
 	SetCharSize( QM_SMALLFONT );
+	bDrawStroke = true;
 }
 
 void CMenuTable::VidInit()
@@ -52,12 +51,9 @@ void CMenuTable::VidInit()
 	iStrokeColor.SetDefault( uiInputFgColor );
 	iStrokeFocusedColor.SetDefault( uiInputTextColor );
 
-	if( !iOutlineWidth )
-	{
-		iOutlineWidth = uiStatic.outlineWidth;
-	}
+	if( iStrokeWidth == 0 ) iStrokeWidth = uiStatic.outlineWidth;
 
-	iNumRows = ( m_scSize.h - iOutlineWidth * 2 ) / m_scChSize - 1;
+	iNumRows = ( m_scSize.h - iStrokeWidth * 2 ) / m_scChSize - 1;
 
 	if( !iCurItem )
 	{
@@ -100,16 +96,16 @@ void CMenuTable::VidInit()
 	else
 		arrow.w = arrow.h = 0;
 	arrow = arrow.Scale();
-	downArrow.x = upArrow.x = m_scPos.x + m_scSize.w - arrow.w + iOutlineWidth * 1;
-	upArrow.y = m_scPos.y - iOutlineWidth;
-	downArrow.y = upArrow.y + m_scSize.h - arrow.h + iOutlineWidth * 2;
+	downArrow.x = upArrow.x = m_scPos.x + m_scSize.w - arrow.w + iStrokeWidth * 1;
+	upArrow.y = m_scPos.y - iStrokeWidth;
+	downArrow.y = upArrow.y + m_scSize.h - arrow.h + iStrokeWidth * 2;
 	if( !bFramedHintText )
 	{
 		upArrow.y += headerSize.h;
 	}
 
 	// calculate header size(position is table position)
-	headerSize.w = m_scSize.w - arrow.w + iOutlineWidth;
+	headerSize.w = m_scSize.w - arrow.w + iStrokeWidth;
 
 	// box is lower than header
 	boxPos.x = m_scPos.x;
@@ -214,7 +210,7 @@ const char *CMenuTable::Key( int key, int down )
 		else if( UI_CursorInRect( boxPos, boxSize ))
 		{
 			// test for item select
-			int starty = boxPos.y + iOutlineWidth;
+			int starty = boxPos.y + iStrokeWidth;
 			int endy = starty + iNumRows * m_scChSize;
 			if( uiStatic.cursorY > starty && uiStatic.cursorY < endy )
 			{
@@ -536,7 +532,7 @@ void CMenuTable::Draw()
 	int upFocus, downFocus, scrollbarFocus;
 
 	// HACKHACK: recalc iNumRows, to be not greater than iNumItems
-	iNumRows = ( m_scSize.h - iOutlineWidth * 2 ) / m_scChSize - 1;
+	iNumRows = ( m_scSize.h - iStrokeWidth * 2 ) / m_scChSize - 1;
 	if( iNumRows > m_pModel->GetRows() )
 		iNumRows = m_pModel->GetRows();
 
@@ -582,11 +578,11 @@ void CMenuTable::Draw()
 
 		if( bFramedHintText )
 		{
-			UI_DrawRectangleExt( m_scPos, headerSize, color, iOutlineWidth, QM_LEFT | QM_TOP | QM_RIGHT );
+			UI_DrawRectangleExt( m_scPos, headerSize, color, iStrokeWidth, QM_LEFT | QM_TOP | QM_RIGHT );
 		}
 
 		if( bDrawStroke )
-			UI_DrawRectangleExt( boxPos, boxSize, color, iOutlineWidth );
+			UI_DrawRectangleExt( boxPos, boxSize, color, iStrokeWidth );
 	}
 
 	float step = (m_pModel->GetRows() <= 1 ) ? 1 : (downArrow.y - upArrow.y - arrow.h) / (float)(m_pModel->GetRows() - 1);
