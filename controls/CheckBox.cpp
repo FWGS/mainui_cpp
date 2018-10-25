@@ -44,8 +44,8 @@ CMenuCheckBox::Init
 */
 void CMenuCheckBox::VidInit( void )
 {
-	BaseClass::VidInit();
 	iColor.SetDefault( uiColorHelp );
+	BaseClass::VidInit();
 	m_scTextPos.x = m_scPos.x + (m_scSize.w * 1.5f );
 	m_scTextPos.y = m_scPos.y;
 
