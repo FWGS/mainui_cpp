@@ -93,6 +93,14 @@ enum ELetterCase
 	QM_UPPERCASE
 };
 
+enum ERenderMode
+{
+	QM_DRAWNORMAL = 0, // normal RGB picture, ignore alpha
+	QM_DRAWHOLES,      // holes
+	QM_DRAWTRANS,      // RGBA
+	QM_DRAWADDITIVE    // additive
+};
+
 struct Size;
 
 struct Point
