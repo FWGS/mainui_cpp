@@ -45,6 +45,7 @@ CMenuCheckBox::Init
 void CMenuCheckBox::VidInit( void )
 {
 	BaseClass::VidInit();
+	iColor.SetDefault( uiColorHelp );
 	m_scTextPos.x = m_scPos.x + (m_scSize.w * 1.5f );
 	m_scTextPos.y = m_scPos.y;
 
@@ -124,7 +125,7 @@ void CMenuCheckBox::Draw( void )
 {
 	uint textflags = ( iFlags & QMF_DROPSHADOW ? ETF_SHADOW : 0 ) | ETF_NOSIZELIMIT | ETF_FORCECOL;
 
-	UI_DrawString( font, m_scTextPos, m_scTextSize, szName, uiColorHelp, m_scChSize, eTextAlignment, textflags );
+	UI_DrawString( font, m_scTextPos, m_scTextSize, szName, iColor, m_scChSize, eTextAlignment, textflags );
 
 	if( szStatusText && iFlags & QMF_NOTIFY )
 	{
@@ -169,7 +170,7 @@ void CMenuCheckBox::Draw( void )
 		{
 			// use two textures for it. Second is just focus texture, slightly orange. Looks pretty.
 			UI_DrawPic( m_scPos, m_scSize, iColor, szPressPic );
-			UI_DrawPicAdditive( m_scPos, m_scSize, uiInputTextColor, szFocusPic );
+			UI_DrawPic( m_scPos, m_scSize, uiInputTextColor, szFocusPic, QM_DRAWADDITIVE );
 		}
 		else
 		{
