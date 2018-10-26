@@ -136,7 +136,7 @@ if(NOT WIN32 AND NOT MINGW)
 	fwgs_add_compile_options(C -Wall -Wextra -Wno-unused-parameter -Wno-unused-variable)
 else()
 
-	# Only for MSVC6 compability mode! Newer VC does fail with this define
+	# Only for MSVC6 compatibility mode! Newer VC does fail with this define
 	# add_definitions(-DMY_COMPILER_SUCKS)
 endif()
 
