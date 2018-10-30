@@ -296,7 +296,7 @@ void CMenuSpinControl::SetCurrentValue( const char *stringValue )
 
 	int i = 0;
 
-	for( ; i < (int)m_flMaxValue; i++ )
+	for( ; i <= (int)m_flMaxValue; i++ )
 	{
 		if( !strcmp( m_pModel->GetText( i ), stringValue ) )
 		{
