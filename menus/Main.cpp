@@ -61,7 +61,7 @@ private:
 
 	CMenuPicButton	resumeGame;
 	CMenuPicButton	disconnect;
-	CMenuPicButton	newGame;
+	CMenuPicButton	credits;
 	CMenuPicButton	hazardCourse;
 	CMenuPicButton	configuration;
 	CMenuPicButton	saveRestore;
@@ -233,10 +233,10 @@ void CMenuMain::_Init( void )
 	disconnect.iFlags |= QMF_NOTIFY;
 	disconnect.onActivated = VoidCb( &CMenuMain::DisconnectDialogCb );
 
-	newGame.SetNameAndStatus( "New Game", MenuStrings[IDS_MAIN_NEWGAMEHELP] );
-	newGame.SetPicture( PC_NEW_GAME );
-	newGame.iFlags |= QMF_NOTIFY;
-	newGame.onActivated = UI_NewGame_Menu;
+	credits.SetNameAndStatus( "Credits", MenuStrings[IDS_MAIN_NEWGAMEHELP] );
+	credits.SetPicture( PC_VIEW_README );
+	credits.iFlags |= QMF_NOTIFY;
+	credits.onActivated = UI_Credits_Menu;
 
 	hazardCourse.SetNameAndStatus( "Hazard Course", MenuStrings[IDS_MAIN_TRAININGHELP] );
 	hazardCourse.SetPicture( PC_HAZARD_COURSE );
@@ -284,7 +284,7 @@ void CMenuMain::_Init( void )
 	minimizeBtn.onActivated.SetCommand( FALSE, "minimize\n" );
 
 	if ( gMenu.m_gameinfo.gamemode == GAME_MULTIPLAYER_ONLY || gMenu.m_gameinfo.startmap[0] == 0 )
-		newGame.SetGrayed( true );
+		credits.SetGrayed( true );
 
 	if ( gMenu.m_gameinfo.gamemode == GAME_SINGLEPLAYER_ONLY )
 		multiPlayer.SetGrayed( true );
@@ -300,7 +300,7 @@ void CMenuMain::_Init( void )
 	{
 		saveRestore.SetGrayed( true );
 		hazardCourse.SetGrayed( true );
-		newGame.SetGrayed( true );
+		credits.SetGrayed( true );
 	}
 
 	dialog.Link( this );
@@ -313,7 +313,7 @@ void CMenuMain::_Init( void )
 
 	AddItem( disconnect );
 	AddItem( resumeGame );
-	AddItem( newGame );
+	AddItem( credits );
 
 	if ( bTrainMap )
 		AddItem( hazardCourse );
@@ -343,7 +343,7 @@ void CMenuMain::_VidInit( void )
 	console.pos.x = 72;
 	resumeGame.SetCoord( 72, 230 );
 	disconnect.SetCoord( 72, 180 );
-	newGame.SetCoord( 72, 280 );
+	credits.SetCoord( 72, 280 );
 	hazardCourse.SetCoord( 72, 330 );
 
 	if( CL_IsActive( ))

@@ -24,12 +24,65 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define UI_CREDITS_PATH		"credits.txt"
 #define UI_CREDITS_MAXLINES		2048
 
-static const char *uiCreditsDefault[] = 
+#ifndef CS_VERSION
+#define CS_VERSION
+#endif
+static const char *uiCreditsDefault[] =
 {
+	"CS16Client " CS_VERSION,
+	"Build Date: " __DATE__ " " __TIME__ ,
 	"",
-	"Copyright XashXT Group 2017 (C)",
-	"Copyright Flying With Gauss 2017 (C)",
-	0
+	"Developers: ",
+	"a1batross",
+	"mittorn",
+	"jeefo",
+	"",
+	"Touch & GFX: ",
+	"SergioPoverony",
+	"ahsim",
+	"",
+	"Beta-testers:",
+	"1.kirill",
+	"Romka_ZVO",
+	"WolfReiser",
+	"MakcuM56",
+	"Mr.Lightning Bolt",
+	"Kirpich",
+	"MeL0maN",
+	"LordAlfaruh",
+	"Velaron",
+	"KOBL1CK",
+	"Rediska_Morkovka",
+	"IcE",
+	"CSPlayer",
+	"Zu1iN~Mage",
+	"lewa_j",
+	"Cosmo",
+	"Maks56873",
+	"THE-Swank",
+	"Namatrasnik",
+	"picos",
+	"BloodyLuxor",
+	"AndroUser",
+	"Bbltashit",
+	"Athiend",
+	"vlad[54rus]",
+	"KinG",
+	"erokhin",
+	"Solexid",
+	"",
+	"Big thanks to Valve Corporation for Counter-Strike",
+	"Uncle Mike for this powerful engine",
+	"ONeiLL for inspiration",
+	"Nagist and s1lentq for successful CS1.6 game researching",
+	"Spirit of Half-Life developers for rain code",
+	"hzqst for studio render code",
+	"",
+	"Copyright Flying With Gauss 2015-2018 (C)",
+	"Flying With Gauss is not affiliated with Valve or any of their partners.",
+	"All copyrights reserved to their respective owners.",
+	"Thanks for playing!",
+	NULL
 };
 
 static class CMenuCredits : public CMenuBaseWindow
@@ -40,12 +93,13 @@ public:
 
 	void Draw() override;
 	const char *Key(int key, int down) override;
-	bool DrawAnimation(EAnimation anim) override { return false; }
+	bool DrawAnimation(EAnimation anim) override { return true; }
 	void Show() override;
 
 	friend void UI_DrawFinalCredits( void );
 	friend void UI_FinalCredits( void );
 	friend int UI_CreditsActive( void );
+	friend void UI_Credits_Menu( void );
 
 private:
 	void _Init() override;
@@ -69,7 +123,9 @@ CMenuCredits::~CMenuCredits()
 void CMenuCredits::Show()
 {
 	CMenuBaseWindow::Show();
-	EngFuncs::KEY_SetDest( KEY_GAME );
+
+	if( finalCredits )
+		EngFuncs::KEY_SetDest( KEY_GAME );
 }
 
 /*
@@ -85,7 +141,7 @@ void CMenuCredits::Draw( void )
 	int	color = 0;
 
 	// draw the background first
-	if( CL_IsActive() && !finalCredits )
+	if( !finalCredits )
 		background.Draw();
 
 	speed = 32.0f * ( 768.0f / ScreenHeight );	// syncronize with final background track :-)
@@ -146,62 +202,9 @@ CMenuCredits::_Init
 */
 void CMenuCredits::_Init( void )
 {
-	if( !uiCredits.buffer )
-	{
-		int	count;
-		char	*p;
-
-		// load credits if needed
-		uiCredits.buffer = (char *)EngFuncs::COM_LoadFile( UI_CREDITS_PATH, &count );
-		if( count )
-		{
-			if( uiCredits.buffer[count - 1] != '\n' && uiCredits.buffer[count - 1] != '\r' )
-			{
-				char *tmp = new char[count + 2];
-				memcpy( tmp, uiCredits.buffer, count ); 
-				EngFuncs::COM_FreeFile( uiCredits.buffer );
-				uiCredits.buffer = tmp; 
-				strncpy( uiCredits.buffer + count, "\r", 1 ); // add terminator
-				count += 2; // added "\r\0"
-			}
-			p = uiCredits.buffer;
-
-			// convert customs credits to 'ideal' strings array
-			for ( uiCredits.numLines = 0; uiCredits.numLines < UI_CREDITS_MAXLINES; uiCredits.numLines++ )
-			{
-				uiCredits.index[uiCredits.numLines] = p;
-				while ( *p != '\r' && *p != '\n' )
-				{
-					p++;
-					if ( --count == 0 )
-						break;
-				}
-
-				if ( *p == '\r' )
-				{
-					*p++ = 0;
-					if( --count == 0 ) break;
-				}
-
-				*p++ = 0;
-				if( --count == 0 ) break;
-			}
-			uiCredits.index[++uiCredits.numLines] = 0;
-			uiCredits.credits = (const char **)uiCredits.index;
-		}
-		else
-		{
-			// use built-in credits
-			uiCredits.credits =  uiCreditsDefault;
-			uiCredits.numLines = ( sizeof( uiCreditsDefault ) / sizeof( uiCreditsDefault[0] )) - 1; // skip term
-		}
-	}
-
-	// run credits
-	uiCredits.startTime = (gpGlobals->time * 1000) + 500; // make half-seconds delay
-	uiCredits.showTime = bound( 1000, strlen( uiCredits.credits[uiCredits.numLines - 1]) * 1000, 10000 );
-	uiCredits.fadeTime = 0; // will be determined later
-	uiCredits.active = true;
+	// use built-in credits
+	uiCredits.credits =  uiCreditsDefault;
+	uiCredits.numLines = ( sizeof( uiCreditsDefault ) / sizeof( uiCreditsDefault[0] )) - 1; // skip term
 }
 
 void UI_DrawFinalCredits( void )
@@ -223,6 +226,20 @@ UI_Credits_Menu
 void UI_Credits_Menu( void )
 {
 	uiCredits.Show();
+	uiCredits.fadeTime = 0; // will be determined later
+	uiCredits.active = true;
+	uiCredits.startTime = (gpGlobals->time * 1000) + 500; // make half-seconds delay
+	uiCredits.showTime = bound( 1000, strlen( uiCredits.credits[uiCredits.numLines - 1]) * 1000, 10000 );
+}
+
+
+/*
+=================
+UI_Main_Precache
+=================
+*/
+void UI_Credits_Precache( void )
+{
 }
 
 void UI_FinalCredits( void )
@@ -233,6 +250,11 @@ void UI_FinalCredits( void )
 
 	uiCredits.active = true;
 	uiCredits.finalCredits = true;
+	uiCredits.startTime = (gpGlobals->time * 1000) + 500; // make half-seconds delay
+	uiCredits.showTime = bound( 1000, strlen( uiCredits.credits[uiCredits.numLines - 1]) * 1000, 10000 );
+
 	// don't create a window
 	// uiCredits.Show();
 }
+
+ADD_MENU( menu_credits, UI_Credits_Precache, UI_Credits_Menu );
