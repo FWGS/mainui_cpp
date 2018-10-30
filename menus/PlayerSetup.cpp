@@ -367,19 +367,19 @@ void CMenuPlayerSetup::_Init( void )
 
 	banner.SetPicture(ART_BANNER);
 
-	name.szStatusText = "Enter your multiplayer display name";
+	name.SetNameAndStatus( "Name","Enter your multiplayer display name" );
 	name.iMaxLength = 32;
 	name.LinkCvar( "name" );
 	name.SetRect( 320, 260, 256, 36 );
 
 	crosshairView.SetRect( 320, 340, 96, 96 );
-	crosshairView.SetNameAndStatus( "Crosshair Preview", "Choose dynamic crosshair" );
+	crosshairView.SetNameAndStatus( "Crosshair preview", "Choose dynamic crosshair" );
 	crosshairView.hWhite = EngFuncs::PIC_Load("*white");
 
-	static const char *strSizes[] = {"auto", "small", "medium", "large"};
+	static const char *strSizes[] = {"Auto", "Small", "Medium", "Large"};
 	static CStringArrayModel modelSizes( strSizes, ARRAYSIZE( strSizes ));
 	crosshairSize.SetRect( 480, 345, 256, 26 );
-	crosshairSize.SetNameAndStatus( "Crosshair Size", "Set crosshair size" );
+	crosshairSize.SetNameAndStatus( "Crosshair size", "Set crosshair size" );
 	crosshairSize.Setup(&modelSizes);
 	crosshairSize.LinkCvar( "cl_crosshair_size", CMenuEditable::CVAR_VALUE );
 
@@ -396,7 +396,7 @@ void CMenuPlayerSetup::_Init( void )
 	crosshairTranslucent.LinkCvar( "cl_crosshair_translucent" );
 
 	extendedMenus.SetCoord( 320, 500 );
-	extendedMenus.SetNameAndStatus( "Extended Menus", "Enable extended menus" );
+	extendedMenus.SetNameAndStatus( "Extended touch menu", "Force touch menus for radio" );
 	extendedMenus.LinkCvar( "_extended_menus" );
 
 	msgBox.SetMessage( "Please, choose another player name" );
