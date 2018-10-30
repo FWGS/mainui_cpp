@@ -133,8 +133,8 @@ void CMenuZoo::_Init()
 		bmp[i].iFlags |= QMF_DISABLESCAILING;
 		bmp[i].szName = pics[i];
 		bmp[i].eFocusAnimation = QM_HIGHLIGHTIFFOCUS;
-		bmp[i].iFocusColor = PackRGBA( 255, 255, 255, 255 );
-		bmp[i].iColor = PackRGBA( 128, 128, 128, 255 );
+		bmp[i].colorFocus = PackRGBA( 255, 255, 255, 255 );
+		bmp[i].colorBase = PackRGBA( 128, 128, 128, 255 );
 		if( i == 0 )
 			bmp[i].SetCoord( 0, 0 );
 		else

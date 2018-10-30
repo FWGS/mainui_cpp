@@ -46,8 +46,8 @@ void CMenuSlider::VidInit(  )
 	if( m_flRange < 0.05f )
 		m_flRange = 0.05f;
 
-	iColor.SetDefault( uiColorWhite );
-	iFocusColor.SetDefault( uiColorWhite );
+	colorBase.SetDefault( uiColorWhite );
+	colorFocus.SetDefault( uiColorWhite );
 
 	BaseClass::VidInit();
 

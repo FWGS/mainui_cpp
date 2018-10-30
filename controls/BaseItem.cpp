@@ -62,9 +62,9 @@ void CMenuBaseItem::VidInit()
 	CalcPosition();
 	CalcSizes();
 
-	iColor.SetDefault( uiPromptTextColor );
-	iFocusColor.SetDefault( uiPromptFocusColor );
-	iStrokeColor.SetDefault( uiInputFgColor );
+	colorBase.SetDefault( uiPromptTextColor );
+	colorFocus.SetDefault( uiPromptFocusColor );
+	colorStroke.SetDefault( uiInputFgColor );
 }
 
 void CMenuBaseItem::Reload()

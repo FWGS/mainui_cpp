@@ -49,7 +49,7 @@ void CMenuBackgroundBitmap::VidInit()
 		}
 	}
 
-	iColor.SetDefault( 0xFF505050 );
+	colorBase.SetDefault( 0xFF505050 );
 
 	CMenuBaseItem::VidInit();
 }
@@ -63,10 +63,10 @@ void CMenuBackgroundBitmap::DrawColor()
 {
 	if( bDrawStroke )
 	{
-		UI_DrawRectangleExt( m_scPos, m_scSize, iStrokeColor, 1 );
+		UI_DrawRectangleExt( m_scPos, m_scSize, colorStroke, 1 );
 	}
 
-	UI_FillRect( m_scPos, m_scSize, iColor );
+	UI_FillRect( m_scPos, m_scSize, colorBase );
 }
 
 void CMenuBackgroundBitmap::DrawBackgroundLayout( Point p, float xScale, float yScale )

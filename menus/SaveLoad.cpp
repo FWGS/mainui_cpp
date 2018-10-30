@@ -55,7 +55,7 @@ void CMenuSaveLoad::_Init( void )
 	banner.SetPicture(ART_BANNER );
 
 	hintMessage.iFlags = QMF_INACTIVE;
-	hintMessage.iColor = uiColorHelp;
+	hintMessage.colorBase = uiColorHelp;
 	hintMessage.SetCharSize( QM_SMALLFONT );
 	hintMessage.szName = hintText;
 	hintMessage.SetCoord( 360, 480 );

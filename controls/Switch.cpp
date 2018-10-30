@@ -216,7 +216,7 @@ void CMenuSwitch::Draw( void )
 
 			if( UI_CursorInRect( m_Points[i], m_Sizes[i] ) && !(iFlags & (QMF_GRAYED|QMF_INACTIVE)))
 			{
-				bgColor = iFocusColor;
+				bgColor = colorFocus;
 				tempflags |= ETF_FORCECOL;
 			}
 

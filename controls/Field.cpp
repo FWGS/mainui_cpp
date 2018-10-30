@@ -502,7 +502,7 @@ void CMenuField::Draw( void )
 
 	if(this != m_pParent->ItemAtCursor())
 	{
-		UI_DrawString( font, newPos, m_scSize, text, iColor, m_scChSize, eTextAlignment, textflags );
+		UI_DrawString( font, newPos, m_scSize, text, colorBase, m_scChSize, eTextAlignment, textflags );
 		return; // no focus
 	}
 
@@ -519,7 +519,7 @@ void CMenuField::Draw( void )
 		x = newPos.x + (m_scSize.w - g_FontMgr.GetTextWideScaled( font, text, m_scChSize )) / 2;
 	}
 
-	UI_DrawString( font, newPos, m_scSize, text, iColor, m_scChSize, eTextAlignment, textflags );
+	UI_DrawString( font, newPos, m_scSize, text, colorBase, m_scChSize, eTextAlignment, textflags );
 
 	int cursorOffset = cursor? g_FontMgr.GetTextWideScaled( font, text, m_scChSize, cursor ):0;
 
@@ -528,22 +528,22 @@ void CMenuField::Draw( void )
 	int cursor_char_width = g_FontMgr.GetTextWideScaled( font, cursor_char, m_scChSize );
 
 	if(( uiStatic.realTime & 499 ) < 250 )
-		UI_DrawString( font, x + cursorOffset, y, cursor_char_width, m_scSize.h, cursor_char, iColor, m_scChSize, QM_LEFT, textflags | ETF_FORCECOL );
+		UI_DrawString( font, x + cursorOffset, y, cursor_char_width, m_scSize.h, cursor_char, colorBase, m_scChSize, QM_LEFT, textflags | ETF_FORCECOL );
 
 
 	switch( eFocusAnimation )
 	{
 	case QM_HIGHLIGHTIFFOCUS:
-		UI_DrawString( font, newPos, m_scSize, text, iFocusColor, m_scChSize, eTextAlignment, textflags );
+		UI_DrawString( font, newPos, m_scSize, text, colorFocus, m_scChSize, eTextAlignment, textflags );
 
 		if(( uiStatic.realTime & 499 ) < 250 )
-			UI_DrawString( font, x + cursorOffset, y, cursor_char_width, m_scSize.h, cursor_char, iFocusColor, m_scChSize, QM_LEFT, textflags | ETF_FORCECOL  );
+			UI_DrawString( font, x + cursorOffset, y, cursor_char_width, m_scSize.h, cursor_char, colorFocus, m_scChSize, QM_LEFT, textflags | ETF_FORCECOL  );
 		break;
 	case QM_PULSEIFFOCUS:
 	{
 		uint	color;
 
-		color = PackAlpha( iColor, 255 * (0.5 + 0.5 * sin( (float)uiStatic.realTime / UI_PULSE_DIVISOR )));
+		color = PackAlpha( colorBase, 255 * (0.5 + 0.5 * sin( (float)uiStatic.realTime / UI_PULSE_DIVISOR )));
 		UI_DrawString( font, newPos, m_scSize, text, color, m_scChSize, eTextAlignment, textflags );
 
 		if(( uiStatic.realTime & 499 ) < 250 )

@@ -273,7 +273,7 @@ void CMenuPicButton::Draw( )
 					InterpColor( uiColorBlack, iColor, a / 255.0f ), m_scChSize, eTextAlignment, textflags );
 			}
 #endif
-			UI_DrawString( font, m_scPos, m_scSize, szName, iColor, m_scChSize, eTextAlignment, textflags );
+			UI_DrawString( font, m_scPos, m_scSize, szName, colorBase, m_scChSize, eTextAlignment, textflags );
 			return; // no focus
 		}
 
@@ -283,7 +283,7 @@ void CMenuPicButton::Draw( )
 			UI_DrawString( uiStatic.hHeavyBlur, m_scPos, m_scSize, szName, iColor, m_scChSize, eTextAlignment, textflags );
 			UI_DrawString( font, m_scPos, m_scSize, szName, iColor, m_scChSize, eTextAlignment, textflags );
 #else
-			UI_DrawString( font, m_scPos, m_scSize, szName, iFocusColor, m_scChSize, eTextAlignment, textflags );
+			UI_DrawString( font, m_scPos, m_scSize, szName, colorFocus, m_scChSize, eTextAlignment, textflags );
 #endif
 		}
 		else if( eFocusAnimation == QM_PULSEIFFOCUS )
@@ -296,7 +296,7 @@ void CMenuPicButton::Draw( )
 			UI_DrawString( font, m_scPos, m_scSize, szName, iColor, m_scChSize, eTextAlignment, textflags );
 #else
 			UI_DrawString( font, m_scPos, m_scSize, szName,
-				InterpColor( iColor, iFocusColor, pulsar ), m_scChSize, eTextAlignment, textflags );
+				InterpColor( colorBase, colorFocus, pulsar ), m_scChSize, eTextAlignment, textflags );
 #endif
 		}
 	}

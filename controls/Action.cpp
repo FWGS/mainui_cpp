@@ -133,7 +133,7 @@ void CMenuAction::Draw( )
 
 	if( bDrawStroke )
 	{
-		UI_DrawRectangleExt( m_scPos, m_scSize, iStrokeColor, iStrokeWidth );
+		UI_DrawRectangleExt( m_scPos, m_scSize, colorStroke, iStrokeWidth );
 	}
 
 	if( m_szBackground )
@@ -174,19 +174,19 @@ void CMenuAction::Draw( )
 
 	if( this != m_pParent->ItemAtCursor() || eFocusAnimation == QM_NOFOCUSANIMATION )
 	{
-		UI_DrawString( font, m_scPos, m_scSize, szName, iColor, m_scChSize, eTextAlignment, textflags );
+		UI_DrawString( font, m_scPos, m_scSize, szName, colorBase, m_scChSize, eTextAlignment, textflags );
 		return; // no focus
 	}
 
 	if( eFocusAnimation == QM_HIGHLIGHTIFFOCUS )
 	{
-		UI_DrawString( font, m_scPos, m_scSize, szName, iFocusColor, m_scChSize, eTextAlignment, textflags );
+		UI_DrawString( font, m_scPos, m_scSize, szName, colorFocus, m_scChSize, eTextAlignment, textflags );
 	}
 	else if( eFocusAnimation == QM_PULSEIFFOCUS )
 	{
 		int	color;
 
-		color = PackAlpha( iColor, 255 * (0.5 + 0.5 * sin( (float)uiStatic.realTime / UI_PULSE_DIVISOR )));
+		color = PackAlpha( colorBase, 255 * (0.5 + 0.5 * sin( (float)uiStatic.realTime / UI_PULSE_DIVISOR )));
 
 		UI_DrawString( font, m_scPos, m_scSize, szName, color, m_scChSize, eTextAlignment, textflags );
 	}
