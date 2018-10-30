@@ -60,22 +60,11 @@ public:
 	CMenuPlayerSetup() : CMenuFramework( "CMenuPlayerSetup" ), msgBox( true ) { }
 
 	void SetConfig();
-	void UpdateModel();
 	void UpdateLogo();
 	void ApplyColorToImagePreview();
 	void ApplyColorToLogoPreview();
 	void WriteNewLogo();
 	void SaveAndPopMenu() override;
-
-	class CModelListModel : public CStringArrayModel
-	{
-	public:
-		CModelListModel() : CStringArrayModel( (const char *)models, CS_SIZE, 0 ) {}
-		void Update();
-
-	private:
-		char models[MAX_PLAYERMODELS][CS_SIZE];
-	} modelsModel;
 
 	class CLogosListModel : public CStringArrayModel
 	{
@@ -87,15 +76,7 @@ public:
 		char logos[MAX_PLAYERMODELS][CS_SIZE];
 	} logosModel;
 
-	CMenuPlayerModelView	view;
-
-	CMenuCheckBox	showModels;
-	CMenuCheckBox	hiModels;
-	CMenuSlider	topColor;
-	CMenuSlider	bottomColor;
-
 	CMenuField	name;
-	CMenuSpinControl	model;
 
 	class CMenuLogoPreview : public CMenuBaseItem
 	{
@@ -105,8 +86,20 @@ public:
 		HIMAGE hImage;
 	} logoImage;
 
+	class CMenuCrosshairPreview : public CMenuBaseItem
+	{
+	public:
+		virtual void Draw();
+		int r, g, b;
+		HIMAGE hWhite;
+	} crosshairView;
+
 	CMenuSpinControl	logo;
 	CMenuSpinControl		logoColor;
+	CMenuSpinControl	crosshairSize;
+	CMenuSpinControl	crosshairColor;
+	CMenuCheckBox	crosshairTranslucent;
+
 
 	CMenuYesNoMessageBox msgBox;
 
@@ -135,43 +128,92 @@ void CMenuPlayerSetup::CMenuLogoPreview::Draw()
 
 }
 
-/*
-=================
-UI_PlayerSetup_FindModels
-=================
-*/
-void CMenuPlayerSetup::CModelListModel::Update( void )
+void CMenuPlayerSetup::CMenuCrosshairPreview::Draw()
 {
-	char	name[256], path[256];
-	char	**filenames;
-	int numFiles, i;
-	
-	m_iCount = 0;
-
-	// Get file list
-	filenames = EngFuncs::GetFilesList(  "models/player/*", &numFiles, TRUE );
-	if( !numFiles )
-		filenames = EngFuncs::GetFilesList(  "models/player/*", &numFiles, FALSE );
-
-#if 0
-	// add default singleplayer model
-	strcpy( models[num_models], "player" );
-	modelsPtr[num_models] = models[num_models];
-	num_models++;
-#endif
-
-	// build the model list
-	for( i = 0; i < numFiles; i++ )
+	static byte g_iCrosshairAvailColors[6][3] =
 	{
-		COM_FileBase( filenames[i], name );
-		snprintf( path, sizeof( path ), "models/player/%s/%s.mdl", name, name );
-		if( !EngFuncs::FileExists( path, TRUE ))
-			continue;
+		{ 50,  250, 50  },
+		{ 250, 50,  50  },
+		{ 50,  50,  250 },
+		{ 250, 250, 50  },
+		{ 50,  250, 250 },
+		{ 0,   0,   0   }
+	};
 
-		Q_strncpy( models[m_iCount], name, sizeof( models[0] ) );
-		m_iCount++;
+	UI_DrawPic(m_scPos, m_scSize, 0x00FFFFFF, "gfx/vgui/crosshair" );
+
+
+	int l;
+	switch( (int)uiPlayerSetup.crosshairSize.GetCurrentValue() )
+	{
+	case 1:
+		l = 10;
+		break;
+	case 2:
+		l = 20;
+		break;
+	case 3:
+		l = 30;
+		break;
+	case 0:
+		if( ScreenWidth < 640 )
+			l = 30;
+		else if( ScreenWidth < 1024 )
+			l = 20;
+		else l = 10;
+	}
+
+	l *= ScreenHeight / 768.0f;
+
+	int x = m_scPos.x, // xpos
+		y = m_scPos.y, // ypos
+		w = m_scSize.w, // width
+		h = m_scSize.h, // height
+		// delta distance
+		d = (m_scSize.w / 2 - l) * 0.5,
+		// alpha
+		a = 180,
+		// red
+		r = g_iCrosshairAvailColors[(int)uiPlayerSetup.crosshairColor.GetCurrentValue()][0],
+		// green
+		g = g_iCrosshairAvailColors[(int)uiPlayerSetup.crosshairColor.GetCurrentValue()][1],
+		// blue
+		b = g_iCrosshairAvailColors[(int)uiPlayerSetup.crosshairColor.GetCurrentValue()][2];
+
+	if( uiPlayerSetup.crosshairTranslucent.bChecked )
+	{
+		// verical
+		EngFuncs::PIC_Set(hWhite, r, g, b, a);
+		EngFuncs::PIC_DrawTrans(x + w / 2, y + d,         1, l );
+
+		EngFuncs::PIC_Set(hWhite, r, g, b, a);
+		EngFuncs::PIC_DrawTrans(x + w / 2, y + h / 2 + d, 1, l );
+
+		// horizontal
+		EngFuncs::PIC_Set(hWhite, r, g, b, a);
+		EngFuncs::PIC_DrawTrans(x + d,         y + h / 2, l, 1 );
+
+		EngFuncs::PIC_Set(hWhite, r, g, b, a);
+		EngFuncs::PIC_DrawTrans(x + w / 2 + d, y + h / 2, l, 1 );
+	}
+	else
+	{
+		// verical
+		EngFuncs::PIC_Set(hWhite, r, g, b, a);
+		EngFuncs::PIC_DrawAdditive(x + w / 2, y + d,         1, l );
+
+		EngFuncs::PIC_Set(hWhite, r, g, b, a);
+		EngFuncs::PIC_DrawAdditive(x + w / 2, y + h / 2 + d, 1, l );
+
+		// horizontal
+		EngFuncs::PIC_Set(hWhite, r, g, b, a);
+		EngFuncs::PIC_DrawAdditive(x + d,         y + h / 2, l, 1 );
+
+		EngFuncs::PIC_Set(hWhite, r, g, b, a);
+		EngFuncs::PIC_DrawAdditive(x + w / 2 + d, y + h / 2, l, 1 );
 	}
 }
+
 
 /*
 =================
@@ -219,11 +261,9 @@ UI_PlayerSetup_SetConfig
 void CMenuPlayerSetup::SetConfig( void )
 {
 	name.WriteCvar();
-	model.WriteCvar();
-	topColor.WriteCvar();
-	bottomColor.WriteCvar();
-	hiModels.WriteCvar();
-	showModels.WriteCvar();
+	crosshairColor.WriteCvar();
+	crosshairSize.WriteCvar();
+	crosshairTranslucent.WriteCvar();
 	WriteNewLogo();
 }
 
@@ -237,35 +277,6 @@ void CMenuPlayerSetup::SaveAndPopMenu()
 
 	SetConfig();
 	CMenuFramework::SaveAndPopMenu();
-}
-
-void CMenuPlayerSetup::UpdateModel()
-{
-	char image[256];
-	const char *mdl = model.GetCurrentString();
-
-	// seems we DON'T have this model locally
-	// just force display string and do nothing
-	if( !mdl )
-	{
-		model.ForceDisplayString( EngFuncs::GetCvarString( "model" ) );
-		return;
-	}
-
-	snprintf( image, 256, "models/player/%s/%s.bmp", mdl, mdl );
-#ifdef PIC_KEEP_SOURCE
-	view.hPlayerImage = EngFuncs::PIC_Load( image, PIC_KEEP_SOURCE );
-#else
-	view.hPlayerImage = EngFuncs::PIC_Load( image, PIC_KEEP_8BIT );
-#endif
-	ApplyColorToImagePreview();
-	EngFuncs::CvarSetString( "model", mdl );
-	if( !strcmp( mdl, "player" ) )
-		strcpy( image, "models/player.mdl" );
-	else
-		snprintf( image, sizeof(image), "models/player/%s/%s.mdl", mdl, mdl );
-	if( view.ent )
-		EngFuncs::SetModel( view.ent, image );
 }
 
 void CMenuPlayerSetup::UpdateLogo()
@@ -283,12 +294,6 @@ void CMenuPlayerSetup::UpdateLogo()
 	ApplyColorToLogoPreview();
 
 	EngFuncs::CvarSetString( "cl_logofile", mdl );
-}
-
-void CMenuPlayerSetup::ApplyColorToImagePreview()
-{
-	EngFuncs::ProcessImage( view.hPlayerImage, -1,
-		topColor.GetCurrentValue(), bottomColor.GetCurrentValue() );
 }
 
 void CMenuPlayerSetup::ApplyColorToLogoPreview()
@@ -365,52 +370,29 @@ void CMenuPlayerSetup::_Init( void )
 	name.LinkCvar( "name" );
 	name.SetRect( 320, 260, 256, 36 );
 
-	modelsModel.Update();
-	if( !modelsModel.GetRows() )
-	{
-		model.SetVisibility( false );
-		hideModels = true;
-	}
-	else
-	{
-		model.Setup( &modelsModel );
-		model.LinkCvar( "model", CMenuEditable::CVAR_STRING );
-		model.onChanged = VoidCb( &CMenuPlayerSetup::UpdateModel );
-		model.SetRect( 660, 580 + UI_OUTLINE_WIDTH, 260, 32 );
-	}
+	crosshairView.SetRect( 320, 340, 96, 96 );
+	crosshairView.SetNameAndStatus( "Crosshair Preview", "Choose dynamic crosshair" );
+	crosshairView.hWhite = EngFuncs::PIC_Load("*white");
 
-	topColor.iFlags |= addFlags;
-	topColor.SetNameAndStatus( "Top color", "Set a player model top color" );
-	topColor.Setup( 0.0, 255, 1 );
-	topColor.LinkCvar( "topcolor" );
-	topColor.onCvarChange = CMenuEditable::WriteCvarCb;
-	topColor.onChanged = VoidCb( &CMenuPlayerSetup::ApplyColorToImagePreview );
-	topColor.SetCoord( 340, 520 );
-	topColor.size.w = 300;
+	static const char *strSizes[] = {"auto", "small", "medium", "large"};
+	static CStringArrayModel modelSizes( strSizes, ARRAYSIZE( strSizes ));
+	crosshairSize.SetRect( 480, 345, 256, 26 );
+	crosshairSize.SetNameAndStatus( "Crosshair Size", "Set crosshair size" );
+	crosshairSize.Setup(&modelSizes);
+	crosshairSize.LinkCvar( "cl_crosshair_size", CMenuEditable::CVAR_VALUE );
 
-	bottomColor.iFlags |= addFlags;
-	bottomColor.SetNameAndStatus( "Bottom color", "Set a player model bottom color" );
-	bottomColor.Setup( 0.0, 255.0, 1 );
-	bottomColor.LinkCvar( "bottomcolor" );
-	bottomColor.onCvarChange = CMenuEditable::WriteCvarCb;
-	bottomColor.onChanged = VoidCb( &CMenuPlayerSetup::ApplyColorToImagePreview );;
-	bottomColor.SetCoord( 340, 590 );
-	bottomColor.size.w = 300;
 
-	showModels.iFlags |= addFlags;
-	showModels.SetNameAndStatus( "Show 3D preview", "Show 3D player models instead of preview thumbnails" );
-	showModels.LinkCvar( "ui_showmodels" );
-	showModels.onCvarChange = CMenuEditable::WriteCvarCb;
-	showModels.SetCoord( 340, 380 );
+	static const char *strColors[] = {"Green", "Red", "Blue", "Yellow", "Ltblue"};
+	static CStringArrayModel modelColors( strColors, ARRAYSIZE( strColors ));
+	crosshairColor.SetRect( 480, 415, 256, 26 );
+	crosshairColor.SetNameAndStatus( "Crosshair color", "Set crosshair color" );
+	crosshairColor.Setup(&modelColors);
+	crosshairColor.LinkCvar( "cl_crosshair_color", CMenuEditable::CVAR_VALUE );
 
-	hiModels.iFlags |= addFlags;
-	hiModels.SetNameAndStatus( "High quality models", "Show HD models in multiplayer" );
-	hiModels.LinkCvar( "cl_himodels" );
-	hiModels.onCvarChange = CMenuEditable::WriteCvarCb;
-	hiModels.SetCoord( 340, 430 );
+	crosshairTranslucent.SetCoord( 320, 450 );
+	crosshairTranslucent.SetNameAndStatus( "Translucent crosshair", "Set additive render crosshair" );
+	crosshairTranslucent.LinkCvar( "cl_crosshair_translucent" );
 
-	view.iFlags |= addFlags;
-	view.SetRect( 660, 260, 260, 320 );
 
 	msgBox.SetMessage( "Please, choose another player name" );
 	msgBox.Link( this );
@@ -460,27 +442,18 @@ void CMenuPlayerSetup::_Init( void )
 	}
 
 	AddItem( name );
+	AddItem( crosshairSize );
+	AddItem( crosshairColor );
+	AddItem( crosshairTranslucent );
+	AddItem( crosshairView );
+
+
 	if( !hideLogos )
 	{
 		AddItem( logo );
 		AddItem( logoColor );
 		AddItem( logoImage );
 		UpdateLogo();
-	}
-
-	if( !(gMenu.m_gameinfo.flags & GFL_NOMODELS) )
-	{
-		AddItem( topColor );
-		AddItem( bottomColor );
-		AddItem( showModels );
-		AddItem( hiModels );
-		AddItem( model );
-		// disable playermodel preview for HLRally to prevent crash
-		if( !hideModels )
-		{
-			UpdateModel();
-			AddItem( view );
-		}
 	}
 }
 
