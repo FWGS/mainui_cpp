@@ -52,6 +52,27 @@ static struct
 { "dkgray", 36,  36,  36  },
 };
 
+
+static byte g_iCrosshairAvailColors[6][3] =
+{
+	{ 0,   0,   0   },
+	{ 50,  250, 50  },
+	{ 250, 50,  50  },
+	{ 50,  50,  250 },
+	{ 250, 250, 50  },
+	{ 50,  250, 250 },
+};
+
+static const char *g_szCrosshairAvailSizes[] =
+{
+	"auto", "small", "medium", "large"
+};
+
+static const char *g_szCrosshairAvailColors[] =
+{
+	"Green", "Red", "Blue", "Yellow", "Ltblue"
+};
+
 static class CMenuPlayerSetup : public CMenuFramework
 {
 private:
@@ -131,15 +152,6 @@ void CMenuPlayerSetup::CMenuLogoPreview::Draw()
 
 void CMenuPlayerSetup::CMenuCrosshairPreview::Draw()
 {
-	static byte g_iCrosshairAvailColors[6][3] =
-	{
-		{ 50,  250, 50  },
-		{ 250, 50,  50  },
-		{ 50,  50,  250 },
-		{ 250, 250, 50  },
-		{ 50,  250, 250 },
-		{ 0,   0,   0   }
-	};
 
 	UI_DrawPic(m_scPos, m_scSize, 0x00FFFFFF, "gfx/vgui/crosshair" );
 
@@ -175,11 +187,11 @@ void CMenuPlayerSetup::CMenuCrosshairPreview::Draw()
 		// alpha
 		a = 180,
 		// red
-		r = g_iCrosshairAvailColors[(int)uiPlayerSetup.crosshairColor.GetCurrentValue()][0],
+		r = g_iCrosshairAvailColors[(int)uiPlayerSetup.crosshairColor.GetCurrentValue()+1][0],
 		// green
-		g = g_iCrosshairAvailColors[(int)uiPlayerSetup.crosshairColor.GetCurrentValue()][1],
+		g = g_iCrosshairAvailColors[(int)uiPlayerSetup.crosshairColor.GetCurrentValue()+1][1],
 		// blue
-		b = g_iCrosshairAvailColors[(int)uiPlayerSetup.crosshairColor.GetCurrentValue()][2];
+		b = g_iCrosshairAvailColors[(int)uiPlayerSetup.crosshairColor.GetCurrentValue()+1][2];
 
 	if( uiPlayerSetup.crosshairTranslucent.bChecked )
 	{
@@ -262,7 +274,13 @@ UI_PlayerSetup_SetConfig
 void CMenuPlayerSetup::SetConfig( void )
 {
 	name.WriteCvar();
-	crosshairColor.WriteCvar();
+	char curColor[CS_SIZE];
+	int i = uiPlayerSetup.crosshairColor.GetCurrentValue() + 1;
+	snprintf( curColor, CS_SIZE, "%i %i %i",
+			  g_iCrosshairAvailColors[i][0],
+			  g_iCrosshairAvailColors[i][1],
+			  g_iCrosshairAvailColors[i][2]);
+	EngFuncs::CvarSetString( "cl_crosshair_color", curColor );
 	crosshairSize.WriteCvar();
 	crosshairTranslucent.WriteCvar();
 	extendedMenus.WriteCvar();
@@ -376,20 +394,16 @@ void CMenuPlayerSetup::_Init( void )
 	crosshairView.SetNameAndStatus( "Crosshair preview", "Choose dynamic crosshair" );
 	crosshairView.hWhite = EngFuncs::PIC_Load("*white");
 
-	static const char *strSizes[] = {"Auto", "Small", "Medium", "Large"};
-	static CStringArrayModel modelSizes( strSizes, ARRAYSIZE( strSizes ));
+	static CStringArrayModel modelSizes( g_szCrosshairAvailSizes, ARRAYSIZE( g_szCrosshairAvailSizes ));
 	crosshairSize.SetRect( 480, 345, 256, 26 );
 	crosshairSize.SetNameAndStatus( "Crosshair size", "Set crosshair size" );
 	crosshairSize.Setup(&modelSizes);
-	crosshairSize.LinkCvar( "cl_crosshair_size", CMenuEditable::CVAR_VALUE );
+	crosshairSize.LinkCvar("cl_crosshair_size", CMenuEditable::CVAR_STRING);
 
-
-	static const char *strColors[] = {"Green", "Red", "Blue", "Yellow", "Ltblue"};
-	static CStringArrayModel modelColors( strColors, ARRAYSIZE( strColors ));
+	static CStringArrayModel modelColors( g_szCrosshairAvailColors, ARRAYSIZE( g_szCrosshairAvailColors ));
 	crosshairColor.SetRect( 480, 415, 256, 26 );
 	crosshairColor.SetNameAndStatus( "Crosshair color", "Set crosshair color" );
 	crosshairColor.Setup(&modelColors);
-	crosshairColor.LinkCvar( "cl_crosshair_color", CMenuEditable::CVAR_VALUE );
 
 	crosshairTranslucent.SetCoord( 320, 450 );
 	crosshairTranslucent.SetNameAndStatus( "Translucent crosshair", "Set additive render crosshair" );
@@ -483,6 +497,36 @@ void UI_PlayerSetup_Menu( void )
 	if ( gMenu.m_gameinfo.gamemode == GAME_SINGLEPLAYER_ONLY )
 		return;
 
+
 	uiPlayerSetup.Show();
+
+	char curColor[CS_SIZE];
+	int rgb[3];
+	strncpy( curColor, EngFuncs::GetCvarString("cl_crosshair_color"), CS_SIZE);
+	sscanf( curColor, "%d %d %d", rgb, rgb + 1, rgb + 2 );
+
+	// check for custom colors
+	int i;
+	for( i = 1; i < 6; i++)
+	{
+		if( rgb[0] == g_iCrosshairAvailColors[i][0] &&
+			rgb[1] == g_iCrosshairAvailColors[i][1] &&
+			rgb[2] == g_iCrosshairAvailColors[i][2] )
+		{
+			break;
+		}
+	}
+
+	if( i == 6 )
+	{
+		g_iCrosshairAvailColors[0][0] = rgb[0];
+		g_iCrosshairAvailColors[0][1] = rgb[1];
+		g_iCrosshairAvailColors[0][2] = rgb[2];
+		uiPlayerSetup.crosshairColor.SetCurrentValue(curColor);
+	}
+	else
+		uiPlayerSetup.crosshairColor.SetCurrentValue(i-1);
+
+
 }
 ADD_MENU( menu_playersetup, UI_PlayerSetup_Precache, UI_PlayerSetup_Menu );
