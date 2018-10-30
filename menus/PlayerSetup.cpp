@@ -99,6 +99,7 @@ public:
 	CMenuSpinControl	crosshairSize;
 	CMenuSpinControl	crosshairColor;
 	CMenuCheckBox	crosshairTranslucent;
+	CMenuCheckBox	extendedMenus;
 
 
 	CMenuYesNoMessageBox msgBox;
@@ -264,6 +265,7 @@ void CMenuPlayerSetup::SetConfig( void )
 	crosshairColor.WriteCvar();
 	crosshairSize.WriteCvar();
 	crosshairTranslucent.WriteCvar();
+	extendedMenus.WriteCvar();
 	WriteNewLogo();
 }
 
@@ -393,6 +395,9 @@ void CMenuPlayerSetup::_Init( void )
 	crosshairTranslucent.SetNameAndStatus( "Translucent crosshair", "Set additive render crosshair" );
 	crosshairTranslucent.LinkCvar( "cl_crosshair_translucent" );
 
+	extendedMenus.SetCoord( 320, 500 );
+	extendedMenus.SetNameAndStatus( "Extended Menus", "Enable extended menus" );
+	extendedMenus.LinkCvar( "_extended_menus" );
 
 	msgBox.SetMessage( "Please, choose another player name" );
 	msgBox.Link( this );
@@ -445,6 +450,7 @@ void CMenuPlayerSetup::_Init( void )
 	AddItem( crosshairSize );
 	AddItem( crosshairColor );
 	AddItem( crosshairTranslucent );
+	AddItem( extendedMenus );
 	AddItem( crosshairView );
 
 
