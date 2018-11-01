@@ -243,7 +243,7 @@ void CMenuCreateGame::_Init( void )
 	hostName.szName = "Server Name:";
 	hostName.iMaxLength = 28;
 	hostName.LinkCvar( "hostname" );
-
+	
 	maxClients.iMaxLength = 3;
 	maxClients.bNumbersOnly = true;
 	maxClients.szName = "Max Players:";
@@ -251,13 +251,25 @@ void CMenuCreateGame::_Init( void )
 	{
 		CMenuField *self = (CMenuField*)pSelf;
 		const char *buf = self->GetBuffer();
+		if( buf[0] == 0 ) return;
+		
 		int players = atoi( buf );
 		if( players <= 1 )
 			self->SetBuffer( "2" );
 		else if( players > 32 )
 			self->SetBuffer( "32" );
 	});
-	maxClients.onCvarGet = maxClients.onChanged;
+	SET_EVENT_MULTI( maxClients.onCvarGet,
+	{
+		CMenuField *self = (CMenuField*)pSelf;
+		const char *buf = self->GetBuffer();
+		
+		int players = atoi( buf );
+		if( players <= 1 )
+			self->SetBuffer( "16" );
+		else if( players > 32 )
+			self->SetBuffer( "32" );
+	});
 	maxClients.LinkCvar( "maxplayers" );
 
 	password.szName = "Password:";
@@ -271,10 +283,10 @@ void CMenuCreateGame::_Init( void )
 	msgBox.Link( this );
 
 	AddButton( "Cancel", "Return to the previous menu", PC_CANCEL, VoidCb( &CMenuCreateGame::Hide ) );
-	AddItem( maxClients );
 	AddItem( hostName );
+	AddItem( maxClients );
 	AddItem( password );
-#if defined(__ANDROID__) || TARGET_OS_IPHONE || defined(__SAILFISH__)
+#if !(defined(__ANDROID__) || TARGET_OS_IPHONE || defined(__SAILFISH__))
 	AddItem( dedicatedServer );
 #endif
 	// HLTV not yet supported
