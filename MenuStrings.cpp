@@ -280,8 +280,8 @@ static void Localize_Free( void )
 		{
 			dictionary_t *next = base->next;
 
-			delete [] base->value;
-			delete [] base->name;
+			delete [] (char*)base->value;
+			delete [] (char*)base->name;
 			delete base;
 
 			base = next;
