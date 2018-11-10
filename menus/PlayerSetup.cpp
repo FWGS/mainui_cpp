@@ -122,7 +122,7 @@ void CMenuPlayerSetup::CMenuLogoPreview::Draw()
 #ifdef NEW_ENGINE_INTERFACE
 		UI_DrawString( font, m_scPos, m_scSize, "No logo", iColor, m_scChSize, QM_CENTER, ETF_SHADOW );
 #else
-		UI_DrawString( font, m_scPos, m_scSize, "Coming soon!", iColor, m_scChSize, QM_CENTER, ETF_SHADOW );
+		UI_DrawString( font, m_scPos, m_scSize, "Coming soon!", colorBase, m_scChSize, QM_CENTER, ETF_SHADOW );
 #endif
 	}
 	else
@@ -132,7 +132,7 @@ void CMenuPlayerSetup::CMenuLogoPreview::Draw()
 
 #ifndef NEW_ENGINE_INTERFACE
 		UI_FillRect( m_scPos, m_scSize, uiColorBlack );
-		UI_DrawString( font, m_scPos, m_scSize, "Coming soon!", iColor, m_scChSize, QM_CENTER, ETF_SHADOW );
+		UI_DrawString( font, m_scPos, m_scSize, "Coming soon!", colorBase, m_scChSize, QM_CENTER, ETF_SHADOW );
 #endif
 	}
 

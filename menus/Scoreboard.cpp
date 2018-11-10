@@ -248,7 +248,7 @@ void CMenuScoreboard::_Init()
 	iFlags |= QMF_DISABLESCAILING;
 
 	background.bForceColor = true;
-	background.iStrokeColor = uiInputTextColor;
+	background.colorStroke = uiInputTextColor;
 
 	serverName.iFlags |= QMF_DISABLESCAILING;
 	serverName.SetCharSize( QM_SMALLFONT );
@@ -281,13 +281,13 @@ void CMenuScoreboard::_Init()
 	CTs_text.eTextAlignment = Ts_score.eTextAlignment = QM_LEFT;
 	Ts_text.eTextAlignment = CTs_score.eTextAlignment = QM_RIGHT;
 
-	CTs_score.iColor = Ts_score.iColor = CTs_text.iColor = Ts_text.iColor =  uiColorWhite;
+	CTs_score.colorBase = Ts_score.colorBase = CTs_text.colorBase = Ts_text.colorBase =  uiColorWhite;
 
 	CTs.iFlags |= QMF_DISABLESCAILING|QMF_INACTIVE;
 	Ts.bShowScrollBar = CTs.bShowScrollBar = false;
 	Ts.bDrawStroke = CTs.bDrawStroke = true;
 	Ts.iStrokeWidth = CTs.iStrokeWidth = 1;
-	Ts.iStrokeColor = CTs.iStrokeColor = uiInputTextColor;
+	Ts.colorStroke = CTs.colorStroke = uiInputTextColor;
 	Ts.iBackgroundColor = CTs.iBackgroundColor = 0;
 	CTs.iHeaderColor = g_ColorBlue;
 	CTs.SetupColumn( 0, L( "Cstrike_TitlesTXT_PLAYERS" ), 0.3f );
@@ -367,7 +367,7 @@ void UI_SetupScoreboard( int xstart, int xend, int ystart, int yend, unsigned in
 	}
 
 	scoreboard.bDrawStroke = drawStroke;
-	scoreboard.background.iColor = color;
+	scoreboard.background.colorBase = color;
 }
 
 void UI_VidInitScoreboard()
