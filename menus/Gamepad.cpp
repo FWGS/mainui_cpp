@@ -198,7 +198,7 @@ void CMenuGamePad::_Init( void )
 
 	axisBind_label.eTextAlignment = QM_CENTER;
 	axisBind_label.iFlags = QMF_INACTIVE|QMF_DROPSHADOW;
-	axisBind_label.iColor = uiColorHelp;
+	axisBind_label.colorBase = uiColorHelp;
 	axisBind_label.szName = "Axis binding map";
 
 	for( i = 0, y = 230; i < 6; i++, y += 50 )

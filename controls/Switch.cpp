@@ -59,8 +59,9 @@ void CMenuSwitch::VidInit()
 
 	int sizes[UI_MAX_MENUITEMS];
 	int sum = 0;
+	int i;
 
-	for( int i = 0; i < m_iSwitches; i++ )
+	for( i = 0; i < m_iSwitches; i++ )
 	{
 		if( m_szNames[i] != NULL && !bKeepToggleWidth )
 			sizes[i] = g_FontMgr.GetTextWideScaled( font, m_szNames[i], m_scChSize );
@@ -69,7 +70,7 @@ void CMenuSwitch::VidInit()
 		sum += sizes[i];
 	}
 
-	for( int i = 0; i < m_iSwitches; i++ )
+	for( i = 0; i < m_iSwitches; i++ )
 	{
 		float frac = (float)sizes[i] / (float)sum;
 
@@ -216,7 +217,7 @@ void CMenuSwitch::Draw( void )
 
 			if( UI_CursorInRect( m_Points[i], m_Sizes[i] ) && !(iFlags & (QMF_GRAYED|QMF_INACTIVE)))
 			{
-				bgColor = iFocusColor;
+				bgColor = colorFocus;
 				tempflags |= ETF_FORCECOL;
 			}
 

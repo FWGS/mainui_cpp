@@ -446,6 +446,7 @@ void CMenuTouchButtons::_Init( void )
 	texture.szName = "Texture:";
 	texture.iMaxLength = 255;
 	texture.onChanged = VoidCb( &CMenuTouchButtons::UpdateTexture );
+	texture.eTextAlignment = QM_RIGHT;
 
 	reset.SetNameAndStatus( "Reset", "Reset touch to default state" );
 	reset.SetPicture( "gfx/shell/btn_touch_reset" );

@@ -36,8 +36,8 @@ CMenuPlayerModelView::CMenuPlayerModelView() : CMenuBaseItem()
 void CMenuPlayerModelView::VidInit()
 {
 	backgroundColor.SetDefault( uiColorHelp );
-	iStrokeColor.SetDefault( uiInputFgColor );
-	iFocusColor.SetDefault( uiInputTextColor );
+	colorStroke.SetDefault( uiInputFgColor );
+	colorFocus.SetDefault( uiInputTextColor );
 
 	if( iStrokeWidth == 0 )
 		iStrokeWidth = uiStatic.outlineWidth;
@@ -143,9 +143,9 @@ void CMenuPlayerModelView::Draw()
 
 	// draw the rectangle
 	if( eFocusAnimation == QM_HIGHLIGHTIFFOCUS && IsCurrentSelected() )
-		UI_DrawRectangleExt( m_scPos, m_scSize, iFocusColor, iStrokeWidth );
+		UI_DrawRectangleExt( m_scPos, m_scSize, colorFocus, iStrokeWidth );
 	else
-		UI_DrawRectangleExt( m_scPos, m_scSize, iStrokeColor, iStrokeWidth );
+		UI_DrawRectangleExt( m_scPos, m_scSize, colorStroke, iStrokeWidth );
 
 	if( ( eOverrideMode == PMV_DONTCARE && !ui_showmodels->value ) || // controlled by engine cvar
 		( eOverrideMode == PMV_SHOWIMAGE ) ) // controlled by menucode
@@ -157,7 +157,7 @@ void CMenuPlayerModelView::Draw()
 		}
 		else
 		{
-			UI_DrawString( font, m_scPos, m_scSize, "No preview", iColor, m_scChSize, QM_CENTER, ETF_SHADOW );
+			UI_DrawString( font, m_scPos, m_scSize, "No preview", colorBase, m_scChSize, QM_CENTER, ETF_SHADOW );
 		}
 	}
 	else

@@ -86,7 +86,7 @@ void CMenuYesNoMessageBox::_Init( void )
 		onPositive = CEventCallback::NoopCb;
 
 	background.bForceColor = true;
-	background.iColor = uiPromptBgColor;
+	background.colorBase = uiPromptBgColor;
 	AddItem( background );
 	AddItem( dlgMessage1 );
 	AddItem( yes );

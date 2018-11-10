@@ -259,7 +259,7 @@ void CMenuTouchOptions::UpdateProfilies()
 	COM_FileBase( EngFuncs::GetCvarString( "touch_config_file" ), curprofile );
 	isCurrent = !strcmp( curprofile, model.profileDesc[ idx ]);
 
-	// Scrolllist changed, update availiable options
+	// Scrolllist changed, update available options
 	remove.SetGrayed( true );
 	if( ( idx > model.firstProfile ) && !isCurrent )
 		remove.SetGrayed( false );

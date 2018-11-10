@@ -48,7 +48,7 @@ void CMenuTable::VidInit()
 
 	iBackgroundColor.SetDefault( uiColorBlack );
 	iHeaderColor.SetDefault( uiColorHelp );
-	iStrokeColor.SetDefault( uiInputFgColor );
+	colorStroke.SetDefault( uiInputFgColor );
 	iStrokeFocusedColor.SetDefault( uiInputTextColor );
 
 	if( iStrokeWidth == 0 ) iStrokeWidth = uiStatic.outlineWidth;
@@ -574,7 +574,7 @@ void CMenuTable::Draw()
 		if( eFocusAnimation == QM_HIGHLIGHTIFFOCUS && iFlags & QMF_HASKEYBOARDFOCUS )
 			color = iStrokeFocusedColor;
 		else
-			color = iStrokeColor;
+			color = colorStroke;
 
 		if( bFramedHintText )
 		{
@@ -719,10 +719,10 @@ void CMenuTable::Draw()
 			{
 				int	color;
 
-				color = PackAlpha( iColor, 255 * (0.5 + 0.5 * sin( (float)uiStatic.realTime / UI_PULSE_DIVISOR )));
+				color = PackAlpha( colorBase, 255 * (0.5 + 0.5 * sin( (float)uiStatic.realTime / UI_PULSE_DIVISOR )));
 
-				UI_DrawPic( upArrow, arrow, (upFocus) ? color : (int)iColor, (upFocus) ? szUpArrowFocus : szUpArrow );
-				UI_DrawPic( downArrow, arrow, (downFocus) ? color : (int)iColor, (downFocus) ? szDownArrowFocus : szDownArrow );
+				UI_DrawPic( upArrow, arrow, (upFocus) ? color : (int)colorBase, (upFocus) ? szUpArrowFocus : szUpArrow );
+				UI_DrawPic( downArrow, arrow, (downFocus) ? color : (int)colorBase, (downFocus) ? szDownArrowFocus : szDownArrow );
 			}
 		}
 	}
@@ -734,7 +734,7 @@ void CMenuTable::Draw()
 
 	for( i = iTopItem; i < m_pModel->GetRows() && i < iNumRows + iTopItem; i++, y += m_scChSize )
 	{
-		int color = iColor; // predict state
+		int color = colorBase; // predict state
 		bool forceCol = false;
 		int fillColor = 0;
 
@@ -748,9 +748,9 @@ void CMenuTable::Draw()
 			if( i == iCurItem )
 			{
 				if( eFocusAnimation == QM_HIGHLIGHTIFFOCUS )
-					color = iFocusColor;
+					color = colorFocus;
 				else if( eFocusAnimation == QM_PULSEIFFOCUS )
-					color = PackAlpha( iColor, 255 * (0.5 + 0.5 * sin( (float)uiStatic.realTime / UI_PULSE_DIVISOR )));
+					color = PackAlpha( colorBase, 255 * (0.5 + 0.5 * sin( (float)uiStatic.realTime / UI_PULSE_DIVISOR )));
 
 				fillColor = selColor;
 			}

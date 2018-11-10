@@ -73,6 +73,8 @@ public:
 		}
 	}
 
+	CColor colorText;
+
 private:
 	Point m_scTextPos;
 	Size m_scTextSize;

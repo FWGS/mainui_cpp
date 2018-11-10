@@ -161,8 +161,8 @@ public:
 	const char *szStatusText;
 	const char *szTag; // tag for searching in res file
 
-	CColor iColor;
-	CColor iFocusColor;
+	CColor colorBase;
+	CColor colorFocus;
 
 	unsigned int eTextAlignment;
 	EFocusAnimation eFocusAnimation;
@@ -171,7 +171,7 @@ public:
 	HFont font;
 
 	bool   bDrawStroke;
-	CColor iStrokeColor;
+	CColor colorStroke;
 	int    iStrokeWidth;
 
 	int		m_iLastFocusTime;

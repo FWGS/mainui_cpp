@@ -24,6 +24,9 @@ def configure(conf):
 		conf.env.USE_STBTT = True
 		conf.env.append_unique('DEFINES', 'MAINUI_USE_STB');
 	
+	if conf.env.COMPILER_CC != 'msvc':
+		conf.env.append_unique('CXXFLAGS', ['-std=gnu++11'])
+
 	if conf.env.DEST_OS != 'win32':
 		if not conf.env.USE_STBTT:
 			errormsg = '{0} not available! Install {0} development package. Also you may need to set PKG_CONFIG_PATH environment variable'

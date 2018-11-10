@@ -31,8 +31,8 @@ CMenuCheckBox::CMenuCheckBox() : BaseClass()
 	bChecked = false;
 	eFocusAnimation = QM_HIGHLIGHTIFFOCUS;
 	iFlags |= QMF_ACT_ONRELEASE|QMF_DROPSHADOW;
-	iColor = uiColorWhite;
-	iFocusColor = uiColorWhite;
+	colorBase = uiColorWhite;
+	colorFocus = uiColorWhite;
 	iMask = 0;
 	bInvertMask = false;
 }
@@ -44,7 +44,7 @@ CMenuCheckBox::Init
 */
 void CMenuCheckBox::VidInit( void )
 {
-	iColor.SetDefault( uiColorHelp );
+	colorText.SetDefault( uiColorHelp );
 	BaseClass::VidInit();
 	m_scTextPos.x = m_scPos.x + (m_scSize.w * 1.5f );
 	m_scTextPos.y = m_scPos.y;
@@ -125,7 +125,7 @@ void CMenuCheckBox::Draw( void )
 {
 	uint textflags = ( iFlags & QMF_DROPSHADOW ? ETF_SHADOW : 0 ) | ETF_NOSIZELIMIT | ETF_FORCECOL;
 
-	UI_DrawString( font, m_scTextPos, m_scTextSize, szName, iColor, m_scChSize, eTextAlignment, textflags );
+	UI_DrawString( font, m_scTextPos, m_scTextSize, szName, colorText, m_scChSize, eTextAlignment, textflags );
 
 	if( szStatusText && iFlags & QMF_NOTIFY )
 	{
@@ -155,35 +155,35 @@ void CMenuCheckBox::Draw( void )
 	   || ( this != m_pParent->ItemAtCursor() ) )
 	{
 		if( !bChecked )
-			UI_DrawPic( m_scPos, m_scSize, iColor, szEmptyPic );
-		else UI_DrawPic( m_scPos, m_scSize, iColor, szCheckPic );
+			UI_DrawPic( m_scPos, m_scSize, colorBase, szEmptyPic );
+		else UI_DrawPic( m_scPos, m_scSize, colorBase, szCheckPic );
 		return; // no focus
 	}
 
 	if( m_bPressed )
 	{
-		UI_DrawPic( m_scPos, m_scSize, iColor, szPressPic );
+		UI_DrawPic( m_scPos, m_scSize, colorBase, szPressPic );
 	}
 	else if( eFocusAnimation == QM_HIGHLIGHTIFFOCUS )
 	{
 		if( bChecked )
 		{
 			// use two textures for it. Second is just focus texture, slightly orange. Looks pretty.
-			UI_DrawPic( m_scPos, m_scSize, iColor, szPressPic );
+			UI_DrawPic( m_scPos, m_scSize, colorBase, szPressPic );
 			UI_DrawPic( m_scPos, m_scSize, uiInputTextColor, szFocusPic, QM_DRAWADDITIVE );
 		}
 		else
 		{
-			UI_DrawPic( m_scPos, m_scSize, iFocusColor, szFocusPic );
+			UI_DrawPic( m_scPos, m_scSize, colorFocus, szFocusPic );
 		}
 	}
 	else if( bChecked )
 	{
-		UI_DrawPic( m_scPos, m_scSize, iColor, szCheckPic );
+		UI_DrawPic( m_scPos, m_scSize, colorBase, szCheckPic );
 	}
 	else
 	{
-		UI_DrawPic( m_scPos, m_scSize, iColor, szEmptyPic );
+		UI_DrawPic( m_scPos, m_scSize, colorBase, szEmptyPic );
 	}
 }
 

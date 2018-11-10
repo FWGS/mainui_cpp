@@ -34,8 +34,8 @@ CMenuBitmap::Init
 */
 void CMenuBitmap::VidInit( )
 {
-	iColor.SetDefault( uiColorWhite );
-	iFocusColor.SetDefault( uiColorWhite );
+	colorBase.SetDefault( uiColorWhite );
+	colorFocus.SetDefault( uiColorWhite );
 
 	BaseClass::VidInit();
 	if( !szFocusPic )
@@ -104,7 +104,7 @@ void CMenuBitmap::Draw( void )
 {
 	if( !szPic )
 	{
-		UI_FillRect( m_scPos, m_scSize, iColor );
+		UI_FillRect( m_scPos, m_scSize, colorBase );
 		return;
 	}
 
@@ -116,36 +116,36 @@ void CMenuBitmap::Draw( void )
 
 	if(( iFlags & QMF_MOUSEONLY ) && !( iFlags & QMF_HASMOUSEFOCUS ))
 	{
-		UI_DrawPic( m_scPos, m_scSize, iColor, szPic, eRenderMode );
+		UI_DrawPic( m_scPos, m_scSize, colorBase, szPic, eRenderMode );
 		return; // no focus
 	}
 
 	if( this != m_pParent->ItemAtCursor() )
 	{
-		UI_DrawPic( m_scPos, m_scSize, iColor, szPic, eRenderMode );
+		UI_DrawPic( m_scPos, m_scSize, colorBase, szPic, eRenderMode );
 		return; // no focus
 	}
 
 	if( this->m_bPressed )
 	{
-		UI_DrawPic( m_scPos, m_scSize, iColor, szPressPic, ePressRenderMode );
+		UI_DrawPic( m_scPos, m_scSize, colorBase, szPressPic, ePressRenderMode );
 	}
 
 	switch( eFocusAnimation )
 	{
 	case QM_HIGHLIGHTIFFOCUS:
-		UI_DrawPic( m_scPos, m_scSize, iColor, szFocusPic, eFocusRenderMode );
+		UI_DrawPic( m_scPos, m_scSize, colorBase, szFocusPic, eFocusRenderMode );
 		break;
 	case QM_PULSEIFFOCUS:
 	{
 		int	color;
 
-		color = PackAlpha( iColor, 255 * (0.5 + 0.5 * sin( (float)uiStatic.realTime / UI_PULSE_DIVISOR )));
+		color = PackAlpha( colorBase, 255 * (0.5 + 0.5 * sin( (float)uiStatic.realTime / UI_PULSE_DIVISOR )));
 		UI_DrawPic( m_scPos, m_scSize, color, szFocusPic, eFocusRenderMode );
 		break;
 	}
 	default:
-		UI_DrawPic( m_scPos, m_scSize, iColor, szPic, eRenderMode ); // ignore focus
+		UI_DrawPic( m_scPos, m_scSize, colorBase, szPic, eRenderMode ); // ignore focus
 		break;
 	}
 }

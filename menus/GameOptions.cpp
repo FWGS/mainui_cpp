@@ -214,7 +214,7 @@ void CMenuGameOptions::_Init( void )
 
 	networkMode.iFlags = QMF_INACTIVE|QMF_DROPSHADOW;
 	networkMode.szName = "Select network mode:";
-	networkMode.iColor = uiColorHelp;
+	networkMode.colorBase = uiColorHelp;
 	networkMode.SetCharSize( QM_BIGFONT );
 	networkMode.SetRect( 240, 450, 400, 32 );
 

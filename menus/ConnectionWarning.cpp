@@ -41,7 +41,7 @@ void CMenuConnectionWarning::_Init()
 	iFlags |= QMF_DIALOG;
 
 	background.bForceColor = true;
-	background.iColor = uiPromptBgColor;
+	background.colorBase = uiPromptBgColor;
 
 	normal.szName = "Normal internet connection";
 	normal.SetCoord( 20, 140 );
