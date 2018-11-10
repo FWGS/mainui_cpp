@@ -1,9 +1,13 @@
+#include "cl_dll/IGameClientExports.h"
 #include <string.h>
+#include "BaseMenu.h"
 #include "BaseWindow.h"
 #include "Action.h"
 #include "Table.h"
 #include "BaseModel.h"
 #include "Scoreboard.h"
+#include "mathlib.h"
+#include "const.h"
 #include "com_model.h"
 
 
@@ -115,8 +119,6 @@ public:
 
 	void Clear();
 
-	bool bDrawStroke;
-
 private:
 	CMenuScoreboardModel CTs_model;
 	CMenuScoreboardModel Ts_model;
@@ -204,7 +206,7 @@ void CMenuScoreboard::Draw()
 			}
 		}
 	}
-	snprintf( spectators_buf, sizeof( spectators_buf ), "%s: ", g_pClient->Localize( "Cstrike_TitlesTXT_Spectators" ) );
+	snprintf( spectators_buf, sizeof( spectators_buf ), "%s: ", L( "Cstrike_TitlesTXT_Spectators" ) );
 	if( spectators.Count() )
 	{
 		char temp[128];
@@ -261,12 +263,12 @@ void CMenuScoreboard::_Init()
 	CTs_text.iFlags |= QMF_DISABLESCAILING;
 	CTs_text.SetCharSize( QM_BIGFONT );
 	CTs_text.SetBackground( PackRGBA( 0, 0, 255, 64 ) );
-	CTs_text.szName = g_pClient->Localize( "Cstrike_ScoreBoard_CT" );
+	CTs_text.szName = L( "Cstrike_ScoreBoard_CT" );
 
 	Ts_text.iFlags |= QMF_DISABLESCAILING;
 	Ts_text.SetCharSize( QM_BIGFONT );
 	Ts_text.SetBackground( PackRGBA( 255, 0, 0, 64 ) );
-	Ts_text.szName = g_pClient->Localize( "Cstrike_ScoreBoard_Ter" );
+	Ts_text.szName = L( "Cstrike_ScoreBoard_Ter" );
 
 	CTs_score.iFlags |= QMF_DISABLESCAILING;
 	CTs_score.SetCharSize( QM_BIGFONT );
@@ -284,15 +286,15 @@ void CMenuScoreboard::_Init()
 	CTs.iFlags |= QMF_DISABLESCAILING|QMF_INACTIVE;
 	Ts.bShowScrollBar = CTs.bShowScrollBar = false;
 	Ts.bDrawStroke = CTs.bDrawStroke = true;
-	Ts.iOutlineWidth = CTs.iOutlineWidth = 1;
+	Ts.iStrokeWidth = CTs.iStrokeWidth = 1;
 	Ts.iStrokeColor = CTs.iStrokeColor = uiInputTextColor;
 	Ts.iBackgroundColor = CTs.iBackgroundColor = 0;
 	CTs.iHeaderColor = g_ColorBlue;
-	CTs.SetupColumn( 0, g_pClient->Localize( "Cstrike_TitlesTXT_PLAYERS" ), 0.4f );
+	CTs.SetupColumn( 0, L( "Cstrike_TitlesTXT_PLAYERS" ), 0.3f );
 	CTs.SetupColumn( 1, "", 0.15f );
-	CTs.SetupColumn( 2, g_pClient->Localize( "Cstrike_TitlesTXT_SCORE" ), 0.15f );
-	CTs.SetupColumn( 3, g_pClient->Localize( "Cstrike_TitlesTXT_DEATHS" ), 0.15f );
-	CTs.SetupColumn( 4, g_pClient->Localize( "Cstrike_TitlesTXT_LATENCY" ), 0.15f );
+	CTs.SetupColumn( 2, L( "Cstrike_TitlesTXT_SCORE" ), 0.15f );
+	CTs.SetupColumn( 3, L( "Cstrike_TitlesTXT_DEATHS" ), 0.2f );
+	CTs.SetupColumn( 4, L( "Cstrike_TitlesTXT_LATENCY" ), 0.2f );
 	CTs.SetModel( &CTs_model );
 	CTs.SetCharSize( QM_DEFAULTFONT );
 
@@ -300,11 +302,11 @@ void CMenuScoreboard::_Init()
 	Ts_model.isTerrorist = true;
 	Ts.iFlags |= QMF_DISABLESCAILING|QMF_INACTIVE;
 	Ts.iHeaderColor = g_ColorRed;
-	Ts.SetupColumn( 0, g_pClient->Localize( "Cstrike_TitlesTXT_PLAYERS" ), 0.4f );
+	Ts.SetupColumn( 0, L( "Cstrike_TitlesTXT_PLAYERS" ), 0.4f );
 	Ts.SetupColumn( 1, "", 0.15f );
-	Ts.SetupColumn( 2, g_pClient->Localize( "Cstrike_TitlesTXT_SCORE" ), 0.15f );
-	Ts.SetupColumn( 3, g_pClient->Localize( "Cstrike_TitlesTXT_DEATHS" ), 0.15f );
-	Ts.SetupColumn( 4, g_pClient->Localize( "Cstrike_TitlesTXT_LATENCY" ), 0.15f );
+	Ts.SetupColumn( 2, L( "Cstrike_TitlesTXT_SCORE" ), 0.15f );
+	Ts.SetupColumn( 3, L( "Cstrike_TitlesTXT_DEATHS" ), 0.15f );
+	Ts.SetupColumn( 4, L( "Cstrike_TitlesTXT_LATENCY" ), 0.15f );
 	Ts.SetModel( &Ts_model );
 	Ts.SetCharSize( QM_DEFAULTFONT );
 

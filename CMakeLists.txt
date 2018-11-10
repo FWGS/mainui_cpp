@@ -63,6 +63,7 @@ set(MAINUI_CONTROLS_SOURCES
 	controls/TabView.cpp
 	controls/PlayerModelView.cpp
 	controls/ScrollView.cpp
+	controls/BaseClientWindow.cpp
 )
 
 set(MAINUI_MENUS_SOURCES
@@ -117,13 +118,14 @@ set(MAINUI_SOURCES
 )
 
 if(CS16CLIENT)
-	add_definitions(-DCS16CLIENT)
+	add_definitions(-DCS16CLIENT -DMAINUI_RENDER_PICBUTTON_TEXT)
 	list(APPEND MAINUI_SOURCES
 		${XASH_SDK}/common/interface.cpp
 		menus/Scoreboard.cpp
 		menus/client/JoinGame.cpp
 		menus/client/JoinClass.cpp
 		menus/client/ClientWindow.cpp
+		menus/client/BuyMenu.cpp
 		)
 endif()
 
