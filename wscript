@@ -25,7 +25,7 @@ def configure(conf):
 		conf.env.append_unique('DEFINES', 'MAINUI_USE_STB');
 	
 	if conf.env.COMPILER_CC != 'msvc':
-		conf.env.append_unique('CXXFLAGS', ['-std=gnu++11'])
+		conf.env.append_unique('CXXFLAGS', ['-std=c++11'])
 
 	if conf.env.DEST_OS != 'win32':
 		if not conf.env.USE_STBTT:
