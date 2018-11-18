@@ -61,7 +61,7 @@ def build(bld):
 		if not bld.env.USE_STBTT:
 			libs += ['FT2', 'FC']
 	else:
-		libs += ['gdi32', 'user32']
+		libs += ['GDI32', 'USER32']
 
 	source = bld.path.ant_glob([
 		'*.cpp', 
