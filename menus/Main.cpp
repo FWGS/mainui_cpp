@@ -171,7 +171,7 @@ const char *CMenuMain::Activate( void )
 		disconnect.Hide();
 	}
 
-	if( gpGlobals->developer )
+	if( EngFuncs::GetCvarFloat("developer") )
 	{
 		console.pos.y = CL_IsActive() ? 130 : 230;
 	}
@@ -308,7 +308,7 @@ void CMenuMain::_Init( void )
 	AddItem( background );
 	AddItem( banner );
 
-	if ( gpGlobals->developer )
+	if ( EngFuncs::GetCvarFloat( "developer" ))
 		AddItem( console );
 
 	AddItem( disconnect );

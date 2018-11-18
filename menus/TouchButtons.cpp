@@ -17,7 +17,8 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
-
+#include "BaseMenu.h" // ADD_MENU
+#ifndef XASH_DISABLE_FWGS_EXTENSIONS
 #include "Framework.h"
 #include "mobility_int.h"
 #include "Bitmap.h"
@@ -29,7 +30,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "CheckBox.h"
 #include "YesNoMessageBox.h"
 #include "StringArrayModel.h"
-
 #define ART_BANNER	  	"gfx/shell/head_touch_buttons"
 
 class CMenuTouchButtons : public CMenuFramework
@@ -557,3 +557,17 @@ void UI_TouchButtons_GetButtonList()
 	uiTouchButtons.model.Update();
 }
 ADD_MENU( menu_touchbuttons, UI_TouchButtons_Precache, UI_TouchButtons_Menu );
+#else // XASH_DISABLE_FWGS_EXTENSIONS
+void UI_TouchButtons_Menu( void )
+{
+	// stub
+}
+
+void UI_TouchButtons_GetButtonList( void )
+{
+	// stub
+}
+
+ADD_MENU( menu_touchbuttons, NULL, UI_TouchButtons_Menu );
+
+#endif // XASH_DISABLE_FWGS_EXTENSIONS
