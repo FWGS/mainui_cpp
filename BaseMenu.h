@@ -291,7 +291,6 @@ void UI_TouchOptions_Menu( void );
 void UI_TouchButtons_Menu( void );
 void UI_TouchEdit_Menu( void );
 void UI_FileDialog_Menu( void );
-void UI_TouchButtons_AddButtonToList( const char *name, const char *texture, const char *command, unsigned char *color, int flags );
 void UI_TouchButtons_GetButtonList();
 void UI_GamePad_Menu( void );
 void UI_Zoo_Menu( void );
