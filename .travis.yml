@@ -2,7 +2,7 @@ sudo: false
 addons:
   apt:
     packages:
-      - wine-development
+      - wine-stable
       - p7zip-full
 git:
   depth: 1
@@ -17,4 +17,4 @@ before_script:
   - git clone --depth=1 https://github.com/a1batross/Xash3D_original
   - 7z x shtudio/shtudio.7z
 script:
-  - wine-development cmd /c compile.bat
+  - wine-stable cmd /c compile.bat
