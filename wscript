@@ -41,8 +41,8 @@ def configure(conf):
 				conf.fatal(errormsg.format('fontconfig'))
 			conf.env.append_unique('DEFINES', 'MAINUI_USE_FREETYPE');
 	else:
-		conf.check(lib='USER32')
-		conf.check(lib='GDI32')
+		conf.check(lib='user32')
+		conf.check(lib='gdi32')
 
 def get_subproject_name(ctx):
 	return os.path.basename(os.path.realpath(str(ctx.path)))
@@ -61,7 +61,7 @@ def build(bld):
 		if not bld.env.USE_STBTT:
 			libs += ['FT2', 'FC']
 	else:
-		libs += ['GDI32', 'USER32']
+		libs += ['gdi32', 'user32']
 
 	source = bld.path.ant_glob([
 		'*.cpp', 
