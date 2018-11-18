@@ -17,4 +17,4 @@ before_script:
   - git clone --depth=1 https://github.com/a1batross/Xash3D_original
   - 7z x shtudio/shtudio.7z
 script:
-  - wine cmd /c compile.bat
+  - wine-development cmd /c compile.bat
