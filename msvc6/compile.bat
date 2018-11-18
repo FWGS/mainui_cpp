@@ -18,6 +18,9 @@ set DEBUG=/debug
 
 cl %DEFINES% %SOURCES% %INCLUDES% -o %OUTNAME% /link /dll %LINKLIBS% /out:%OUTNAME% %DEBUG%
 
+rem Check cl.exe return value
+IF %ERRORLEVEL% NEQ 1 EXIT /B %ERRORLEVEL%
+
 echo -- Compile done. Cleaning...
 
 del *.obj *.exp *.lib *.ilk

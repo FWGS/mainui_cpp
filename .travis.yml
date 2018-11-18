@@ -12,3 +12,5 @@ before_script:
   - 7z x shtudio/shtudio.7z
 script:
   - cmd "/c compile.bat"
+after_script:
+  - sh travis-deploy.sh menudll_orig menu.dll menu.pdb
