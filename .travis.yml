@@ -3,6 +3,7 @@ addons:
   apt:
     packages:
       - wine-development
+      - p7zip-full
 git:
   depth: 1
   submodules: true
