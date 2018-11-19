@@ -25,7 +25,7 @@ def configure(conf):
 		conf.env.append_unique('DEFINES', 'MAINUI_USE_STB');
 	
 	if conf.env.COMPILER_CC != 'msvc':
-		conf.env.append_unique('CXXFLAGS', ['-std=gnu++11'])
+		conf.env.append_unique('CXXFLAGS', ['-std=c++11'])
 
 	if conf.env.DEST_OS != 'win32':
 		if not conf.env.USE_STBTT:
@@ -41,8 +41,8 @@ def configure(conf):
 				conf.fatal(errormsg.format('fontconfig'))
 			conf.env.append_unique('DEFINES', 'MAINUI_USE_FREETYPE');
 	else:
-		conf.check(lib='USER32')
-		conf.check(lib='GDI32')
+		conf.check(lib='user32')
+		conf.check(lib='gdi32')
 
 def get_subproject_name(ctx):
 	return os.path.basename(os.path.realpath(str(ctx.path)))
