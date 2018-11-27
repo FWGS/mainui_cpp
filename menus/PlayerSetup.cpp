@@ -41,15 +41,15 @@ static struct
 	unsigned char b;
 } g_LogoColors[] =
 {
-{ L( "Valve_Orange" ), 255, 120, 24  },
-{ L( "Valve_Yellow" ),	225, 180, 24  },
-{ L( "Valve_Blue" ),   0,   60,  255 },
-{ L( "Valve_Ltblue" ), 0,   167, 255 },
-{ L( "Valve_Green" ),  0,   167, 0   },
-{ L( "Valve_Red" ),    255, 43,  0   },
-{ L( "Valve_Brown" ),  123, 73,  0   },
-{ L( "Valve_Ltgray" ), 100, 100, 100 },
-{ L( "Valve_Dkgray" ), 36,  36,  36  },
+{ "Valve_Orange", 255, 120, 24  },
+{ "Valve_Yellow",	225, 180, 24  },
+{ "Valve_Blue",   0,   60,  255 },
+{ "Valve_Ltblue", 0,   167, 255 },
+{ "Valve_Green",  0,   167, 0   },
+{ "Valve_Red",    255, 43,  0   },
+{ "Valve_Brown",  123, 73,  0   },
+{ "Valve_Ltgray", 100, 100, 100 },
+{ "Valve_Dkgray", 36,  36,  36  },
 };
 
 static class CMenuPlayerSetup : public CMenuFramework
@@ -443,7 +443,7 @@ void CMenuPlayerSetup::_Init( void )
 			static const char *itemlist[ARRAYSIZE( g_LogoColors )];
 			static CStringArrayModel colors( itemlist, ARRAYSIZE( g_LogoColors ) );
 			for( size_t i = 0; i < ARRAYSIZE( g_LogoColors ); i++ )
-				itemlist[i] = g_LogoColors[i].name;
+				itemlist[i] = L( g_LogoColors[i].name );
 
 			logoImage.SetRect( 72, 230 + m_iBtnsNum * 50 + 10, 200, 200 );
 
