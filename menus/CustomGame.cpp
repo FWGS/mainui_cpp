@@ -147,24 +147,24 @@ void CMenuCustomGame::_Init( void )
 
 	AddItem( background );
 	AddItem( banner );
-	load = AddButton( "Activate", "Activate selected custom game", PC_ACTIVATE,
+	load = AddButton( L( "Activate" ), L( "Activate selected custom game" ), PC_ACTIVATE,
 		MenuCb( &CMenuCustomGame::ChangeGame ) );
 	load->onActivatedClActive = msgBox.MakeOpenEvent();
 
-	go2url = AddButton( "Visit web site", "Visit the web site of game developers", PC_VISIT_WEB_SITE,
+	go2url = AddButton( L( "Visit web site" ), L( "Visit the web site of game developers" ), PC_VISIT_WEB_SITE,
 		MenuCb( &CMenuCustomGame::Go2Site ) );
-	AddButton( "Done", "Return to main menu", PC_DONE,
+	AddButton( L( "Done" ), L( "Return to main menu" ), PC_DONE,	// Done - уже где-то было, поэтому в отдельный файл повторно не выношу
 		VoidCb( &CMenuCustomGame::Hide ) );
 
 	modList.onChanged = VoidCb( &CMenuCustomGame::UpdateExtras );
-	modList.SetupColumn( 0, "Type", 0.20f );
-	modList.SetupColumn( 1, "Name", 0.50f );
-	modList.SetupColumn( 2, "Ver",  0.15f );
-	modList.SetupColumn( 3, "Size", 0.15f );
+	modList.SetupColumn( 0, L( "GameUI_Type" ), 0.20f );
+	modList.SetupColumn( 1, L( "Name" ), 0.50f );
+	modList.SetupColumn( 2, L( "Ver" ),  0.15f );
+	modList.SetupColumn( 3, L( "Size" ), 0.15f );
 	modList.SetModel( &modListModel );
 	modList.SetRect( 360, 230, -20, 465 );
 
-	msgBox.SetMessage( "Leave current game?" );
+	msgBox.SetMessage( L( "Leave current game?" ) );
 	msgBox.onPositive = MenuCb( &CMenuCustomGame::ChangeGame );
 	msgBox.Link( this );
 

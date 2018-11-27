@@ -158,11 +158,11 @@ void CMenuSavesListModel::Update( void )
 	if ( uiLoadGame.IsSaveMode() && CL_IsActive() )
 	{
 		// create new entry for current save game
-		Q_strncpy( saveName[i], "new", CS_SIZE );
+		Q_strncpy( saveName[i], L( "GameUI_SaveGame_New" ), CS_SIZE );
 		Q_strncpy( delName[i], "", CS_SIZE );
-		strcpy( m_szCells[i][0], "Current" );
-		strcpy( m_szCells[i][1], "New Saved Game" );
-		strcpy( m_szCells[i][2], "New" );
+		strcpy( m_szCells[i][0], L( "GameUI_SaveGame_Current" ) );
+		strcpy( m_szCells[i][1], L( "GameUI_SaveGame_NewSavedGame" ) );
+		strcpy( m_szCells[i][2], L( "GameUI_SaveGame_New" ) );
 		i++;
 	}
 
@@ -228,22 +228,22 @@ UI_LoadGame_Init
 */
 void CMenuLoadGame::_Init( void )
 {
-	save.SetNameAndStatus( "Save", "Save curret game" );
+	save.SetNameAndStatus( L( "GameUI_Save" ), L( "Save curret game" ) );
 	save.SetPicture( PC_SAVE_GAME );
 	save.onActivated = VoidCb( &CMenuLoadGame::SaveGame );
 	save.SetCoord( 72, 230 );
 
-	load.SetNameAndStatus( "Load", "Load saved game" );
+	load.SetNameAndStatus( L( "GameUI_Load" ), L( "Load saved game" ) );
 	load.SetPicture( PC_LOAD_GAME );
 	load.onActivated = VoidCb( &CMenuLoadGame::LoadGame );
 	load.SetCoord( 72, 230 );
 
-	remove.SetNameAndStatus( "Delete", "Delete saved game" );
+	remove.SetNameAndStatus( L( "Delete" ), L( "Delete saved game" ) );
 	remove.SetPicture( PC_DELETE );
 	remove.onActivated = msgBox.MakeOpenEvent();
 	remove.SetCoord( 72, 280 );
 
-	cancel.SetNameAndStatus( "Cancel", "Return back to main menu" );
+	cancel.SetNameAndStatus( L( "GameUI_Cancel" ), L( "Return back to main menu" ) );
 	cancel.SetPicture( PC_CANCEL );
 	cancel.onActivated = VoidCb( &CMenuLoadGame::Hide );
 	cancel.SetCoord( 72, 330 );
@@ -251,15 +251,15 @@ void CMenuLoadGame::_Init( void )
 	savesList.szName = hintText;
 	savesList.onChanged = VoidCb( &CMenuLoadGame::UpdateGame );
 	// savesList.onDeleteEntry = msgBox.MakeOpenEvent();
-	savesList.SetupColumn( 0, "Time", 0.30f );
-	savesList.SetupColumn( 1, "Game", 0.55f );
-	savesList.SetupColumn( 2, "Elapsed Time", 0.15f );
+	savesList.SetupColumn( 0, L( "GameUI_Time" ), 0.30f );
+	savesList.SetupColumn( 1, L( "GameUI_Game" ), 0.55f );
+	savesList.SetupColumn( 2, L( "GameUI_ElapsedTime" ), 0.15f );
 
 	savesList.SetModel( &savesListModel );
 	savesList.SetCharSize( QM_SMALLFONT );
 	savesList.SetRect( 360, 230, -20, 465 );
 
-	msgBox.SetMessage( "Delete this save?" );
+	msgBox.SetMessage( L( "Delete this saved game?" ) );
 	msgBox.onPositive = VoidCb( &CMenuLoadGame::DeleteGame );
 	msgBox.Link( this );
 

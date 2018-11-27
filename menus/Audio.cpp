@@ -124,60 +124,60 @@ void CMenuAudio::_Init( void )
 {
 	static const char *lerpingStr[] =
 	{
-		"Disabled", "Balance", "Quality"
+		L( "Disabled" ), L( "Balance" ), L( "Quality" )
 	};
 
 	banner.SetPicture(ART_BANNER);
 
-	soundVolume.SetNameAndStatus( "Game sound volume", "Set master volume level" );
+	soundVolume.SetNameAndStatus( L( "GameUI_SoundEffectVolume" ), L( "Set master volume level" ) );
 	soundVolume.Setup( 0.0, 1.0, 0.05f );
 	soundVolume.onChanged = CMenuEditable::WriteCvarCb;
 	soundVolume.SetCoord( 320, 280 );
 
-	musicVolume.SetNameAndStatus( "Game music volume", "Set background music volume level" );
+	musicVolume.SetNameAndStatus( L( "GameUI_MP3Volume" ), L( "Set background music volume level" ) );
 	musicVolume.Setup( 0.0, 1.0, 0.05f );
 	musicVolume.onChanged = CMenuEditable::WriteCvarCb;
 	musicVolume.SetCoord( 320, 340 );
 
-	suitVolume.SetNameAndStatus( "Suit volume", "Set suit volume level" );
+	suitVolume.SetNameAndStatus( L( "GameUI_HEVSuitVolume" ), L( "Set suit volume level" ) );
 	suitVolume.Setup( 0.0, 1.0, 0.05f );
 	suitVolume.onChanged = CMenuEditable::WriteCvarCb;
 	suitVolume.SetCoord( 320, 400 );
 
 	static CStringArrayModel model( lerpingStr, ARRAYSIZE( lerpingStr ));
-	lerping.SetNameAndStatus( "Sound interpolation", "Enable/disable interpolation on sound output" );
+	lerping.SetNameAndStatus( L( "Sound interpolation" ), L( "Enable/disable interpolation on sound output" ) );
 	lerping.Setup( &model );
 	lerping.onChanged = CMenuEditable::WriteCvarCb;
 	lerping.font = QM_SMALLFONT;
 	lerping.SetRect( 320, 470, 300, 32 );
 
-	noDSP.SetNameAndStatus( "Disable DSP effects", "Disable sound processing (like echo, flanger, etc)" );
+	noDSP.SetNameAndStatus( L( "Disable DSP effects" ), L( "Disable sound processing (like echo, flanger, etc)" ) );
 	noDSP.onChanged = CMenuEditable::WriteCvarCb;
 	noDSP.SetCoord( 320, 520 );
 
-	muteFocusLost.SetNameAndStatus( "Mute when inactive", "Disable sound when game goes into background" );
+	muteFocusLost.SetNameAndStatus( L( "Mute when inactive" ), L( "Disable sound when game goes into background" ) );
 	muteFocusLost.onChanged = CMenuEditable::WriteCvarCb;
 	muteFocusLost.SetCoord( 320, 570 );
 
-	vibrationEnable.SetNameAndStatus( "Enable vibration", "In-game vibration(when player injured, etc)");
+	vibrationEnable.SetNameAndStatus( L( "Enable vibration" ), L( "In-game vibration(when player injured, etc)" ) );
 	vibrationEnable.iMask = (QMF_GRAYED|QMF_INACTIVE);
 	vibrationEnable.bInvertMask = true;
 	vibrationEnable.onChanged = CMenuCheckBox::BitMaskCb;
 	vibrationEnable.onChanged.pExtra = &vibration.iFlags;
 	vibrationEnable.SetCoord( 700, 470 );
 
-	vibration.SetNameAndStatus( "Vibration", "Default vibration length" );
+	vibration.SetNameAndStatus( L( "Vibration" ), L( "Default vibration length" ) );
 	vibration.Setup( 0.0f, 5.0f, 0.05f );
 	vibration.onChanged = VoidCb( &CMenuAudio::VibrateChanged );
 	vibration.SetCoord( 700, 570 );
 
-	reverseChannels.SetNameAndStatus( "Reverse audio channels", "Use it when you can't swap your headphones' speakers" );
+	reverseChannels.SetNameAndStatus( L( "Reverse audio channels" ), L( "Use it when you can't swap your headphones' speakers" ) );
 	reverseChannels.onChanged = CMenuEditable::WriteCvarCb;
 	reverseChannels.SetCoord( 320, 620 );
 
 	AddItem( background );
 	AddItem( banner );
-	AddButton( "Done", "Go back to the Configuration Menu", PC_DONE,
+	AddButton( L( "Done" ), L( "Go back to the Configuration Menu" ), PC_DONE,
 		VoidCb( &CMenuAudio::SaveAndPopMenu ) );
 	AddItem( soundVolume );
 	AddItem( musicVolume );

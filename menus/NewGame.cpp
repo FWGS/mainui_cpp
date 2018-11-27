@@ -92,9 +92,9 @@ void CMenuNewGame::_Init( void )
 	SET_EVENT( normCallback, CMenuNewGame::StartGameCb( 2.0f ) );
 	SET_EVENT( hardCallback, CMenuNewGame::StartGameCb( 3.0f ) );
 	
-	CMenuPicButton *easy = AddButton( "Easy", MenuStrings[IDS_NEWGAME_EASYHELP], PC_EASY, easyCallback, QMF_NOTIFY );
-	CMenuPicButton *norm = AddButton( "Medium", MenuStrings[IDS_NEWGAME_MEDIUMHELP], PC_MEDIUM, normCallback, QMF_NOTIFY );
-	CMenuPicButton *hard = AddButton( "Difficult", MenuStrings[IDS_NEWGAME_DIFFICULTHELP], PC_DIFFICULT, hardCallback, QMF_NOTIFY );
+	CMenuPicButton *easy = AddButton( L( "GameUI_Easy" ), L( "StringsList_200" ), PC_EASY, easyCallback, QMF_NOTIFY );
+	CMenuPicButton *norm = AddButton( L( "GameUI_Medium" ), L( "StringsList_201" ), PC_MEDIUM, normCallback, QMF_NOTIFY );
+	CMenuPicButton *hard = AddButton( L( "GameUI_Hard" ), L( "StringsList_202" ), PC_DIFFICULT, hardCallback, QMF_NOTIFY );
 
 	easy->onActivatedClActive =
 		norm->onActivatedClActive =
@@ -103,9 +103,9 @@ void CMenuNewGame::_Init( void )
 	norm->onActivatedClActive.pExtra = &normCallback;
 	hard->onActivatedClActive.pExtra = &hardCallback;
 
-	AddButton( "Cancel", "Go back to the main menu", PC_CANCEL, VoidCb( &CMenuNewGame::Hide ), QMF_NOTIFY );
+	AddButton( L( "GameUI_Cancel" ), L( "Go back to the Main menu" ), PC_CANCEL, VoidCb( &CMenuNewGame::Hide ), QMF_NOTIFY );
 
-	msgBox.SetMessage( MenuStrings[IDS_NEWGAME_NEWPROMPT] );
+	msgBox.SetMessage( L( "StringsList_240" ) );
 	msgBox.HighlightChoice( CMenuYesNoMessageBox::HIGHLIGHT_NO );
 	msgBox.Link( this );
 

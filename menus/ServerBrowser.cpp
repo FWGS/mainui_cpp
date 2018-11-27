@@ -412,11 +412,11 @@ void CMenuServerBrowser::_Init( void )
 	AddItem( background );
 	AddItem( banner );
 
-	joinGame = AddButton( "Join game", "Join to selected game", PC_JOIN_GAME,
+	joinGame = AddButton( L( "Join game" ), L( "Join to selected game" ), PC_JOIN_GAME,
 		VoidCb( &CMenuServerBrowser::JoinGame ), QMF_GRAYED );
 	joinGame->onActivatedClActive = msgBox.MakeOpenEvent();
 
-	createGame = AddButton( "Create game", NULL, PC_CREATE_GAME );
+	createGame = AddButton( L( "GameUI_GameMenu_CreateServer" ), NULL, PC_CREATE_GAME );
 	SET_EVENT_MULTI( createGame->onActivated,
 	{
 		if( ((CMenuServerBrowser*)pSelf->Parent())->m_bLanOnly )
@@ -427,30 +427,30 @@ void CMenuServerBrowser::_Init( void )
 	});
 
 	// TODO: implement!
-	AddButton( "View game info", "Get detail game info", PC_VIEW_GAME_INFO, CEventCallback::NoopCb, QMF_GRAYED );
+	AddButton( L( "View game info" ), L( "Get detail game info" ), PC_VIEW_GAME_INFO, CEventCallback::NoopCb, QMF_GRAYED );
 
-	refresh = AddButton( "Refresh", "Refresh servers list", PC_REFRESH, VoidCb( &CMenuServerBrowser::RefreshList ) );
+	refresh = AddButton( L( "Refresh" ), L( "Refresh servers list" ), PC_REFRESH, VoidCb( &CMenuServerBrowser::RefreshList ) );
 
-	AddButton( "Done", "Return to main menu", PC_DONE, VoidCb( &CMenuServerBrowser::Hide ) );
+	AddButton( L( "Done" ), L( "Return to main menu" ), PC_DONE, VoidCb( &CMenuServerBrowser::Hide ) );
 
-	msgBox.SetMessage( "Join a network game will exit any current game, OK to exit?" );
-	msgBox.SetPositiveButton( "Ok", PC_OK );
+	msgBox.SetMessage( L( "Join a network game will exit any current game, OK to exit?" ) );
+	msgBox.SetPositiveButton( L( "GameUI_OK" ), PC_OK );
 	msgBox.HighlightChoice( CMenuYesNoMessageBox::HIGHLIGHT_YES );
 	msgBox.onPositive = VoidCb( &CMenuServerBrowser::JoinGame );
 	msgBox.Link( this );
 
 	gameList.SetCharSize( QM_SMALLFONT );
 	gameList.SetupColumn( 0, NULL, 32.0f, true );
-	gameList.SetupColumn( 1, "Name", 0.40f );
-	gameList.SetupColumn( 2, "Map", 0.25f );
-	gameList.SetupColumn( 3, "Players", 100.0f, true );
-	gameList.SetupColumn( 4, "Ping", 120.0f, true );
+	gameList.SetupColumn( 1, L( "Name" ), 0.40f );
+	gameList.SetupColumn( 2, L( "GameUI_Map" ), 0.25f );
+	gameList.SetupColumn( 3, L( "Players" ), 100.0f, true );
+	gameList.SetupColumn( 4, L( "Ping" ), 120.0f, true );
 	gameList.SetModel( &gameListModel );
 	gameList.bFramedHintText = true;
 	gameList.bAllowSorting = true;
 
-	natOrDirect.AddSwitch( "Direct" );
-	natOrDirect.AddSwitch( "NAT" );
+	natOrDirect.AddSwitch( L( "Direct" ) );
+	natOrDirect.AddSwitch( L( "NAT" ) );							// Уже встречалось ранее.......
 	natOrDirect.eTextAlignment = QM_CENTER;
 	natOrDirect.bMouseToggle = false;
 	natOrDirect.LinkCvar( "cl_nat" );
@@ -474,7 +474,7 @@ void CMenuServerBrowser::_Init( void )
 	password.bHideInput = true;
 	password.bAllowColorstrings = false;
 	password.bNumbersOnly = false;
-	password.szName = "Password:";
+	password.szName = L( "GameUI_Password" );
 	password.iMaxLength = 16;
 	password.SetRect( 188, 140, 270, 32 );
 
@@ -496,7 +496,7 @@ void CMenuServerBrowser::_Init( void )
 		staticWaitingPassword = false;
 	});
 
-	askPassword.SetMessage( "Enter server password to continue:" );
+	askPassword.SetMessage( L( "GameUI_PasswordPrompt" ) );
 	askPassword.Link( this );
 	askPassword.Init();
 	askPassword.AddItem( password );
@@ -515,13 +515,13 @@ void CMenuServerBrowser::_VidInit()
 	if( m_bLanOnly )
 	{
 		banner.SetPicture( ART_BANNER_LAN );
-		createGame->szStatusText = ( "Create new LAN game" );
+		createGame->szStatusText = ( L( "Create new LAN game" ) );
 		natOrDirect.Hide();
 	}
 	else
 	{
 		banner.SetPicture( ART_BANNER_INET );
-		createGame->szStatusText = ( "Create new Internet game" );
+		createGame->szStatusText = ( L( "Create new Internet game" ) );
 		natOrDirect.Show();
 	}
 

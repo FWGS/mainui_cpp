@@ -145,47 +145,47 @@ void CAdvancedControls::_Init( void )
 {
 	banner.SetPicture( ART_BANNER );
 
-	done.SetNameAndStatus( "Done", "save changed and go back to the Customize Menu" );
+	done.SetNameAndStatus( L( "Done" ), L( "save changed and go back to the Customize Menu" ) );
 	done.SetPicture( PC_DONE );
 	done.onActivated = VoidCb( &CAdvancedControls::SaveAndPopMenu );
 	done.SetCoord( 72, 680 );
 
-	crosshair.SetNameAndStatus( "Crosshair", "Enable the weapon aiming crosshair" );
+	crosshair.SetNameAndStatus( L( "Crosshair" ), L( "Enable the weapon aiming crosshair" ) );
 	crosshair.iFlags |= QMF_NOTIFY;
 	crosshair.SetCoord( 72, 280 );
 
-	invertMouse.SetNameAndStatus( "Invert mouse", "Reverse mouse up/down axis" );
+	invertMouse.SetNameAndStatus( L( "GameUI_ReverseMouse" ), L( "GameUI_ReverseMouseLabel" ) );
 	invertMouse.iFlags |= QMF_NOTIFY;
 	invertMouse.onChanged = VoidCb( &CAdvancedControls::PitchInvert );
 	invertMouse.SetCoord( 72, 330 );
 
-	mouseLook.SetNameAndStatus( "Mouse look", "Use the mouse to look around instead of using the mouse to move" );
+	mouseLook.SetNameAndStatus( L( "GameUI_MouseLook" ), L( "GameUI_MouseLookLabel" ) );
 	mouseLook.iFlags |= QMF_NOTIFY;
 	SET_EVENT( mouseLook.onChanged,
 		((CAdvancedControls*)pSelf->Parent())->ToggleLookCheckboxes( true ) );
 	mouseLook.SetCoord( 72, 380 );
 
-	lookSpring.SetNameAndStatus("Look spring", "Causes the screen to 'spring' back to looking straight ahead when you move forward" );
+	lookSpring.SetNameAndStatus( L( "Look spring" ), L( "Causes the screen to 'spring' back to looking straight ahead when you move forward" ) );
 	lookSpring.iFlags |= QMF_NOTIFY;
 	lookSpring.SetCoord( 72, 430 );
 
-	lookStrafe.SetNameAndStatus( "Look strafe", "In combination with your mouse look modifier, causes left-right movements to strafe instead of turn");
+	lookStrafe.SetNameAndStatus( L( "Look strafe" ), L( "In combination with your mouse look modifier, causes left-right movements to strafe instead of turn" ) );
 	lookStrafe.iFlags |= QMF_NOTIFY;
 	lookStrafe.SetCoord( 72, 480 );
 
-	lookFilter.SetNameAndStatus( "Look filter", "Average look inputs over the last two frames to smooth out movements(generic)" );
+	lookFilter.SetNameAndStatus( L( "GameUI_MouseFilter" ), L( "GameUI_MouseFilterLabel" ) );
 	lookFilter.iFlags |= QMF_NOTIFY;
 	lookFilter.SetCoord( 72, 530 );
 
-	autoaim.SetNameAndStatus( "Autoaim", "Let game to help you aim at enemies" );
+	autoaim.SetNameAndStatus( L( "GameUI_AutoAim" ), L( "GameUI_AutoaimLabel" ) );
 	autoaim.iFlags |= QMF_NOTIFY;
 	autoaim.SetCoord( 72, 580 );
 
-	sensitivity.SetNameAndStatus( "Senitivity", "Set in-game mouse sensitivity" );
+	sensitivity.SetNameAndStatus( L( "GameUI_MouseSensitivity" ), L( "Set in-game mouse sensitivity" ) );
 	sensitivity.Setup( 0.0, 20.0f, 0.1 );
 	sensitivity.SetCoord( 72, 660 );
 
-	inputDev.SetNameAndStatus( "Input devices", "Toggle mouse, touch controls" );
+	inputDev.SetNameAndStatus( L( "Input devices" ), L( "Toggle mouse, touch controls" ) );
 	inputDev.onActivated = UI_InputDevices_Menu;
 	inputDev.iFlags |= QMF_NOTIFY;
 	if( CL_IsActive() && !EngFuncs::GetCvarFloat( "host_serverstate" ))

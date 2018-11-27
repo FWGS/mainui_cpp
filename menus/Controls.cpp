@@ -380,23 +380,23 @@ void CMenuControls::_Init( void )
 
 	keysList.SetRect( 360, 230, -20, 465 );
 	keysList.SetModel( &keysListModel );
-	keysList.SetupColumn( 0, "Action", 0.50f );
-	keysList.SetupColumn( 1, "Key/Button", 0.25f );
-	keysList.SetupColumn( 2, "Alternate", 0.25f );
+	keysList.SetupColumn( 0, L( "GameUI_Action" ), 0.50f );
+	keysList.SetupColumn( 1, L( "GameUI_KeyButton" ), 0.25f );
+	keysList.SetupColumn( 2, L( "GameUI_Alternate" ), 0.25f );
 
-	msgBox1.SetMessage( "Press a key or button" );
+	msgBox1.SetMessage( L( "Press a key or button" ) );
 
-	msgBox2.SetMessage( "Reset buttons to default?" );
+	msgBox2.SetMessage( L( "GameUI_KeyboardSettingsText" ) );
 	msgBox2.onPositive = VoidCb( &CMenuControls::ResetKeysList );
 	msgBox2.Link( this );
 
 	AddItem( background );
 	AddItem( banner );
-	AddButton( "Use defaults", "Reset all buttons binding to their default values", PC_USE_DEFAULTS, msgBox2.MakeOpenEvent() );
-	AddButton( "Adv controls", "Change mouse sensitivity, enable autoaim, mouselook and crosshair", PC_ADV_CONTROLS, UI_AdvControls_Menu );
-	AddButton( "Ok", "Save changed and return to configuration menu", PC_DONE,
+	AddButton( L( "GameUI_UseDefaults" ), L( "GameUI_KeyboardSettingsText" ), PC_USE_DEFAULTS, msgBox2.MakeOpenEvent() );
+	AddButton( L( "Adv controls" ), L( "Change mouse sensitivity, enable autoaim, mouselook and crosshair" ), PC_ADV_CONTROLS, UI_AdvControls_Menu );
+	AddButton( L( "GameUI_OK" ), L( "Save changed and return to configuration menu" ), PC_DONE,
 		VoidCb( &CMenuControls::SaveAndPopMenu ) );
-	AddButton( "Cancel", "Discard changes and return to configuration menu", PC_CANCEL,
+	AddButton( L( "GameUI_Cancel" ), L( "Discard changes and return to configuration menu" ), PC_CANCEL,
 		VoidCb( &CMenuControls::Cancel ) );
 	AddItem( keysList );
 }

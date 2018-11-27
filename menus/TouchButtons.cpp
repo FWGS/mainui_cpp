@@ -17,8 +17,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
-#include "BaseMenu.h" // ADD_MENU
-#ifndef XASH_DISABLE_FWGS_EXTENSIONS
+
 #include "Framework.h"
 #include "mobility_int.h"
 #include "Bitmap.h"
@@ -30,6 +29,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "CheckBox.h"
 #include "YesNoMessageBox.h"
 #include "StringArrayModel.h"
+
 #define ART_BANNER	  	"gfx/shell/head_touch_buttons"
 
 class CMenuTouchButtons : public CMenuFramework
@@ -333,14 +333,14 @@ void CMenuTouchButtons::SaveButton()
 
 void CMenuTouchButtons::RemoveMsgBox()
 {
-	msgBox.SetMessage( "Delete selected button?" );
+	msgBox.SetMessage( L( "Delete selected button?" ) );					// Delete ??? Может быть Clear ? Или Reset ?
 	msgBox.onPositive = VoidCb( &CMenuTouchButtons::DeleteButton );
 	msgBox.Show();
 }
 
 void CMenuTouchButtons::ResetMsgBox()
 {
-	msgBox.SetMessage( "Reset all buttons?" );
+	msgBox.SetMessage( L( "Reset all buttons?" ) );
 	msgBox.onPositive = VoidCb( &CMenuTouchButtons::ResetButtons );
 	msgBox.Show();
 }
@@ -373,86 +373,86 @@ void CMenuTouchButtons::_Init( void )
 
 	banner.SetPicture(ART_BANNER);
 
-	done.SetNameAndStatus( "Done", "Save changes and go back to the Touch Menu" );
+	done.SetNameAndStatus( L( "Done" ), L( "Save changes and go back to the Touch Menu" ) );
 	done.SetPicture( PC_DONE );
 	done.onActivated = ExitMenuCb;
 	done.onActivated.pExtra = (void*)"touch_writeconfig\n";
 
-	cancel.SetNameAndStatus( "Cancel", "Discard changes and go back to the Touch Menu" );
+	cancel.SetNameAndStatus( L( "GameUI_Cancel" ), L( "Discard changes and go back to the Touch Menu" ) );
 	cancel.SetPicture( PC_CANCEL );
 	cancel.onActivated = ExitMenuCb;
 	cancel.onActivated.pExtra = (void*)"touch_loadconfig\n";
 
 	red.eFocusAnimation = QM_PULSEIFFOCUS;
-	red.SetNameAndStatus( "Red:", "Texture red channel" );
+	red.SetNameAndStatus( L( "Red:" ), L( "Texture red channel" ) );
 	red.Setup( 0, 255, 1 );
 
 	green.eFocusAnimation = QM_PULSEIFFOCUS;
-	green.SetNameAndStatus( "Green:", "Texture green channel" );
+	green.SetNameAndStatus( L( "Green:" ), L( "Texture green channel" ) );
 	green.Setup( 0, 255, 1 );
 
 	blue.eFocusAnimation = QM_PULSEIFFOCUS;
-	blue.SetNameAndStatus( "Blue:", "Texture blue channel" );
+	blue.SetNameAndStatus( L( "Blue:" ), L( "Texture blue channel" ) );
 	blue.Setup( 0, 255, 1 );
 
 	alpha.eFocusAnimation = QM_PULSEIFFOCUS;
-	alpha.SetNameAndStatus( "Alpha:", "Texture alpha channel" );
+	alpha.SetNameAndStatus( L( "Alpha:" ), L( "Texture alpha channel" ) );
 	alpha.Setup( 0, 255, 1 );
 
-	hide.SetNameAndStatus( "Hide", "Show/hide button" );
+	hide.SetNameAndStatus( L( "Hide" ), L( "Show/hide button" ) );
 	hide.iMask = TOUCH_FL_HIDE;
 	hide.onChanged.pExtra = &curflags;
 	hide.onChanged = CMenuCheckBox::BitMaskCb;
 
-	additive.SetNameAndStatus( "Additive", "Set button additive draw mode" );
+	additive.SetNameAndStatus( L( "Additive" ), L( "Set button additive draw mode" ) );
 	additive.iMask = TOUCH_FL_DRAW_ADDITIVE;
 	additive.onChanged.pExtra = &curflags;
 	additive.onChanged = CMenuCheckBox::BitMaskCb;
 
-	mp.SetNameAndStatus( "MP", "Show button only in multiplayer" );
+	mp.SetNameAndStatus( L( "MP" ), L( "Show button only in multiplayer" ) );
 	mp.onChanged = VoidCb( &CMenuTouchButtons::UpdateMP );
 
-	sp.SetNameAndStatus( "SP", "Show button only in singleplayer" );
+	sp.SetNameAndStatus( L( "SP" ), L( "Show button only in singleplayer" ) );
 	sp.onChanged = VoidCb( &CMenuTouchButtons::UpdateSP );
 
-	lock.SetNameAndStatus( "Lock", "Lock button editing" );
+	lock.SetNameAndStatus( L( "Lock" ), L( "Lock button editing" ) );
 	lock.iMask = TOUCH_FL_NOEDIT;
 	lock.onChanged.pExtra = &curflags;
 	lock.onChanged = CMenuCheckBox::BitMaskCb;
 
-	precision.SetNameAndStatus( "Look precision", "Increase look precision" );
+	precision.SetNameAndStatus( L( "Look precision" ), L( "Increase look precision" ) );
 	precision.iMask = TOUCH_FL_PRECISION;
 	precision.onChanged.pExtra = &curflags;
 	precision.onChanged = CMenuCheckBox::BitMaskCb;
 
-	save.SetNameAndStatus( "Save", "Save as new button" );
+	save.SetNameAndStatus( L( "GameUI_Save" ), L( "Save as new button" ) );
 	save.SetPicture("gfx/shell/btn_touch_save");
 	save.onActivated = VoidCb( &CMenuTouchButtons::SaveButton );
 
-	editor.SetNameAndStatus( "Editor", "Open interactive editor" );
+	editor.SetNameAndStatus( L( "Editor" ), L( "Open interactive editor" ) );
 	editor.SetPicture("gfx/shell/btn_touch_editor");
 	editor.onActivated = UI_TouchEdit_Menu;
 
-	select.SetNameAndStatus( "Select", "Select texture from list" );
+	select.SetNameAndStatus( L( "Select" ), L( "Select texture from list" ) );
 	select.SetPicture("gfx/shell/btn_touch_select");
 	select.onActivated = VoidCb( &CMenuTouchButtons::OpenFileDialog );
 
-	name.szName = "New Button:";
+	name.szName = L( "New Button:" );
 	name.iMaxLength = 255;
 
-	command.szName = "Command:";
+	command.szName = L( "Command:" );
 	command.iMaxLength = 255;
 
-	texture.szName = "Texture:";
+	texture.szName = L( "Texture:" );
 	texture.iMaxLength = 255;
 	texture.onChanged = VoidCb( &CMenuTouchButtons::UpdateTexture );
 	texture.eTextAlignment = QM_RIGHT;
 
-	reset.SetNameAndStatus( "Reset", "Reset touch to default state" );
+	reset.SetNameAndStatus( L( "Reset" ), L( "Reset touch to default state" ) );
 	reset.SetPicture( "gfx/shell/btn_touch_reset" );
 	reset.onActivated = VoidCb( &CMenuTouchButtons::ResetMsgBox );
 
-	remove.SetNameAndStatus( "Delete", "Delete selected button" );
+	remove.SetNameAndStatus( L( "Delete" ), L( "Delete selected button" ) );		// Delete - уже было раньше
 	remove.SetPicture( PC_DELETE );
 	remove.onActivated = VoidCb( &CMenuTouchButtons::RemoveMsgBox );
 
@@ -557,17 +557,3 @@ void UI_TouchButtons_GetButtonList()
 	uiTouchButtons.model.Update();
 }
 ADD_MENU( menu_touchbuttons, UI_TouchButtons_Precache, UI_TouchButtons_Menu );
-#else // XASH_DISABLE_FWGS_EXTENSIONS
-void UI_TouchButtons_Menu( void )
-{
-	// stub
-}
-
-void UI_TouchButtons_GetButtonList( void )
-{
-	// stub
-}
-
-ADD_MENU( menu_touchbuttons, NULL, UI_TouchButtons_Menu );
-
-#endif // XASH_DISABLE_FWGS_EXTENSIONS

@@ -108,9 +108,9 @@ void CMenuMain::CMenuMainBanner::Draw()
 void CMenuMain::QuitDialog(void *pExtra)
 {
 	if( CL_IsActive() && EngFuncs::GetCvarFloat( "host_serverstate" ) && EngFuncs::GetCvarFloat( "maxplayers" ) == 1.0f )
-		dialog.SetMessage( MenuStrings[IDS_MAIN_QUITPROMPTINGAME] );
+		dialog.SetMessage( L( "StringsList_235" ) );
 	else
-		dialog.SetMessage( MenuStrings[IDS_MAIN_QUITPROMPT] );
+		dialog.SetMessage( L( "StringsList_236" ) );
 
 	dialog.onPositive.SetCommand( FALSE, "quit\n" );
 	dialog.Show();
@@ -119,14 +119,14 @@ void CMenuMain::QuitDialog(void *pExtra)
 void CMenuMain::DisconnectDialogCb()
 {
 	dialog.onPositive.SetCommand( FALSE, "cmd disconnect;endgame disconnect;wait;wait;wait;menu_options;menu_main\n" );
-	dialog.SetMessage( "Really disconnect?" );
+	dialog.SetMessage( L( "Really disconnect?" ) );
 	dialog.Show();
 }
 
 void CMenuMain::HazardCourseDialogCb()
 {
 	dialog.onPositive = VoidCb( &CMenuMain::HazardCourseCb );;
-	dialog.SetMessage( MenuStrings[IDS_TRAINING_EXITCURRENT] );
+	dialog.SetMessage( L( "StringsList_234" ) );
 	dialog.Show();
 }
 
@@ -171,7 +171,7 @@ const char *CMenuMain::Activate( void )
 		disconnect.Hide();
 	}
 
-	if( EngFuncs::GetCvarFloat("developer") )
+	if( gpGlobals->developer )
 	{
 		console.pos.y = CL_IsActive() ? 130 : 230;
 	}
@@ -189,7 +189,7 @@ UI_Main_HazardCourse
 void CMenuMain::HazardCourseCb()
 {
 	if( EngFuncs::GetCvarFloat( "host_serverstate" ) && EngFuncs::GetCvarFloat( "maxplayers" ) > 1 )
-		EngFuncs::HostEndGame( "end of the game" );
+		EngFuncs::HostEndGame( L( "end of the game" ) );
 
 	EngFuncs::CvarSetValue( "skill", 1.0f );
 	EngFuncs::CvarSetValue( "deathmatch", 0.0f );
@@ -214,7 +214,7 @@ void CMenuMain::_Init( void )
 	else bCustomGame = false;
 
 	// console
-	console.SetNameAndStatus( "Console", "Show console" );
+	console.SetNameAndStatus( L( "GameUI_Console" ), L( "Show console" ) );
 	console.iFlags |= QMF_NOTIFY;
 	console.SetPicture( PC_CONSOLE );
 	SET_EVENT_MULTI( console.onActivated,
@@ -223,33 +223,33 @@ void CMenuMain::_Init( void )
 		EngFuncs::KEY_SetDest( KEY_CONSOLE );
 	});
 
-	resumeGame.SetNameAndStatus( "Resume Game", MenuStrings[IDS_MAIN_RETURNHELP] );
+	resumeGame.SetNameAndStatus( L( "GameUI_GameMenu_ResumeGame" ), L( "StringsList_188" ) );
 	resumeGame.SetPicture( PC_RESUME_GAME );
 	resumeGame.iFlags |= QMF_NOTIFY;
 	resumeGame.onActivated = UI_CloseMenu;
 
-	disconnect.SetNameAndStatus( "Disconnect", "Disconnect from server" );
+	disconnect.SetNameAndStatus( L( "GameUI_GameMenu_Disconnect" ), L( "Disconnect from server" ) );
 	disconnect.SetPicture( PC_DISCONNECT );
 	disconnect.iFlags |= QMF_NOTIFY;
 	disconnect.onActivated = VoidCb( &CMenuMain::DisconnectDialogCb );
 
-	newGame.SetNameAndStatus( "New Game", MenuStrings[IDS_MAIN_NEWGAMEHELP] );
+	newGame.SetNameAndStatus( L( "GameUI_NewGame" ), L( "StringsList_189" ) );
 	newGame.SetPicture( PC_NEW_GAME );
 	newGame.iFlags |= QMF_NOTIFY;
 	newGame.onActivated = UI_NewGame_Menu;
 
-	hazardCourse.SetNameAndStatus( "Hazard Course", MenuStrings[IDS_MAIN_TRAININGHELP] );
+	hazardCourse.SetNameAndStatus( L( "GameUI_TrainingRoom" ), L( "StringsList_190" ) );
 	hazardCourse.SetPicture( PC_HAZARD_COURSE );
 	hazardCourse.iFlags |= QMF_NOTIFY;
 	hazardCourse.onActivatedClActive = VoidCb( &CMenuMain::HazardCourseDialogCb );
 	hazardCourse.onActivated = VoidCb( &CMenuMain::HazardCourseCb );
 
-	multiPlayer.SetNameAndStatus( "Multiplayer", MenuStrings[IDS_MAIN_MULTIPLAYERHELP] );
+	multiPlayer.SetNameAndStatus( L( "GameUI_Multiplayer" ), L( "StringsList_198" ) );
 	multiPlayer.SetPicture( PC_MULTIPLAYER );
 	multiPlayer.iFlags |= QMF_NOTIFY;
 	multiPlayer.onActivated = UI_MultiPlayer_Menu;
 
-	configuration.SetNameAndStatus( "Configuration", MenuStrings[IDS_MAIN_CONFIGUREHELP] );
+	configuration.SetNameAndStatus( L( "GameUI_Options" ), L( "StringsList_193" ) );
 	configuration.SetPicture( PC_CONFIG );
 	configuration.iFlags |= QMF_NOTIFY;
 	configuration.onActivated = UI_Options_Menu;
@@ -258,17 +258,17 @@ void CMenuMain::_Init( void )
 	saveRestore.onActivatedClActive = UI_SaveLoad_Menu;
 	saveRestore.onActivated = UI_LoadGame_Menu;
 
-	customGame.SetNameAndStatus( "Custom Game", MenuStrings[IDS_MAIN_CUSTOMHELP] );
+	customGame.SetNameAndStatus( L( "GameUI_ChangeGame" ), L( "StringsList_530" ) );
 	customGame.SetPicture( PC_CUSTOM_GAME );
 	customGame.iFlags |= QMF_NOTIFY;
 	customGame.onActivated = UI_CustomGame_Menu;
 
-	previews.SetNameAndStatus( "Previews", MenuStrings[ IDS_MAIN_PREVIEWSHELP ] );
+	previews.SetNameAndStatus( L( "Previews" ), L( "StringsList_400" ) );
 	previews.SetPicture( PC_PREVIEWS );
 	previews.iFlags |= QMF_NOTIFY;
-	SET_EVENT( previews.onActivated, EngFuncs::ShellExecute( MenuStrings[IDS_MEDIA_PREVIEWURL], NULL, false ) );
+	SET_EVENT( previews.onActivated, EngFuncs::ShellExecute( MenuStrings[ IDS_MEDIA_PREVIEWURL ], NULL, false ) );
 
-	quit.SetNameAndStatus( "Quit", MenuStrings[IDS_MAIN_QUITPROMPT] );
+	quit.SetNameAndStatus( L( "GameUI_GameMenu_Quit" ), L( "StringsList_236" ) );
 	quit.SetPicture( PC_QUIT );
 	quit.iFlags |= QMF_NOTIFY;
 	quit.onActivated = MenuCb( &CMenuMain::QuitDialog );
@@ -308,7 +308,7 @@ void CMenuMain::_Init( void )
 	AddItem( background );
 	AddItem( banner );
 
-	if ( EngFuncs::GetCvarFloat( "developer" ))
+	if ( gpGlobals->developer )
 		AddItem( console );
 
 	AddItem( disconnect );
@@ -348,12 +348,12 @@ void CMenuMain::_VidInit( void )
 
 	if( CL_IsActive( ))
 	{
-		saveRestore.SetNameAndStatus( "Save\\Load Game", MenuStrings[IDS_MAIN_LOADSAVEHELP] );
+		saveRestore.SetNameAndStatus( L( "Save\\Load Game" ), L( "StringsList_192" ) );
 		saveRestore.SetPicture( PC_SAVE_LOAD_GAME );
 	}
 	else
 	{
-		saveRestore.SetNameAndStatus( "Load Game", MenuStrings[IDS_MAIN_LOADHELP] );
+		saveRestore.SetNameAndStatus( L( "GameUI_LoadGame" ), L( "StringsList_191" ) );
 		saveRestore.SetPicture( PC_LOAD_GAME );
 	}
 

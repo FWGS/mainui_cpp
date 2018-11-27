@@ -50,9 +50,9 @@ void UI_Video_Menu( void )
 
 		video.AddItem( video.background );
 		video.AddItem( video.banner );
-		video.AddButton( "Video options", "Set video options such as screen size, gamma and image quality.", PC_VID_OPT, UI_VidOptions_Menu, QMF_NOTIFY );
-		video.AddButton( "Video modes", "Set video modes and configure 3D accelerators.", PC_VID_MODES, UI_VidModes_Menu, QMF_NOTIFY );
-		video.AddButton( "Done", "Go back to the previous menu", PC_DONE, VoidCb( &CMenuFramework::Hide ), QMF_NOTIFY );
+		video.AddButton( L( "Video options" ), L( "Set video options such as screen size, gamma and image quality." ), PC_VID_OPT, UI_VidOptions_Menu, QMF_NOTIFY );
+		video.AddButton( L( "Video modes" ), L( "Set video modes and configure 3D accelerators." ), PC_VID_MODES, UI_VidModes_Menu, QMF_NOTIFY );
+		video.AddButton( L( "Done" ), L( "Go back to the previous menu" ), PC_DONE, VoidCb( &CMenuFramework::Hide ), QMF_NOTIFY );
 	}
 
 	video.Show();

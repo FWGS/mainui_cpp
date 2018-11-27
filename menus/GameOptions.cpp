@@ -130,8 +130,8 @@ UI_GameOptions_Init
 void CMenuGameOptions::_Init( void )
 {
 	banner.SetPicture( ART_BANNER );
-	maxFPS.szName = "Limit game FPS";
-	maxFPS.szStatusText = "Cap your game frame rate";
+	maxFPS.szName = L( "Valve_Max_FPS" );
+	maxFPS.szStatusText = L( "Cap your game frame rate" );
 	maxFPS.Setup( 20, 500, 20 );
 	maxFPS.LinkCvar( "fps_max", CMenuEditable::CVAR_VALUE );
 	maxFPS.SetRect( 240, 270, 220, 32 );
@@ -140,27 +140,27 @@ void CMenuGameOptions::_Init( void )
 	//hand.LinkCvar( "cl_righthand" );
 	// hand.SetCoord( 240, 330 );
 
-	allowDownload.SetNameAndStatus( "Allow download", "Allow download of files from servers" );
+	allowDownload.SetNameAndStatus( L( "Allow download" ), L( "Allow download of files from servers" ) );
 	allowDownload.LinkCvar( "sv_allow_download" );
 	allowDownload.SetCoord( 240, 315 );
 
 #ifdef NEW_ENGINE_INTERFACE
-	cl_predict.SetNameAndStatus( "Disable predicting", "Disable player movement prediction" );
+	cl_predict.SetNameAndStatus( L( "Disable predicting" ), L( "Disable player movement prediction" ) );
 	cl_predict.LinkCvar( "cl_nopred" );
 #else
-	cl_predict.SetNameAndStatus( "Predict movement", "Enable player movement prediction" );
+	cl_predict.SetNameAndStatus( L( "Predict movement" ), L( "Enable player movement prediction" ) );
 	cl_predict.LinkCvar( "cl_predict" );
 #endif
 	cl_predict.SetCoord( 240, 365 );
 
-	cl_lw.SetNameAndStatus( "Local weapons", "Enable local weapons" );
+	cl_lw.SetNameAndStatus( L( "Local weapons" ), L( "Enable local weapons" ) );
 	cl_lw.LinkCvar( "cl_lw" );
 	cl_lw.SetCoord( 240, 415 );
 
 	maxpacket.SetRect( 650, 270, 200, 32 );
 	maxpacket.Setup( 150, 1550, 50 );
 	maxpacket.LinkCvar( "cl_maxpacket", CMenuEditable::CVAR_VALUE );
-	maxpacket.SetNameAndStatus( "Network packet size limit (cl_maxpacket)", "Split packet size and minimum size to compress");
+	maxpacket.SetNameAndStatus( L( "Network packet size limit (cl_maxpacket)" ), L( "Split packet size and minimum size to compress" ) );
 	SET_EVENT_MULTI( maxpacket.onChanged,
 	{
 		CMenuSpinControl *self = (CMenuSpinControl *)pSelf;
@@ -180,7 +180,7 @@ void CMenuGameOptions::_Init( void )
 	maxpayload.SetRect( 650, 370, 200, 32 );
 	maxpayload.Setup( 150, 1550, 50 );
 	maxpayload.LinkCvar( "cl_maxpayload", CMenuEditable::CVAR_VALUE );
-	maxpayload.SetNameAndStatus( "Singon size (cl_maxpayload)", "Singon cnain split decrease if cl_maxpacket does not help");
+	maxpayload.SetNameAndStatus( L( "Singon size (cl_maxpayload)" ), L( "Singon cnain split decrease if cl_maxpacket does not help" ) );
 	SET_EVENT_MULTI( maxpayload.onChanged,
 	{
 		CMenuSpinControl *self = (CMenuSpinControl *)pSelf;
@@ -200,26 +200,26 @@ void CMenuGameOptions::_Init( void )
 	cmdrate.SetRect( 650, 470, 200, 32 );
 	cmdrate.Setup( 20, 60, 5 );
 	cmdrate.LinkCvar( "cl_cmdrate", CMenuEditable::CVAR_VALUE );
-	cmdrate.SetNameAndStatus( "Command rate (cl_cmdrate)", "How many commands sent to server in second");
+	cmdrate.SetNameAndStatus( L( "Command rate (cl_cmdrate)" ), L( "How many commands sent to server in second" ) );
 
 	updaterate.SetRect( 650, 570, 200, 32 );
 	updaterate.Setup( 20, 100, 5 );
 	updaterate.LinkCvar( "cl_updaterate", CMenuEditable::CVAR_VALUE );
-	updaterate.SetNameAndStatus( "Update rate (cl_updaterate)", "How many uodates sent from server per second");
+	updaterate.SetNameAndStatus( L( "Update rate (cl_updaterate)" ), L( "How many updates sent from server per second" ) );
 
 	rate.SetRect( 650, 670, 200, 32 );
 	rate.Setup( 2500, 90000, 500 );
 	rate.LinkCvar( "rate", CMenuEditable::CVAR_VALUE );
-	rate.SetNameAndStatus( "Network speed (rate)", "Limit traffic (bytes per second)");
+	rate.SetNameAndStatus( L( "Network speed (rate)" ), L( "Limit traffic (bytes per second)" ) );
 
 	networkMode.iFlags = QMF_INACTIVE|QMF_DROPSHADOW;
-	networkMode.szName = "Select network mode:";
+	networkMode.szName = L( "Select network mode:" );
 	networkMode.colorBase = uiColorHelp;
 	networkMode.SetCharSize( QM_BIGFONT );
 	networkMode.SetRect( 240, 450, 400, 32 );
 
 	normal.SetRect( 240, 510, 24, 24 );
-	normal.szName = "Normal internet connection";
+	normal.szName = L( "Normal internet connection" ); 	// Такая строка где-то уже была, поэтому в отдельный файл НЕ ВЫНОШУ !
 	SET_EVENT_MULTI( normal.onChanged,
 	{
 		uiGameOptions.SetNetworkMode( 1400, 0, 30, 60, 25000 );
@@ -227,7 +227,7 @@ void CMenuGameOptions::_Init( void )
 	});
 
 	dsl.SetRect( 240, 560, 24, 24 );
-	dsl.szName = "DSL or PPTP with limited packet size";
+	dsl.szName = L( "DSL or PPTP with limited packet size" );	// И такое тоже уже было !
 	SET_EVENT_MULTI( dsl.onChanged,
 	{
 		uiGameOptions.SetNetworkMode( 1200, 1000, 30, 60, 25000 );
@@ -236,24 +236,24 @@ void CMenuGameOptions::_Init( void )
 
 
 	slowest.SetRect( 240, 610, 24, 24 );
-	slowest.szName = "Slow connection mode (64kbps)";
+	slowest.szName = L( "Slow connection mode (64kbps)" );	// Было, повтор !
 	SET_EVENT_MULTI( slowest.onChanged,
 	{
 		uiGameOptions.SetNetworkMode( 900, 700, 25, 30, 7500 );
 		((CMenuCheckBox*)pSelf)->bChecked = true;
 	});
-	compress.SetNameAndStatus( "Compress", "Compress splitted packets (need split to work)" );
+	compress.SetNameAndStatus( L( "Compress" ), L( "Compress splitted packets (need split to work)" ) );
 	compress.LinkCvar("cl_enable_splitcompress" );
 	compress.SetCoord( 390, 680 );
 
 	split.SetCoord( 240, 680 );
-	split.SetNameAndStatus( "Split", "Split network packets" );
+	split.SetNameAndStatus( L( "Split" ), L( "Split network packets" ) );
 	split.LinkCvar("cl_enable_split" );
 
 	AddItem( background );
 	AddItem( banner );
-	AddButton( "Done", "Save changes and go back to the Customize Menu", PC_DONE, VoidCb( &CMenuGameOptions::SaveCb ) );
-	AddButton( "Cancel", "Go back to the Customize Menu", PC_CANCEL, VoidCb( &CMenuGameOptions::RestoreCb ) );
+	AddButton( L( "Done" ), L( "Save changes and go back to the Customize Menu" ), PC_DONE, VoidCb( &CMenuGameOptions::SaveCb ) );
+	AddButton( L( "GameUI_Cancel" ), L( "Go back to the Customize Menu" ), PC_CANCEL, VoidCb( &CMenuGameOptions::RestoreCb ) );
 
 	AddItem( maxFPS );
 	//AddItem( hand );

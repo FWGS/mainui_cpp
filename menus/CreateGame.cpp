@@ -185,7 +185,7 @@ void CMenuMapListModel::Update( void )
 	char token[1024];
 	int numMaps = 1;
 
-	strcpy( mapName[0], "<Random Map>" );
+	strcpy( mapName[0], L( "GameUI_RandomMap" ) );
 	mapsDescription[0][0] = 0;
 	
 	while(( pfile = EngFuncs::COM_ParseFile( pfile, token )) != NULL )
@@ -218,35 +218,35 @@ void CMenuCreateGame::_Init( void )
 	uiStatic.needMapListUpdate = true;
 	banner.SetPicture( ART_BANNER );
 
-	nat.SetNameAndStatus( "NAT", "Use NAT Bypass instead of direct mode" );
+	nat.SetNameAndStatus( L( "NAT" ), L( "Use NAT Bypass instead of direct mode" ) );
 	nat.bChecked = true;
 
-	dedicatedServer.SetNameAndStatus( "Dedicated server", "faster, but you can't join the server from this machine" );
+	dedicatedServer.SetNameAndStatus( L( "Dedicated server" ), L( "faster, but you can't join the server from this machine" ) );
 
-	hltv.SetNameAndStatus( "HLTV", "Enable HLTV mode in Multiplayer" );
+	hltv.SetNameAndStatus( L( "HLTV" ), L( "Enable HLTV mode in Multiplayer" ) );
 	hltv.LinkCvar( "hltv" );
 
 	// add them here, so "done" button can be used by mapsListModel::Update
 	AddItem( background );
 	AddItem( banner );
-	CMenuPicButton *advOpt = AddButton( "Adv. Options", "Open the game advanced options menu", PC_ADV_OPT, UI_AdvServerOptions_Menu );
+	CMenuPicButton *advOpt = AddButton( L( "Adv. Options" ), L( "Open the game advanced options menu" ), PC_ADV_OPT, UI_AdvServerOptions_Menu );
 	advOpt->SetGrayed( !UI_AdvServerOptions_IsAvailable() );
 
-	done = AddButton( "Ok", "Start the multiplayer game", PC_DONE, Begin );
+	done = AddButton( L( "GameUI_OK" ), L( "Start the multiplayer game" ), PC_DONE, Begin );
 	done->onActivatedClActive = msgBox.MakeOpenEvent();
 
 	mapsList.SetCharSize( QM_SMALLFONT );
-	mapsList.SetupColumn( 0, "Map", 0.5f );
-	mapsList.SetupColumn( 1, "Title", 0.5f );
+	mapsList.SetupColumn( 0, L( "GameUI_Map" ), 0.5f );
+	mapsList.SetupColumn( 1, L( "Title" ), 0.5f );
 	mapsList.SetModel( &mapsListModel );
 
-	hostName.szName = "Server Name:";
+	hostName.szName = L( "GameUI_ServerName" );
 	hostName.iMaxLength = 28;
 	hostName.LinkCvar( "hostname" );
 	
 	maxClients.iMaxLength = 3;
 	maxClients.bNumbersOnly = true;
-	maxClients.szName = "Max Players:";
+	maxClients.szName = L( "GameUI_MaxPlayers" );
 	SET_EVENT_MULTI( maxClients.onChanged,
 	{
 		CMenuField *self = (CMenuField*)pSelf;
@@ -272,17 +272,17 @@ void CMenuCreateGame::_Init( void )
 	});
 	maxClients.LinkCvar( "maxplayers" );
 
-	password.szName = "Password:";
+	password.szName = L( "GameUI_Password" );
 	password.iMaxLength = 16;
 	password.eTextAlignment = QM_CENTER;
 	password.bHideInput = true;
 	password.LinkCvar( "sv_password" );
 
 	msgBox.onPositive = Begin;
-	msgBox.SetMessage( "Starting a new game will exit any current game, OK to exit?" );
+	msgBox.SetMessage( L( "Starting a new game will exit any current game, OK to exit?" ) );
 	msgBox.Link( this );
 
-	AddButton( "Cancel", "Return to the previous menu", PC_CANCEL, VoidCb( &CMenuCreateGame::Hide ) );
+	AddButton( L( "GameUI_Cancel" ), L( "Return to the previous menu" ), PC_CANCEL, VoidCb( &CMenuCreateGame::Hide ) );
 	AddItem( hostName );
 	AddItem( maxClients );
 	AddItem( password );

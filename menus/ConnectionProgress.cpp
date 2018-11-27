@@ -57,7 +57,7 @@ public:
 	void HandleDisconnect( void );
 	void HandlePrecache( void )
 	{
-		SetCommonText( "Precaching resources" );
+		SetCommonText( L( "GameUI_PrecachingResources" ) );
 		commonProgress.LinkCvar( "scr_loading", 0, 100 );
 		m_iState = STATE_CONNECTING;
 	}
@@ -71,7 +71,7 @@ public:
 	{
 		if( strstr( pszFileName, ".bsp" ) )
 			uiStatic.needMapListUpdate = true;
-		snprintf( sDownloadString, sizeof( sDownloadString ) - 1, "Downloading %s \nfrom %s", pszFileName, pszServerName );
+		snprintf( sDownloadString, sizeof( sDownloadString ) - 1, L( "Downloading %s \nfrom %s" ), pszFileName, pszServerName );
 		snprintf( sCommonString, sizeof( sCommonString ) - 1, "%d of %d %s", iCurrent + 1, iTotal, comment );
 		m_iState = STATE_DOWNLOAD;
 		commonProgress.SetValue( (float)iCurrent/iTotal +  0.01f / iTotal * EngFuncs::GetCvarFloat("scr_download") );
@@ -85,11 +85,12 @@ public:
 	{
 		if( m_iSource == SOURCE_CREATEGAME )
 		{
-			strcpy( sTitleString, "Starting game..." );
+			strcpy( sTitleString, L( "GameUI_StartingServer" ) );
 		}
 		else
 		{
-			snprintf( sTitleString, sizeof( sTitleString ) - 1, "Connecting to %s...", pszName );
+			snprintf( sTitleString, sizeof( sTitleString ) - 1,
+				"%s %s", L( "GameUI_EstablishingConnection" ), pszName );
 		}
 
 		commonProgress.SetValue( 0 );
@@ -175,7 +176,7 @@ void CMenuConnectionProgress::HandleDisconnect( void )
 		}
 	}
 	
-	SetCommonText( "Disconnected." );
+	SetCommonText( L( "GameUI_Disconnected" ) );
 
 	m_iState = STATE_NONE;
 	VidInit();
@@ -201,7 +202,7 @@ void CMenuConnectionProgress::_Init( void )
 	background.colorBase = uiPromptBgColor;
 
 	consoleButton.SetPicture( PC_CONSOLE );
-	consoleButton.szName = "Console";
+	consoleButton.szName = L( "GameUI_Console" );
 	SET_EVENT_MULTI( consoleButton.onActivated,
 	{
 		CMenuConnectionProgress *parent = (CMenuConnectionProgress *)pSelf->Parent();
@@ -214,11 +215,11 @@ void CMenuConnectionProgress::_Init( void )
 	consoleButton.bEnableTransitions = false;
 
 	disconnectButton.SetPicture( PC_DISCONNECT );
-	disconnectButton.szName = "Disconnect";
+	disconnectButton.szName = L( "GameUI_GameMenu_Disconnect" );
 	disconnectButton.onActivated = VoidCb( &CMenuConnectionProgress::Disconnect );
 	disconnectButton.bEnableTransitions = false;
 
-	dialog.SetMessage( "Really disconnect?" );
+	dialog.SetMessage( L( "Really disconnect?" ) );
 	dialog.Link( this );
 	dialog.onPositive = VoidCb( &CMenuConnectionProgress::Disconnect );
 
@@ -226,7 +227,7 @@ void CMenuConnectionProgress::_Init( void )
 	title.eTextAlignment = QM_CENTER;
 	title.szName = sTitleString;
 
-	skipButton.szName = "Skip";
+	skipButton.szName = L( "Skip" );
 	skipButton.onActivated.SetCommand( TRUE, "http_skip\n" );
 	skipButton.bEnableTransitions = false;
 
@@ -264,7 +265,7 @@ void CMenuConnectionProgress::_VidInit( void )
 	consoleButton.SetRect( 188, cursor, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
 	disconnectButton.SetRect( 338, cursor, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
 
-	if( EngFuncs::GetCvarFloat( "developer" ) != 0.0f )
+	if( !gpGlobals->developer )
 		consoleButton.Hide();
 
 	cursor -= 30;
@@ -358,7 +359,7 @@ void UI_ConnectionProgress_f( void )
 		uiConnectionProgress.m_iSource = SOURCE_SERVERBROWSER;
 		if( EngFuncs::CmdArgc() > 2 )
 			uiConnectionProgress.SetServer( EngFuncs::CmdArgv(2) );
-		uiConnectionProgress.SetCommonText( "Establishing network connection to server...");
+		uiConnectionProgress.SetCommonText( L( "GameUI_EstablishingConnection" ) );
 		uiConnectionProgress.Show();
 	}
 
@@ -367,14 +368,14 @@ void UI_ConnectionProgress_f( void )
 		uiConnectionProgress.m_iState = STATE_MENU;
 		uiConnectionProgress.m_iSource = SOURCE_CREATEGAME;
 		uiConnectionProgress.SetServer( "" );
-		uiConnectionProgress.SetCommonText( "Starting local server...");
+		uiConnectionProgress.SetCommonText( L( "GameUI_StartingServer" ) );
 		uiConnectionProgress.Show();
 	}
 
 	else if( !strcmp( EngFuncs::CmdArgv(1), "changelevel" ) )
 	{
 		uiConnectionProgress.m_iState = STATE_MENU;
-		uiConnectionProgress.SetCommonText( "Changing level on server");
+		uiConnectionProgress.SetCommonText( L( "Changing level on server" ) );
 		uiConnectionProgress.Show();
 	}
 
@@ -383,7 +384,7 @@ void UI_ConnectionProgress_f( void )
 		if( EngFuncs::CmdArgc() > 2 )
 			uiConnectionProgress.SetServer( EngFuncs::CmdArgv(2) );
 		uiConnectionProgress.m_iState = STATE_CONNECTING;
-		uiConnectionProgress.SetCommonText( "Parsing server info..." );
+		uiConnectionProgress.SetCommonText( L( "GameUI_ParseServerInfo" ) );
 		uiConnectionProgress.Show();
 	}
 

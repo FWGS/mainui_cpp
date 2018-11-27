@@ -86,8 +86,8 @@ void CMenuVidModesModel::Update( void )
 {
 	unsigned int i;
 
-	m_szModes[0] = "<Current window size>";
-	m_szModes[1] = "<Desktop size>";
+	m_szModes[0] = L( "<Current window size>" );
+	m_szModes[1] = L( "<Desktop size>" );
 
 	for( i = VID_MODES_POS; i < 64 - VID_MODES_POS; i++ )
 	{
@@ -171,7 +171,7 @@ void CMenuVidModes::Draw()
 	{
 		if( testModeTimer - gpGlobals->time > 0 )
 		{
-			snprintf( testModeMsg, sizeof( testModeMsg ) - 1, "Keep this resolution? %i seconds remaining", (int)(testModeTimer - gpGlobals->time) );
+			snprintf( testModeMsg, sizeof( testModeMsg ) - 1, L( "Keep this resolution? %i seconds remaining" ), (int)(testModeTimer - gpGlobals->time) );
 			testModeMsg[sizeof(testModeMsg)-1] = 0;
 		}
 		else
@@ -193,10 +193,10 @@ void CMenuVidModes::_Init( void )
 	banner.SetPicture(ART_BANNER);
 
 	vidList.SetRect( 360, 230, -20, 365 );
-	vidList.SetupColumn( 0, MenuStrings[IDS_VIDEO_MODECOL], 1.0f );
+	vidList.SetupColumn( 0, L( "GameUI_DisplayMode" ), 1.0f );
 	vidList.SetModel( &vidListModel );
 
-	windowed.SetNameAndStatus( "Run in a window", "Run game in window mode" );
+	windowed.SetNameAndStatus( L( "GameUI_Windowed" ), L( "GameUI_Windowed" ) );
 	windowed.SetCoord( 360, 620 );
 	SET_EVENT_MULTI( windowed.onChanged,
 	{
@@ -210,9 +210,13 @@ void CMenuVidModes::_Init( void )
 			uiVidModes.vidList.SetCurrentIndex( VID_AUTOMODE_POS );
 	});
 
-	vsync.SetNameAndStatus( "Vertical sync", "Enable vertical synchronization" );
+	vsync.SetNameAndStatus( L( "GameUI_VSync" ), L( "GameUI_VSync" ) );
 	vsync.SetCoord( 360, 670 );
+#ifdef NEW_ENGINE_INTERFACE
+	vsync.LinkCvar( "gl_vsync" );
+#else
 	vsync.LinkCvar( "gl_swapInterval" );
+#endif
 
 	testModeMsgBox.SetMessage( testModeMsg );
 	testModeMsgBox.onPositive = VoidCb( &CMenuVidModes::ApplyChanges );
@@ -221,8 +225,8 @@ void CMenuVidModes::_Init( void )
 
 	AddItem( background );
 	AddItem( banner );
-	AddButton( "Apply", "Apply changes", PC_OK, VoidCb( &CMenuVidModes::SetConfig ) );
-	AddButton( "Cancel", "Return back to previous menu", PC_CANCEL, VoidCb( &CMenuVidModes::Hide ) );
+	AddButton( L( "GameUI_Apply" ), L( "Apply changes" ), PC_OK, VoidCb( &CMenuVidModes::SetConfig ) );
+	AddButton( L( "GameUI_Cancel" ), L( "Return back to previous menu" ), PC_CANCEL, VoidCb( &CMenuVidModes::Hide ) );
 	AddItem( windowed );
 	AddItem( vsync );
 	AddItem( vidList );

@@ -56,16 +56,16 @@ void CMenuMultiplayer::_Init( void )
 	banner.SetPicture( ART_BANNER );
 	AddItem( banner );
 
-	AddButton( "Internet game", "View list of a game internet servers and join the one of your choice", PC_INET_GAME, UI_InternetGames_Menu, QMF_NOTIFY );
-	// AddButton( "Spectate game", "Spectate internet games", PC_SPECTATE_GAMES, NoopCb, QMF_GRAYED | QMF_NOTIFY );
-	AddButton( "LAN game", "Set up the game on the local area network", PC_LAN_GAME, UI_LanGame_Menu, QMF_NOTIFY );
-	AddButton( "Customize", "Choose your player name, and select visual options for your character", PC_CUSTOMIZE, UI_PlayerSetup_Menu, QMF_NOTIFY );
-	AddButton( "Controls", "Change keyboard and mouse settings", PC_CONTROLS, UI_Controls_Menu, QMF_NOTIFY );
-	AddButton( "Done", "Go back to the Main menu", PC_DONE, VoidCb( &CMenuMultiplayer::Hide ), QMF_NOTIFY );
+	AddButton( L( "Internet game" ), L( "View list of a game internet servers and join the one of your choice" ), PC_INET_GAME, UI_InternetGames_Menu, QMF_NOTIFY );
+	// AddButton( L( "Spectate game" ), L( "Spectate internet games" ), PC_SPECTATE_GAMES, NoopCb, QMF_GRAYED | QMF_NOTIFY );
+	AddButton( L( "LAN game" ), L( "Set up the game on the local area network" ), PC_LAN_GAME, UI_LanGame_Menu, QMF_NOTIFY );
+	AddButton( L( "GameUI_GameMenu_Customize" ), L( "Choose your player name, and select visual options for your character" ), PC_CUSTOMIZE, UI_PlayerSetup_Menu, QMF_NOTIFY );
+	AddButton( L( "Controls" ), L( "Change keyboard and mouse settings" ), PC_CONTROLS, UI_Controls_Menu, QMF_NOTIFY );
+	AddButton( L( "Done" ), L( "Go back to the Main menu" ), PC_DONE, VoidCb( &CMenuMultiplayer::Hide ), QMF_NOTIFY );
 
-	msgBox.SetMessage( "It is recomended to enable client movement prediction.\nPress OK to enable it now or enable it later in ^5(Multiplayer/Customize)");
-	msgBox.SetPositiveButton( "Ok", PC_OK );
-	msgBox.SetNegativeButton( "Cancel", PC_CANCEL );
+	msgBox.SetMessage( L( "It is recomended to enable client movement prediction.\nPress OK to enable it now or enable it later in ^5(Multiplayer/Customize)" ) );
+	msgBox.SetPositiveButton( L( "GameUI_OK" ), PC_OK );
+	msgBox.SetNegativeButton( L( "GameUI_Cancel" ), PC_CANCEL );
 	msgBox.HighlightChoice( CMenuYesNoMessageBox::HIGHLIGHT_YES );
 	SET_EVENT_MULTI( msgBox.onPositive,
 	{

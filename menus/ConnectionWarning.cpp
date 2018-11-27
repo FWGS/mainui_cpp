@@ -43,30 +43,30 @@ void CMenuConnectionWarning::_Init()
 	background.bForceColor = true;
 	background.colorBase = uiPromptBgColor;
 
-	normal.szName = "Normal internet connection";
+	normal.szName = L( "Normal internet connection" );
 	normal.SetCoord( 20, 140 );
 	SET_EVENT( normal.onChanged,
 		((CMenuConnectionWarning*)pSelf->Parent())->WriteSettings( EPRESET_NORMAL ) );
 
-	dsl.szName = "DSL or PPTP with limited packet size";
+	dsl.szName = L( "DSL or PPTP with limited packet size" );
 	dsl.SetCoord( 20, 200 );
 	SET_EVENT( dsl.onChanged,
 		((CMenuConnectionWarning*)pSelf->Parent())->WriteSettings( EPRESET_DSL ) );
 
-	slowest.szName = "Slow connection mode (64kbps)";
+	slowest.szName = L( "Slow connection mode (64kbps)" );
 	slowest.SetCoord( 20, 260 );
 	SET_EVENT( slowest.onChanged,
 		((CMenuConnectionWarning*)pSelf->Parent())->WriteSettings( EPRESET_SLOW ) );
 
 	done.SetPicture( PC_DONE );
-	done.szName = "Done";
+	done.szName = L( "Done" );
 	done.SetGrayed( true );
 	done.SetRect( 410, 320, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
 	done.onActivated = VoidCb( &CMenuConnectionWarning::Hide );
 	done.bEnableTransitions = false;
 
 	options.SetPicture( PC_ADV_OPT );
-	options.szName = "Adv Options";
+	options.szName = L( "Adv Options" );
 	SET_EVENT_MULTI( options.onActivated,
 	{
 		UI_GameOptions_Menu();
@@ -77,11 +77,11 @@ void CMenuConnectionWarning::_Init()
 
 	title.iFlags = QMF_INACTIVE|QMF_DROPSHADOW;
 	title.eTextAlignment = QM_CENTER;
-	title.szName = "Connection problem";
+	title.szName = L( "Connection problem" );
 	title.SetRect( 0, 16, 640, 20 );
 
 	message.iFlags = QMF_INACTIVE;
-	message.szName = "Too many lost packets while connecting!\nPlease select network settings";
+	message.szName = L( "Too many lost packets while connecting!\nPlease select network settings" );
 	message.SetRect( 20, 60, 600, 32 );
 
 	AddItem( background );
