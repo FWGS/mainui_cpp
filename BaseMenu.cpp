@@ -710,7 +710,11 @@ void UI_UpdateMenu( float flTime )
 
 	if( loadStuff )
 	{
+		// load localized strings
 		UI_LoadCustomStrings();
+
+		// load scr
+		UI_LoadScriptConfig();
 
 		loadStuff = false;
 	}
@@ -1386,9 +1390,6 @@ void UI_Init( void )
 
 	// setup game info
 	EngFuncs::GetGameInfo( &gMenu.m_gameinfo );
-
-	// load scr
-	UI_LoadScriptConfig();
 
 	// trying to load colors.lst
 	UI_ApplyCustomColors ();
