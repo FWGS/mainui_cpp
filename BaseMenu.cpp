@@ -42,6 +42,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 cvar_t		*ui_showmodels;
 cvar_t		*ui_show_window_stack;
 cvar_t		*ui_borderclip;
+cvar_t		*ui_language;
 
 uiStatic_t	uiStatic;
 static CMenuEntry	*s_pEntries = NULL;
@@ -704,7 +705,23 @@ void UI_UpdateMenu( float flTime )
 	if( !uiStatic.initialized )
 		return;
 
+	static bool loadStuff = true;
+
+	if( loadStuff )
+	{
+		UI_LoadCustomStrings();
+
+		loadStuff = false;
+	}
+
 	UI_DrawFinalCredits ();
+
+	if( uiStatic.nextFrameActive )
+	{
+		UI_Main_Menu();
+
+		uiStatic.nextFrameActive = false;
+	}
 
 	// let's use engine credits "feature" for drawing client windows
 	if( uiStatic.client.IsActive() )
@@ -937,7 +954,7 @@ void UI_SetActiveMenu( int fActive )
 	if( fActive )
 	{
 		EngFuncs::KEY_SetDest( KEY_MENU );
-		UI_Main_Menu();
+		uiStatic.nextFrameActive = true; // main menu open moved to UI_UpdateMenu
 	}
 	else
 	{
@@ -1337,6 +1354,7 @@ void UI_Init( void )
 	ui_showmodels = EngFuncs::CvarRegister( "ui_showmodels", "0", FCVAR_ARCHIVE );
 	ui_show_window_stack = EngFuncs::CvarRegister( "ui_show_window_stack", "0", FCVAR_ARCHIVE );
 	ui_borderclip = EngFuncs::CvarRegister( "ui_borderclip", "0", FCVAR_ARCHIVE );
+	ui_language = EngFuncs::CvarRegister( "ui_language", "english", FCVAR_ARCHIVE );
 #ifdef CS16CLIENT
 	// autofill ammo after bought weapon
 	EngFuncs::CvarRegister( "ui_cs_autofill", "0", FCVAR_ARCHIVE );
@@ -1365,9 +1383,6 @@ void UI_Init( void )
 
 	// setup game info
 	EngFuncs::GetGameInfo( &gMenu.m_gameinfo );
-
-	// load custom strings
-	UI_LoadCustomStrings();
 
 	// load scr
 	UI_LoadScriptConfig();
