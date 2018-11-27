@@ -121,11 +121,19 @@ static void Dictionary_Insert( const char *name, const char *second )
 	uint hash = Com_HashKey( name, HASH_SIZE );
 	dictionary_t *elem;
 
-	elem = new dictionary_t;
-	elem->name = StringCopy(name);
-	elem->value = StringCopy(second);
-	elem->next   = hashed_cmds[hash];
-	hashed_cmds[hash] = elem;
+	elem = Dictionary_FindInBucket( hashed_cmds[hash], name );
+	if( elem )
+	{
+		elem->value = StringCopy( second );
+	}
+	else
+	{
+		elem = new dictionary_t;
+		elem->name = StringCopy(name);
+		elem->value = StringCopy(second);
+		elem->next   = hashed_cmds[hash];
+		hashed_cmds[hash] = elem;
+	}
 }
 
 static inline dictionary_t *Dictionary_GetBucket( const char *name )
@@ -353,7 +361,7 @@ static void Localize_AddToDictionary( const char *name, const char *lang )
 
 			if( pfile )
 			{
-				Con_DPrintf("New token: %s %s\n", token, szLocString );
+				// Con_DPrintf("New token: %s %s\n", token, szLocString );
 				Dictionary_Insert( token, szLocString );
 				i++;
 			}
@@ -368,26 +376,48 @@ error:
 	}
 	else
 	{
-		Con_Printf( "Couldn't open file %s. Strings will not be localized!.\n", filename );
+		Con_Printf( "Couldn't open file %s. Some strings will not be localized!.\n", filename );
 	}
 }
 
 static void Localize_Init( void )
 {
+	EngFuncs::ClientCmd( TRUE, "exec mainui.cfg\n" );
+
 	char gamedir[256];
 
 	EngFuncs::GetGameDir( gamedir );
 
 	memset( hashed_cmds, 0, sizeof( hashed_cmds ) );
 
-	// first is lowest in priority
-	if( strcmp( gamedir, "gameui" )) // just for case
-		Localize_AddToDictionary( "gameui", "english" );
+	// strings.lst first
+	for( int i = 0; i < IDS_LAST; i++ )
+	{
+		if( !MenuStrings[i][0] )
+			continue;
 
-	Localize_AddToDictionary( "valve",  "english" );
+		char buf[256];
+
+		snprintf( buf, sizeof( buf ), "StringsList_%i", i );
+
+		Dictionary_Insert( buf, MenuStrings[i] );
+	}
+
+	const char *language = EngFuncs::GetCvarString( "ui_language" );
+
+	if( !language[0] )
+		language = "english"; // fallback to just english
+
+	if( strcmp( gamedir, "mainui" ))
+		Localize_AddToDictionary( "mainui", language );
+
+	if( strcmp( gamedir, "gameui" ))
+		Localize_AddToDictionary( "gameui", language );
 
 	if( strcmp( gamedir, "valve" ))
-		Localize_AddToDictionary( gamedir,  "english" );
+		Localize_AddToDictionary( "valve",  language );
+
+	Localize_AddToDictionary( gamedir,  language );
 }
 
 static void Localize_Free( void )
@@ -418,10 +448,9 @@ void UI_LoadCustomStrings( void )
 	int string_num;
 
 	UI_InitAliasStrings ();
-	Localize_Init();
 
 	if( !afile )
-		return;
+		goto localize_init;
 
 	while(( pfile = EngFuncs::COM_ParseFile( pfile, token )) != NULL )
 	{
@@ -442,6 +471,9 @@ void UI_LoadCustomStrings( void )
 	}
 
 	EngFuncs::COM_FreeFile( afile );
+
+localize_init:
+	Localize_Init();
 }
 
 const char *L( const char *szStr ) // L means Localize!
