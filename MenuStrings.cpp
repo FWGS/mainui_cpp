@@ -167,7 +167,7 @@ static void UI_InitAliasStrings( void )
 	sprintf( token, "Search for %s servers, configure character", gMenu.m_gameinfo.title );
 	MenuStrings[IDS_MAIN_MULTIPLAYERHELP] = StringCopy( token );
 }
-#ifdef XASH_DISABLE_FWGS_EXTENSIONS
+
 int UTFToCP1251( char *out, const char *instr, int len, int maxoutlen )
 {
 	int m = -1, k = 0, uc = 0;
@@ -281,7 +281,6 @@ int UTFToCP1251( char *out, const char *instr, int len, int maxoutlen )
 	*out = 0;
 	return out - outbegin;
 }
-#endif
 
 static void Localize_AddToDictionary( const char *name, const char *lang )
 {
@@ -301,9 +300,9 @@ static void Localize_AddToDictionary( const char *name, const char *lang )
 
 		Q_UTF16ToUTF8( unicodeBuf + 1, afile, ansiLength, STRINGCONVERT_ASSERT_REPLACE );
 
-#ifdef XASH_DISABLE_FWGS_EXTENSIONS // menu runs in cp1251 mode
-		UTFToCP1251( afile, afile, ansiLength, ansiLength );
-#endif
+		if( ui_ru_l10n_hack->value )
+			UTFToCP1251( afile, afile, ansiLength, ansiLength );
+
 		pfile = EngFuncs::COM_ParseFile( pfile, token );
 
 		if( stricmp( token, "lang" ))

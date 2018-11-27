@@ -43,6 +43,7 @@ cvar_t		*ui_showmodels;
 cvar_t		*ui_show_window_stack;
 cvar_t		*ui_borderclip;
 cvar_t		*ui_language;
+cvar_t		*ui_ru_l10n_hack;
 
 uiStatic_t	uiStatic;
 static CMenuEntry	*s_pEntries = NULL;
@@ -1355,6 +1356,8 @@ void UI_Init( void )
 	ui_show_window_stack = EngFuncs::CvarRegister( "ui_show_window_stack", "0", FCVAR_ARCHIVE );
 	ui_borderclip = EngFuncs::CvarRegister( "ui_borderclip", "0", FCVAR_ARCHIVE );
 	ui_language = EngFuncs::CvarRegister( "ui_language", "english", FCVAR_ARCHIVE );
+	ui_ru_l10n_hack = EngFuncs::CvarRegister( "ui_ru_l10n_hack", "0", FCVAR_ARCHIVE );
+
 #ifdef CS16CLIENT
 	// autofill ammo after bought weapon
 	EngFuncs::CvarRegister( "ui_cs_autofill", "0", FCVAR_ARCHIVE );

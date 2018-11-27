@@ -69,6 +69,7 @@ extern cvar_t	*ui_showmodels;
 extern cvar_t   *ui_show_window_stack;
 extern cvar_t	*ui_borderclip;
 extern cvar_t	*ui_language;
+extern cvar_t	*ui_ru_l10n_hack;
 
 class CMenuBaseWindow;
 
