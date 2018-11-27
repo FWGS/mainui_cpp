@@ -124,6 +124,7 @@ static void Dictionary_Insert( const char *name, const char *second )
 	elem = Dictionary_FindInBucket( hashed_cmds[hash], name );
 	if( elem )
 	{
+		delete [] (char*) elem->value;
 		elem->value = StringCopy( second );
 	}
 	else
@@ -143,29 +144,41 @@ static inline dictionary_t *Dictionary_GetBucket( const char *name )
 
 static void UI_InitAliasStrings( void )
 {
-	char token[1024];
+	const struct
+	{
+		const char *defAliasString;
+		int idx;
+	} aliasStrings[] =
+	{
+	{ "Quit %s without\nsaving current game?", IDS_MAIN_QUITPROMPTINGAME },
+	{ "Learn how to play %s", IDS_MAIN_TRAININGHELP },
+	{ "Play %s on the 'easy' skill setting", IDS_NEWGAME_EASYHELP },
+	{ "Play %s on the 'medium' skill setting", IDS_NEWGAME_MEDIUMHELP },
+	{ "Play %s on the 'difficult' skill setting", IDS_NEWGAME_DIFFICULTHELP },
+	{ "Quit playing %s", IDS_MAIN_QUITHELP },
+	{ "Search for %s servers, configure character", IDS_MAIN_MULTIPLAYERHELP },
+	};
 
-	// some strings needs to be initialized here
-	sprintf( token, "Quit %s without\nsaving current game?", gMenu.m_gameinfo.title );
-	MenuStrings[IDS_MAIN_QUITPROMPTINGAME] = StringCopy( token );
+	for( int i = 0; i < ARRAYSIZE( aliasStrings ); i++ )
+	{
+		if( MenuStrings[aliasStrings[i].idx][0]) // check if not initialized by strings.lst
+			continue;
 
-	sprintf( token, "Learn how to play %s", gMenu.m_gameinfo.title );
-	MenuStrings[IDS_MAIN_TRAININGHELP] = StringCopy( token );
+		char token[1024];
+		char token2[1024];
+		sprintf( token, "StringsList_%d", aliasStrings[i].idx );
 
-	sprintf( token, "Play %s on the 'easy' skill setting", gMenu.m_gameinfo.title );
-	MenuStrings[IDS_NEWGAME_EASYHELP] = StringCopy( token );
+		const char *fmt = L( token );
+		if( fmt == token )
+		{
+			fmt = aliasStrings[i].defAliasString;
+		}
 
-	sprintf( token, "Play %s on the 'medium' skill setting", gMenu.m_gameinfo.title );
-	MenuStrings[IDS_NEWGAME_MEDIUMHELP] = StringCopy( token );
+		sprintf( token2, fmt, gMenu.m_gameinfo.title );
+		MenuStrings[aliasStrings[i].idx] = StringCopy( token2 );
 
-	sprintf( token, "Play %s on the 'difficult' skill setting", gMenu.m_gameinfo.title );
-	MenuStrings[IDS_NEWGAME_DIFFICULTHELP] = StringCopy( token );
-
-	sprintf( token, "Quit playing %s", gMenu.m_gameinfo.title );
-	MenuStrings[IDS_MAIN_QUITHELP] = StringCopy( token );
-
-	sprintf( token, "Search for %s servers, configure character", gMenu.m_gameinfo.title );
-	MenuStrings[IDS_MAIN_MULTIPLAYERHELP] = StringCopy( token );
+		Dictionary_Insert( token, MenuStrings[aliasStrings[i].idx] );
+	}
 }
 
 int UTFToCP1251( char *out, const char *instr, int len, int maxoutlen )
@@ -430,6 +443,7 @@ static void Localize_Free( void )
 
 			delete [] (char*)base->value;
 			delete [] (char*)base->name;
+
 			delete base;
 
 			base = next;
@@ -445,8 +459,6 @@ void UI_LoadCustomStrings( void )
 	char *pfile = afile;
 	char token[1024];
 	int string_num;
-
-	UI_InitAliasStrings ();
 
 	if( !afile )
 		goto localize_init;
@@ -473,6 +485,7 @@ void UI_LoadCustomStrings( void )
 
 localize_init:
 	Localize_Init();
+	UI_InitAliasStrings ();
 }
 
 const char *L( const char *szStr ) // L means Localize!
