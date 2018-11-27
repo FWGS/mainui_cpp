@@ -295,9 +295,9 @@ void CMenuPlayerSetup::ApplyColorToLogoPreview()
 {
 	const char *logoColorStr = logoColor.GetCurrentString();
 
-	for( size_t i = 0; i < ARRAYSIZE( g_LogoColors ); i++ )
+	for( size_t i = 0; i < ARRAYSIZE( g_LogoColors ) && logoColorStr; i++ )
 	{
-		if( !stricmp( logoColorStr, g_LogoColors[i].name ))
+		if( !stricmp( logoColorStr, L( g_LogoColors[i].name )))
 		{
 			logoImage.r = g_LogoColors[i].r;
 			logoImage.g = g_LogoColors[i].g;
