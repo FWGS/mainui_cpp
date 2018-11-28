@@ -490,9 +490,17 @@ int Con_UtfProcessChar( int in )
 	return 0;
 #else
 	// remap in unicode
-	if( in >= 0xC0 && in <= 0xFF )
+	switch( in )
 	{
-		return in - 0xC0 + 0x410;
+	case 0xA8:
+		return 0x401; // Cyrillic Captial Letter Io
+	case 0xB8:
+		return 0x451; // Cyrillic Small Letter Io
+	default:
+		if( in >= 0xC0 && in <= 0xFF )
+		{
+			return in - 0xC0 + 0x410;
+		}
 	}
 	return in;
 #endif

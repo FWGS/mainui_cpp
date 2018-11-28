@@ -250,6 +250,8 @@ int UTFToCP1251( char *out, const char *instr, int len, int maxoutlen )
 			instr++;
 			continue;
 		}
+
+
 		if( k == m )
 		{
 			k = m = -1;
@@ -260,14 +262,15 @@ int UTFToCP1251( char *out, const char *instr, int len, int maxoutlen )
 				instr++;
 				continue;
 			}
+
 			// cp1251
-			else if( uc >= 0x0410 && uc <= 0x042F )
+			if( uc >= 0x0410 && uc <= 0x042F ) // Cyrillic Capital Letters
 			{
 				*out++ = uc - 0x410 + 0xC0;
 				instr++;
 				continue;
 			}
-			else if( uc >= 0x0430 && uc <= 0x044F )
+			else if( uc >= 0x0430 && uc <= 0x044F ) // Cyrillic Small Letters
 			{
 				*out++ = uc - 0x430 + 0xE0;
 				instr++;
@@ -277,12 +280,14 @@ int UTFToCP1251( char *out, const char *instr, int len, int maxoutlen )
 			{
 				int i;
 				for( i = 0; i < 64; i++ )
+				{
 					if( table_cp1251[i] == uc )
 					{
 						*out++ = i + 0x80;
 						instr++;
 						break;
 					}
+				}
 				continue;
 			}
 

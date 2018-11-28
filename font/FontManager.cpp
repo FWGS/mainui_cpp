@@ -448,6 +448,8 @@ void CFontManager::UploadTextureForFont(CBaseFont *font)
 	{
 	{ 33, 126 },			// ascii printable range
 	{ 0x0400, 0x045F },		// cyrillic range
+	{ 0x401, 0x401 },		// Capital Io
+	{ 0x451, 0x451 },		// Small Io
 	};
 
 	font->UploadGlyphsForRanges( range, ARRAYSIZE( range ) );
