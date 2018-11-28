@@ -227,6 +227,7 @@ namespace Names
 bool CheckIsNameValid( const char *name );
 }
 }
+extern const int table_cp1251[64];
 int Con_UtfProcessChar(int in );
 int Con_UtfMoveLeft( const char *str, int pos );
 int Con_UtfMoveRight( const char *str, int pos, int length );
