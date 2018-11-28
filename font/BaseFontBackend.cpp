@@ -100,8 +100,21 @@ void CBaseFont::UploadGlyphsForRanges(charRange_t *range, int rangeSize)
 	int xstart = 0, ystart = hdr->height-1;
 	for( int iRange = 0; iRange < rangeSize; iRange++ )
 	{
-		for( int ch = range[iRange].chMin; ch <= range[iRange].chMax; ch++ )
+		int size;
+
+		if( range[iRange].sequence )
+			size = range[iRange].size;
+		else
+			size = range[iRange].chMax - range[iRange].chMin;
+
+		for( int i = 0; i < size; i++ )
 		{
+			int ch;
+
+			if( range[iRange].sequence )
+				ch = range[iRange].sequence[i];
+			else ch = range[iRange].chMin + i;
+
 			// clear temporary buffer
 			memset( temp, 0, tempSize );
 

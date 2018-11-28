@@ -29,6 +29,8 @@ struct charRange_t
 {
 	int chMin;
 	int chMax;
+	const int *sequence;
+	int size;
 };
 
 class CBaseFont

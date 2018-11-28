@@ -446,10 +446,9 @@ void CFontManager::UploadTextureForFont(CBaseFont *font)
 
 	charRange_t range[] =
 	{
-	{ 33, 126 },			// ascii printable range
-	{ 0x0400, 0x045F },		// cyrillic range
-	{ 0x401, 0x401 },		// Capital Io
-	{ 0x451, 0x451 },		// Small Io
+	{ 33, 126, NULL, 0 },			// ascii printable range
+	{ 0, 0, table_cp1251, ARRAYSIZE( table_cp1251 ) }, // cp1251
+	{ 0x0400, 0x045F, NULL, 0 },		// cyrillic range
 	};
 
 	font->UploadGlyphsForRanges( range, ARRAYSIZE( range ) );
