@@ -397,10 +397,6 @@ static void Localize_Init( void )
 {
 	EngFuncs::ClientCmd( TRUE, "exec mainui.cfg\n" );
 
-	char gamedir[256];
-
-	EngFuncs::GetGameDir( gamedir );
-
 	memset( hashed_cmds, 0, sizeof( hashed_cmds ) );
 
 	// strings.lst first
@@ -417,6 +413,7 @@ static void Localize_Init( void )
 	}
 
 	const char *language = EngFuncs::GetCvarString( "ui_language" );
+	const char *gamedir = gMenu.m_gameinfo.gamefolder;
 
 	if( !language[0] )
 		language = "english"; // fallback to just english
