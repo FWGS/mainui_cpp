@@ -132,6 +132,14 @@ void UI_NewGame_Menu( void )
 	if( gMenu.m_gameinfo.gamemode == GAME_MULTIPLAYER_ONLY || !EngFuncs::CheckGameDll() )
 		return;
 
+#ifdef GFL_NOSKILLS
+	if( gMenu.m_gameinfo.flags & GFL_NOSKILLS )
+	{
+		uiNewGame.StartGameCb( 1.0f );
+		return;
+	}
+#endif
+
 	uiNewGame.Show();
 }
 ADD_MENU( menu_newgame, UI_NewGame_Precache, UI_NewGame_Menu );
