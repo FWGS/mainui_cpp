@@ -188,14 +188,14 @@ int UTFToCP1251( char *out, const char *instr, int len, int maxoutlen )
 	char *outbegin = out;
 
 	static const int table_cp1251[64] = {
-			0x0402, 0x0403, 0x201A, 0x0453, 0x201E, 0x2026, 0x2020, 0x2021,
-			0x20AC, 0x2030, 0x0409, 0x2039, 0x040A, 0x040C, 0x040B, 0x040F,
-			0x0452, 0x2018, 0x2019, 0x201C, 0x201D, 0x2022, 0x2013, 0x2014,
-			0x007F, 0x2122, 0x0459, 0x203A, 0x045A, 0x045C, 0x045B, 0x045F,
-			0x00A0, 0x040E, 0x045E, 0x0408, 0x00A4, 0x0490, 0x00A6, 0x00A7,
-			0x0401, 0x00A9, 0x0404, 0x00AB, 0x00AC, 0x00AD, 0x00AE, 0x0407,
-			0x00B0, 0x00B1, 0x0406, 0x0456, 0x0491, 0x00B5, 0x00B6, 0x00B7,
-			0x0451, 0x2116, 0x0454, 0x00BB, 0x0458, 0x0405, 0x0455, 0x0457
+		0x0402, 0x0403, 0x201A, 0x0453, 0x201E, 0x2026, 0x2020, 0x2021,
+		0x20AC, 0x2030, 0x0409, 0x2039, 0x040A, 0x040C, 0x040B, 0x040F,
+		0x0452, 0x2018, 0x2019, 0x201C, 0x201D, 0x2022, 0x2013, 0x2014,
+		0x007F, 0x2122, 0x0459, 0x203A, 0x045A, 0x045C, 0x045B, 0x045F,
+		0x00A0, 0x040E, 0x045E, 0x0408, 0x00A4, 0x0490, 0x00A6, 0x00A7,
+		0x0401, 0x00A9, 0x0404, 0x00AB, 0x00AC, 0x00AD, 0x00AE, 0x0407,
+		0x00B0, 0x00B1, 0x0406, 0x0456, 0x0491, 0x00B5, 0x00B6, 0x00B7,
+		0x0451, 0x2116, 0x0454, 0x00BB, 0x0458, 0x0405, 0x0455, 0x0457
 	};
 
 	while( *instr && (out - outbegin) < maxoutlen )
@@ -203,52 +203,52 @@ int UTFToCP1251( char *out, const char *instr, int len, int maxoutlen )
 		int in = *instr & 255;
 		if( instr - inbegin >= len )
 		{
-				*out = 0;
-				return out - outbegin;
+			*out = 0;
+			return out - outbegin;
 		}
 
 		// Get character length
 		if(m == -1)
 		{
-				uc = 0;
-				if( in >= 0xF8 )
-				{
-						instr++;
-						continue;
-				}
-				else if( in >= 0xF0 )
-						uc = in & 0x07, m = 3;
-				else if( in >= 0xE0 )
-						uc = in & 0x0F, m = 2;
-				else if( in >= 0xC0 )
-						uc = in & 0x1F, m = 1;
-				else if( in <= 0x7F)
-				{
-						if( in == '\\' && *(instr + 1) != '\\'  )
-						{
-								instr++;
-								continue;
-						}
-						*out++ = *instr++;
-						continue;
-				}
-				// we need more chars to decode one
-				k=0;
+			uc = 0;
+			if( in >= 0xF8 )
+			{
 				instr++;
 				continue;
+			}
+			else if( in >= 0xF0 )
+				uc = in & 0x07, m = 3;
+			else if( in >= 0xE0 )
+				uc = in & 0x0F, m = 2;
+			else if( in >= 0xC0 )
+				uc = in & 0x1F, m = 1;
+			else if( in <= 0x7F)
+			{
+				if( in == '\\' && *(instr + 1) != '\\'  )
+				{
+					instr++;
+					continue;
+				}
+				*out++ = *instr++;
+				continue;
+			}
+			// we need more chars to decode one
+			k=0;
+			instr++;
+			continue;
 		}
 		// get more chars
 		else if( k <= m )
 		{
-				uc <<= 6;
-				uc += in & 0x3F;
-				k++;
+			uc <<= 6;
+			uc += in & 0x3F;
+			k++;
 		}
 		if( in > 0xBF || m < 0 )
 		{
-				m = -1;
-				instr++;
-				continue;
+			m = -1;
+			instr++;
+			continue;
 		}
 		if( k == m )
 		{
@@ -263,27 +263,27 @@ int UTFToCP1251( char *out, const char *instr, int len, int maxoutlen )
 			// cp1251
 			else if( uc >= 0x0410 && uc <= 0x042F )
 			{
-					*out++ = uc - 0x410 + 0xC0;
-					instr++;
-					continue;
+				*out++ = uc - 0x410 + 0xC0;
+				instr++;
+				continue;
 			}
 			else if( uc >= 0x0430 && uc <= 0x044F )
 			{
-					*out++ = uc - 0x430 + 0xE0;
-					instr++;
-					continue;
+				*out++ = uc - 0x430 + 0xE0;
+				instr++;
+				continue;
 			}
 			else
 			{
-					int i;
-					for( i = 0; i < 64; i++ )
-							if( table_cp1251[i] == uc )
-							{
-									*out++ = i + 0x80;
-									instr++;
-									break;
-							}
-					continue;
+				int i;
+				for( i = 0; i < 64; i++ )
+					if( table_cp1251[i] == uc )
+					{
+						*out++ = i + 0x80;
+						instr++;
+						break;
+					}
+				continue;
 			}
 
 			*out++ = *instr++;
