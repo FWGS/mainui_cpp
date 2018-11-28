@@ -130,7 +130,7 @@ UI_GameOptions_Init
 void CMenuGameOptions::_Init( void )
 {
 	banner.SetPicture( ART_BANNER );
-	maxFPS.szName = L( "Valve_Max_FPS" );
+	maxFPS.szName = L( "FPS limit" );
 	maxFPS.szStatusText = L( "Cap your game frame rate" );
 	maxFPS.Setup( 20, 500, 20 );
 	maxFPS.LinkCvar( "fps_max", CMenuEditable::CVAR_VALUE );
