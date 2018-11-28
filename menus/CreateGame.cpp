@@ -144,7 +144,7 @@ void CMenuCreateGame::Begin( CMenuBaseItem *pSelf, void *pExtra )
 	{
 		EngFuncs::WriteServerConfig( EngFuncs::GetCvarString( "lservercfgfile" ));
 
-		char cmd[128], cmd2[256];
+		char cmd[1024], cmd2[256];
 		sprintf( cmd, "exec %s\n", EngFuncs::GetCvarString( "lservercfgfile" ) );
 	
 		EngFuncs::ClientCmd( TRUE, cmd );

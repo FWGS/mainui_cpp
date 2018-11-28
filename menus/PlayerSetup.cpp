@@ -142,7 +142,7 @@ UI_PlayerSetup_FindModels
 */
 void CMenuPlayerSetup::CModelListModel::Update( void )
 {
-	char	name[256], path[256];
+	char	name[256], path[1024];
 	char	**filenames;
 	int numFiles, i;
 	
