@@ -295,17 +295,21 @@ static void Localize_AddToDictionary( const char *name, const char *lang )
 	snprintf( filename, sizeof( filename ), "resource/%s_%s.txt", name, lang );
 
 	int unicodeLength;
-	uchar16 *unicodeBuf = (uchar16*)EngFuncs::COM_LoadFile( filename, &unicodeLength );
+	char *pFileBuf = (char*)EngFuncs::COM_LoadFile( filename, &unicodeLength );
 
-	if( unicodeBuf ) // no problem, so read it.
+	if( pFileBuf ) // no problem, so read it.
 	{
-		int ansiLength = unicodeLength;
+		int ansiLength = unicodeLength + 1;
 		char *afile = new char[ansiLength]; // save original pointer, so we can free it later
+		uchar16 *autf16 = new uchar16[unicodeLength/2 + 1];
 		char *pfile = afile;
 		char token[4096];
 		int i = 0;
 
-		Q_UTF16ToUTF8( unicodeBuf + 1, afile, ansiLength, STRINGCONVERT_ASSERT_REPLACE );
+		memcpy( autf16, pFileBuf + 2, unicodeLength - 1 );
+		autf16[unicodeLength/2-1] = 0; //null terminator
+
+		Q_UTF16ToUTF8( autf16, afile, ansiLength, STRINGCONVERT_ASSERT_REPLACE );
 
 #ifdef XASH_DISABLE_FWGS_EXTENSIONS
 		UTFToCP1251( afile, afile, ansiLength, ansiLength );
@@ -378,8 +382,9 @@ static void Localize_AddToDictionary( const char *name, const char *lang )
 
 error:
 		delete[] afile;
+		delete[] autf16;
 
-		EngFuncs::COM_FreeFile( unicodeBuf );
+		EngFuncs::COM_FreeFile( pFileBuf );
 	}
 	else
 	{
