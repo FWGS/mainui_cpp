@@ -239,7 +239,7 @@ void CMenuVidModes::_Init( void )
 	banner.SetPicture(ART_BANNER);
 
 	vidList.SetRect( 360, 230, -20, 365 );
-	vidList.SetupColumn( 0, L( "GameUI_DisplayMode" ), 1.0f );
+	vidList.SetupColumn( 0, L( "GameUI_Resolution" ), 1.0f );
 	vidList.SetModel( &vidListModel );
 
 	windowed.SetNameAndStatus( L( "GameUI_Windowed" ), L( "GameUI_Windowed" ) );
