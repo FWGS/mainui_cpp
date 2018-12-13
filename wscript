@@ -4,12 +4,14 @@
 
 from waflib import Logs
 import os
+from fwgslib import get_flags_by_compiler
+from fwgslib import get_subproject_name
 
 top = '.'
 
 def options(opt):
-	opt.add_option('--use-stb', action = 'store_true', dest = 'USE_STBTT',
-		help = 'prefer stbtt over freetype')
+	opt.add_option('--enable-stbtt', action = 'store_true', dest = 'USE_STBTT',
+		help = 'prefer stb_truetype.h over freetype')
 
 	return
 
@@ -17,16 +19,18 @@ def configure(conf):
 	if conf.options.DEDICATED:
 		return
 
+	# conf.env.CXX11_MANDATORY = False
+	conf.load('cxx11')
+	if not conf.env.HAVE_CXX11:
+		conf.env.append_unique('DEFINES', 'MY_COMPILER_SUCKS')
+	
 	conf.env.USE_STBTT = conf.options.USE_STBTT
 	conf.env.append_unique('DEFINES', 'MAINUI_USE_CUSTOM_FONT_RENDER');
-	
+
 	if conf.env.DEST_OS == 'darwin':
 		conf.env.USE_STBTT = True
 		conf.env.append_unique('DEFINES', 'MAINUI_USE_STB');
 	
-	if conf.env.COMPILER_CC != 'msvc':
-		conf.env.append_unique('CXXFLAGS', ['-std=c++11'])
-
 	if conf.env.DEST_OS != 'win32':
 		if not conf.env.USE_STBTT:
 			errormsg = '{0} not available! Install {0} development package. Also you may need to set PKG_CONFIG_PATH environment variable'
@@ -40,12 +44,6 @@ def configure(conf):
 			except conf.errors.ConfigurationError:
 				conf.fatal(errormsg.format('fontconfig'))
 			conf.env.append_unique('DEFINES', 'MAINUI_USE_FREETYPE');
-	else:
-		conf.check(lib='user32')
-		conf.check(lib='gdi32')
-
-def get_subproject_name(ctx):
-	return os.path.basename(os.path.realpath(str(ctx.path)))
 
 def build(bld):
 	bld.load_envs()
