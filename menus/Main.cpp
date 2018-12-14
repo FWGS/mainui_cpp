@@ -70,9 +70,9 @@ static CMenuMain uiMain;
 void CMenuMain::QuitDialog(void *pExtra)
 {
 	if( CL_IsActive() && EngFuncs::GetCvarFloat( "host_serverstate" ) && EngFuncs::GetCvarFloat( "maxplayers" ) == 1.0f )
-		dialog.SetMessage( MenuStrings[IDS_MAIN_QUITPROMPTINGAME] );
+		dialog.SetMessage( L( "StringsList_235" ) );
 	else
-		dialog.SetMessage( MenuStrings[IDS_MAIN_QUITPROMPT] );
+		dialog.SetMessage( L( "StringsList_236" ) );
 
 	dialog.onPositive.SetCommand( FALSE, "quit\n" );
 	dialog.Show();
@@ -81,7 +81,7 @@ void CMenuMain::QuitDialog(void *pExtra)
 void CMenuMain::DisconnectDialogCb()
 {
 	dialog.onPositive.SetCommand( FALSE, "cmd disconnect;endgame disconnect;wait;wait;wait;menu_options;menu_main\n" );
-	dialog.SetMessage( "Really disconnect?" );
+	dialog.SetMessage( L( "Really disconnect?" ) );
 	dialog.Show();
 }
 
@@ -136,7 +136,7 @@ const char *CMenuMain::Activate( void )
 void CMenuMain::_Init( void )
 {
 	// console
-	console.SetNameAndStatus( "Console", "Show console" );
+	console.SetNameAndStatus( L( "GameUI_Console" ), L( "Show console" ) );
 	console.iFlags |= QMF_NOTIFY;
 	console.SetPicture( PC_CONSOLE );
 	SET_EVENT_MULTI( console.onActivated,
@@ -145,37 +145,37 @@ void CMenuMain::_Init( void )
 		EngFuncs::KEY_SetDest( KEY_CONSOLE );
 	});
 
-	createGame.SetNameAndStatus( "Create Game", MenuStrings[IDS_MAIN_RETURNHELP] );
+	createGame.SetNameAndStatus( GameUI_GameMenu_CreateServer, "" );
 	createGame.SetPicture( PC_CREATE_GAME );
 	createGame.iFlags |= QMF_NOTIFY;
 	createGame.onActivated = UI_CreateGame_Menu;
 
-	resumeGame.SetNameAndStatus( "Resume Game", MenuStrings[IDS_MAIN_RETURNHELP] );
+	resumeGame.SetNameAndStatus( L( "GameUI_GameMenu_ResumeGame" ), L( "StringsList_188" ) );
 	resumeGame.SetPicture( PC_RESUME_GAME );
 	resumeGame.iFlags |= QMF_NOTIFY;
 	resumeGame.onActivated = UI_CloseMenu;
 
-	disconnect.SetNameAndStatus( "Disconnect", "Disconnect from server" );
+	disconnect.SetNameAndStatus( L( "GameUI_GameMenu_Disconnect" ), L( "Disconnect from server" ) );
 	disconnect.SetPicture( PC_DISCONNECT );
 	disconnect.iFlags |= QMF_NOTIFY;
 	disconnect.onActivated = VoidCb( &CMenuMain::DisconnectDialogCb );
 
-	multiPlayer.SetNameAndStatus( "Multiplayer", MenuStrings[IDS_MAIN_MULTIPLAYERHELP] );
+	multiPlayer.SetNameAndStatus( L( "GameUI_Multiplayer" ), L( "StringsList_198" ) );
 	multiPlayer.SetPicture( PC_MULTIPLAYER );
 	multiPlayer.iFlags |= QMF_NOTIFY;
 	multiPlayer.onActivated = UI_ServerBrowser_Menu;
 
-	configuration.SetNameAndStatus( "Configuration", MenuStrings[IDS_MAIN_CONFIGUREHELP] );
+	configuration.SetNameAndStatus( L( "GameUI_Options" ), L( "StringsList_193" ) );
 	configuration.SetPicture( PC_CONFIG );
 	configuration.iFlags |= QMF_NOTIFY;
 	configuration.onActivated = UI_Options_Menu;
 
-	previews.SetNameAndStatus( "Previews", MenuStrings[ IDS_MAIN_PREVIEWSHELP ] );
+	previews.SetNameAndStatus( L( "Previews" ), L( "StringsList_400" ) );
 	previews.SetPicture( PC_PREVIEWS );
 	previews.iFlags |= QMF_NOTIFY;
-	SET_EVENT( previews.onActivated, EngFuncs::ShellExecute( MenuStrings[IDS_MEDIA_PREVIEWURL], NULL, false ) );
+	SET_EVENT( previews.onActivated, EngFuncs::ShellExecute( MenuStrings[ IDS_MEDIA_PREVIEWURL ], NULL, false ) );
 
-	quit.SetNameAndStatus( "Quit", MenuStrings[IDS_MAIN_QUITPROMPT] );
+	quit.SetNameAndStatus( L( "GameUI_GameMenu_Quit" ), L( "StringsList_236" ) );
 	quit.SetPicture( PC_QUIT );
 	quit.iFlags |= QMF_NOTIFY;
 	quit.onActivated = MenuCb( &CMenuMain::QuitDialog );
@@ -192,7 +192,8 @@ void CMenuMain::_Init( void )
 	dialog.Link( this );
 
 	AddItem( background );
-	if( gpGlobals->developer ) AddItem( console );
+	if ( EngFuncs::GetCvarFloat( "developer" ))
+		AddItem( console );
 	AddItem( disconnect );
 	AddItem( resumeGame );
 	AddItem( createGame );
@@ -213,12 +214,17 @@ void CMenuMain::_VidInit( void )
 	if( CL_IsActive() )
 	{
 		console.SetCoord( 72, 280 );
+		resumeGame.Show();
 		resumeGame.SetCoord( 72, 330 );
+
+		disconnect.Show();
 		disconnect.SetCoord( 72, 380 );
 	}
 	else
 	{
 		console.SetCoord( 72, 380 );
+		resumeGame.Hide();
+		disconnect.Hide();
 	}
 	createGame.SetCoord( 72, 430 );
 	multiPlayer.SetCoord( 72, 480 );

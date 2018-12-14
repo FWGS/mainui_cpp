@@ -153,18 +153,18 @@ void CMenuVidOptions::_Init( void )
 	testImage.SetRect( 390, 225, 480, 450 );
 	testImage.SetPicture( ART_GAMMA );
 
-	done.SetNameAndStatus( "Done", "Go back to the Video Menu" );
+	done.SetNameAndStatus( L( "GameUI_OK" ), L( "Go back to the Video Menu" ) );
 	done.SetCoord( 72, 435 );
 	done.SetPicture( PC_DONE );
 	done.onActivated = VoidCb( &CMenuVidOptions::SaveAndPopMenu );
 
-	screenSize.SetNameAndStatus( "Screen size",  "Set the screen size" );
+	screenSize.SetNameAndStatus( L( "Screen size" ), L( "Set the screen size" ) );
 	screenSize.SetCoord( 72, 280 );
 	screenSize.Setup( 30, 120, 10 );
 	screenSize.LinkCvar( "viewsize" );
 	screenSize.onChanged = CMenuEditable::WriteCvarCb;
 
-	gammaIntensity.SetNameAndStatus( "Gamma", "Set gamma value (0.5 - 2.3)" );
+	gammaIntensity.SetNameAndStatus( L( "GameUI_Gamma" ), L( "Set gamma value (0.5 - 2.3)" ) );
 	gammaIntensity.SetCoord( 72, 340 );
 	gammaIntensity.Setup( 0.0, 1.0, 0.025 );
 	gammaIntensity.onChanged = VoidCb( &CMenuVidOptions::GammaUpdate );
@@ -174,24 +174,24 @@ void CMenuVidOptions::_Init( void )
 	glareReduction.SetCoord( 72, 400 );
 	if( UI_IsXashFWGS() )
 	{
-		glareReduction.SetNameAndStatus( "Glare reduction", "Set glare reduction level" );
+		glareReduction.SetNameAndStatus( L( "Glare reduction" ), L( "Set glare reduction level" ) );
 		glareReduction.Setup( 100, 300, 15 );
 		glareReduction.LinkCvar( "r_flaresize" );
 	}
 	else
 	{
-		glareReduction.SetNameAndStatus( "Brightness", "Set brightness level" );
+		glareReduction.SetNameAndStatus( L( "GameUI_Brightness" ), L( "Set brightness level" ) );
 		glareReduction.Setup( 0, 3, 0.1 );
 		glareReduction.LinkCvar( "brightness" );
 	}
 
-	bump.SetNameAndStatus( "Bump-mapping", "Enable bump mapping" );
+	bump.SetNameAndStatus( L( "Bump-mapping" ), L( "Enable bump mapping" ) );
 	bump.SetCoord( 72, 515 );
 	bump.LinkCvar( "r_bump" );
 	if( !EngFuncs::GetCvarFloat( "r_vbo" ) )
 		bump.SetGrayed( true );
 
-	vbo.SetNameAndStatus( "Use VBO", "Use new world renderer. Faster, but rarely glitchy" );
+	vbo.SetNameAndStatus( L( "Use VBO" ), L( "Use new world renderer. Faster, but rarely glitchy" ) );
 	vbo.SetCoord( 72, 565 );
 	vbo.LinkCvar( "r_vbo" );
 	vbo.onChanged = CMenuCheckBox::BitMaskCb;
@@ -199,11 +199,11 @@ void CMenuVidOptions::_Init( void )
 	vbo.bInvertMask = true;
 	vbo.iMask = QMF_GRAYED;
 
-	fastSky.SetNameAndStatus( "Draw simple sky", "enable/disable fast sky rendering (for old computers)" );
+	fastSky.SetNameAndStatus( L( "Draw simple sky" ), L( "enable/disable fast sky rendering (for old computers)" ) );
 	fastSky.SetCoord( 72, 615 );
 	fastSky.LinkCvar( "r_fastsky" );
 
-	hiTextures.SetNameAndStatus( "Allow materials", "let engine replace 8-bit textures with full color hi-res prototypes (if present)" );
+	hiTextures.SetNameAndStatus( L( "Allow materials" ), L( "let engine replace 8-bit textures with full color hi-res prototypes (if present)" ) );
 	hiTextures.SetCoord( 72, 665 );
 	hiTextures.LinkCvar( "host_allow_materials" );
 
@@ -213,8 +213,11 @@ void CMenuVidOptions::_Init( void )
 	AddItem( screenSize );
 	AddItem( gammaIntensity );
 	AddItem( glareReduction );
-	AddItem( bump );
-	AddItem( vbo );
+	if( UI_IsXashFWGS() )
+	{
+		AddItem( bump );
+		AddItem( vbo );
+	}
 	AddItem( fastSky );
 	AddItem( hiTextures );
 	AddItem( testImage );

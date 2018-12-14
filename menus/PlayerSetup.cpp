@@ -41,21 +41,22 @@ static struct
 	unsigned char b;
 } g_LogoColors[] =
 {
-{ "orange", 255, 120, 24  },
-{ "yellow",	225, 180, 24  },
-{ "blue",   0,   60,  255 },
-{ "ltblue", 0,   167, 255 },
-{ "green",  0,   167, 0   },
-{ "red",    255, 43,  0   },
-{ "brown",  123, 73,  0   },
-{ "ltgray", 100, 100, 100 },
-{ "dkgray", 36,  36,  36  },
+{ "#Valve_Orange", 255, 120, 24  },
+{ "#Valve_Yellow",	225, 180, 24  },
+{ "#Valve_Blue",   0,   60,  255 },
+{ "#Valve_Ltblue", 0,   167, 255 },
+{ "#Valve_Green",  0,   167, 0   },
+{ "#Valve_Red",    255, 43,  0   },
+{ "#Valve_Brown",  123, 73,  0   },
+{ "#Valve_Ltgray", 100, 100, 100 },
+{ "#Valve_Dkgray", 36,  36,  36  },
 };
 
 static class CMenuPlayerSetup : public CMenuFramework
 {
 private:
 	void _Init() override;
+	void Reload() override;
 public:
 	CMenuPlayerSetup() : CMenuFramework( "CMenuPlayerSetup" ), msgBox( true ) { }
 
@@ -110,6 +111,7 @@ public:
 
 	CMenuYesNoMessageBox msgBox;
 
+	bool hideModels, hideLogos;
 } uiPlayerSetup;
 
 void CMenuPlayerSetup::CMenuLogoPreview::Draw()
@@ -151,16 +153,15 @@ UI_PlayerSetup_FindModels
 */
 void CMenuPlayerSetup::CModelListModel::Update( void )
 {
-	char	name[256], path[256];
+	char	name[256];
 	char	**filenames;
 	int numFiles, i;
 	
 	m_iCount = 0;
 
 	// Get file list
-	filenames = EngFuncs::GetFilesList(  "models/player/*", &numFiles, TRUE );
-	if( !numFiles )
-		filenames = EngFuncs::GetFilesList(  "models/player/*", &numFiles, FALSE );
+	// search in basedir too, because that's how GoldSrc does this
+	filenames = EngFuncs::GetFilesList(  "models/player/*", &numFiles, FALSE );
 
 #if 0
 	// add default singleplayer model
@@ -173,10 +174,6 @@ void CMenuPlayerSetup::CModelListModel::Update( void )
 	for( i = 0; i < numFiles; i++ )
 	{
 		COM_FileBase( filenames[i], name );
-		snprintf( path, sizeof( path ), "models/player/%s/%s.mdl", name, name );
-		if( !EngFuncs::FileExists( path, TRUE ))
-			continue;
-
 		Q_strncpy( models[m_iCount], name, sizeof( models[0] ) );
 		m_iCount++;
 	}
@@ -306,9 +303,9 @@ void CMenuPlayerSetup::ApplyColorToLogoPreview()
 {
 	const char *logoColorStr = logoColor.GetCurrentString();
 
-	for( size_t i = 0; i < ARRAYSIZE( g_LogoColors ); i++ )
+	for( size_t i = 0; i < ARRAYSIZE( g_LogoColors ) && logoColorStr; i++ )
 	{
-		if( !stricmp( logoColorStr, g_LogoColors[i].name ))
+		if( !stricmp( logoColorStr, L( g_LogoColors[i].name )))
 		{
 			logoImage.r = g_LogoColors[i].r;
 			logoImage.g = g_LogoColors[i].g;
@@ -335,6 +332,9 @@ void CMenuPlayerSetup::WriteNewLogo( void )
 	if( !bmpFile )
 		return;
 
+	logo.WriteCvar();
+	logoColor.WriteCvar();
+
 	// remap logo if needed
 	bmpFile->RemapLogo( logoImage.r, logoImage.g, logoImage.b );
 
@@ -353,9 +353,9 @@ UI_PlayerSetup_Init
 */
 void CMenuPlayerSetup::_Init( void )
 {
-	bool hideModels = false;
-	bool hideLogos = false;
 	int addFlags = 0;
+
+	hideModels = hideLogos = false;
 
 	// disable playermodel preview for HLRally to prevent crash
 	if( !stricmp( gMenu.m_gameinfo.gamefolder, "hlrally" ))
@@ -371,7 +371,7 @@ void CMenuPlayerSetup::_Init( void )
 
 	banner.SetPicture(ART_BANNER);
 
-	name.szStatusText = "Enter your multiplayer display name";
+	name.szStatusText = L( "Enter your multiplayer display name" );
 	name.iMaxLength = 32;
 	name.LinkCvar( "name" );
 	name.SetRect( 320, 260, 256, 36 );
@@ -391,7 +391,7 @@ void CMenuPlayerSetup::_Init( void )
 	}
 
 	topColor.iFlags |= addFlags;
-	topColor.SetNameAndStatus( "Top color", "Set a player model top color" );
+	topColor.SetNameAndStatus( L( "GameUI_PrimaryColor" ), L( "Set a player model top color" ) );
 	topColor.Setup( 0.0, 255, 1 );
 	topColor.LinkCvar( "topcolor" );
 	topColor.onCvarChange = CMenuEditable::WriteCvarCb;
@@ -400,7 +400,7 @@ void CMenuPlayerSetup::_Init( void )
 	topColor.size.w = 300;
 
 	bottomColor.iFlags |= addFlags;
-	bottomColor.SetNameAndStatus( "Bottom color", "Set a player model bottom color" );
+	bottomColor.SetNameAndStatus( L( "GameUI_SecondaryColor" ), L( "Set a player model bottom color" ) );
 	bottomColor.Setup( 0.0, 255.0, 1 );
 	bottomColor.LinkCvar( "bottomcolor" );
 	bottomColor.onCvarChange = CMenuEditable::WriteCvarCb;
@@ -409,13 +409,13 @@ void CMenuPlayerSetup::_Init( void )
 	bottomColor.size.w = 300;
 
 	showModels.iFlags |= addFlags;
-	showModels.SetNameAndStatus( "Show 3D preview", "Show 3D player models instead of preview thumbnails" );
+	showModels.SetNameAndStatus( L( "Show 3D preview" ), L( "Show 3D player models instead of preview thumbnails" ) );
 	showModels.LinkCvar( "ui_showmodels" );
 	showModels.onCvarChange = CMenuEditable::WriteCvarCb;
 	showModels.SetCoord( 340, 380 );
 
 	hiModels.iFlags |= addFlags;
-	hiModels.SetNameAndStatus( "High quality models", "Show HD models in multiplayer" );
+	hiModels.SetNameAndStatus( L( "GameUI_HighModels" ), L( "Show HD models in multiplayer" ) );
 	hiModels.LinkCvar( "cl_himodels" );
 	hiModels.onCvarChange = CMenuEditable::WriteCvarCb;
 	hiModels.SetCoord( 340, 430 );
@@ -423,21 +423,21 @@ void CMenuPlayerSetup::_Init( void )
 	view.iFlags |= addFlags;
 	view.SetRect( 660, 260, 260, 320 );
 
-	msgBox.SetMessage( "Please, choose another player name" );
+	msgBox.SetMessage( L( "Please, choose another player name" ) );
 	msgBox.Link( this );
 
 	AddItem( background );
 	AddItem( banner );
 
-	AddButton( "Done", "Go back to the Multiplayer Menu", PC_DONE, VoidCb( &CMenuPlayerSetup::SaveAndPopMenu ) );
-	CMenuPicButton *gameOpt = AddButton( "Game options", "Configure handness, fov and other advanced options", PC_GAME_OPTIONS );
+	AddButton( L( "Done" ), L( "Go back to the Multiplayer Menu" ), PC_DONE, VoidCb( &CMenuPlayerSetup::SaveAndPopMenu ) );
+	CMenuPicButton *gameOpt = AddButton( L( "Game options" ), L( "Configure handness, fov and other advanced options" ), PC_GAME_OPTIONS );
 	SET_EVENT_MULTI( gameOpt->onActivated,
 	{
 		((CMenuPlayerSetup*)pSelf->Parent())->SetConfig();
 		UI_AdvUserOptions_Menu();
 	});
 
-	AddButton( "Adv options", "", PC_ADV_OPT, UI_GameOptions_Menu );
+	AddButton( L( "Adv options" ), "", PC_ADV_OPT, UI_GameOptions_Menu );
 	gameOpt->SetGrayed( !UI_AdvUserOptions_IsAvailable() );
 
 
@@ -454,7 +454,7 @@ void CMenuPlayerSetup::_Init( void )
 			static const char *itemlist[ARRAYSIZE( g_LogoColors )];
 			static CStringArrayModel colors( itemlist, ARRAYSIZE( g_LogoColors ) );
 			for( size_t i = 0; i < ARRAYSIZE( g_LogoColors ); i++ )
-				itemlist[i] = g_LogoColors[i].name;
+				itemlist[i] = L( g_LogoColors[i].name );
 
 			logoImage.SetRect( 72, 230 + m_iBtnsNum * 50 + 10, 200, 200 );
 
@@ -481,10 +481,10 @@ void CMenuPlayerSetup::_Init( void )
 	AddItem( name );
 	if( !hideLogos )
 	{
+		UpdateLogo();
 		AddItem( logo );
 		AddItem( logoColor );
 		AddItem( logoImage );
-		UpdateLogo();
 	}
 
 	if( !(gMenu.m_gameinfo.flags & GFL_NOMODELS) )
@@ -497,10 +497,15 @@ void CMenuPlayerSetup::_Init( void )
 		// disable playermodel preview for HLRally to prevent crash
 		if( !hideModels )
 		{
-			UpdateModel();
 			AddItem( view );
 		}
 	}
+}
+
+void CMenuPlayerSetup::Reload()
+{
+	if( !hideLogos ) UpdateLogo();
+	if( !hideModels ) UpdateModel();
 }
 
 /*

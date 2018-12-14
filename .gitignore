@@ -36,3 +36,4 @@ ipch/
 *.vcxproj.filters
 *.vcxproj
 *.sln
+*.pdb

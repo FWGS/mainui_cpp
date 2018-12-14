@@ -121,11 +121,20 @@ static void Dictionary_Insert( const char *name, const char *second )
 	uint hash = Com_HashKey( name, HASH_SIZE );
 	dictionary_t *elem;
 
-	elem = new dictionary_t;
-	elem->name = StringCopy(name);
-	elem->value = StringCopy(second);
-	elem->next   = hashed_cmds[hash];
-	hashed_cmds[hash] = elem;
+	elem = Dictionary_FindInBucket( hashed_cmds[hash], name );
+	if( elem )
+	{
+		delete [] (char*) elem->value;
+		elem->value = StringCopy( second );
+	}
+	else
+	{
+		elem = new dictionary_t;
+		elem->name = StringCopy(name);
+		elem->value = StringCopy(second);
+		elem->next   = hashed_cmds[hash];
+		hashed_cmds[hash] = elem;
+	}
 }
 
 static inline dictionary_t *Dictionary_GetBucket( const char *name )
@@ -135,29 +144,149 @@ static inline dictionary_t *Dictionary_GetBucket( const char *name )
 
 static void UI_InitAliasStrings( void )
 {
-	char token[1024];
+	const struct
+	{
+		const char *defAliasString;
+		int idx;
+	} aliasStrings[] =
+	{
+	{ "Quit %s without\nsaving current game?", IDS_MAIN_QUITPROMPTINGAME },
+	{ "Learn how to play %s", IDS_MAIN_TRAININGHELP },
+	{ "Play %s on the 'easy' skill setting", IDS_NEWGAME_EASYHELP },
+	{ "Play %s on the 'medium' skill setting", IDS_NEWGAME_MEDIUMHELP },
+	{ "Play %s on the 'difficult' skill setting", IDS_NEWGAME_DIFFICULTHELP },
+	{ "Quit playing %s", IDS_MAIN_QUITHELP },
+	{ "Search for %s servers, configure character", IDS_MAIN_MULTIPLAYERHELP },
+	};
 
-	// some strings needs to be initialized here
-	sprintf( token, "Quit %s without\nsaving current game?", gMenu.m_gameinfo.title );
-	MenuStrings[IDS_MAIN_QUITPROMPTINGAME] = StringCopy( token );
+	for( int i = 0; i < ARRAYSIZE( aliasStrings ); i++ )
+	{
+		if( MenuStrings[aliasStrings[i].idx][0]) // check if not initialized by strings.lst
+			continue;
 
-	sprintf( token, "Learn how to play %s", gMenu.m_gameinfo.title );
-	MenuStrings[IDS_MAIN_TRAININGHELP] = StringCopy( token );
+		char token[1024];
+		char token2[1024];
+		sprintf( token, "StringsList_%d", aliasStrings[i].idx );
 
-	sprintf( token, "Play %s on the 'easy' skill setting", gMenu.m_gameinfo.title );
-	MenuStrings[IDS_NEWGAME_EASYHELP] = StringCopy( token );
+		const char *fmt = L( token );
+		if( fmt == token )
+		{
+			fmt = aliasStrings[i].defAliasString;
+		}
 
-	sprintf( token, "Play %s on the 'medium' skill setting", gMenu.m_gameinfo.title );
-	MenuStrings[IDS_NEWGAME_MEDIUMHELP] = StringCopy( token );
+		sprintf( token2, fmt, gMenu.m_gameinfo.title );
+		MenuStrings[aliasStrings[i].idx] = StringCopy( token2 );
 
-	sprintf( token, "Play %s on the 'difficult' skill setting", gMenu.m_gameinfo.title );
-	MenuStrings[IDS_NEWGAME_DIFFICULTHELP] = StringCopy( token );
+		Dictionary_Insert( token, MenuStrings[aliasStrings[i].idx] );
+	}
+}
 
-	sprintf( token, "Quit playing %s", gMenu.m_gameinfo.title );
-	MenuStrings[IDS_MAIN_QUITHELP] = StringCopy( token );
+int UTFToCP1251( char *out, const char *instr, int len, int maxoutlen )
+{
+	int m = -1, k = 0, uc = 0;
+	const char *inbegin = instr;
+	char *outbegin = out;
 
-	sprintf( token, "Search for %s servers, configure character", gMenu.m_gameinfo.title );
-	MenuStrings[IDS_MAIN_MULTIPLAYERHELP] = StringCopy( token );
+	while( *instr && (out - outbegin) < maxoutlen )
+	{
+		int in = *instr & 255;
+		if( instr - inbegin >= len )
+		{
+			*out = 0;
+			return out - outbegin;
+		}
+
+		// Get character length
+		if(m == -1)
+		{
+			uc = 0;
+			if( in >= 0xF8 )
+			{
+				instr++;
+				continue;
+			}
+			else if( in >= 0xF0 )
+				uc = in & 0x07, m = 3;
+			else if( in >= 0xE0 )
+				uc = in & 0x0F, m = 2;
+			else if( in >= 0xC0 )
+				uc = in & 0x1F, m = 1;
+			else if( in <= 0x7F)
+			{
+				if( in == '\\' && *(instr + 1) != '\\'  )
+				{
+					instr++;
+					continue;
+				}
+				*out++ = *instr++;
+				continue;
+			}
+			// we need more chars to decode one
+			k=0;
+			instr++;
+			continue;
+		}
+		// get more chars
+		else if( k <= m )
+		{
+			uc <<= 6;
+			uc += in & 0x3F;
+			k++;
+		}
+		if( in > 0xBF || m < 0 )
+		{
+			m = -1;
+			instr++;
+			continue;
+		}
+
+
+		if( k == m )
+		{
+			k = m = -1;
+			// cp1252 hackish translate
+			if( uc > 0x7F && uc <= 0xFF )
+			{
+				*out++ = uc;
+				instr++;
+				continue;
+			}
+
+			// cp1251
+			if( uc >= 0x0410 && uc <= 0x042F ) // Cyrillic Capital Letters
+			{
+				*out++ = uc - 0x410 + 0xC0;
+				instr++;
+				continue;
+			}
+			else if( uc >= 0x0430 && uc <= 0x044F ) // Cyrillic Small Letters
+			{
+				*out++ = uc - 0x430 + 0xE0;
+				instr++;
+				continue;
+			}
+			else
+			{
+				int i;
+				for( i = 0; i < 64; i++ )
+				{
+					if( table_cp1251[i] == uc )
+					{
+						*out++ = i + 0x80;
+						instr++;
+						break;
+					}
+				}
+				continue;
+			}
+
+			*out++ = *instr++;
+			continue;
+		}
+		instr++;
+	}
+	*out = 0;
+	return out - outbegin;
 }
 
 static void Localize_AddToDictionary( const char *name, const char *lang )
@@ -166,17 +295,25 @@ static void Localize_AddToDictionary( const char *name, const char *lang )
 	snprintf( filename, sizeof( filename ), "resource/%s_%s.txt", name, lang );
 
 	int unicodeLength;
-	uchar16 *unicodeBuf = (uchar16*)EngFuncs::COM_LoadFile( filename, &unicodeLength );
+	char *pFileBuf = (char*)EngFuncs::COM_LoadFile( filename, &unicodeLength );
 
-	if( unicodeBuf ) // no problem, so read it.
+	if( pFileBuf ) // no problem, so read it.
 	{
-		int ansiLength = unicodeLength / 2;
+		int ansiLength = unicodeLength + 1;
 		char *afile = new char[ansiLength]; // save original pointer, so we can free it later
+		uchar16 *autf16 = new uchar16[unicodeLength/2 + 1];
 		char *pfile = afile;
 		char token[4096];
 		int i = 0;
 
-		Q_UTF16ToUTF8( unicodeBuf + 1, afile, ansiLength, STRINGCONVERT_ASSERT_REPLACE );
+		memcpy( autf16, pFileBuf + 2, unicodeLength - 1 );
+		autf16[unicodeLength/2-1] = 0; //null terminator
+
+		Q_UTF16ToUTF8( autf16, afile, ansiLength, STRINGCONVERT_ASSERT_REPLACE );
+
+#ifdef XASH_DISABLE_FWGS_EXTENSIONS
+		UTFToCP1251( afile, afile, ansiLength, ansiLength );
+#endif // XASH_DISABLE_FWGS_EXTENSIONS
 
 		pfile = EngFuncs::COM_ParseFile( pfile, token );
 
@@ -235,6 +372,7 @@ static void Localize_AddToDictionary( const char *name, const char *lang )
 
 			if( pfile )
 			{
+				// Con_DPrintf("New token: %s %s\n", token, szLocString );
 				Dictionary_Insert( token, szLocString );
 				i++;
 			}
@@ -244,31 +382,51 @@ static void Localize_AddToDictionary( const char *name, const char *lang )
 
 error:
 		delete[] afile;
+		delete[] autf16;
 
-		EngFuncs::COM_FreeFile( unicodeBuf );
+		EngFuncs::COM_FreeFile( pFileBuf );
 	}
 	else
 	{
-		Con_Printf( "Couldn't open file %s. Strings will not be localized!.\n", filename );
+		Con_Printf( "Couldn't open file %s. Some strings will not be localized!.\n", filename );
 	}
 }
 
 static void Localize_Init( void )
 {
-	char gamedir[256];
-
-	EngFuncs::GetGameDir( gamedir );
+	EngFuncs::ClientCmd( TRUE, "exec mainui.cfg\n" );
 
 	memset( hashed_cmds, 0, sizeof( hashed_cmds ) );
 
-	// first is lowest in priority
-	if( strcmp( gamedir, "gameui" )) // just for case
-		Localize_AddToDictionary( "gameui", "english" );
+	// strings.lst first
+	for( int i = 0; i < IDS_LAST; i++ )
+	{
+		if( !MenuStrings[i][0] )
+			continue;
 
-	Localize_AddToDictionary( "valve",  "english" );
+		char buf[256];
+
+		snprintf( buf, sizeof( buf ), "StringsList_%i", i );
+
+		Dictionary_Insert( buf, MenuStrings[i] );
+	}
+
+	const char *language = EngFuncs::GetCvarString( "ui_language" );
+	const char *gamedir = gMenu.m_gameinfo.gamefolder;
+
+	if( !language[0] )
+		language = "english"; // fallback to just english
+
+	if( strcmp( gamedir, "mainui" ))
+		Localize_AddToDictionary( "mainui", language );
+
+	if( strcmp( gamedir, "gameui" ))
+		Localize_AddToDictionary( "gameui", language );
 
 	if( strcmp( gamedir, "valve" ))
-		Localize_AddToDictionary( gamedir,  "english" );
+		Localize_AddToDictionary( "valve",  language );
+
+	Localize_AddToDictionary( gamedir,  language );
 }
 
 static void Localize_Free( void )
@@ -282,6 +440,7 @@ static void Localize_Free( void )
 
 			delete [] (char*)base->value;
 			delete [] (char*)base->name;
+
 			delete base;
 
 			base = next;
@@ -298,11 +457,8 @@ void UI_LoadCustomStrings( void )
 	char token[1024];
 	int string_num;
 
-	UI_InitAliasStrings ();
-	Localize_Init();
-
 	if( !afile )
-		return;
+		goto localize_init;
 
 	while(( pfile = EngFuncs::COM_ParseFile( pfile, token )) != NULL )
 	{
@@ -323,6 +479,10 @@ void UI_LoadCustomStrings( void )
 	}
 
 	EngFuncs::COM_FreeFile( afile );
+
+localize_init:
+	Localize_Init();
+	UI_InitAliasStrings ();
 }
 
 const char *L( const char *szStr ) // L means Localize!

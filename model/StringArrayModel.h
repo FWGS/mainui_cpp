@@ -27,6 +27,11 @@ public:
 
 	const char *GetText( int line )
 	{
+		if( line < 0 || line > m_iCount )
+		{
+			Con_Printf("StringArrayModel: wrong index %d of %d\n", line, m_iCount );
+			return "";
+		}
 		if( m_iOffset )
 			return m_u.m_pArrayOfChars + m_iOffset * line;
 		return m_u.m_pArrayOfPtrs[line];

@@ -174,8 +174,8 @@ void CMenuScriptConfig::_Init( void )
 {
 	AddItem( background );
 	AddItem( banner );
-	AddButton( "Done", "Save and Go back to previous menu", PC_DONE, VoidCb( &CMenuScriptConfig::SaveAndPopMenu ) );
-	AddButton( "Cancel", "Go back to previous menu", PC_CANCEL, VoidCb( &CMenuScriptConfig::Hide ) );
+	AddButton( L( "Done" ), L( "Save and Go back to previous menu" ), PC_DONE, VoidCb( &CMenuScriptConfig::SaveAndPopMenu ) );
+	AddButton( L( "GameUI_Cancel" ), L( "Go back to previous menu" ), PC_CANCEL, VoidCb( &CMenuScriptConfig::Hide ) );
 
 	if( !m_pVars )
 		return;
@@ -338,14 +338,14 @@ static CMenuScriptConfig staticUserOptions;
 void UI_AdvServerOptions_Menu()
 {
 	staticServerOptions.banner.SetPicture( ART_BANNER_SERVER );
-	staticUserOptions.szName = "Server Options";
+	staticUserOptions.szName = L( "Server Options" );
 	staticServerOptions.Show();
 }
 
 void UI_AdvUserOptions_Menu()
 {
 	staticUserOptions.banner.SetPicture( ART_BANNER_USER );
-	staticUserOptions.szName = "User Options";
+	staticUserOptions.szName = L( "GameUI_MultiplayerAdvanced" );
 	staticUserOptions.Show();
 }
 

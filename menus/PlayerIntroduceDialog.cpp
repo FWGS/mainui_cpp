@@ -82,14 +82,14 @@ void CMenuPlayerIntroduceDialog::_Init()
 		self->pCaller->Hide(); // hide our parent
 	});
 
-	SetMessage( "Enter your name:");
+	SetMessage( L( "GameUI_PlayerName" ) );
 
 	name.bAllowColorstrings = true;
 	name.SetRect( 188, 140, 270, 32 );
 	name.LinkCvar( "name" );
 	name.iMaxLength = MAX_SCOREBOARDNAME;
 
-	msgBox.SetMessage( "Please, choose another player name" );
+	msgBox.SetMessage( L( "Please, choose another player name" ) );
 	msgBox.Link( this );
 
 	// don't close automatically

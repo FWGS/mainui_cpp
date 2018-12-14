@@ -192,7 +192,6 @@ bool CSCR_ParseSingleCvar( parserstate_t *ps, scrvardef_t *result )
 
 		for( int i = 0; entry; entry = entry->next, i++ )
 		{
-
 			result->list.pArray[i] = L( entry->szName );
 		}
 	}

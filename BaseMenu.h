@@ -68,6 +68,7 @@ extern cvar_t	*ui_precache;
 extern cvar_t	*ui_showmodels;
 extern cvar_t   *ui_show_window_stack;
 extern cvar_t	*ui_borderclip;
+extern cvar_t	*ui_language;
 
 class CMenuBaseWindow;
 
@@ -150,6 +151,8 @@ typedef struct
 
 	bool isForkedEngine;
 	bool needMapListUpdate;
+
+	bool nextFrameActive;
 } uiStatic_t;
 
 extern float	cursorDY;			// use for touch scroll
@@ -291,7 +294,6 @@ void UI_TouchOptions_Menu( void );
 void UI_TouchButtons_Menu( void );
 void UI_TouchEdit_Menu( void );
 void UI_FileDialog_Menu( void );
-void UI_TouchButtons_AddButtonToList( const char *name, const char *texture, const char *command, unsigned char *color, int flags );
 void UI_TouchButtons_GetButtonList();
 void UI_GamePad_Menu( void );
 void UI_Zoo_Menu( void );

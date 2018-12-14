@@ -49,13 +49,13 @@ void UI_Touch_Menu( void )
 		touch.AddItem( touch.background );
 		touch.AddItem( touch.banner );
 
-		touch.AddButton( "Touch options", "Touch sensitivity and profile options", "gfx/shell/btn_touch_options",
+		touch.AddButton( L( "Touch options" ), L( "Touch sensitivity and profile options" ), "gfx/shell/btn_touch_options",
 			UI_TouchOptions_Menu, QMF_NOTIFY );
 
-		touch.AddButton( "Touch buttons", "Add, remove, edit touch buttons", "gfx/shell/btn_touch_buttons",
+		touch.AddButton( L( "Touch buttons" ), L( "Add, remove, edit touch buttons" ), "gfx/shell/btn_touch_buttons",
 			UI_TouchButtons_Menu, QMF_NOTIFY );
 
-		touch.AddButton( "Done",  "Go back to the previous menu", PC_DONE, VoidCb( &CMenuFramework::Hide ), QMF_NOTIFY );
+		touch.AddButton( L( "Done" ),  L( "Go back to the previous menu" ), PC_DONE, VoidCb( &CMenuFramework::Hide ), QMF_NOTIFY );
 	}
 
 	touch.Show();

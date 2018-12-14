@@ -274,6 +274,7 @@ bool CStbFont::Create(const char *name, int tall, int weight, int blur, float br
 
 	m_pFontData = new byte[len+1];
 	size_t red = fread( m_pFontData, 1, len, fd );
+	fclose( fd );
 	if( red != len )
 	{
 		Con_DPrintf( "Unable to read font file %s!\n", m_szRealFontFile );
