@@ -13,11 +13,10 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 
-
+#include "cl_dll/IGameClientExports.h"
 #include "extdll_menu.h"
 #include "BaseMenu.h"
 #include "Utils.h"
-#include "cl_dll/IGameClientExports.h"
 #include "Scoreboard.h"
 
 ui_enginefuncs_t EngFuncs::engfuncs;
@@ -88,12 +87,12 @@ void UI_JoinGame_Show( int param1, int param2 );
 void UI_JoinClassT_Show( int param1, int param2 );
 void UI_JoinClassCT_Show( int param1, int param2 );
 void UI_BuyMenu_Show( int param1, int param2 );
-void UI_BuyMenu_Pistol_Show( int param1, int param2 );
-void UI_BuyMenu_Shotgun_Show( int param1, int param2 );
-void UI_BuyMenu_Submachine_Show( int param1, int param2 );
-void UI_BuyMenu_Rifle_Show( int param1, int param2 );
-void UI_BuyMenu_Machinegun_Show( int param1, int param2 );
-void UI_BuyMenu_Item_Show( int param1, int param2 );
+void UI_BuyMenu_Pistol_Show(int param1, int param2 );
+void UI_BuyMenu_Shotgun_Show(int param1, int param2 );
+void UI_BuyMenu_Submachine_Show(int param1, int param2 );
+void UI_BuyMenu_Rifle_Show(int param1, int param2 );
+void UI_BuyMenu_Machinegun_Show(int param1, int param2 );
+void UI_BuyMenu_Item_Show(int param1, int param2 );
 
 static class CGameMenuExports : public IGameMenuExports
 {
@@ -103,6 +102,11 @@ public:
 		g_pClient = (IGameClientExports*)factory( GAMECLIENTEXPORTS_INTERFACE_VERSION, NULL );
 
 		return g_pClient ? true : false;
+	}
+
+	const char *L( const char *szStr ) override
+	{
+		return ::L( szStr );
 	}
 
 	bool IsActive() override
@@ -183,6 +187,13 @@ public:
 		case MENU_TEAM: UI_JoinGame_Show( param1, param2 ); break;
 		case MENU_CLASS_T: UI_JoinClassT_Show( param1, param2 ); break;
 		case MENU_CLASS_CT: UI_JoinClassCT_Show( param1, param2 ); break;
+		case MENU_BUY: UI_BuyMenu_Show( param1, param2 ); break;
+		case MENU_BUY_PISTOL: UI_BuyMenu_Pistol_Show( param1, param2 ); break;
+		case MENU_BUY_SHOTGUN: UI_BuyMenu_Shotgun_Show( param1, param2 ); break;
+		case MENU_BUY_RIFLE: UI_BuyMenu_Rifle_Show( param1, param2 ); break;
+		case MENU_BUY_SUBMACHINEGUN: UI_BuyMenu_Submachine_Show( param1, param2 ); break;
+		case MENU_BUY_MACHINEGUN: UI_BuyMenu_Machinegun_Show( param1, param2 ); break;
+		case MENU_BUY_ITEM: UI_BuyMenu_Item_Show( param1, param2 ); break;
 		}
 	}
 } s_Menu;
