@@ -22,7 +22,7 @@
 #ifdef NO_STL
 template <class T>
 void *operator new(size_t count, T *ptr) {
-return ptr;
+	return ptr;
 }
 #elif defined _WIN32
 #include <new.h>
