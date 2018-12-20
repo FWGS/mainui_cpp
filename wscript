@@ -23,14 +23,14 @@ def configure(conf):
 	conf.load('cxx11')
 	if not conf.env.HAVE_CXX11:
 		conf.env.append_unique('DEFINES', 'MY_COMPILER_SUCKS')
-	
+
 	conf.env.USE_STBTT = conf.options.USE_STBTT
 	conf.env.append_unique('DEFINES', 'MAINUI_USE_CUSTOM_FONT_RENDER');
 
-	if conf.env.DEST_OS == 'darwin':
+	if conf.env.DEST_OS == 'darwin' or conf.env.DEST_OS2 == 'android':
 		conf.env.USE_STBTT = True
 		conf.env.append_unique('DEFINES', 'MAINUI_USE_STB');
-	
+
 	if conf.env.DEST_OS != 'win32':
 		if not conf.env.USE_STBTT:
 			errormsg = '{0} not available! Install {0} development package. Also you may need to set PKG_CONFIG_PATH environment variable'
