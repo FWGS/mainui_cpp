@@ -16,7 +16,7 @@ GNU General Public License for more details.
 #ifndef FONTMANAGER_H
 #define FONTMANAGER_H
 
-#include "utl/utlvector.h"
+#include "miniutl/utlvector.h"
 #include "Primitive.h"
 #include "FontRenderer.h"
 
