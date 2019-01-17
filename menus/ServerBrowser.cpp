@@ -548,6 +548,12 @@ void CMenuServerBrowser::AddServerToList(netadr_t adr, const char *info)
 	if( stricmp( gMenu.m_gameinfo.gamefolder, Info_ValueForKey( info, "gamedir" )) != 0 )
 		return;
 
+	if( !WasInit() )
+		return;
+
+	if( !IsVisible() )
+		return;
+
 	gameListModel.AddServerToList( adr, info );
 
 	joinGame->SetGrayed( false );
