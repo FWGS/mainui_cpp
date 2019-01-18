@@ -30,9 +30,9 @@ public:
 	void VidInit() override;
 
 	void Reload() override;
-	const char *Key( int key, int down ) override;
+	bool KeyUp( int key ) override;
+	bool KeyDown( int key ) override;
 	void Char( int key ) override;
-	const char *Activate( void ) override;
 	void ToggleInactive( void ) override;
 	void SetInactive( bool visible ) override;
 	void Draw( void ) override;
@@ -99,6 +99,9 @@ protected:
 	bool m_bWrapCursor;
 
 	const char *m_szResFile;
+private:
+	bool Key( const int key, const bool down );
+	CMenuBaseItem *m_pItemAtCursorOnDown;
 };
 
 #endif // EMBEDITEM_H

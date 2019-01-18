@@ -33,7 +33,7 @@ class CMenuGameOptions : public CMenuFramework
 public:
 	CMenuGameOptions() : CMenuFramework("CMenuGameOptions") { }
 
-	const char *Key(int key, int down) override;
+	bool KeyDown( int key ) override;
 	void SetNetworkMode( int maxpacket, int maxpayload, int cmdrate, int updaterate, int rate );
 private:
 	void _Init() override;
@@ -61,11 +61,11 @@ static CMenuGameOptions	uiGameOptions;
 UI_GameOptions_KeyFunc
 =================
 */
-const char *CMenuGameOptions::Key( int key, int down )
+bool CMenuGameOptions::KeyDown( int key )
 {
-	if( down && UI::Key::IsEscape( key ) )
+	if( UI::Key::IsEscape( key ) )
 		Restore();
-	return CMenuFramework::Key( key, down );
+	return CMenuFramework::KeyDown( key );
 }
 
 void CMenuGameOptions::SetNetworkMode( int maxpacket1, int maxpayload1, int cmdrate1, int updaterate1, int rate1 )

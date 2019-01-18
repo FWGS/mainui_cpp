@@ -33,7 +33,8 @@ public:
 
 	CMenuCheckBox();
 	void VidInit() override;
-	const char * Key( int key, int down ) override;
+	bool KeyUp( int key ) override;
+	bool KeyDown( int key ) override;
 	void Draw( void ) override;
 	void UpdateEditable() override;
 	void LinkCvar( const char *name ) override
@@ -50,7 +51,10 @@ public:
 		szGrayedPic = grayed;
 	}
 
-	bool		bChecked;
+	bool bChecked;
+	bool bInvertMask;
+	bool bChangeOnPressed;
+
 	const char	*szEmptyPic;
 	const char	*szFocusPic;
 	const char	*szPressPic;
@@ -58,7 +62,6 @@ public:
 	const char	*szGrayedPic;	// when QMF_GRAYED is set
 
 	unsigned int iMask; // used only for BitMaskCb
-	bool bInvertMask;
 	static void BitMaskCb( CMenuBaseItem *pSelf, void *pExtra )
 	{
 		CMenuCheckBox *self = (CMenuCheckBox*)pSelf;
@@ -74,7 +77,6 @@ public:
 	}
 
 	CColor colorText;
-
 private:
 	Point m_scTextPos;
 	Size m_scTextSize;

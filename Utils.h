@@ -205,20 +205,53 @@ namespace Key
 {
 inline bool IsEscape( int key )
 {
-	return ( key == K_ESCAPE
+	switch( key )
+	{
+	case K_ESCAPE:
 #ifndef XASH_DISABLE_FWGS_EXTENSIONS
-	|| key == K_B_BUTTON
-#endif // XASH_DISABLE_FWGS_EXTENSIONS
-	);
+	case K_B_BUTTON:
+#endif
+		return true;
+	}
+	return false;
 }
 
 inline bool IsEnter( int key )
 {
-	return ( key == K_ENTER
+	switch( key )
+	{
+	case K_ENTER:
+	case K_KP_ENTER:
 #ifndef XASH_DISABLE_FWGS_EXTENSIONS
-	|| key == K_A_BUTTON
-#endif // XASH_DISABLE_FWGS_EXTENSIONS
-	);
+	case K_A_BUTTON:
+#endif
+		return true;
+	}
+	return false;
+}
+
+inline bool IsLeftMouse( int key )
+{
+	switch( key )
+	{
+	case K_MOUSE1:
+		return true;
+	}
+	return false;
+}
+
+inline bool IsMouse( int key )
+{
+	switch( key )
+	{
+	case K_MOUSE1:
+	case K_MOUSE2:
+	case K_MOUSE3:
+	case K_MOUSE4:
+	case K_MOUSE5:
+		return true;
+	}
+	return false;
 }
 }
 

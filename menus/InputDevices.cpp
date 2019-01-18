@@ -81,7 +81,7 @@ void CMenuInputDevices::_Init( void )
 
 	done.SetNameAndStatus( L( "Done" ), L( "Save changed and go back to the Customize Menu" ) );
 	done.SetPicture( PC_DONE );
-	done.onActivated = VoidCb( &CMenuInputDevices::SaveAndPopMenu );
+	done.onReleased = VoidCb( &CMenuInputDevices::SaveAndPopMenu );
 	done.SetCoord( 72, 680 );
 
 	mouse.szName = L( "Ignore mouse" );
@@ -119,7 +119,7 @@ void CMenuInputDevices::_Init( void )
 	evdev.szStatusText = L( "Press this to enable full mouse and keyboard control on Android" );
 	evdev.iFlags |= QMF_NOTIFY;
 	evdev.SetCoord( 72, 380 );
-	evdev.onActivated.SetCommand( FALSE, "evdev_autodetect\n" );
+	evdev.onReleased.SetCommand( FALSE, "evdev_autodetect\n" );
 
 	AddItem( background );
 	//AddItem( banner );

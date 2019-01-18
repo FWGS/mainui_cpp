@@ -311,7 +311,7 @@ void CMenuTouchOptions::_Init( void )
 
 	done.SetNameAndStatus( L( "Done" ), L( "Go back to the Touch Menu" ) );
 	done.SetPicture( PC_DONE );
-	done.onActivated = VoidCb( &CMenuTouchOptions::SaveAndPopMenu );
+	done.onReleased = VoidCb( &CMenuTouchOptions::SaveAndPopMenu );
 
 	lookX.SetNameAndStatus( L( "Look X" ), L( "Horizontal look sensitivity" ) );
 	lookX.Setup( 50, 500, 5 );
@@ -366,19 +366,19 @@ void CMenuTouchOptions::_Init( void )
 
 	reset.SetNameAndStatus( L( "Reset" ), L( "Reset sensitivity settings" ) );
 	reset.SetPicture("gfx/shell/btn_touch_reset");
-	reset.onActivated = VoidCb( &CMenuTouchOptions::ResetMsgBox );
+	reset.onReleased = VoidCb( &CMenuTouchOptions::ResetMsgBox );
 
 	remove.SetNameAndStatus( L( "Delete" ), L( "Delete saved game" ) );
 	remove.SetPicture( PC_DELETE );
-	remove.onActivated = VoidCb( &CMenuTouchOptions::DeleteMsgBox );
+	remove.onReleased = VoidCb( &CMenuTouchOptions::DeleteMsgBox );
 
 	apply.SetNameAndStatus( L( "Activate" ), L( "Apply selected profile" ) );
 	apply.SetPicture( PC_ACTIVATE );
-	apply.onActivated = VoidCb( &CMenuTouchOptions::Apply );
+	apply.onReleased = VoidCb( &CMenuTouchOptions::Apply );
 
 	save.SetNameAndStatus( L( "GameUI_Save" ), L( "Save new profile" ) );
 	save.SetPicture("gfx/shell/btn_touch_save");
-	save.onActivated = VoidCb( &CMenuTouchOptions::Save );
+	save.onReleased = VoidCb( &CMenuTouchOptions::Save );
 
 	msgBox.SetPositiveButton( L( "GameUI_OK" ), PC_OK );
 	msgBox.Link( this );

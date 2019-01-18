@@ -375,13 +375,13 @@ void CMenuTouchButtons::_Init( void )
 
 	done.SetNameAndStatus( L( "Done" ), L( "Save changes and go back to the Touch Menu" ) );
 	done.SetPicture( PC_DONE );
-	done.onActivated = ExitMenuCb;
-	done.onActivated.pExtra = (void*)"touch_writeconfig\n";
+	done.onReleased = ExitMenuCb;
+	done.onReleased.pExtra = (void*)"touch_writeconfig\n";
 
 	cancel.SetNameAndStatus( L( "GameUI_Cancel" ), L( "Discard changes and go back to the Touch Menu" ) );
 	cancel.SetPicture( PC_CANCEL );
-	cancel.onActivated = ExitMenuCb;
-	cancel.onActivated.pExtra = (void*)"touch_loadconfig\n";
+	cancel.onReleased = ExitMenuCb;
+	cancel.onReleased.pExtra = (void*)"touch_loadconfig\n";
 
 	red.eFocusAnimation = QM_PULSEIFFOCUS;
 	red.SetNameAndStatus( L( "Red:" ), L( "Texture red channel" ) );
@@ -427,15 +427,15 @@ void CMenuTouchButtons::_Init( void )
 
 	save.SetNameAndStatus( L( "GameUI_Save" ), L( "Save as new button" ) );
 	save.SetPicture("gfx/shell/btn_touch_save");
-	save.onActivated = VoidCb( &CMenuTouchButtons::SaveButton );
+	save.onReleased = VoidCb( &CMenuTouchButtons::SaveButton );
 
 	editor.SetNameAndStatus( L( "Editor" ), L( "Open interactive editor" ) );
 	editor.SetPicture("gfx/shell/btn_touch_editor");
-	editor.onActivated = UI_TouchEdit_Menu;
+	editor.onReleased = UI_TouchEdit_Menu;
 
 	select.SetNameAndStatus( L( "Select" ), L( "Select texture from list" ) );
 	select.SetPicture("gfx/shell/btn_touch_select");
-	select.onActivated = VoidCb( &CMenuTouchButtons::OpenFileDialog );
+	select.onReleased = VoidCb( &CMenuTouchButtons::OpenFileDialog );
 
 	name.szName = L( "New Button:" );
 	name.iMaxLength = 255;
@@ -450,11 +450,11 @@ void CMenuTouchButtons::_Init( void )
 
 	reset.SetNameAndStatus( L( "Reset" ), L( "Reset touch to default state" ) );
 	reset.SetPicture( "gfx/shell/btn_touch_reset" );
-	reset.onActivated = VoidCb( &CMenuTouchButtons::ResetMsgBox );
+	reset.onReleased = VoidCb( &CMenuTouchButtons::ResetMsgBox );
 
 	remove.SetNameAndStatus( L( "Delete" ), L( "Delete selected button" ) );		// Delete - уже было раньше
 	remove.SetPicture( PC_DELETE );
-	remove.onActivated = VoidCb( &CMenuTouchButtons::RemoveMsgBox );
+	remove.onReleased = VoidCb( &CMenuTouchButtons::RemoveMsgBox );
 
 	buttonList.SetModel( &model );
 	buttonList.onChanged = VoidCb( &CMenuTouchButtons::UpdateFields );

@@ -147,7 +147,7 @@ void CAdvancedControls::_Init( void )
 
 	done.SetNameAndStatus( L( "Done" ), L( "save changed and go back to the Customize Menu" ) );
 	done.SetPicture( PC_DONE );
-	done.onActivated = VoidCb( &CAdvancedControls::SaveAndPopMenu );
+	done.onReleased = VoidCb( &CAdvancedControls::SaveAndPopMenu );
 	done.SetCoord( 72, 680 );
 
 	crosshair.SetNameAndStatus( L( "Crosshair" ), L( "Enable the weapon aiming crosshair" ) );
@@ -186,7 +186,7 @@ void CAdvancedControls::_Init( void )
 	sensitivity.SetCoord( 72, 660 );
 
 	inputDev.SetNameAndStatus( L( "Input devices" ), L( "Toggle mouse, touch controls" ) );
-	inputDev.onActivated = UI_InputDevices_Menu;
+	inputDev.onReleased = UI_InputDevices_Menu;
 	inputDev.iFlags |= QMF_NOTIFY;
 	if( CL_IsActive() && !EngFuncs::GetCvarFloat( "host_serverstate" ))
 		inputDev.SetGrayed( true );

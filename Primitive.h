@@ -54,12 +54,11 @@ enum
 	QMF_HASMOUSEFOCUS      = BIT( 6 ),
 	QMF_MOUSEONLY          = BIT( 7 ), // Only mouse input allowed
 	QMF_NOTIFY             = BIT( 9 ), // draw notify at right screen side
-	QMF_ACT_ONRELEASE      = BIT( 10 ), // call Key_Event when button is released
+	// deprecated: QMF_ACT_ONRELEASE      = BIT( 10 ), // call Key_Event when button is released
 	QMF_HASKEYBOARDFOCUS   = BIT( 11 ),
 	QMF_DIALOG             = BIT( 12 ), // modal windows. Will grab key, char and mousemove events
 	QMF_DISABLESCAILING    = BIT( 13 ), // disables CalcPosition and CalcSizes
-	QMF_EVENTSIGNOREFOCUS  = BIT( 14 ), // don't care if item have focus, it must get events anyway. NOTE: they cannot issue sounds
-
+	QMF_EVENTSIGNOREFOCUS  = BIT( 14 ), // don't care if item have focus, it must get events anyway
 	QMF_HIDDENBYPARENT     = BIT( 30 ), // INTERNAL USE ONLY: parent set this flag and don't want to draw this control
 	QMF_HIDDEN             = BIT( 31 ), // INTERNAL USE ONLY: Use Show/Hide/SetVisibility/ToggleVisibility
 };

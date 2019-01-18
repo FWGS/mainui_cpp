@@ -28,7 +28,8 @@ public:
 
 	CMenuSlider();
 	void VidInit( void ) override;
-	const char * Key( int key, int down ) override;
+	bool KeyUp( int key ) override;
+	bool KeyDown( int key ) override;
 	void Draw( void ) override;
 	void UpdateEditable() override;
 	void LinkCvar(const char *name) override

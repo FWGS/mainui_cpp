@@ -96,12 +96,12 @@ void CMenuNewGame::_Init( void )
 	CMenuPicButton *norm = AddButton( L( "GameUI_Medium" ), L( "StringsList_201" ), PC_MEDIUM, normCallback, QMF_NOTIFY );
 	CMenuPicButton *hard = AddButton( L( "GameUI_Hard" ), L( "StringsList_202" ), PC_DIFFICULT, hardCallback, QMF_NOTIFY );
 
-	easy->onActivatedClActive =
-		norm->onActivatedClActive =
-		hard->onActivatedClActive = ShowDialogCb;
-	easy->onActivatedClActive.pExtra = &easyCallback;
-	norm->onActivatedClActive.pExtra = &normCallback;
-	hard->onActivatedClActive.pExtra = &hardCallback;
+	easy->onReleasedClActive =
+		norm->onReleasedClActive =
+		hard->onReleasedClActive = ShowDialogCb;
+	easy->onReleasedClActive.pExtra = &easyCallback;
+	norm->onReleasedClActive.pExtra = &normCallback;
+	hard->onReleasedClActive.pExtra = &hardCallback;
 
 	AddButton( L( "GameUI_Cancel" ), L( "Go back to the Main menu" ), PC_CANCEL, VoidCb( &CMenuNewGame::Hide ), QMF_NOTIFY );
 

@@ -21,24 +21,21 @@ CMenuBaseClientWindow::CMenuBaseClientWindow( const  char *name ) :
 	m_pStack = &uiStatic.client;
 }
 
-const char *CMenuBaseClientWindow::Key(int key, int down)
+bool CMenuBaseClientWindow::KeyDown( int key )
 {
-	if( down )
+	// copy engine behaviour
+	if( UI::Key::IsEscape( key ))
 	{
-		if( UI::Key::IsEscape( key ))
-		{
-			EngFuncs::KEY_SetDest( KEY_GAME ); // set engine states before "escape"
-			EngFuncs::ClientCmd( FALSE, "escape\n" );
-			return uiSoundNull;
-		}
-		else if( key == '`' )
-		{
-			EngFuncs::KEY_SetDest( KEY_CONSOLE );
-		}
+		EngFuncs::KEY_SetDest( KEY_GAME ); // set engine states before "escape"
+		EngFuncs::ClientCmd( FALSE, "escape\n" );
+		return true;
+	}
+	else if( key == '`' )
+	{
+		EngFuncs::KEY_SetDest( KEY_CONSOLE );
 	}
 
-	return BaseClass::Key( key, down );
-
+	return BaseClass::KeyDown( key );
 }
 
 

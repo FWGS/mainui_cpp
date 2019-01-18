@@ -51,7 +51,8 @@ public:
 	CMenuTable();
 
 
-	const char *Key( int key, int down ) override;
+	bool KeyUp( int key ) override;
+	bool KeyDown( int key ) override;
 	void Draw() override;
 	void VidInit() override;
 	bool MoveView( int delta );

@@ -33,7 +33,8 @@ public:
 	void Show() override;
 	bool IsVisible() const override;
 
-	const char *Key( int key, int down ) override;
+	bool KeyUp( int key ) override;
+	bool KeyDown( int key ) override;
 	void Draw() override;
 
 	bool KeyValueData(const char *key, const char *data) override;
@@ -95,6 +96,7 @@ private:
 	friend void UI_UpdateMenu( float flTime );
 
 	bool IsAbsolutePositioned( void ) const override { return true; }
+	void DragDrop( int down );
 
 	bool m_bHolding;
 	Point m_bHoldOffset;

@@ -52,7 +52,7 @@ public:
 	void _VidInit() override;
 	void Draw() override;
 	bool DrawAnimation(EAnimation anim) override;
-	const char *Key( int key, int down ) override;
+	bool KeyDown( int key ) override;
 	void Disconnect();
 	void HandleDisconnect( void );
 	void HandlePrecache( void )
@@ -123,26 +123,25 @@ CMenuConnectionProgress::CMenuConnectionProgress() : CMenuBaseWindow( "Connectio
 	szName = "ConnectionProgress";
 }
 
-const char *CMenuConnectionProgress::Key( int key, int down )
+bool CMenuConnectionProgress::KeyDown( int key )
 {
-	if( down )
+	switch( key )
 	{
-		switch( key )
-		{
-		case K_ESCAPE:
-			dialog.Show();
-			return uiSoundOut;
-		case '~':
-			consoleButton.Activate();
-			return uiSoundLaunch;
-		case 'A':
-			HandleDisconnect();
-			break;
-		default: break;
-		}
+	case K_ESCAPE:
+		dialog.Show();
+		PlayLocalSound( uiSoundOut );
+		return true;
+	case '~':
+		consoleButton.onReleased( &consoleButton );
+		PlayLocalSound( uiSoundLaunch );
+		return true;
+	case 'A':
+		HandleDisconnect();
+		break;
+	default: break;
 	}
 
-	return CMenuItemsHolder::Key( key, down );
+	return CMenuItemsHolder::KeyDown( key );
 }
 
 void CMenuConnectionProgress::HandleDisconnect( void )
@@ -203,7 +202,7 @@ void CMenuConnectionProgress::_Init( void )
 
 	consoleButton.SetPicture( PC_CONSOLE );
 	consoleButton.szName = L( "GameUI_Console" );
-	SET_EVENT_MULTI( consoleButton.onActivated,
+	SET_EVENT_MULTI( consoleButton.onReleased,
 	{
 		CMenuConnectionProgress *parent = (CMenuConnectionProgress *)pSelf->Parent();
 		EngFuncs::KEY_SetDest( KEY_CONSOLE );
@@ -216,7 +215,7 @@ void CMenuConnectionProgress::_Init( void )
 
 	disconnectButton.SetPicture( PC_DISCONNECT );
 	disconnectButton.szName = L( "GameUI_GameMenu_Disconnect" );
-	disconnectButton.onActivated = VoidCb( &CMenuConnectionProgress::Disconnect );
+	disconnectButton.onReleased = VoidCb( &CMenuConnectionProgress::Disconnect );
 	disconnectButton.bEnableTransitions = false;
 
 	dialog.SetMessage( L( "Really disconnect?" ) );
@@ -228,7 +227,7 @@ void CMenuConnectionProgress::_Init( void )
 	title.szName = sTitleString;
 
 	skipButton.szName = L( "Skip" );
-	skipButton.onActivated.SetCommand( TRUE, "http_skip\n" );
+	skipButton.onReleased.SetCommand( TRUE, "http_skip\n" );
 	skipButton.bEnableTransitions = false;
 
 	downloadText.iFlags = commonText.iFlags = QMF_INACTIVE;

@@ -40,10 +40,10 @@ public:
 	bool IsRoot() override { return true; }
 
 	CMenuPicButton *AddButton( const char *szName, const char *szStatus,
-		EDefaultBtns iButton, CEventCallback onActivated = CEventCallback(), int iFlags = 0 );
+		EDefaultBtns iButton, CEventCallback onReleased = CEventCallback(), int iFlags = 0 );
 
 	CMenuPicButton *AddButton( const char *szName, const char *szStatus,
-		const char *szButtonPath, CEventCallback onActivated = CEventCallback(), int iFlags = 0 );
+		const char *szButtonPath, CEventCallback onReleased = CEventCallback(), int iFlags = 0 );
 
 	bool DrawAnimation(EAnimation anim) override;
 

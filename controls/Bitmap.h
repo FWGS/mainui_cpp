@@ -28,7 +28,8 @@ public:
 	CMenuBitmap();
 
 	void VidInit( void ) override;
-	const char * Key( int key, int down ) override;
+	bool KeyUp( int key ) override;
+	bool KeyDown( int key ) override;
 	void Draw( void ) override;
 	void SetPicture( const char *pic, const char *focusPic = NULL, const char *pressPic = NULL)
 	{

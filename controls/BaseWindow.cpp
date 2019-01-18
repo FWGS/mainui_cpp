@@ -176,22 +176,34 @@ void CMenuBaseWindow::SaveAndPopMenu()
 	Hide();
 }
 
-const char *CMenuBaseWindow::Key(int key, int down)
+void CMenuBaseWindow::DragDrop( int down )
+{
+	m_bHolding = down;
+	m_bHoldOffset.x = uiStatic.cursorX;
+	m_bHoldOffset.y = uiStatic.cursorY;
+}
+
+bool CMenuBaseWindow::KeyDown( int key )
 {
 	if( key == K_MOUSE1 && bAllowDrag )
-	{
-		m_bHolding = down;
-		m_bHoldOffset.x = uiStatic.cursorX;
-		m_bHoldOffset.y = uiStatic.cursorY;
-	}
+		DragDrop( true );
 
-	if( down && UI::Key::IsEscape( key ) )
+	if( UI::Key::IsEscape( key ) )
 	{
 		Hide( );
-		return uiSoundOut;
+		PlayLocalSound( uiSoundOut );
+		return true;
 	}
 
-	return CMenuItemsHolder::Key( key, down );
+	return BaseClass::KeyDown( key );
+}
+
+bool CMenuBaseWindow::KeyUp( int key )
+{
+	if( key == K_MOUSE1 && bAllowDrag )
+		DragDrop( false );
+
+	return BaseClass::KeyUp( key );
 }
 
 void CMenuBaseWindow::Draw()

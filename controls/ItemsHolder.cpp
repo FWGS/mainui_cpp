@@ -28,26 +28,46 @@ CMenuItemsHolder::CMenuItemsHolder() :
 	;
 }
 
-const char *CMenuItemsHolder::Key( int key, int down )
+bool CMenuItemsHolder::Key( const int key, const bool down )
 {
-	const char *sound = uiSoundNull;
+	bool handled = false;
 
 	if( m_numItems )
 	{
-		CMenuBaseItem *item = ItemAtCursor();
+		CMenuBaseItem *item = NULL;
 		int cursorPrev;
+
+		if( down )
+		{
+			item = ItemAtCursor();
+			m_pItemAtCursorOnDown = item;
+		}
+		else
+		{
+			// don't send released event to item, which don't got pressed before!
+			if( m_pItemAtCursorOnDown && m_pItemAtCursorOnDown->m_pParent == this )
+				item = m_pItemAtCursorOnDown;
+			m_pItemAtCursorOnDown = NULL;
+		}
 
 		if( item && item->IsVisible() && !(item->iFlags & (QMF_GRAYED|QMF_INACTIVE) ) )
 		{
 			// mouse keys must be checked for item bounds
-			if( key < K_MOUSE1 || key > K_MOUSE5 ||
-				( uiStatic.cursorX >= item->m_scPos.x &&
-				uiStatic.cursorY >= item->m_scPos.y &&
-				uiStatic.cursorX <= item->m_scPos.x + item->m_scSize.w &&
-				uiStatic.cursorY <= item->m_scPos.y + item->m_scSize.h ) )
+
+			if( UI::Key::IsMouse( key ))
 			{
-				sound = item->Key( key, down );
-				if( sound ) return sound;
+				if( UI_CursorInRect( item->m_scPos, item->m_scSize ))
+				{
+					handled = down ? item->KeyDown( key ) : item->KeyUp( key );
+					if( handled )
+						return handled;
+				}
+			}
+			else
+			{
+				handled = down ? item->KeyDown( key ) : item->KeyUp( key );
+				if( handled )
+					return handled;
 			}
 		}
 
@@ -70,12 +90,12 @@ const char *CMenuItemsHolder::Key( int key, int down )
 			if( !item->IsVisible() )
 				continue;
 
-			item->Key( key, down );
+			down ? item->KeyDown( key ) : item->KeyUp( key );
 		}
 
 		// system keys are always wait for keys down and never keys up
 		if( !down )
-			return 0;
+			return false;
 
 		// default handling -- items navigation
 		switch( key )
@@ -92,8 +112,8 @@ const char *CMenuItemsHolder::Key( int key, int down )
 				if( cursorPrev != m_iCursor )
 				{
 					CursorMoved();
-					if( !( m_pItems[m_iCursor]->iFlags & QMF_SILENT ) )
-						sound = uiSoundMove;
+					m_pItems[m_iCursor]->PlayLocalSound( uiSoundMove );
+					handled = true;
 
 					m_pItems[m_iCursorPrev]->iFlags &= ~QMF_HASKEYBOARDFOCUS;
 					m_pItems[m_iCursor]->iFlags |= QMF_HASKEYBOARDFOCUS;
@@ -101,7 +121,7 @@ const char *CMenuItemsHolder::Key( int key, int down )
 			}
 			else
 			{
-				sound = NULL;
+				handled = false;
 			}
 			break;
 		case K_DOWNARROW:
@@ -116,8 +136,8 @@ const char *CMenuItemsHolder::Key( int key, int down )
 				if( cursorPrev != m_iCursor )
 				{
 					CursorMoved();
-					if( !(m_pItems[m_iCursor]->iFlags & QMF_SILENT ) )
-						sound = uiSoundMove;
+					m_pItems[m_iCursor]->PlayLocalSound( uiSoundMove );
+					handled = true;
 
 					m_pItems[m_iCursorPrev]->iFlags &= ~QMF_HASKEYBOARDFOCUS;
 					m_pItems[m_iCursor]->iFlags |= QMF_HASKEYBOARDFOCUS;
@@ -125,13 +145,23 @@ const char *CMenuItemsHolder::Key( int key, int down )
 			}
 			else
 			{
-				sound = NULL;
+				handled = false;
 			}
 			break;
 		}
 	}
 
-	return sound;
+	return handled;
+}
+
+bool CMenuItemsHolder::KeyDown( int key )
+{
+	return CMenuItemsHolder::Key( key, true );
+}
+
+bool CMenuItemsHolder::KeyUp( int key )
+{
+	return CMenuItemsHolder::Key( key, false );
 }
 
 void CMenuItemsHolder::Char( int ch )
@@ -167,11 +197,6 @@ void CMenuItemsHolder::Char( int ch )
 	}
 }
 
-const char *CMenuItemsHolder::Activate()
-{
-	return 0;
-}
-
 bool CMenuItemsHolder::MouseMove( int x, int y )
 {
 	int i;
@@ -180,6 +205,10 @@ bool CMenuItemsHolder::MouseMove( int x, int y )
 	for( i = m_numItems - 1; i >= 0; i-- )
 	{
 		CMenuBaseItem *item = m_pItems[i];
+
+		// just in case
+		if( !item )
+			continue;
 
 		// Invisible or inactive items will be skipped
 		if( !item->IsVisible() || item->iFlags & (QMF_INACTIVE) )
@@ -196,7 +225,6 @@ bool CMenuItemsHolder::MouseMove( int x, int y )
 		// simple region test
 		if( !UI_CursorInRect( item->m_scPos, item->m_scSize ) || !item->MouseMove( x, y ) )
 		{
-			item->m_bPressed = false;
 			item->iFlags &= ~QMF_HASMOUSEFOCUS;
 			continue;
 		}
@@ -208,8 +236,7 @@ bool CMenuItemsHolder::MouseMove( int x, int y )
 			if( m_iCursorPrev != -1 )
 				m_pItems[m_iCursorPrev]->iFlags &= ~(QMF_HASMOUSEFOCUS|QMF_HASKEYBOARDFOCUS);
 
-			if( !( m_pItems[m_iCursor]->iFlags & QMF_SILENT ) )
-				EngFuncs::PlayLocalSound( uiSoundMove );
+			m_pItems[m_iCursor]->PlayLocalSound( uiSoundMove );
 		}
 
 		m_pItems[m_iCursor]->iFlags |= QMF_HASMOUSEFOCUS;
@@ -222,7 +249,6 @@ bool CMenuItemsHolder::MouseMove( int x, int y )
 	if( !i )
 	{
 		m_pItems[m_iCursor]->iFlags &= ~QMF_HASMOUSEFOCUS;
-		m_pItems[m_iCursor]->m_bPressed = false;
 
 		// a mouse only item restores focus to the previous item
 		if( m_pItems[m_iCursor]->iFlags & QMF_MOUSEONLY )
@@ -465,6 +491,9 @@ void CMenuItemsHolder::CursorMoved()
 		item = m_pItems[m_iCursorPrev];
 
 		item->_Event( QM_LOSTFOCUS );
+
+		// unconditionally remove pressed state, because item without focus can't be pressed anymore
+		item->m_bPressed = false;
 	}
 
 	if( m_iCursor >= 0 && m_iCursor < m_numItems )
@@ -472,6 +501,9 @@ void CMenuItemsHolder::CursorMoved()
 		item = m_pItems[m_iCursor];
 
 		item->_Event( QM_GOTFOCUS );
+
+		if( item == m_pItemAtCursorOnDown )
+			item->m_bPressed = true; // restore pressed state
 	}
 }
 

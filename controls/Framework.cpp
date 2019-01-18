@@ -117,7 +117,7 @@ void CMenuFramework::VidInit()
 	BaseClass::VidInit();
 }
 
-CMenuPicButton * CMenuFramework::AddButton(const char *szName, const char *szStatus, EDefaultBtns buttonPicId, CEventCallback onActivated, int iFlags)
+CMenuPicButton * CMenuFramework::AddButton(const char *szName, const char *szStatus, EDefaultBtns buttonPicId, CEventCallback onReleased, int iFlags)
 {
 	if( m_iBtnsNum >= MAX_FRAMEWORK_PICBUTTONS )
 	{
@@ -130,7 +130,7 @@ CMenuPicButton * CMenuFramework::AddButton(const char *szName, const char *szSta
 	btn->SetNameAndStatus( szName, szStatus );
 	btn->SetPicture( buttonPicId );
 	btn->iFlags |= iFlags;
-	btn->onActivated = onActivated;
+	btn->onReleased = onReleased;
 	btn->SetCoord( 72, 230 + m_iBtnsNum * 50 );
 	AddItem( btn );
 
@@ -139,7 +139,7 @@ CMenuPicButton * CMenuFramework::AddButton(const char *szName, const char *szSta
 	return btn;
 }
 
-CMenuPicButton * CMenuFramework::AddButton(const char *szName, const char *szStatus, const char *szButtonPath, CEventCallback onActivated, int iFlags)
+CMenuPicButton * CMenuFramework::AddButton(const char *szName, const char *szStatus, const char *szButtonPath, CEventCallback onReleased, int iFlags)
 {
 	if( m_iBtnsNum >= MAX_FRAMEWORK_PICBUTTONS )
 	{
@@ -152,7 +152,7 @@ CMenuPicButton * CMenuFramework::AddButton(const char *szName, const char *szSta
 	btn->SetNameAndStatus( szName, szStatus );
 	btn->SetPicture( szButtonPath );
 	btn->iFlags |= iFlags;
-	btn->onActivated = onActivated;
+	btn->onReleased = onReleased;
 	btn->SetCoord( 72, 230 + m_iBtnsNum * 50 );
 	AddItem( btn );
 

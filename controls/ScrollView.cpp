@@ -27,57 +27,54 @@ void CMenuScrollView::VidInit()
 	m_iMax *= uiStatic.scaleX;
 }
 
-const char *CMenuScrollView::Key( int key, int down )
+bool CMenuScrollView::KeyDown( int key )
 {
 	// act when key is pressed or repeated
-	if( down )
+	if( !m_bDisableScrolling )
 	{
-		if( !m_bDisableScrolling )
+		int newPos = m_iPos;
+		switch( key )
 		{
-			int newPos = m_iPos;
-			switch( key )
+		case K_MWHEELUP:
+		case K_UPARROW:
+			newPos -= 20;
+			break;
+		case K_MWHEELDOWN:
+		case K_DOWNARROW:
+			newPos += 20;
+			break;
+
+		case K_PGUP:
+			newPos -= 100;
+			break;
+		case K_PGDN:
+			newPos += 100;
+			break;
+		case K_MOUSE1:
+			// m_bHoldingMouse1 = down != 0;
+			// m_HoldingPoint = Point( uiStatic.cursorX, uiStatic.cursorY );
+			// drag & drop
+			// scrollbar
+			break;
+		}
+		// TODO: overscrolling
+		newPos = bound( 0, newPos, m_iMax - m_scSize.h );
+
+		// recalc
+		if( newPos != m_iPos )
+		{
+			m_iPos = newPos;
+			for( int i = 0; i < m_numItems; i++ )
 			{
-			case K_MWHEELUP:
-			case K_UPARROW:
-				newPos -= 20;
-				break;
-			case K_MWHEELDOWN:
-			case K_DOWNARROW:
-				newPos += 20;
-				break;
+				CMenuBaseItem *pItem = m_pItems[i];
 
-			case K_PGUP:
-				newPos -= 100;
-				break;
-			case K_PGDN:
-				newPos += 100;
-				break;
-			case K_MOUSE1:
-				// m_bHoldingMouse1 = down != 0;
-				// m_HoldingPoint = Point( uiStatic.cursorX, uiStatic.cursorY );
-				// drag & drop
-				// scrollbar
-				break;
+				pItem->VidInit();
 			}
-			// TODO: overscrolling
-			newPos = bound( 0, newPos, m_iMax - m_scSize.h );
-
-			// recalc
-			if( newPos != m_iPos )
-			{
-				m_iPos = newPos;
-				for( int i = 0; i < m_numItems; i++ )
-				{
-					CMenuBaseItem *pItem = m_pItems[i];
-
-					pItem->VidInit();
-				}
-				CMenuItemsHolder::MouseMove( uiStatic.cursorX, uiStatic.cursorY );
-			}
+			CMenuItemsHolder::MouseMove( uiStatic.cursorX, uiStatic.cursorY );
 		}
 	}
 
-	return CMenuItemsHolder::Key( key, down );
+	return CMenuItemsHolder::KeyDown( key );
 }
 
 Point CMenuScrollView::GetPositionOffset() const

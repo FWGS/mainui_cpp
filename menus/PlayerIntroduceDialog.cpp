@@ -35,7 +35,7 @@ public:
 
 	void WriteOrDiscard();
 	void _Init() override;
-	const char *Key( int key, int down ) override;
+	bool KeyDown( int key ) override;
 
 	CMenuBaseWindow *pCaller;
 
@@ -57,19 +57,19 @@ void CMenuPlayerIntroduceDialog::WriteOrDiscard()
 	}
 }
 
-const char *CMenuPlayerIntroduceDialog::Key( int key, int down )
+bool CMenuPlayerIntroduceDialog::KeyDown( int key )
 {
-	if( down && UI::Key::IsEscape( key ) )
+	if( UI::Key::IsEscape( key ) )
 	{
-		return uiSoundNull; // handled
+		return true; // handled
 	}
 
-	if( down && UI::Key::IsEnter( key ) && ItemAtCursor() == &name )
+	if( UI::Key::IsEnter( key ) && ItemAtCursor() == &name )
 	{
 		WriteOrDiscard();
 	}
 
-	return CMenuYesNoMessageBox::Key( key, down );
+	return CMenuYesNoMessageBox::KeyDown( key );
 }
 
 void CMenuPlayerIntroduceDialog::_Init()

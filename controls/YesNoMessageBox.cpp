@@ -40,10 +40,10 @@ CMenuYesNoMessageBox::CMenuYesNoMessageBox( bool alert ) : BaseClass( "YesNoMess
 	}
 	no.SetRect( 338, 204, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
 
-	yes.onActivated.pExtra = no.onActivated.pExtra = this;
+	yes.onReleased.pExtra = no.onReleased.pExtra = this;
 	yes.bEnableTransitions = no.bEnableTransitions = false;
 
-	SET_EVENT_MULTI( yes.onActivated,
+	SET_EVENT_MULTI( yes.onReleased,
 	{
 		CMenuYesNoMessageBox *msgBox = (CMenuYesNoMessageBox*)pExtra;
 
@@ -52,7 +52,7 @@ CMenuYesNoMessageBox::CMenuYesNoMessageBox( bool alert ) : BaseClass( "YesNoMess
 
 	});
 
-	SET_EVENT_MULTI( no.onActivated,
+	SET_EVENT_MULTI( no.onReleased,
 	{
 		CMenuYesNoMessageBox *msgBox = (CMenuYesNoMessageBox*)pExtra;
 
@@ -130,19 +130,17 @@ void CMenuYesNoMessageBox::Draw( void )
 CMenuYesNoMessageBox::Key
 ==============
 */
-const char *CMenuYesNoMessageBox::Key(int key, int down)
+bool CMenuYesNoMessageBox::KeyDown( int key )
 {
-	if( UI::Key::IsEscape( key ) && down )
+	if( UI::Key::IsEscape( key ) )
 	{
 		Hide();
 		onNegative( this );
 
-		return uiSoundNull;
+		return true;
 	}
-	else
-	{
-		return CMenuBaseWindow::Key( key, down );
-	}
+
+	return BaseClass::KeyDown( key );
 }
 
 /*

@@ -43,11 +43,6 @@ void CMenuTabView::VidInit()
 	m_szTab.h = m_scChSize * 1.5f;
 }
 
-const char *CMenuTabView::Key(int key, int down)
-{
-	return CMenuItemsHolder::Key( key, down );
-}
-
 void CMenuTabView::DrawTab(Point pt, const char *name, bool isEnd, bool isSelected, bool isHighlighted)
 {
 	uint textColor = uiInputTextColor;

@@ -80,7 +80,7 @@ public:
 
 	void _Init();
 	void _VidInit();
-	const char *Key( int key, int down );
+	bool KeyDown( int key );
 	void EnterGrabMode( void );
 	void UnbindEntry( void );
 	static void GetKeyBindings( const char *command, int *twoKeys );
@@ -299,18 +299,19 @@ void CMenuControls::ResetKeysList( void )
 UI_Controls_KeyFunc
 =================
 */
-const char *CMenuControls::Key( int key, int down )
+bool CMenuControls::KeyDown( int key )
 {
 	char	cmd[128];
 
 	if( msgBox1.IsVisible() && bind_grab ) // assume we are in grab-mode
 	{
 		// defining a key
-		if( key == '`' || key == '~' )
+		if( key == '`' || key == '~' || key == K_ESCAPE )
 		{
-			return uiSoundBuzz;
+			PlayLocalSound( uiSoundBuzz );
+			return true;
 		}
-		else if( key != K_ESCAPE )
+		else
 		{
 			const char *bindName = keysListModel.keysBind[keysList.GetCurrentIndex()];
 			sprintf( cmd, "bind \"%s\" \"%s\"\n", EngFuncs::KeynumToString( key ), bindName );
@@ -322,24 +323,25 @@ const char *CMenuControls::Key( int key, int down )
 
 		PromptDialog();
 
-		return uiSoundLaunch;
+		PlayLocalSound( uiSoundLaunch );
+		return true;
 	}
 	
-	return CMenuFramework::Key( key, down );
+	return CMenuFramework::KeyDown( key );
 }
 
 void CMenuControls::UnbindEntry()
 {
 	if( !keysListModel.IsLineUsable( keysList.GetCurrentIndex() ) )
 	{
-		EngFuncs::PlayLocalSound( uiSoundBuzz );
+		PlayLocalSound( uiSoundBuzz );
 		return; // not a key
 	}
 
 	const char *bindName = keysListModel.keysBind[keysList.GetCurrentIndex()];
 
 	UnbindCommand( bindName );
-	EngFuncs::PlayLocalSound( uiSoundRemoveKey );
+	PlayLocalSound( uiSoundRemoveKey );
 	keysListModel.Update();
 
 	PromptDialog();
@@ -349,7 +351,7 @@ void CMenuControls::EnterGrabMode()
 {
 	if( !keysListModel.IsLineUsable( keysList.GetCurrentIndex() ) )
 	{
-		EngFuncs::PlayLocalSound( uiSoundBuzz );
+		PlayLocalSound( uiSoundBuzz );
 		return;
 	}
 
@@ -366,7 +368,7 @@ void CMenuControls::EnterGrabMode()
 
 	PromptDialog();
 
-	EngFuncs::PlayLocalSound( uiSoundKey );
+	PlayLocalSound( uiSoundKey );
 }
 
 /*

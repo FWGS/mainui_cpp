@@ -42,8 +42,9 @@ public:
 	virtual void Reload( void );
 
 	// Key is called every key press
-	// Must return sound name, or NULL
-	virtual const char *Key( int key, int down );
+	// returns true if handled or false if ignored
+	virtual bool KeyUp( int key );
+	virtual bool KeyDown( int key );
 
 	// Draw is called every frame
 	virtual void Draw( void );
@@ -54,9 +55,6 @@ public:
 	// Called every mouse movement got from engine.
 	// Should return true, if
 	virtual bool MouseMove( int x, int y ) { return true; }
-
-	// Called when UI is shown, for example, in pause during play
-	virtual const char *Activate( void );
 
 	// Toggle inactivity of item
 	virtual void ToggleInactive( void )
@@ -121,15 +119,24 @@ public:
 	// Calculate scale size(item size, char size)
 	void CalcSizes( void );
 
+	// Play sound
+	void PlayLocalSound( const char *name )
+	{
+		if( iFlags & QMF_SILENT )
+			return;
+
+		EngFuncs::PlayLocalSound( name );
+	}
+
 
 	CEventCallback onGotFocus;
 	CEventCallback onLostFocus;
-	CEventCallback onActivated;
+	CEventCallback onReleased;
 	CEventCallback onChanged;
 	CEventCallback onPressed;
 
 	// called when CL_IsActive returns true, otherwise onActivate
-	CEventCallback onActivatedClActive;
+	CEventCallback onReleasedClActive;
 
 	inline void SetCoord( int x, int y )                { pos.x = x; pos.y = y; }
 	inline void SetSize( int w, int h )                 { size.w = w; size.h = h; }

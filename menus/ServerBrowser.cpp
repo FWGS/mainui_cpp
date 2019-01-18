@@ -414,10 +414,10 @@ void CMenuServerBrowser::_Init( void )
 
 	joinGame = AddButton( L( "Join game" ), L( "Join to selected game" ), PC_JOIN_GAME,
 		VoidCb( &CMenuServerBrowser::JoinGame ), QMF_GRAYED );
-	joinGame->onActivatedClActive = msgBox.MakeOpenEvent();
+	joinGame->onReleasedClActive = msgBox.MakeOpenEvent();
 
 	createGame = AddButton( L( "GameUI_GameMenu_CreateServer" ), NULL, PC_CREATE_GAME );
-	SET_EVENT_MULTI( createGame->onActivated,
+	SET_EVENT_MULTI( createGame->onReleased,
 	{
 		if( ((CMenuServerBrowser*)pSelf->Parent())->m_bLanOnly )
 			EngFuncs::CvarSetValue( "public", 0.0f );

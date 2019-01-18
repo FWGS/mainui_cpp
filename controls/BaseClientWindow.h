@@ -24,7 +24,7 @@ public:
 	typedef CMenuBaseWindow BaseClass;
 	CMenuBaseClientWindow( const char *name = "BaseClientWindow" );
 
-	const char *Key( int key, int down ) override;
+	bool KeyDown( int key ) override;
 };
 
 #endif // BASECLIENTWINDOW_H

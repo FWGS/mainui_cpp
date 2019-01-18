@@ -421,7 +421,7 @@ void CMenuPlayerSetup::_Init( void )
 
 	AddButton( L( "Done" ), L( "Go back to the Multiplayer Menu" ), PC_DONE, VoidCb( &CMenuPlayerSetup::SaveAndPopMenu ) );
 	CMenuPicButton *gameOpt = AddButton( L( "Game options" ), L( "Configure handness, fov and other advanced options" ), PC_GAME_OPTIONS );
-	SET_EVENT_MULTI( gameOpt->onActivated,
+	SET_EVENT_MULTI( gameOpt->onReleased,
 	{
 		((CMenuPlayerSetup*)pSelf->Parent())->SetConfig();
 		UI_AdvUserOptions_Menu();

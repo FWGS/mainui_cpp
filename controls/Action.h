@@ -27,7 +27,8 @@ public:
 	CMenuAction();
 
 	void VidInit( void ) override;
-	const char * Key( int key, int down ) override;
+	bool KeyUp( int key ) override;
+	bool KeyDown( int key ) override;
 	void Draw( void ) override;
 
 	void SetBackground( const char *path, unsigned int color = uiColorWhite );

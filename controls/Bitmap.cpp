@@ -42,57 +42,37 @@ void CMenuBitmap::VidInit( )
 		szFocusPic = szPic;
 }
 
-/*
-=================
-CMenuBitmap::Key
-=================
-*/
-const char *CMenuBitmap::Key( int key, int down )
+bool CMenuBitmap::KeyUp( int key )
 {
-	const char	*sound = 0;
+	const char *sound = 0;
 
-	switch( key )
-	{
-	case K_MOUSE1:
-		if(!( iFlags & QMF_HASMOUSEFOCUS ))
-			break;
+	if( UI::Key::IsEnter( key ) && !(iFlags & QMF_MOUSEONLY) )
 		sound = uiSoundLaunch;
-		break;
-	case K_ENTER:
-	case K_KP_ENTER:
-	case K_AUX1:
-		//if( !down ) return sound;
-		if( iFlags & QMF_MOUSEONLY )
-			break;
+	else if( UI::Key::IsLeftMouse( key ) && ( iFlags & QMF_HASMOUSEFOCUS ) )
 		sound = uiSoundLaunch;
-		break;
-	}
 
-	if( sound && ( iFlags & QMF_SILENT ))
-		sound = uiSoundNull;
-
-	if( iFlags & QMF_ACT_ONRELEASE )
+	if( sound )
 	{
-		if( sound )
-		{
-			int	event;
-
-			if( down )
-			{
-				event = QM_PRESSED;
-				m_bPressed = true;
-			}
-			else event = QM_ACTIVATED;
-			_Event( event );
-		}
-	}
-	else if( down )
-	{
-		if( sound )
-			_Event( QM_ACTIVATED );
+		_Event( QM_PRESSED );
+		PlayLocalSound( sound );
 	}
 
-	return sound;
+	return sound != NULL;
+}
+
+bool CMenuBitmap::KeyDown( int key )
+{
+	bool handled = false;
+
+	if( UI::Key::IsEnter( key ) && !(iFlags & QMF_MOUSEONLY) )
+		handled = true;
+	else if( UI::Key::IsLeftMouse( key ) && ( iFlags & QMF_HASMOUSEFOCUS ) )
+		handled = true;
+
+	if( handled )
+		_Event( QM_PRESSED );
+
+	return handled;
 }
 
 /*

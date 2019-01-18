@@ -40,8 +40,7 @@ class CMenuMain: public CMenuFramework
 public:
 	CMenuMain() : CMenuFramework( "CMenuMain" ) { }
 
-	const char *Key( int key, int down ) override;
-	const char *Activate( ) override;
+	bool KeyDown( int key ) override;
 
 private:
 	void _Init() override;
@@ -135,9 +134,9 @@ void CMenuMain::HazardCourseDialogCb()
 CMenuMain::Key
 =================
 */
-const char *CMenuMain::Key( int key, int down )
+bool CMenuMain::KeyDown( int key )
 {
-	if( down && UI::Key::IsEscape( key ) )
+	if( UI::Key::IsEscape( key ) )
 	{
 		if ( CL_IsActive( ))
 		{
@@ -148,37 +147,9 @@ const char *CMenuMain::Key( int key, int down )
 		{
 			QuitDialog( );
 		}
-		return uiSoundNull;
+		return true;
 	}
-	return CMenuFramework::Key( key, down );
-}
-
-/*
-=================
-UI_Main_ActivateFunc
-=================
-*/
-const char *CMenuMain::Activate( void )
-{
-	if ( CL_IsActive( ))
-	{
-		resumeGame.Show();
-		disconnect.Show();
-	}
-	else
-	{
-		resumeGame.Hide();
-		disconnect.Hide();
-	}
-
-	if( EngFuncs::GetCvarFloat("developer") )
-	{
-		console.pos.y = CL_IsActive() ? 130 : 230;
-	}
-
-	CMenuPicButton::ClearButtonStack();
-
-	return 0;
+	return CMenuFramework::KeyDown( key );
 }
 
 /*
@@ -217,7 +188,7 @@ void CMenuMain::_Init( void )
 	console.SetNameAndStatus( L( "GameUI_Console" ), L( "Show console" ) );
 	console.iFlags |= QMF_NOTIFY;
 	console.SetPicture( PC_CONSOLE );
-	SET_EVENT_MULTI( console.onActivated,
+	SET_EVENT_MULTI( console.onReleased,
 	{
 		UI_SetActiveMenu( FALSE );
 		EngFuncs::KEY_SetDest( KEY_CONSOLE );
@@ -226,62 +197,62 @@ void CMenuMain::_Init( void )
 	resumeGame.SetNameAndStatus( L( "GameUI_GameMenu_ResumeGame" ), L( "StringsList_188" ) );
 	resumeGame.SetPicture( PC_RESUME_GAME );
 	resumeGame.iFlags |= QMF_NOTIFY;
-	resumeGame.onActivated = UI_CloseMenu;
+	resumeGame.onReleased = UI_CloseMenu;
 
 	disconnect.SetNameAndStatus( L( "GameUI_GameMenu_Disconnect" ), L( "Disconnect from server" ) );
 	disconnect.SetPicture( PC_DISCONNECT );
 	disconnect.iFlags |= QMF_NOTIFY;
-	disconnect.onActivated = VoidCb( &CMenuMain::DisconnectDialogCb );
+	disconnect.onReleased = VoidCb( &CMenuMain::DisconnectDialogCb );
 
 	newGame.SetNameAndStatus( L( "GameUI_NewGame" ), L( "StringsList_189" ) );
 	newGame.SetPicture( PC_NEW_GAME );
 	newGame.iFlags |= QMF_NOTIFY;
-	newGame.onActivated = UI_NewGame_Menu;
+	newGame.onReleased = UI_NewGame_Menu;
 
 	hazardCourse.SetNameAndStatus( L( "GameUI_TrainingRoom" ), L( "StringsList_190" ) );
 	hazardCourse.SetPicture( PC_HAZARD_COURSE );
 	hazardCourse.iFlags |= QMF_NOTIFY;
-	hazardCourse.onActivatedClActive = VoidCb( &CMenuMain::HazardCourseDialogCb );
-	hazardCourse.onActivated = VoidCb( &CMenuMain::HazardCourseCb );
+	hazardCourse.onReleasedClActive = VoidCb( &CMenuMain::HazardCourseDialogCb );
+	hazardCourse.onReleased = VoidCb( &CMenuMain::HazardCourseCb );
 
 	multiPlayer.SetNameAndStatus( L( "GameUI_Multiplayer" ), L( "StringsList_198" ) );
 	multiPlayer.SetPicture( PC_MULTIPLAYER );
 	multiPlayer.iFlags |= QMF_NOTIFY;
-	multiPlayer.onActivated = UI_MultiPlayer_Menu;
+	multiPlayer.onReleased = UI_MultiPlayer_Menu;
 
 	configuration.SetNameAndStatus( L( "GameUI_Options" ), L( "StringsList_193" ) );
 	configuration.SetPicture( PC_CONFIG );
 	configuration.iFlags |= QMF_NOTIFY;
-	configuration.onActivated = UI_Options_Menu;
+	configuration.onReleased = UI_Options_Menu;
 
 	saveRestore.iFlags |= QMF_NOTIFY;
-	saveRestore.onActivatedClActive = UI_SaveLoad_Menu;
-	saveRestore.onActivated = UI_LoadGame_Menu;
+	saveRestore.onReleasedClActive = UI_SaveLoad_Menu;
+	saveRestore.onReleased = UI_LoadGame_Menu;
 
 	customGame.SetNameAndStatus( L( "GameUI_ChangeGame" ), L( "StringsList_530" ) );
 	customGame.SetPicture( PC_CUSTOM_GAME );
 	customGame.iFlags |= QMF_NOTIFY;
-	customGame.onActivated = UI_CustomGame_Menu;
+	customGame.onReleased = UI_CustomGame_Menu;
 
 	previews.SetNameAndStatus( L( "Previews" ), L( "StringsList_400" ) );
 	previews.SetPicture( PC_PREVIEWS );
 	previews.iFlags |= QMF_NOTIFY;
-	SET_EVENT( previews.onActivated, EngFuncs::ShellExecute( MenuStrings[ IDS_MEDIA_PREVIEWURL ], NULL, false ) );
+	SET_EVENT( previews.onReleased, EngFuncs::ShellExecute( MenuStrings[ IDS_MEDIA_PREVIEWURL ], NULL, false ) );
 
 	quit.SetNameAndStatus( L( "GameUI_GameMenu_Quit" ), L( "StringsList_236" ) );
 	quit.SetPicture( PC_QUIT );
 	quit.iFlags |= QMF_NOTIFY;
-	quit.onActivated = MenuCb( &CMenuMain::QuitDialog );
+	quit.onReleased = MenuCb( &CMenuMain::QuitDialog );
 
 	quitButton.SetPicture( ART_CLOSEBTN_N, ART_CLOSEBTN_F, ART_CLOSEBTN_D );
-	quitButton.iFlags = QMF_MOUSEONLY|QMF_ACT_ONRELEASE;
+	quitButton.iFlags = QMF_MOUSEONLY;
 	quitButton.eFocusAnimation = QM_HIGHLIGHTIFFOCUS;
-	quitButton.onActivated = MenuCb( &CMenuMain::QuitDialog );
+	quitButton.onReleased = MenuCb( &CMenuMain::QuitDialog );
 
 	minimizeBtn.SetPicture( ART_MINIMIZE_N, ART_MINIMIZE_F, ART_MINIMIZE_D );
-	minimizeBtn.iFlags = QMF_MOUSEONLY|QMF_ACT_ONRELEASE;
+	minimizeBtn.iFlags = QMF_MOUSEONLY;
 	minimizeBtn.eFocusAnimation = QM_HIGHLIGHTIFFOCUS;
-	minimizeBtn.onActivated.SetCommand( FALSE, "minimize\n" );
+	minimizeBtn.onReleased.SetCommand( FALSE, "minimize\n" );
 
 	if ( gMenu.m_gameinfo.gamemode == GAME_MULTIPLAYER_ONLY || gMenu.m_gameinfo.startmap[0] == 0 )
 		newGame.SetGrayed( true );
@@ -338,7 +309,23 @@ UI_Main_Init
 */
 void CMenuMain::_VidInit( void )
 {
-	Activate();
+	if ( CL_IsActive( ))
+	{
+		resumeGame.Show();
+		disconnect.Show();
+	}
+	else
+	{
+		resumeGame.Hide();
+		disconnect.Hide();
+	}
+
+	if( gpGlobals->developer )
+	{
+		console.pos.y = CL_IsActive() ? 130 : 230;
+	}
+
+	CMenuPicButton::ClearButtonStack();
 
 	console.pos.x = 72;
 	resumeGame.SetCoord( 72, 230 );

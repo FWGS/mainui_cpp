@@ -30,7 +30,7 @@ public:
 	CMenuField();
 	void Init( void ) override;
 	void VidInit( void ) override;
-	const char * Key( int key, int down ) override;
+	bool KeyDown( int key ) override;
 	void Draw( void ) override;
 	void Char( int key ) override;
 	void UpdateEditable() override;

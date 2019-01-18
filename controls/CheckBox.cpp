@@ -30,7 +30,8 @@ CMenuCheckBox::CMenuCheckBox() : BaseClass()
 		UI_CHECKBOX_GRAYED );
 	bChecked = false;
 	eFocusAnimation = QM_HIGHLIGHTIFFOCUS;
-	iFlags |= QMF_ACT_ONRELEASE|QMF_DROPSHADOW;
+	iFlags |= QMF_DROPSHADOW;
+	bChangeOnPressed = false;
 	colorBase = uiColorWhite;
 	colorFocus = uiColorWhite;
 	iMask = 0;
@@ -53,12 +54,7 @@ void CMenuCheckBox::VidInit( void )
 	m_scTextSize.h = m_scChSize;
 }
 
-/*
-=================
-CMenuCheckBox::Key
-=================
-*/
-const char *CMenuCheckBox::Key( int key, int down )
+bool CMenuCheckBox::KeyUp( int key )
 {
 	const char	*sound = 0;
 
@@ -79,42 +75,57 @@ const char *CMenuCheckBox::Key( int key, int down )
 		break;
 	}
 
-	if( iFlags & QMF_ACT_ONRELEASE )
+	if( sound )
 	{
-		if( sound )
+		_Event( QM_RELEASED );
+		if( !bChangeOnPressed )
 		{
-			int	event;
-
-			if( down )
-			{
-				event = QM_PRESSED;
-				m_bPressed = true;
-			}
-			else
-			{
-				m_bPressed = false;
-				event = QM_CHANGED;
-				bChecked = !bChecked;	// apply on release
-				SetCvarValue( bChecked );
-
-			}
-			_Event( event );
-		}
-	}
-	else if( down )
-	{
-		if( sound )
-		{
-			bChecked = !bChecked;
+			bChecked = !bChecked;	// apply on release
 			SetCvarValue( bChecked );
 			_Event( QM_CHANGED );
+			PlayLocalSound( sound ); // emit sound only when changed
 		}
 	}
 
-	if( iFlags & QMF_SILENT )
-		return 0;
-	return sound;
+	return sound != NULL;
 }
+
+bool CMenuCheckBox::KeyDown( int key )
+{
+	const char	*sound = 0;
+
+	switch( key )
+	{
+	case K_MOUSE1:
+		if(!( iFlags & QMF_HASMOUSEFOCUS ))
+			break;
+		sound = uiSoundGlow;
+		break;
+	case K_ENTER:
+	case K_KP_ENTER:
+	case K_AUX1:
+		//if( !down ) return sound;
+		if( iFlags & QMF_MOUSEONLY )
+			break;
+		sound = uiSoundGlow;
+		break;
+	}
+
+	if( sound )
+	{
+		_Event( QM_PRESSED );
+		if( bChangeOnPressed )
+		{
+			bChecked = !bChecked;	// apply on release
+			SetCvarValue( bChecked );
+			_Event( QM_CHANGED );
+			PlayLocalSound( sound ); // emit sound only when changed
+		}
+	}
+
+	return sound != NULL;
+}
+
 
 /*
 =================

@@ -156,7 +156,7 @@ void CMenuVidOptions::_Init( void )
 	done.SetNameAndStatus( L( "GameUI_OK" ), L( "Go back to the Video Menu" ) );
 	done.SetCoord( 72, 435 );
 	done.SetPicture( PC_DONE );
-	done.onActivated = VoidCb( &CMenuVidOptions::SaveAndPopMenu );
+	done.onReleased = VoidCb( &CMenuVidOptions::SaveAndPopMenu );
 
 	screenSize.SetNameAndStatus( L( "Screen size" ), L( "Set the screen size" ) );
 	screenSize.SetCoord( 72, 280 );

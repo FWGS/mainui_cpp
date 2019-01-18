@@ -24,7 +24,6 @@ public:
 	CMenuTabView();
 
 	void VidInit() override;
-	const char *Key( int key, int down ) override;
 	void Draw() override;
 	Point GetPositionOffset() const override;
 

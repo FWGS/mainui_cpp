@@ -32,7 +32,7 @@ CMenuPicButton::CMenuPicButton() : BaseClass()
 {
 	bEnableTransitions = true;
 	eFocusAnimation = QM_HIGHLIGHTIFFOCUS;
-	iFlags = QMF_DROPSHADOW|QMF_ACT_ONRELEASE;
+	iFlags = QMF_DROPSHADOW;
 
 	iFocusStartTime = 0;
 
@@ -59,61 +59,43 @@ CMenuPicButton::CMenuPicButton() : BaseClass()
 CMenuPicButton::Key
 =================
 */
-const char *CMenuPicButton::Key( int key, int down )
+bool CMenuPicButton::KeyUp( int key )
 {
-	const char	*sound = 0;
+	const char *sound = 0;
 
-	switch( key )
-	{
-	case K_MOUSE1:
-		if(!( iFlags & QMF_HASMOUSEFOCUS ))
-			break;
+	if( UI::Key::IsEnter( key ) && !(iFlags & QMF_MOUSEONLY) )
 		sound = uiSoundLaunch;
-		break;
-	case K_ENTER:
-	case K_KP_ENTER:
-	case K_AUX1:
-		if( iFlags & QMF_MOUSEONLY )
-			break;
+	else if( UI::Key::IsLeftMouse( key ) && ( iFlags & QMF_HASMOUSEFOCUS ) )
 		sound = uiSoundLaunch;
-	}
-	if( sound && ( iFlags & QMF_SILENT ))
-		sound = uiSoundNull;
 
 	if( sound )
 	{
-		if( iFlags & QMF_ACT_ONRELEASE )
-		{
-			int event;
-			if( down )
-			{
-				event = QM_PRESSED;
-				m_bPressed = true;
-			}
-			else
-			{
-				temp = this;
-				event = QM_ACTIVATED;
-			}
-
-			_Event( event );
+		temp = this;
+		_Event( QM_RELEASED );
 #if !defined(TA_ALT_MODE2)
-			if( event == QM_ACTIVATED )
-				SetTransPicForLast( hPic );
+		SetTransPicForLast( hPic );
 #endif
-		}
-		else if( down )
-		{
-			temp = this;
-			_Event( QM_ACTIVATED );
-#if !defined(TA_ALT_MODE2)
-			SetTransPicForLast( hPic );
-#endif
-		}
+		PlayLocalSound( sound );
 	}
 
-	return sound;
+	return sound != NULL;
 }
+
+bool CMenuPicButton::KeyDown( int key )
+{
+	bool handled = false;
+
+	if( UI::Key::IsEnter( key ) && !(iFlags & QMF_MOUSEONLY) )
+		handled = true;
+	else if( UI::Key::IsLeftMouse( key ) && ( iFlags & QMF_HASMOUSEFOCUS ) )
+		handled = true;
+
+	if( handled )
+		_Event( QM_PRESSED );
+
+	return handled;
+}
+
 
 // #define ALT_PICBUTTON_FOCUS_ANIM
 
@@ -150,7 +132,7 @@ void CMenuPicButton::Draw( )
 	{
 		if( !bRollOver )
 		{
-			EngFuncs::PlayLocalSound( uiSoundRollOver );
+			PlayLocalSound( uiSoundRollOver );
 			bRollOver = true;
 		}
 	}
@@ -167,9 +149,8 @@ void CMenuPicButton::Draw( )
 	}
 
 	// make sure what cursor in rect
-	if( m_bPressed && g_bCursorDown )
+	if( m_bPressed )
 		state = BUTTON_PRESSED;
-	else m_bPressed = false;
 
 	if( iOldState == BUTTON_NOFOCUS && state != BUTTON_NOFOCUS )
 		iFocusStartTime = uiStatic.realTime;

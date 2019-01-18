@@ -85,7 +85,9 @@ public:
 	bool IsActive( void ) { return menuDepth > 0; }
 	void VidInit( bool firstTime );
 	void Update( void );
-	void KeyEvent( int key, int down );
+	void KeyEvent( int key, bool down );
+	void KeyUpEvent( int key );
+	void KeyDownEvent( int key );
 	void CharEvent( int ch );
 	void MouseEvent( int x, int y );
 

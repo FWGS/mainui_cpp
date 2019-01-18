@@ -34,7 +34,7 @@ public:
 	void Hide();
 	void Draw();
 	bool DrawAnimation(EAnimation anim);
-	const char *Key(int key, int down);
+	bool KeyDown( int key ) override;
 private:
 	float saveTouchEnable;
 };
@@ -85,14 +85,15 @@ void CMenuTouchEdit::Draw( void )
 UI_TouchEdit_KeyFunc
 =================
 */
-const char *CMenuTouchEdit::Key( int key, int down )
+bool CMenuTouchEdit::KeyDown( int key )
 {
-	if( down && UI::Key::IsEscape( key ) )
+	if( UI::Key::IsEscape( key ) )
 	{
 		Hide();
-		return uiSoundOut;
+		PlayLocalSound( uiSoundOut );
+		return true;
 	}
-	return uiSoundNull;
+	return false;
 }
 
 /*

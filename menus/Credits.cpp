@@ -39,7 +39,8 @@ public:
 	~CMenuCredits() override;
 
 	void Draw() override;
-	const char *Key(int key, int down) override;
+	bool KeyUp( int key ) override;
+	bool KeyDown( int key ) override;
 	bool DrawAnimation(EAnimation anim) override { return false; }
 	void Show() override;
 
@@ -122,21 +123,24 @@ void CMenuCredits::Draw( void )
 		Hide();
 }
 
+bool CMenuCredits::KeyUp( int key )
+{
+	return true;
+}
+
 /*
 =================
 CMenuCredits::Key
 =================
 */
-const char *CMenuCredits::Key( int key, int down )
+bool CMenuCredits::KeyDown( int key )
 {
-	if( !down ) return uiSoundNull;
-
 	// final credits can't be intterupted
 	if( uiCredits.finalCredits )
-		return uiSoundNull;
+		return true;
 
 	uiCredits.active = false;
-	return uiSoundNull;
+	return true;
 }
 
 /*

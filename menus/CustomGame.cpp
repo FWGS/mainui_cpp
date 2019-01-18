@@ -89,10 +89,10 @@ void CMenuCustomGame::UpdateExtras( )
 {
 	int i = modList.GetCurrentIndex();
 
-	load->onActivated.pExtra = modListModel.modsDir[i];
+	load->onReleased.pExtra = modListModel.modsDir[i];
 	load->SetGrayed( !stricmp( modListModel.modsDir[i], gMenu.m_gameinfo.gamefolder ) );
 
-	go2url->onActivated.pExtra = modListModel.modsWebSites[i];
+	go2url->onReleased.pExtra = modListModel.modsWebSites[i];
 	go2url->SetGrayed( modListModel.modsWebSites[i][0] == 0 );
 
 	msgBox.onPositive.pExtra = modListModel.modsDir[i];
@@ -149,7 +149,7 @@ void CMenuCustomGame::_Init( void )
 	AddItem( banner );
 	load = AddButton( L( "Activate" ), L( "Activate selected custom game" ), PC_ACTIVATE,
 		MenuCb( &CMenuCustomGame::ChangeGame ) );
-	load->onActivatedClActive = msgBox.MakeOpenEvent();
+	load->onReleasedClActive = msgBox.MakeOpenEvent();
 
 	go2url = AddButton( L( "Visit web site" ), L( "Visit the web site of game developers" ), PC_VISIT_WEB_SITE,
 		MenuCb( &CMenuCustomGame::Go2Site ) );

@@ -173,22 +173,16 @@ void CMenuTable::SetCurrentIndex( int idx )
 	}
 }
 
-const char *CMenuTable::Key( int key, int down )
+bool CMenuTable::KeyUp( int key )
 {
 	const char *sound = 0;
 	int i;
 	bool noscroll = false;
-
-	if( !down )
-	{
-		iScrollBarSliding = false;
-		return uiSoundNull;
-	}
+	iScrollBarSliding = false;
 
 	switch( key )
 	{
 	case K_MOUSE1:
-	{
 		noscroll = true; // don't scroll to current when mouse used
 
 		if( !( iFlags & QMF_HASMOUSEFOCUS ) )
@@ -262,19 +256,72 @@ const char *CMenuTable::Key( int key, int down )
 				}
 			}
 		}
+	case K_ENTER:
+	case K_AUX1:
+	case K_AUX31:
+	case K_AUX32:
+		m_pModel->OnActivateEntry( iCurItem ); // activate only on release
+		break;
+	}
+
+	if( !noscroll )
+	{
+		if( iCurItem < iTopItem )
+			iTopItem = iCurItem;
+		if( iCurItem > iTopItem + iNumRows - 1 )
+			iTopItem = iCurItem - iNumRows + 1;
+		if( iTopItem > m_pModel->GetRows() - iNumRows )
+			iTopItem = m_pModel->GetRows() - iNumRows;
+		if( iTopItem < 0 )
+			iTopItem = 0;
+	}
+
+	if( sound )
+	{
+		if( sound != uiSoundBuzz )
+			_Event( QM_CHANGED );
+
+		PlayLocalSound( sound );
+	}
+
+	return sound != NULL;
+}
+
+bool CMenuTable::KeyDown( int key )
+{
+	const char *sound = 0;
+	int i;
+	bool noscroll = false;
+
+	switch( key )
+	{
+	case K_MOUSE1:
+	{
+		noscroll = true; // don't scroll to current when mouse used
+
+		if( !( iFlags & QMF_HASMOUSEFOCUS ) )
+			break;
+
+		// test for arrows
+		if( UI_CursorInRect( upArrow, arrow ) )
+		{
+		}
+		else if( UI_CursorInRect( downArrow, arrow ))
+		{
+		}
+		else if( UI_CursorInRect( boxPos, boxSize ))
+		{
+		}
+		else if( bAllowSorting && UI_CursorInRect( m_scPos, headerSize ))
+		{
+		}
 		else
 		{
 			// ADAMIX
-			if( UI_CursorInRect(
-					upArrow.x,
-					upArrow.y + arrow.h,
-					arrow.w,
-					sbarPos.y - upArrow.y - arrow.h ) ||
-				UI_CursorInRect(
-					upArrow.x,
-					sbarPos.y + sbarSize.h,
-					arrow.w,
-					downArrow.y - sbarPos.y - sbarSize.h ))
+			if( UI_CursorInRect( upArrow.x, upArrow.y + arrow.h,
+					arrow.w, sbarPos.y - upArrow.y - arrow.h ) ||
+				UI_CursorInRect( upArrow.x, sbarPos.y + sbarSize.h,
+					arrow.w, downArrow.y - sbarPos.y - sbarSize.h ))
 			{
 				iScrollBarSliding = true;
 			}
@@ -321,13 +368,7 @@ const char *CMenuTable::Key( int key, int down )
 	case K_BACKSPACE:
 	case K_DEL:
 	case K_AUX30:
-		m_pModel->OnDeleteEntry( iCurItem );
-		break;
-	case K_ENTER:
-	case K_AUX1:
-	case K_AUX31:
-	case K_AUX32:
-		m_pModel->OnActivateEntry( iCurItem );
+		m_pModel->OnDeleteEntry( iCurItem ); // allow removing entries on repeating
 		break;
 	}
 
@@ -345,14 +386,13 @@ const char *CMenuTable::Key( int key, int down )
 
 	if( sound )
 	{
-		if( iFlags & QMF_SILENT )
-			sound = uiSoundNull;
-
 		if( sound != uiSoundBuzz )
 			_Event( QM_CHANGED );
+
+		PlayLocalSound( sound );
 	}
 
-	return sound;
+	return sound != NULL;
 }
 
 void CMenuTable::DrawLine( Point p, const char **psz, size_t size, uint textColor, bool forceCol, uint fillColor )

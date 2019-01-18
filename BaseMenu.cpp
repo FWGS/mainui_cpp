@@ -756,8 +756,6 @@ void UI_UpdateMenu( float flTime )
 		// we loading background so skip SCR_Update
 		if( UI_StartBackGroundMap( )) return;
 
-		uiStatic.menu.menuActive->Activate();
-
 		uiStatic.firstDraw = false;
 		static int first = TRUE;
                     
@@ -784,31 +782,39 @@ void UI_UpdateMenu( float flTime )
 	uiStatic.menu.Update();
 }
 
-void windowStack_t::KeyEvent( int key, int down )
+void windowStack_t::KeyUpEvent( int key )
 {
 	const char	*sound = NULL;
-
-	if( !IsActive() )
-		return;
-
-	if( key == K_MOUSE1 )
-	{
-		g_bCursorDown = !!down;
-	}
 
 	// go down on stack to nearest root or dialog
 	int rootPos = rootPosition;
 	for( int i = menuDepth-1; i >= rootPos; i-- )
 	{
-		sound = menuStack[i]->Key( key, down );
-
-		if( !down && sound && sound != uiSoundNull )
-			EngFuncs::PlayLocalSound( sound );
+		bool handled = menuStack[i]->KeyUp( key );
 
 		if( menuStack[i]->iFlags & QMF_DIALOG )
 			break;
 	}
 }
+
+void windowStack_t::KeyDownEvent( int key )
+{
+	// go down on stack to nearest root or dialog
+	int rootPos = rootPosition;
+	for( int i = menuDepth-1; i >= rootPos; i-- )
+	{
+		bool handled = menuStack[i]->KeyDown( key );
+
+		if( menuStack[i]->iFlags & QMF_DIALOG )
+			break;
+	}
+}
+
+void windowStack_t::KeyEvent( int key, bool down )
+{
+	down ? KeyDownEvent( key ) : KeyUpEvent( key );
+}
+
 
 /*
 =================
@@ -822,6 +828,11 @@ void UI_KeyEvent( int key, int down )
 	if( !uiStatic.initialized )
 		return;
 
+	if( key == K_MOUSE1 )
+	{
+		g_bCursorDown = !!down;
+	}
+
 	clientActive = uiStatic.client.IsActive();
 	menuActive = uiStatic.menu.IsActive();
 
@@ -834,9 +845,6 @@ void UI_KeyEvent( int key, int down )
 
 void windowStack_t::CharEvent( int key )
 {
-	if( !menuActive )
-		return;
-
 	int rootPos = rootPosition;
 	for( int i = menuDepth-1; i >= rootPos; i-- )
 	{
@@ -869,11 +877,9 @@ void UI_CharEvent( int key )
 
 void windowStack_t::MouseEvent( int x, int y )
 {
-	int		i;
-
 	// go down on stack to nearest root or dialog
 	int rootPos = rootPosition;
-	for( i = menuDepth-1; i >= rootPos; i-- )
+	for( int i = menuDepth-1; i >= rootPos; i-- )
 	{
 		menuStack[i]->MouseMove( x, y );
 

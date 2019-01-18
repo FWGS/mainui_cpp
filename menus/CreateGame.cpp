@@ -233,7 +233,7 @@ void CMenuCreateGame::_Init( void )
 	advOpt->SetGrayed( !UI_AdvServerOptions_IsAvailable() );
 
 	done = AddButton( L( "GameUI_OK" ), L( "Start the multiplayer game" ), PC_DONE, Begin );
-	done->onActivatedClActive = msgBox.MakeOpenEvent();
+	done->onReleasedClActive = msgBox.MakeOpenEvent();
 
 	mapsList.SetCharSize( QM_SMALLFONT );
 	mapsList.SetupColumn( 0, L( "GameUI_Map" ), 0.5f );

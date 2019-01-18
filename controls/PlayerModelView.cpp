@@ -79,21 +79,30 @@ void CMenuPlayerModelView::VidInit()
 	ent->player = bDrawAsPlayer; // yes, draw me as playermodel
 }
 
-const char *CMenuPlayerModelView::Key(int key, int down)
+bool CMenuPlayerModelView::KeyUp( int key )
 {
 	if( !ent )
-		return uiSoundNull;
+		return true;
 
-	if( key == K_MOUSE1 && UI_CursorInRect( m_scPos, m_scSize ) &&
-		down && !mouseYawControl )
+	if( key == K_MOUSE1 && mouseYawControl )
+	{
+		mouseYawControl = false;
+	}
+
+	return false;
+}
+
+bool CMenuPlayerModelView::KeyDown( int key )
+{
+	if( !ent )
+		return true;
+
+	if( key == K_MOUSE1 && UI_CursorInRect( m_scPos, m_scSize )
+		&& !mouseYawControl )
 	{
 		mouseYawControl = true;
 		prevCursorX =  uiStatic.cursorX;
 		prevCursorY =  uiStatic.cursorY;
-	}
-	else if( key == K_MOUSE1 && !down && mouseYawControl )
-	{
-		mouseYawControl = false;
 	}
 
 	float yaw = ent->angles[1];
@@ -102,39 +111,35 @@ const char *CMenuPlayerModelView::Key(int key, int down)
 	{
 	case K_LEFTARROW:
 	case K_KP_RIGHTARROW:
-		if( down )
-		{
-			yaw -= 10.0f;
+		yaw -= 10.0f;
 
-			if( yaw > 180.0f ) yaw -= 360.0f;
-			else if( yaw < -180.0f ) yaw += 360.0f;
+		if( yaw > 180.0f ) yaw -= 360.0f;
+		else if( yaw < -180.0f ) yaw += 360.0f;
 
-			ent->angles[1] = ent->curstate.angles[1] = yaw;
-		}
+		ent->angles[1] = ent->curstate.angles[1] = yaw;
 		break;
 	case K_RIGHTARROW:
 	case K_KP_LEFTARROW:
-		if( down )
-		{
-			yaw += 10.0f;
+		yaw += 10.0f;
 
-			if( yaw > 180.0f ) yaw -= 360.0f;
-			else if( yaw < -180.0f ) yaw += 360.0f;
+		if( yaw > 180.0f ) yaw -= 360.0f;
+		else if( yaw < -180.0f ) yaw += 360.0f;
 
-			ent->angles[1] = ent->curstate.angles[1] = yaw;
-		}
+		ent->angles[1] = ent->curstate.angles[1] = yaw;
 		break;
 	case K_ENTER:
 	case K_AUX1:
 	case K_MOUSE2:
-		if( down ) ent->curstate.sequence++;
+		ent->curstate.sequence++;
 		break;
 	default:
-		return CMenuBaseItem::Key( key, down );
+		return CMenuBaseItem::KeyDown( key );
 	}
 
-	return uiSoundLaunch;
+	PlayLocalSound( uiSoundLaunch );
+	return false;
 }
+
 
 void CMenuPlayerModelView::Draw()
 {

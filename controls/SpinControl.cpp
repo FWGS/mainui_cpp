@@ -49,18 +49,51 @@ void CMenuSpinControl::VidInit( void )
 	BaseClass::VidInit();
 }
 
+bool CMenuSpinControl::KeyDown(	int key )
+{
+	const char *sound = 0;
+
+	switch( key )
+	{
+	case K_LEFTARROW:
+	case K_KP_LEFTARROW:
+		if( iFlags & QMF_MOUSEONLY )
+			break;
+
+		sound = MoveLeft();
+		break;
+	case K_RIGHTARROW:
+	case K_KP_RIGHTARROW:
+		if( iFlags & QMF_MOUSEONLY )
+			break;
+
+		sound = MoveRight();
+		break;
+	}
+
+	if( sound )
+	{
+		_Event( QM_PRESSED );
+		if( sound != uiSoundBuzz )
+		{
+			Display();
+			_Event( QM_CHANGED );
+		}
+		PlayLocalSound( sound );
+	}
+	return sound != NULL;
+}
+
 /*
 =================
 CMenuSpinControl::Key
 =================
 */
-const char *CMenuSpinControl::Key( int key, int down )
+bool CMenuSpinControl::KeyUp( int key )
 {
-	const char	*sound = 0;
+	const char *sound = 0;
 	Size arrow;
 	Point left, right;
-
-	if( !down ) return uiSoundNull;
 
 	switch( key )
 	{
@@ -88,34 +121,19 @@ const char *CMenuSpinControl::Key( int key, int down )
 			sound = MoveRight();
 		}
 		break;
-	case K_LEFTARROW:
-	case K_KP_LEFTARROW:
-		if( iFlags & QMF_MOUSEONLY )
-			break;
-
-		sound = MoveLeft();
-		break;
-	case K_RIGHTARROW:
-	case K_KP_RIGHTARROW:
-		if( iFlags & QMF_MOUSEONLY )
-			break;
-
-		sound = MoveRight();
-		break;
 	}
-
-	if( sound && ( iFlags & QMF_SILENT ))
-		sound = uiSoundNull;
 
 	if( sound )
 	{
+		_Event( QM_RELEASED );
 		if( sound != uiSoundBuzz )
 		{
 			Display();
 			_Event( QM_CHANGED );
 		}
+		PlayLocalSound( sound );
 	}
-	return sound;
+	return sound != NULL;
 }
 
 /*

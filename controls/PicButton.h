@@ -36,7 +36,8 @@ public:
 	typedef CMenuBaseItem BaseClass;
 
 	CMenuPicButton();
-	const char * Key( int key, int down ) override;
+	bool KeyUp( int key ) override;
+	bool KeyDown( int key ) override;
 	void Draw( void ) override;
 
 	void SetPicture( EDefaultBtns ID );

@@ -30,7 +30,8 @@ public:
 
 	CMenuSwitch();
 
-	const char *Key(int key, int down) override;
+	bool KeyDown( int key ) override;
+	bool KeyUp( int key ) override;
 	void VidInit() override;
 	void Draw() override;
 	void UpdateEditable() override;
@@ -44,6 +45,7 @@ public:
 
 	bool bMouseToggle;
 	bool bKeepToggleWidth;
+	bool bChangeOnPressed;
 
 	CColor iSelectColor;
 	CColor iBackgroundColor;
@@ -53,6 +55,7 @@ public:
 	float fTextOffsetX;
 	float fTextOffsetY;
 private:
+	int IsNewStateByMouseClick( void );
 	int m_iSwitches;
 	int m_iState;
 

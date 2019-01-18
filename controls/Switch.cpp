@@ -41,11 +41,38 @@ CMenuSwitch::CMenuSwitch( ) : BaseClass( )
 	memset( m_szNames, 0, sizeof( m_szNames ));
 	memset( m_Sizes, 0, sizeof( m_Sizes ));
 	memset( m_Points, 0, sizeof( m_Points ));
+
+	bChangeOnPressed = false;
 }
 
 void CMenuSwitch::AddSwitch(const char *text)
 {
 	m_szNames[m_iSwitches++] = text;
+}
+
+int CMenuSwitch::IsNewStateByMouseClick()
+{
+	int state = m_iState;
+
+	if( bMouseToggle )
+	{
+		state++;
+
+		if( state >= m_iSwitches )
+			state = 0;
+	}
+	else
+	{
+		for( int i = 0; i < m_iSwitches; i++ )
+		{
+			if( ( UI_CursorInRect( m_Points[i], m_Sizes[i] ) && m_iState != i))
+			{
+				state = i;
+			}
+		}
+	}
+
+	return state;
 }
 
 void CMenuSwitch::VidInit()
@@ -90,38 +117,21 @@ void CMenuSwitch::VidInit()
 	m_scTextSize.h = m_scChSize;
 }
 
-const char * CMenuSwitch::Key(int key, int down)
+bool CMenuSwitch::KeyUp( int key )
 {
 	const char *sound = NULL;
 	bool haveNewState = false;
-	int state = m_iState;
+	int state;
 
 	switch( key )
 	{
 	case K_MOUSE1:
 		if(!( iFlags & QMF_HASMOUSEFOCUS ))
 			break;
-		if( bMouseToggle )
-		{
+		state = IsNewStateByMouseClick();
+		haveNewState = state != m_iState;
+		if( haveNewState )
 			sound = uiSoundGlow;
-			haveNewState = true;
-			state++;
-
-			if( state >= m_iSwitches )
-				state = 0;
-		}
-		else
-		{
-			for( int i = 0; i < m_iSwitches; i++ )
-			{
-				if( ( UI_CursorInRect( m_Points[i], m_Sizes[i] ) && m_iState != i))
-				{
-					sound = uiSoundGlow;
-					haveNewState = true;
-					state = i;
-				}
-			}
-		}
 		break;
 	case K_ENTER:
 	case K_KP_ENTER:
@@ -135,36 +145,56 @@ const char * CMenuSwitch::Key(int key, int down)
 
 	if( sound )
 	{
-		if( iFlags & QMF_ACT_ONRELEASE )
-		{
-			int event;
-
-			if( down )
-			{
-				event = QM_PRESSED;
-				m_bPressed = true;
-				_Event( event );
-			}
-			else if( haveNewState )
-			{
-				event = QM_CHANGED;
-				m_iState = state;
-				SetCvarValue( m_iState );
-				_Event( event );
-			}
-		}
-		else if( down && haveNewState )
+		_Event( QM_RELEASED );
+		if( haveNewState && !bChangeOnPressed )
 		{
 			m_iState = state;
 			SetCvarValue( m_iState );
 			_Event( QM_CHANGED );
+			PlayLocalSound( sound ); // emit sound only on changes
 		}
 	}
 
-	if( iFlags & QMF_SILENT )
-		return 0;
+	return sound != NULL;
+}
 
-	return sound;
+bool CMenuSwitch::KeyDown( int key )
+{
+	const char *sound = NULL;
+	bool haveNewState = false;
+	int state;
+
+	switch( key )
+	{
+	case K_MOUSE1:
+		if(!( iFlags & QMF_HASMOUSEFOCUS ))
+			break;
+		state = IsNewStateByMouseClick();
+		haveNewState = state != m_iState;
+		break;
+	case K_ENTER:
+	case K_KP_ENTER:
+	case K_SPACE:
+	case K_AUX1:
+		if( iFlags & QMF_MOUSEONLY )
+			break;
+		sound = uiSoundGlow;
+		break;
+	}
+
+	if( sound )
+	{
+		_Event( QM_PRESSED );
+		if( haveNewState && bChangeOnPressed )
+		{
+			m_iState = state;
+			SetCvarValue( m_iState );
+			_Event( QM_CHANGED );
+			PlayLocalSound( sound ); // emit sound only on changes
+		}
+	}
+
+	return sound != NULL;
 }
 
 void CMenuSwitch::Draw( void )
