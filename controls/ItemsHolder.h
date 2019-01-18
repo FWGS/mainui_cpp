@@ -17,6 +17,7 @@ GNU General Public License for more details.
 #define EMBEDITEM_H
 
 #include "BaseItem.h"
+#include "utlvector.h"
 
 class CMenuItemsHolder : public CMenuBaseItem
 {
@@ -57,20 +58,18 @@ public:
 	CMenuBaseItem *FindItemByTag( const char *tag );
 	inline CMenuBaseItem *GetItemByIndex( int idx )
 	{
-		if( idx >= 0 && idx < UI_MAX_MENUITEMS )
+		if( m_pItems.IsValidIndex( idx ))
 			return m_pItems[idx];
 		return NULL;
 	}
-	inline int GetItemCount() { return m_numItems; }
 
 	void CalcItemsPositions();
 	void CalcItemsSizes();
 
-
 	inline void AddItem( CMenuBaseItem *item ) { AddItem( *item ); }
 	inline int GetCursor() const { return m_iCursor; }
 	inline int GetCursorPrev() const { return m_iCursorPrev; }
-	inline int ItemCount() const { return m_numItems; }
+	inline int ItemCount() const { return m_pItems.Count(); }
 	inline bool WasInit() const { return m_bInit; }
 
 	void SetResourceFilename( const char *filename ) { m_szResFile = filename; }
@@ -88,12 +87,10 @@ protected:
 	int m_iCursor;
 	int m_iCursorPrev;
 
-	CMenuBaseItem *m_pItems[UI_MAX_MENUITEMS];
-	int m_numItems;
+	CUtlVector<CMenuBaseItem *> m_pItems;
 
 	// it's unnecessary to register here, it's only for searching events by res file
-	CEventCallback m_events[UI_MAX_MENUITEMS];
-	int m_numEvents;
+	CUtlVector<CEventCallback> m_events;
 
 	bool m_bInit;
 	bool m_bWrapCursor;

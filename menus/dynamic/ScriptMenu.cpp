@@ -96,7 +96,7 @@ CMenuScriptConfigPage::CMenuScriptConfigPage() : CMenuItemsHolder()
 
 CMenuScriptConfigPage::~CMenuScriptConfigPage()
 {
-	for( int i = 0; i < m_numItems; i++ )
+	FOR_EACH_VEC( m_pItems, i )
 	{
 		delete m_pItems[i];
 	}
@@ -117,7 +117,7 @@ void CMenuScriptConfigPage::PrepareItem(CMenuEditable &item)
 
 void CMenuScriptConfigPage::Save()
 {
-	for( int i = 0; i < m_numItems; i++ )
+	FOR_EACH_VEC( m_pItems, i )
 	{
 		((CMenuEditable*)m_pItems[i])->WriteCvar();
 	}
@@ -191,7 +191,7 @@ void CMenuScriptConfig::_Init( void )
 	page->Show();
 	m_iCurrentPage = 0;
 	m_iPagesCount = 1;
-	m_iPagesIndex = m_numItems;
+	m_iPagesIndex = m_pItems.Count();
 	AddItem( page );
 
 	for( scrvardef_t *var = m_pVars; var; var = var->next )
@@ -323,8 +323,8 @@ void CMenuScriptConfig::FlipMenu( void )
 {
 	int newIndex = (int)pageSelector.GetCurrentValue() - 1;
 
-	CMenuScriptConfigPage *oldPage = *((CMenuScriptConfigPage**)m_pItems + m_iPagesIndex + m_iCurrentPage);
-	CMenuScriptConfigPage *newPage = *((CMenuScriptConfigPage**)m_pItems + m_iPagesIndex + newIndex);
+	CMenuScriptConfigPage *oldPage = (CMenuScriptConfigPage *)m_pItems[m_iPagesIndex + m_iCurrentPage];
+	CMenuScriptConfigPage *newPage = (CMenuScriptConfigPage *)m_pItems[m_iPagesIndex + newIndex];
 
 	oldPage->Hide();
 	newPage->Show();

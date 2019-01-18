@@ -535,7 +535,7 @@ void UI_DrawMouseCursor( void )
 	}
 	else
 	{
-		for( i = 0; i < uiStatic.menu.menuActive->m_numItems; i++ )
+		FOR_EACH_VEC( uiStatic.menu.menuActive->m_pItems, i )
 		{
 			item = (CMenuBaseItem *)uiStatic.menu.menuActive->m_pItems[i];
 

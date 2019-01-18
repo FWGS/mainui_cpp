@@ -21,8 +21,8 @@ GNU General Public License for more details.
 #include <string.h>
 
 CMenuItemsHolder::CMenuItemsHolder() :
-	BaseClass(), m_iCursor( 0 ), m_iCursorPrev( 0 ), m_pItems( ), m_numItems( 0 ),
-	m_events(), m_numEvents( 0 ), m_bInit( false ),
+	BaseClass(), m_iCursor( 0 ), m_iCursorPrev( 0 ), m_pItems( ),
+	m_events(), m_bInit( false ),
 	m_bWrapCursor( true ), m_szResFile( 0 )
 {
 	;
@@ -32,7 +32,7 @@ bool CMenuItemsHolder::Key( const int key, const bool down )
 {
 	bool handled = false;
 
-	if( m_numItems )
+	if( m_pItems.Count() )
 	{
 		CMenuBaseItem *item = NULL;
 		int cursorPrev;
@@ -71,7 +71,7 @@ bool CMenuItemsHolder::Key( const int key, const bool down )
 			}
 		}
 
-		for( int i = 0; i < m_numItems; i++ )
+		FOR_EACH_VEC( m_pItems, i )
 		{
 			item = m_pItems[i];
 
@@ -166,7 +166,7 @@ bool CMenuItemsHolder::KeyUp( int key )
 
 void CMenuItemsHolder::Char( int ch )
 {
-	if( !m_numItems )
+	if( m_pItems.IsEmpty() )
 		return;
 
 	CMenuBaseItem *item = ItemAtCursor();
@@ -174,7 +174,7 @@ void CMenuItemsHolder::Char( int ch )
 	if( item && item->IsVisible() && !(item->iFlags & (QMF_GRAYED|QMF_INACTIVE)) )
 		item->Char( ch );
 
-	for( int i = 0; i < m_numItems; i++ )
+	FOR_EACH_VEC( m_pItems, i )
 	{
 		item = m_pItems[i];
 
@@ -202,7 +202,7 @@ bool CMenuItemsHolder::MouseMove( int x, int y )
 	int i;
 	// region test the active menu items
 	// go in reverse direction, so last items will be first
-	for( i = m_numItems - 1; i >= 0; i-- )
+	FOR_EACH_VEC_BACK( m_pItems, i )
 	{
 		CMenuBaseItem *item = m_pItems[i];
 
@@ -284,32 +284,26 @@ void CMenuItemsHolder::VidInit()
 
 void CMenuItemsHolder::Reload()
 {
-	for( CMenuBaseItem **i = m_pItems; i < m_pItems + m_numItems; i++ )
-		(*i)->Reload();
+	FOR_EACH_VEC( m_pItems, i )
+		m_pItems[i]->Reload();
 }
 
 void CMenuItemsHolder::VidInitItems()
 {
-	for( CMenuBaseItem **i = m_pItems; i < m_pItems + m_numItems; i++ )
-	{
-		(*i)->VidInit();
-	}
+	FOR_EACH_VEC( m_pItems, i )
+		m_pItems[i]->VidInit();
 }
 
 void CMenuItemsHolder::ToggleInactive()
 {
-	for( int i = 0; i < m_numItems; i++ )
-	{
+	FOR_EACH_VEC( m_pItems, i )
 		m_pItems[i]->ToggleInactive();
-	}
 }
 
 void CMenuItemsHolder::SetInactive( bool inactive )
 {
-	for( int i = 0; i < m_numItems; i++ )
-	{
+	FOR_EACH_VEC( m_pItems, i )
 		m_pItems[i]->SetInactive( inactive );
-	}
 }
 
 void CMenuItemsHolder::Draw( )
@@ -317,7 +311,7 @@ void CMenuItemsHolder::Draw( )
 	CMenuBaseItem *item;
 
 	// draw contents
-	for( int i = 0; i < m_numItems; i++ )
+	FOR_EACH_VEC( m_pItems, i )
 	{
 		item = m_pItems[i];
 
@@ -348,7 +342,7 @@ bool CMenuItemsHolder::AdjustCursor( int dir )
 	bool wrapped = false;
 
 wrap:
-	while( m_iCursor >= 0 && m_iCursor < m_numItems )
+	while( m_iCursor >= 0 && m_iCursor < m_pItems.Count() )
 	{
 		item = m_pItems[m_iCursor];
 		if( !item->IsVisible() || item->iFlags & (QMF_INACTIVE|QMF_MOUSEONLY) )
@@ -360,7 +354,7 @@ wrap:
 
 	if( dir > 0 )
 	{
-		if( m_iCursor >= m_numItems )
+		if( m_iCursor >= m_pItems.Count() )
 		{
 			if( wrapped )
 			{
@@ -381,7 +375,7 @@ wrap:
 				m_iCursor = m_iCursorPrev;
 				return false;
 			}
-			m_iCursor = m_numItems - 1;
+			m_iCursor = m_pItems.Count() - 1;
 			wrapped = true;
 			goto wrap;
 		}
@@ -394,7 +388,7 @@ wrap:
 
 CMenuBaseItem *CMenuItemsHolder::ItemAtCursor()
 {
-	if( m_iCursor < 0 || m_iCursor >= m_numItems )
+	if( m_iCursor < 0 || m_iCursor >= m_pItems.Count() )
 		return 0;
 
 	// inactive items can't be has focus
@@ -406,7 +400,7 @@ CMenuBaseItem *CMenuItemsHolder::ItemAtCursor()
 
 CMenuBaseItem *CMenuItemsHolder::ItemAtCursorPrev()
 {
-	if( m_iCursorPrev < 0 || m_iCursorPrev >= m_numItems )
+	if( m_iCursorPrev < 0 || m_iCursorPrev >= m_pItems.Count() )
 		return 0;
 
 	// inactive items can't be has focus
@@ -424,7 +418,7 @@ CMenuBaseItem *CMenuItemsHolder::FindItemByTag(const char *tag)
 	if( this->szTag && !strcmp( this->szTag, tag ) )
 		return this;
 
-	for( int i = 0; i < m_numItems; i++ )
+	FOR_EACH_VEC( m_pItems, i )
 	{
 		if( !m_pItems[i]->szTag )
 			continue;
@@ -438,7 +432,7 @@ CMenuBaseItem *CMenuItemsHolder::FindItemByTag(const char *tag)
 
 void CMenuItemsHolder::SetCursorToItem(CMenuBaseItem &item, bool notify )
 {
-	for( int i = 0; i < m_numItems; i++ )
+	FOR_EACH_VEC( m_pItems, i )
 	{
 		if( m_pItems[i] == &item )
 		{
@@ -450,23 +444,19 @@ void CMenuItemsHolder::SetCursorToItem(CMenuBaseItem &item, bool notify )
 
 void CMenuItemsHolder::CalcItemsPositions()
 {
-	for( int i = 0; i < m_numItems; i++ )
-	{
+	FOR_EACH_VEC( m_pItems, i )
 		m_pItems[i]->CalcPosition();
-	}
 }
 
 void CMenuItemsHolder::CalcItemsSizes()
 {
-	for( int i = 0; i < m_numItems; i++ )
-	{
+	FOR_EACH_VEC( m_pItems, i )
 		m_pItems[i]->CalcSizes();
-	}
 }
 
 void CMenuItemsHolder::SetCursor( int newCursor, bool notify )
 {
-	if( newCursor < 0 || newCursor >= m_numItems )
+	if( newCursor < 0 || newCursor >= m_pItems.Count() )
 		return;
 
 	if( !m_pItems[newCursor]->IsVisible() || (m_pItems[newCursor]->iFlags & (QMF_INACTIVE)) )
@@ -486,7 +476,7 @@ void CMenuItemsHolder::CursorMoved()
 	if( m_iCursor == m_iCursorPrev )
 		return;
 
-	if( m_iCursorPrev >= 0 && m_iCursorPrev < m_numItems )
+	if( m_iCursorPrev >= 0 && m_iCursorPrev < m_pItems.Count() )
 	{
 		item = m_pItems[m_iCursorPrev];
 
@@ -496,7 +486,7 @@ void CMenuItemsHolder::CursorMoved()
 		item->m_bPressed = false;
 	}
 
-	if( m_iCursor >= 0 && m_iCursor < m_numItems )
+	if( m_iCursor >= 0 && m_iCursor < m_pItems.Count() )
 	{
 		item = m_pItems[m_iCursor];
 
@@ -509,31 +499,18 @@ void CMenuItemsHolder::CursorMoved()
 
 void CMenuItemsHolder::AddItem(CMenuBaseItem &item)
 {
-	if( m_numItems >= UI_MAX_MENUITEMS )
-		Host_Error( "UI_AddItem: UI_MAX_MENUITEMS limit exceeded\n" );
-
-	m_pItems[m_numItems] = &item;
+	m_pItems.AddToTail( &item );
 	item.m_pParent = this; // U OWNED
 	item.iFlags &= ~(QMF_HASMOUSEFOCUS|QMF_HIDDENBYPARENT);
-
-	m_numItems++;
 
 	item.Init();
 }
 
 void CMenuItemsHolder::RemoveItem(CMenuBaseItem &item)
 {
-	for( int i = m_numItems; i >= 0; i-- )
+	if( m_pItems.FindAndRemove( &item ) )
 	{
-		if( m_pItems[i] == &item )
-		{
-			item.m_pParent = NULL;
-
-			memmove( m_pItems + i, m_pItems + i + 1, ( m_numItems - i + 1 ) * sizeof( *m_pItems ) );
-
-			m_numItems--;
-			break;
-		}
+		item.m_pParent = NULL;
 	}
 }
 
@@ -646,21 +623,16 @@ bool CMenuItemsHolder::LoadRES(const char *filename)
 
 void CMenuItemsHolder::RegisterNamedEvent(CEventCallback ev, const char *name)
 {
-	if( m_numEvents >= UI_MAX_MENUITEMS )
-		Host_Error( "RegisterNamedEvent: UI_MAX_MENUITEMS limit exceeded\n" );
-
 	ASSERT( name );
 	ASSERT( ev );
 
 	ev.szName = name;
-	m_events[m_numEvents] = ev;
-
-	m_numEvents++;
+	m_events.AddToTail( ev );
 }
 
 CEventCallback CMenuItemsHolder::FindEventByName(const char *name)
 {
-	for( int i = 0; i < m_numEvents; i++ )
+	for( int i = 0; i < m_events.Count(); i++ )
 	{
 		if( !strcmp( m_events[i].szName, name ))
 			return m_events[i];

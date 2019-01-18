@@ -15,7 +15,7 @@ void CMenuScrollView::VidInit()
 	m_iMax = 0;
 	m_iPos = 0;
 
-	for( int i = 0; i < m_numItems; i++ )
+	FOR_EACH_VEC( m_pItems, i )
 	{
 		Point pt = m_pItems[i]->pos;
 		Size sz = m_pItems[i]->size;
@@ -64,7 +64,7 @@ bool CMenuScrollView::KeyDown( int key )
 		if( newPos != m_iPos )
 		{
 			m_iPos = newPos;
-			for( int i = 0; i < m_numItems; i++ )
+			FOR_EACH_VEC( m_pItems, i )
 			{
 				CMenuBaseItem *pItem = m_pItems[i];
 
@@ -126,7 +126,7 @@ void CMenuScrollView::Draw()
 		if( newPos != m_iPos )
 		{
 			m_iPos = newPos;
-			for( int i = 0; i < m_numItems; i++ )
+			FOR_EACH_VEC( m_pItems, i )
 			{
 				CMenuBaseItem *pItem = m_pItems[i];
 
@@ -142,7 +142,7 @@ void CMenuScrollView::Draw()
 	}
 
 	int drawn = 0, skipped = 0;
-	for( int i = 0; i < m_numItems; i++ )
+	FOR_EACH_VEC( m_pItems, i )
 	{
 		if( !IsRectVisible( m_pItems[i]->GetRenderPosition(), m_pItems[i]->GetRenderSize() ) )
 		{

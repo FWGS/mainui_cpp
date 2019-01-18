@@ -111,7 +111,7 @@ void CMenuBaseWindow::PushMenu( windowStack_t &stack )
 	m_iCursor = 0;
 	m_iCursorPrev = 0;
 	// force first available item to have focus
-	for( i = 0; i < m_numItems; i++ )
+	FOR_EACH_VEC( m_pItems, i )
 	{
 		item = m_pItems[i];
 

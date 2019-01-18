@@ -15,8 +15,7 @@ GNU General Public License for more details.
 #include "TabView.h"
 #include "Scissor.h"
 
-CMenuTabView::CMenuTabView() : BaseClass(),
-	m_szTabNames()
+CMenuTabView::CMenuTabView() : BaseClass()
 {
 	m_bWrapCursor = true;
 	SetCharSize( QM_BOLDFONT );
@@ -39,7 +38,7 @@ void CMenuTabView::VidInit()
 	_VidInit();
 	VidInitItems();
 
-	m_szTab.w = m_scSize.w / m_numItems;
+	m_szTab.w = m_scSize.w / m_pItems.Count();
 	m_szTab.h = m_scChSize * 1.5f;
 }
 
@@ -81,13 +80,13 @@ void CMenuTabView::Draw()
 
 	// draw tabs
 	Point tabOffset = m_scPos;
-	for( int i = 0; i < m_numItems; i++ )
+	FOR_EACH_VEC( m_pItems, i )
 	{
-		bool isEnd = i == ( m_numItems - 1 );
+		bool isEnd = i == ( m_pItems.Count() - 1 );
 		bool isHighlighted = UI_CursorInRect( tabOffset, m_szTab );
 		bool isSelected = i == m_iCursor;
 
-		DrawTab( tabOffset, m_szTabNames[i], isEnd, isSelected, isHighlighted );
+		DrawTab( tabOffset, m_pItems[i]->szName, isEnd, isSelected, isHighlighted );
 		tabOffset.x += m_szTab.w;
 	}
 
@@ -102,7 +101,7 @@ void CMenuTabView::Draw()
 	UI_FillRect( contentOffset, contentSize, uiColorBlack );
 
 	// draw contents
-	if( m_iCursor >= 0 && m_iCursor < m_numItems )
+	if( m_iCursor >= 0 && m_iCursor < m_pItems.Count() )
 	{
 		UI::Scissor::PushScissor( contentOffset, contentSize );
 			m_pItems[m_iCursor]->Draw();
