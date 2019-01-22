@@ -328,6 +328,14 @@ void CMenuItemsHolder::Draw( )
 	}
 }
 
+void CMenuItemsHolder::Think( void )
+{
+	FOR_EACH_VEC( m_pItems, i )
+	{
+		m_pItems[i]->Think();
+	}
+}
+
 /*
 =================
 UI_AdjustCursor
@@ -508,7 +516,7 @@ void CMenuItemsHolder::AddItem(CMenuBaseItem &item)
 
 void CMenuItemsHolder::RemoveItem(CMenuBaseItem &item)
 {
-	if( m_pItems.FindAndRemove( &item ) )
+	if( m_pItems.FindAndRemove( &item ) != m_pItems.InvalidIndex() )
 	{
 		item.m_pParent = NULL;
 	}

@@ -33,7 +33,7 @@ public:
 	void Show();
 	void Hide();
 	void Draw();
-	bool DrawAnimation(EAnimation anim);
+	bool DrawAnimation();
 	bool KeyDown( int key ) override;
 private:
 	float saveTouchEnable;
@@ -61,7 +61,7 @@ void CMenuTouchEdit::Hide()
 	CMenuFramework::Hide();
 }
 
-bool CMenuTouchEdit::DrawAnimation(EAnimation anim)
+bool CMenuTouchEdit::DrawAnimation()
 {
 	return true;
 }

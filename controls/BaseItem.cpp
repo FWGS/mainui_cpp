@@ -77,6 +77,11 @@ void CMenuBaseItem::Draw()
 	;
 }
 
+void CMenuBaseItem::Think()
+{
+	;
+}
+
 void CMenuBaseItem::Char( int key )
 {
 	;

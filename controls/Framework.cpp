@@ -35,9 +35,6 @@ void CMenuFramework::Show()
 {
 	CMenuPicButton::RootChanged( true );
 	BaseClass::Show();
-
-	m_pStack->rootActive = this;
-	m_pStack->rootPosition = m_pStack->menuDepth-1;
 }
 
 void CMenuFramework::Draw()
@@ -79,24 +76,12 @@ void CMenuFramework::Draw()
 
 void CMenuFramework::Hide()
 {
-	int i;
 	BaseClass::Hide();
 
-	for( i = m_pStack->menuDepth-1; i >= 0; i-- )
+	if( m_pStack->Current() && m_pStack->Current()->IsRoot() )
 	{
-		if( m_pStack->menuStack[i]->IsRoot() )
-		{
-			m_pStack->rootActive = m_pStack->menuStack[i];
-			m_pStack->rootPosition = i;
-			CMenuPicButton::RootChanged( false );
-			return;
-		}
+		CMenuPicButton::RootChanged( false );
 	}
-
-
-	// looks like we are have a modal or some window over game
-	m_pStack->rootActive = NULL;
-	m_pStack->rootPosition = 0;
 }
 
 void CMenuFramework::Init()
@@ -162,13 +147,13 @@ CMenuPicButton * CMenuFramework::AddButton(const char *szName, const char *szSta
 }
 
 
-bool CMenuFramework::DrawAnimation(EAnimation anim)
+bool CMenuFramework::DrawAnimation()
 {
-	bool b = CMenuBaseWindow::DrawAnimation( anim );
+	bool b = CMenuBaseWindow::DrawAnimation( );
 
 #ifndef CS16CLIENT
 	if( IsRoot() )
-		b = CMenuPicButton::DrawTitleAnim( anim );
+		b = CMenuPicButton::DrawTitleAnim( eTransitionType );
 #endif
 
 	return b;

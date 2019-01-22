@@ -25,6 +25,7 @@ GNU General Public License for more details.
 #include "Utils.h"
 #include "FontManager.h"
 #include "BtnsBMPTable.h"
+#include "WindowSystem.h"
 
 #define UI_MAX_MENUDEPTH		64
 #define UI_MAX_MENUITEMS		64
@@ -70,41 +71,10 @@ extern cvar_t   *ui_show_window_stack;
 extern cvar_t	*ui_borderclip;
 extern cvar_t	*ui_language;
 
-class CMenuBaseWindow;
-
-class windowStack_t
-{
-public:
-	CMenuBaseWindow *rootActive; // current active fullscreen holder(menu framework)
-	CMenuBaseWindow *menuActive; // current active window
-	CMenuBaseWindow *prevMenu;   // previous active window
-	CMenuBaseWindow *menuStack[UI_MAX_MENUDEPTH];
-	int menuDepth;
-	int rootPosition;
-
-	bool IsActive( void ) { return menuDepth > 0; }
-	void VidInit( bool firstTime );
-	void Update( void );
-	void KeyEvent( int key, bool down );
-	void KeyUpEvent( int key );
-	void KeyDownEvent( int key );
-	void CharEvent( int ch );
-	void MouseEvent( int x, int y );
-
-	void InputMethodResized( void );
-
-	void Close( void )
-	{
-		menuActive = NULL;
-		menuDepth = 0;
-		rootPosition = 0;
-	}
-};
-
 typedef struct
 {
-	windowStack_t menu;
-	windowStack_t client; // separate window stack for client windows
+	CWindowStack menu;
+	CWindowStack client; // separate window stack for client windows
 	char	bgmaps[UI_MAX_BGMAPS][80];
 	int		bgmapcount;
 

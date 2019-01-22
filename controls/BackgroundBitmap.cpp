@@ -127,7 +127,7 @@ void CMenuBackgroundBitmap::Draw()
 	if( m_pParent && m_pParent->IsWindow() )
 	{
 		CMenuBaseWindow *window = (CMenuBaseWindow*)m_pParent;
-		if( window->IsRoot() && window->bInTransition )
+		if( window->IsRoot() && window->eTransitionType )
 		{
 			alphaFactor.Override();
 

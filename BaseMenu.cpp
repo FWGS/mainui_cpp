@@ -33,7 +33,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "ConnectionProgress.h"
 #include "ConnectionWarning.h"
 #include "BackgroundBitmap.h"
-#include "con_nprint.h"
 #include "FontManager.h"
 #ifdef CS16CLIENT
 #include "Scoreboard.h"
@@ -612,7 +611,7 @@ UI_CloseMenu
 */
 void UI_CloseMenu( void )
 {
-	uiStatic.menu.Close();
+	uiStatic.menu.Clean();
 	CMenuPicButton::ClearButtonStack();
 
 //	EngFuncs::KEY_ClearStates ();
@@ -622,78 +621,6 @@ void UI_CloseMenu( void )
 
 // =====================================================================
 
-void windowStack_t::Update( )
-{
-	if( !IsActive() )
-		return;
-
-	// find last root element
-	int i;
-	for( i = rootPosition ; i < menuDepth; i++ )
-	{
-		CMenuBaseWindow *window = menuStack[i];
-
-		if( window->bInTransition )
-		{
-			window->eTransitionType = CMenuBaseWindow::ANIM_IN;
-			if( window->DrawAnimation( window->eTransitionType ) )
-				window->bInTransition = false;
-		}
-
-		// transition is ended, so just draw
-		if( !window->bInTransition )
-		{
-			window->Draw();
-		}
-	}
-
-	if( prevMenu && prevMenu->bInTransition )
-	{
-		prevMenu->eTransitionType = CMenuBaseWindow::ANIM_OUT;
-		if( prevMenu->DrawAnimation( prevMenu->eTransitionType ) )
-		{
-			prevMenu->bInTransition = false;
-		}
-	}
-
-	con_nprint_t con;
-	con.time_to_live = 0.1f;
-
-	if( ui_show_window_stack && ui_show_window_stack->value )
-	{
-		for( int i = 0; i < menuDepth; i++ )
-		{
-			con.index++;
-			if( menuActive == menuStack[i] )
-			{
-				con.color[0] = 0.0f;
-				con.color[1] = 1.0f;
-				con.color[2] = 0.0f;
-			}
-			else
-			{
-				con.color[0] = con.color[1] = con.color[2] = 1.0f;
-			}
-
-
-			if( menuStack[i]->IsRoot() )
-			{
-				if( rootActive == menuStack[i] &&
-					rootActive != menuActive )
-				{
-					con.color[0] = 1.0f;
-					con.color[1] = 1.0f;
-					con.color[2] = 0.0f;
-				}
-				Con_NXPrintf( &con, "%p - %s\n", menuStack[i], menuStack[i]->szName );
-			}
-			else
-			{
-				Con_NXPrintf( &con, "     %p - %s\n", menuStack[i], menuStack[i]->szName );
-			}
-		}
-	}
-}
 
 /*
 =================
@@ -782,40 +709,6 @@ void UI_UpdateMenu( float flTime )
 	uiStatic.menu.Update();
 }
 
-void windowStack_t::KeyUpEvent( int key )
-{
-	const char	*sound = NULL;
-
-	// go down on stack to nearest root or dialog
-	int rootPos = rootPosition;
-	for( int i = menuDepth-1; i >= rootPos; i-- )
-	{
-		bool handled = menuStack[i]->KeyUp( key );
-
-		if( menuStack[i]->iFlags & QMF_DIALOG )
-			break;
-	}
-}
-
-void windowStack_t::KeyDownEvent( int key )
-{
-	// go down on stack to nearest root or dialog
-	int rootPos = rootPosition;
-	for( int i = menuDepth-1; i >= rootPos; i-- )
-	{
-		bool handled = menuStack[i]->KeyDown( key );
-
-		if( menuStack[i]->iFlags & QMF_DIALOG )
-			break;
-	}
-}
-
-void windowStack_t::KeyEvent( int key, bool down )
-{
-	down ? KeyDownEvent( key ) : KeyUpEvent( key );
-}
-
-
 /*
 =================
 UI_KeyEvent
@@ -837,22 +730,12 @@ void UI_KeyEvent( int key, int down )
 	menuActive = uiStatic.menu.IsActive();
 
 	if( clientActive && !menuActive )
-		uiStatic.client.KeyEvent( key, down );
+		down ? uiStatic.client.KeyDownEvent( key ) :
+			uiStatic.client.KeyUpEvent( key );
 
 	if( menuActive )
-		uiStatic.menu.KeyEvent( key, down );
-}
-
-void windowStack_t::CharEvent( int key )
-{
-	int rootPos = rootPosition;
-	for( int i = menuDepth-1; i >= rootPos; i-- )
-	{
-		menuStack[i]->Char( key );
-
-		if( menuStack[i]->iFlags & QMF_DIALOG )
-			break;
-	}
+		down ? uiStatic.menu.KeyDownEvent( key ) :
+			uiStatic.menu.KeyUpEvent( key );
 }
 
 /*
@@ -874,21 +757,6 @@ void UI_CharEvent( int key )
 	if( menuActive )
 		uiStatic.menu.CharEvent( key );
 }
-
-void windowStack_t::MouseEvent( int x, int y )
-{
-	// go down on stack to nearest root or dialog
-	int rootPos = rootPosition;
-	for( int i = menuDepth-1; i >= rootPos; i-- )
-	{
-		menuStack[i]->MouseMove( x, y );
-
-		if( menuStack[i]->iFlags & QMF_DIALOG )
-			break;
-	}
-
-}
-
 
 bool g_bCursorDown;
 float cursorDY;
@@ -1192,51 +1060,7 @@ static void UI_LoadBackgroundMapList( void )
 	EngFuncs::COM_FreeFile( afile );
 }
 
-void windowStack_t::InputMethodResized( void )
-{
-	if( menuActive && menuActive->ItemAtCursor() )
-		menuActive->ItemAtCursor()->_Event( QM_IMRESIZED );
-}
 
-void windowStack_t::VidInit( bool calledOnce )
-{
-	// now recalc all the menus in stack
-	for( int i = 0; i < menuDepth; i++ )
-	{
-		CMenuBaseWindow *item = menuStack[i];
-
-		if( item )
-		{
-			int cursor, cursorPrev;
-			bool valid = false;
-
-			// HACKHACK: Save cursor values when VidInit is called once
-			// this don't let menu "forget" actual cursor values after, for example, window resizing
-			if( calledOnce
-				&& item->GetCursor() > 0 // ignore 0, because useless
-				&& item->GetCursor() < item->ItemCount()
-				&& item->GetCursorPrev() > 0
-				&& item->GetCursorPrev() < item->ItemCount() )
-			{
-				valid = true;
-				cursor = item->GetCursor();
-				cursorPrev = item->GetCursorPrev();
-			}
-
-			// do vid restart for all pushed elements
-			item->VidInit();
-
-			item->Reload();
-
-			if( valid )
-			{
-				// don't notify menu widget about cursor changes
-				item->SetCursor( cursorPrev, false );
-				item->SetCursor( cursor, false );
-			}
-		}
-	}
-}
 
 /*
 =================

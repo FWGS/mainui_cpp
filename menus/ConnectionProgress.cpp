@@ -51,7 +51,7 @@ public:
 	void _Init() override;
 	void _VidInit() override;
 	void Draw() override;
-	bool DrawAnimation(EAnimation anim) override;
+	bool DrawAnimation() override;
 	bool KeyDown( int key ) override;
 	void Disconnect();
 	void HandleDisconnect( void );
@@ -155,7 +155,7 @@ void CMenuConnectionProgress::HandleDisconnect( void )
 		return;
 	}
 
-	if( UI_IsVisible() && m_pStack->menuActive == this )
+	if( UI_IsVisible() && m_pStack->Current() == this )
 	{
 		Hide();
 		if( m_iSource != SOURCE_CONSOLE && m_iState != STATE_MENU )
@@ -298,7 +298,7 @@ void CMenuConnectionProgress::_VidInit( void )
 	CalcSizes();
 }
 
-bool CMenuConnectionProgress::DrawAnimation(EAnimation anim)
+bool CMenuConnectionProgress::DrawAnimation()
 {
 	// We don't have animation
 	return true;
@@ -306,7 +306,7 @@ bool CMenuConnectionProgress::DrawAnimation(EAnimation anim)
 
 void CMenuConnectionProgress::Draw( void )
 {
-	if( ( m_iState != STATE_MENU && CL_IsActive() ) || ( m_iState == STATE_NONE && m_pStack->menuActive == this ) )
+	if( ( m_iState != STATE_MENU && CL_IsActive() ) || ( m_iState == STATE_NONE && m_pStack->Current() == this ) )
 	{
 		m_iState = STATE_NONE;
 		Hide();

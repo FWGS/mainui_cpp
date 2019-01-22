@@ -152,8 +152,7 @@ void CMenuBannerBitmap::Draw()
 	if( CMenuPicButton::GetTitleTransFraction() < 1.0f )
 		return;
 
-	if( window && window->IsRoot() && window->bInTransition &&
-		window->eTransitionType == CMenuBaseWindow::ANIM_OUT )
+	if( window && window->IsRoot() && window->eTransitionType == CMenuBaseWindow::ANIM_OUT )
 		return;
 
 	BaseClass::Draw();

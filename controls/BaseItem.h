@@ -46,8 +46,11 @@ public:
 	virtual bool KeyUp( int key );
 	virtual bool KeyDown( int key );
 
-	// Draw is called every frame
+	// Draw is called when screen must be updated
 	virtual void Draw( void );
+
+	// Think is called every frame, before drawing
+	virtual void Think( void );
 
 	// Char is a special key press event for text input
 	virtual void Char( int key );
@@ -182,16 +185,14 @@ public:
 	int    iStrokeWidth;
 
 	int		m_iLastFocusTime;
-protected:
+
 	// calls specific EventCallback
 	virtual void _Event( int ev );
+protected:
 
 	// Determine, is this item is absolute positioned
 	// If false, it will be positiond relative to it's parent
 	virtual bool IsAbsolutePositioned( void ) const { return false; }
-
-	friend int UI_VidInit( void );
-	friend class windowStack_t;
 
 	CMenuItemsHolder	*m_pParent;
 	bool	m_bPressed;

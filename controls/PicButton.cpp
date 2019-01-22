@@ -471,10 +471,6 @@ void CMenuPicButton::SetTransPic(HIMAGE pic)
 
 bool CMenuPicButton::DrawTitleAnim( CMenuBaseWindow::EAnimation state )
 {
-	// don't draw it twice
-	if( state == CMenuBaseWindow::ANIM_OUT )
-		return false; // but request more frame for animation
-
 #if 1
 	float frac = GetTitleTransFraction();
 #else
@@ -490,6 +486,9 @@ bool CMenuPicButton::DrawTitleAnim( CMenuBaseWindow::EAnimation state )
 		s_hCurrentTransPic = 0;
 		return true;
 	}
+
+	if( state == CMenuBaseWindow::ANIM_OUT )
+		return false; // but request more frame for animation
 
 	if( !s_hCurrentTransPic )
 		return false; // wait for transition pic

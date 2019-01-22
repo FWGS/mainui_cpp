@@ -37,6 +37,7 @@ public:
 	void ToggleInactive( void ) override;
 	void SetInactive( bool visible ) override;
 	void Draw( void ) override;
+	void Think( void ) override;
 
 	bool MouseMove( int x, int y ) override;
 

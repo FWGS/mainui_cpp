@@ -41,8 +41,9 @@ public:
 
 	enum EAnimation
 	{
-		ANIM_IN = 0,
-		ANIM_OUT
+		ANIM_NO = 0,  // no animation
+		ANIM_OUT,     // window closing animation
+		ANIM_IN,      // window showing animation
 	};
 
 	// Override this method to draw custom animations
@@ -50,11 +51,7 @@ public:
 	// Return false when animation is still going
 	// Otherwise return true, so window will be marked as "no animation"
 	// and this method will not be called anymore(until next menu transition)
-
-	// Window animation draw life during transition
-	// 1. ANIM_IN
-	// 2. ANIM_OUT
-	virtual bool DrawAnimation( EAnimation anim );
+	virtual bool DrawAnimation();
 
 	// Check current window is a root
 	virtual bool IsRoot() { return false; }
@@ -64,7 +61,18 @@ public:
 
 	bool IsWindow() override { return true; }
 
-	void EnableTransition();
+	void EnableTransition( EAnimation type );
+	void DisableTransition() { eTransitionType = ANIM_NO; }
+
+	bool IsMaximized() const
+	{
+		if( !FBitSet( iFlags, QMF_HIDDEN ) && // minimized
+		    m_scPos == Point( 0, 0 ) &&
+		    isrange( gpGlobals->scrWidth - 1, m_scSize.w, gpGlobals->scrWidth + 1 ) &&
+		    isrange( gpGlobals->scrHeight - 1, m_scSize.h, gpGlobals->scrHeight + 1 ))
+			return true;
+		return false;
+	}
 
 	// set parent of window
 	void Link( CMenuItemsHolder *h )
@@ -73,11 +81,10 @@ public:
 	}
 
 	bool bAllowDrag;
-	bool bInTransition;
 	EAnimation eTransitionType; // valid only when in transition
 	CMenuBackgroundBitmap background;
 
-	const windowStack_t *WindowStack() const
+	const CWindowStack *WindowStack() const
 	{
 		return m_pStack;
 	}
@@ -85,10 +92,7 @@ public:
 protected:
 	int m_iTransitionStartTime;
 
-	void PushMenu( windowStack_t &stack );
-	void PopMenu( windowStack_t &stack );
-	windowStack_t *m_pStack;
-
+	CWindowStack *m_pStack;
 private:
 	CMenuBaseWindow(); // remove
 

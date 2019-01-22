@@ -24,11 +24,15 @@ GNU General Public License for more details.
 
 template<class T>
 inline bool isrange( T min, T value, T max )
-{ return (((value) >= (min))) && (((value) <= (max))); };
+{ return (((value) >= (min))) && (((value) <= (max))); }
 
 #define bound( min, num, max )	((num) >= (min) ? ((num) < (max) ? (num) : (max)) : (min))
 #define Q_min( a, b ) (((a) < (b)) ? (a) : (b))
 #define Q_max( a, b ) (((a) < (b)) ? (b) : (a))
+
+#define SetBits( iBitVector, bits )	((iBitVector) = (iBitVector) | (bits))
+#define ClearBits( iBitVector, bits )	((iBitVector) = (iBitVector) & ~(bits))
+#define FBitSet( iBitVector, bit )	((iBitVector) & (bit))
 
 // engine constants
 enum
@@ -59,6 +63,8 @@ enum
 	QMF_DIALOG             = BIT( 12 ), // modal windows. Will grab key, char and mousemove events
 	QMF_DISABLESCAILING    = BIT( 13 ), // disables CalcPosition and CalcSizes
 	QMF_EVENTSIGNOREFOCUS  = BIT( 14 ), // don't care if item have focus, it must get events anyway
+
+	QMF_CLOSING            = BIT( 29 ), // INTERNAL USE ONLY: window is closing right now and we need only draw animation
 	QMF_HIDDENBYPARENT     = BIT( 30 ), // INTERNAL USE ONLY: parent set this flag and don't want to draw this control
 	QMF_HIDDEN             = BIT( 31 ), // INTERNAL USE ONLY: Use Show/Hide/SetVisibility/ToggleVisibility
 };
@@ -119,6 +125,11 @@ struct Point
 		return Point( a.x - b.x, a.y - b.y );
 	}
 
+	bool operator ==( const Point &a ) const
+	{
+		return x == a.x && y == a.y;
+	}
+
 	Point& operator+=( const Point &a )
 	{
 		x += a.x;
@@ -155,6 +166,11 @@ struct Size
 		return Size( a.w - b.w, a.h - b.h );
 	}
 
+	bool operator ==( const Size &a ) const
+	{
+		return w == a.w && w == a.w;
+	}
+
 	Size AddVertical( const Size &a )
 	{
 		return Size( w, a.h + h );
@@ -170,6 +186,33 @@ struct Size
 
 	Size operator *( const float scale ) { return Size( (int)(w * scale), (int)(h * scale) ); }
 	Size operator /( const float scale ) { return Size( (int)(w / scale), (int)(h / scale) ); }
+};
+
+// rectangle in screen space
+struct Rect
+{
+	Rect( int x, int y, int w, int h ) :
+		pt( x, y ), sz( w, h ) { }
+	Rect( Point pt, Size sz ) :
+		pt( pt ), sz( sz ) { }
+
+	// true if this rect overlaps
+	// false otherwise
+	bool IsInside( const Rect &b ) const
+	{
+		Point l1( pt.x, pt.y ),
+			l2( b.pt.x, b.pt.y ),
+			r1( pt.x + sz.w, pt.y + sz.h ),
+			r2( b.pt.x + b.sz.w, b.pt.y + b.sz.h );
+
+		if( l2.x >= l1.x && r2.x <= r1.x &&
+		    l2.y >= l1.y && r2.y <= r1.y )
+			return true;
+		return false;
+	}
+
+	Point pt;
+	Size  sz;
 };
 
 inline Point operator +(const Point &a, const Size &b)

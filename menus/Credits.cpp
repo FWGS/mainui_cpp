@@ -41,7 +41,7 @@ public:
 	void Draw() override;
 	bool KeyUp( int key ) override;
 	bool KeyDown( int key ) override;
-	bool DrawAnimation(EAnimation anim) override { return false; }
+	bool DrawAnimation() override { return true; }
 	void Show() override;
 
 	friend void UI_DrawFinalCredits( void );

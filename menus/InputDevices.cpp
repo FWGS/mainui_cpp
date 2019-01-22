@@ -34,6 +34,7 @@ class CMenuInputDevices : public CMenuFramework
 private:
 	void _Init( void ) override;
 	void _VidInit( void ) override;
+	bool DrawAnimation() override { return true; }
 
 	void GetConfig( void );
 	void SaveAndPopMenu( void ) override;
@@ -77,7 +78,6 @@ UI_AdvControls_Init
 void CMenuInputDevices::_Init( void )
 {
 	//banner.SetPicture( ART_BANNER );
-	eTransitionType = ANIM_OUT;
 
 	done.SetNameAndStatus( L( "Done" ), L( "Save changed and go back to the Customize Menu" ) );
 	done.SetPicture( PC_DONE );

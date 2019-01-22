@@ -45,7 +45,7 @@ public:
 	CMenuPicButton *AddButton( const char *szName, const char *szStatus,
 		const char *szButtonPath, CEventCallback onReleased = CEventCallback(), int iFlags = 0 );
 
-	bool DrawAnimation(EAnimation anim) override;
+	bool DrawAnimation() override;
 
 	CMenuBannerBitmap banner;
 
