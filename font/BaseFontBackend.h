@@ -106,16 +106,14 @@ private:
 		HIMAGE texture;
 		wrect_t rect;
 
-		bool operator< (const glyph_t &a)
+		bool operator< (const glyph_t &a) const
 		{
 			return ch < a.ch;
 		}
 	};
 
 	CUtlRBTree<glyph_t, int> m_glyphs;
-	static bool GlyphLessFunc( const glyph_t &a, const glyph_t &b );
 	friend class CFontManager;
-
 };
 
 

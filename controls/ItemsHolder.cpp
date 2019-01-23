@@ -202,7 +202,7 @@ bool CMenuItemsHolder::MouseMove( int x, int y )
 	int i;
 	// region test the active menu items
 	// go in reverse direction, so last items will be first
-	FOR_EACH_VEC_BACK( m_pItems, i )
+	for ( i = m_pItems.Count()-1; i >= 0; i-- )
 	{
 		CMenuBaseItem *item = m_pItems[i];
 
@@ -516,7 +516,7 @@ void CMenuItemsHolder::AddItem(CMenuBaseItem &item)
 
 void CMenuItemsHolder::RemoveItem(CMenuBaseItem &item)
 {
-	if( m_pItems.FindAndRemove( &item ) != m_pItems.InvalidIndex() )
+	if( m_pItems.FindAndRemove( &item ) )
 	{
 		item.m_pParent = NULL;
 	}

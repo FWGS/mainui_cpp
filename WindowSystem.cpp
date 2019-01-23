@@ -150,14 +150,14 @@ void CWindowStack::Update( )
 		drawList.AddToTail( stack[i] );
 	}
 
-	FOR_EACH_VEC( removeList, i )
+	FOR_EACH_VEC( removeList, j )
 	{
-		stack.Remove( removeList[i] );
+		stack.Remove( removeList[j] );
 	}
 
-	FOR_EACH_VEC_BACK( drawList, i )
+	FOR_EACH_VEC_BACK( drawList, k )
 	{
-		CMenuBaseWindow *window = drawList[i];
+		CMenuBaseWindow *window = drawList[k];
 
 		if( window->eTransitionType > CMenuBaseWindow::ANIM_OUT )
 		{
@@ -166,11 +166,11 @@ void CWindowStack::Update( )
 		}
 
 		if( !window->eTransitionType )
-			drawList[i]->Draw();
+			drawList[k]->Draw();
 
-		if( i != drawList.Count() - 1 )
+		if( k != drawList.Count() - 1 )
 		{
-			window = drawList[i+1];
+			window = drawList[k+1];
 
 			if( window->eTransitionType == CMenuBaseWindow::ANIM_OUT )
 			{
@@ -189,16 +189,16 @@ void CWindowStack::Update( )
 
 		Con_NXPrintf( &con, "Stack:\n" );
 
-		FOR_EACH_LL( stack, i )
+		FOR_EACH_LL( stack, l )
 		{
 			con.index++;
-			if( active == i )
+			if( active == l )
 			{
 				con.color[0] = 0.0f;
 				con.color[1] = 1.0f;
 				con.color[2] = 0.0f;
 			}
-			else if( FBitSet( stack[i]->iFlags, QMF_CLOSING ))
+			else if( FBitSet( stack[l]->iFlags, QMF_CLOSING ))
 			{
 				// bloody :)
 				con.color[0] = 1.0f;
@@ -211,16 +211,16 @@ void CWindowStack::Update( )
 			}
 
 			char visible = '-';
-			if( drawList.Find( stack[i] ) != drawList.InvalidIndex() )
+			if( drawList.Find( stack[l] ) != drawList.InvalidIndex() )
 				visible = '+';
 
-			if( stack[i]->IsRoot() )
+			if( stack[l]->IsRoot() )
 			{
-				Con_NXPrintf( &con, "%c %p - %s\n", visible, stack[i], stack[i]->szName );
+				Con_NXPrintf( &con, "%c %p - %s\n", visible, stack[l], stack[l]->szName );
 			}
 			else
 			{
-				Con_NXPrintf( &con, "%c     %p - %s\n", visible, stack[i], stack[i]->szName );
+				Con_NXPrintf( &con, "%c     %p - %s\n", visible, stack[l], stack[l]->szName );
 			}
 		}
 	}

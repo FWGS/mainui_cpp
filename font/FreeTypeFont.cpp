@@ -26,14 +26,10 @@ FT_Library CFreeTypeFont::m_Library;
 #define PIXEL(x) ((((x)+63) & -64)>>6)
 
 
-bool ABCCacheLessFunc( const abc_t &a, const abc_t &b )
-{
-	return a.ch < b.ch;
-}
-
 CFreeTypeFont::CFreeTypeFont() : CBaseFont(),
-	m_ABCCache(0, 0, ABCCacheLessFunc), face(), m_szRealFontFile()
+	m_ABCCache(0, 0), face(), m_szRealFontFile()
 {
+	SetDefLessFunc( m_ABCCache );
 }
 
 CFreeTypeFont::~CFreeTypeFont()

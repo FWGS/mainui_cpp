@@ -24,6 +24,7 @@ CBaseFont::CBaseFont()
 	m_iEllipsisWide( 0 ),
 	m_glyphs(0, 0)
 {
+	SetDefLessFunc( m_glyphs );
 }
 
 

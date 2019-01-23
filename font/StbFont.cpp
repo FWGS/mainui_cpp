@@ -37,14 +37,10 @@ GNU General Public License for more details.
 
 #include "Utils.h"
 
-bool ABCCacheLessFunc( const abc_t &a, const abc_t &b )
-{
-	return a.ch < b.ch;
-}
-
 CStbFont::CStbFont() : CBaseFont(),
-	m_ABCCache(0, 0, ABCCacheLessFunc), m_szRealFontFile(), m_pFontData( NULL )
+	m_ABCCache(0, 0), m_szRealFontFile(), m_pFontData( NULL )
 {
+	SetDefLessFunc( m_ABCCache );
 }
 
 CStbFont::~CStbFont()

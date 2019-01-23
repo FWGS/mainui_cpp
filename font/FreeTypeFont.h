@@ -34,6 +34,11 @@ struct abc_t
 {
 	int ch;
 	int a, b, c;
+
+	bool operator< ( const abc_t &a ) const
+	{
+		return ch < a.ch;
+	}
 };
 
 class CFreeTypeFont : public CBaseFont

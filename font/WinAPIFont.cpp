@@ -23,6 +23,7 @@ GNU General Public License for more details.
 
 CWinAPIFont::CWinAPIFont( ) : CBaseFont( ), m_ABCCache( 0, 0 )
 {
+	SetDefLessFunc( m_ABCCache );
 }
 
 CWinAPIFont::~CWinAPIFont( )
