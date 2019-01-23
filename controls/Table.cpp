@@ -256,6 +256,7 @@ bool CMenuTable::KeyUp( int key )
 				}
 			}
 		}
+		break;
 	case K_ENTER:
 	case K_AUX1:
 	case K_AUX31:
