@@ -24,13 +24,18 @@ GNU General Public License for more details.
 #include "BaseFontBackend.h"
 #include "FontManager.h"
 
-#include "utl/utlmemory.h"
-#include "utl/utlrbtree.h"
+#include "utlmemory.h"
+#include "utlrbtree.h"
 
 struct abc_t
 {
 	int ch;
 	int a, b, c;
+
+	bool operator<(const abc_t &a)
+	{
+		return ch < a.ch;
+	}
 };
 
 class CWinAPIFont : public CBaseFont

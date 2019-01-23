@@ -84,6 +84,10 @@ public:
 	void UnbindEntry( void );
 	static void GetKeyBindings( const char *command, int *twoKeys );
 
+	// state toggle by
+	CMenuTable keysList;
+	CMenuKeysModel keysListModel;
+
 private:
 	void UnbindCommand( const char *command );
 	void ResetKeysList( void );
@@ -95,9 +99,6 @@ private:
 
 	CMenuBannerBitmap banner;
 
-	// state toggle by
-	CMenuTable keysList;
-	CMenuKeysModel keysListModel;
 
 	// redefine key wait dialog
 	class CGrabKeyMessageBox : public CMenuMessageBox

@@ -17,17 +17,12 @@ GNU General Public License for more details.
 #include <math.h>
 #include "Utils.h"
 
-bool CBaseFont::GlyphLessFunc( const glyph_t &a, const glyph_t &b )
-{
-	return a.ch < b.ch;
-}
-
 CBaseFont::CBaseFont()
 	: m_szName( ), m_iTall(), m_iWeight(), m_iFlags(),
 	m_iHeight(), m_iMaxCharWidth(), m_iAscent(),
 	m_iBlur(), m_fBrighten(),
 	m_iEllipsisWide( 0 ),
-	m_glyphs(0, 0, GlyphLessFunc)
+	m_glyphs(0, 0)
 {
 }
 

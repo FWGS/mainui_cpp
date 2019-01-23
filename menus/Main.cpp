@@ -320,7 +320,7 @@ void CMenuMain::_VidInit( void )
 		disconnect.Hide();
 	}
 
-	if( gpGlobals->developer )
+	if( EngFuncs::GetCvarFloat( "developer" ) )
 	{
 		console.pos.y = CL_IsActive() ? 130 : 230;
 	}
