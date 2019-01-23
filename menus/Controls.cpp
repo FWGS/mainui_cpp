@@ -80,21 +80,18 @@ public:
 
 	void _Init();
 	void _VidInit();
-	bool KeyDown( int key );
 	void EnterGrabMode( void );
 	void UnbindEntry( void );
 	static void GetKeyBindings( const char *command, int *twoKeys );
 
 private:
 	void UnbindCommand( const char *command );
-	void PromptDialog( void );
 	void ResetKeysList( void );
 	void Cancel( void )
 	{
 		EngFuncs::ClientCmd( TRUE, "exec keyboard\n" );
 		Hide();
 	}
-
 
 	CMenuBannerBitmap banner;
 
@@ -103,18 +100,14 @@ private:
 	CMenuKeysModel keysListModel;
 
 	// redefine key wait dialog
-	CMenuMessageBox msgBox1; // small msgbox
+	class CGrabKeyMessageBox : public CMenuMessageBox
+	{
+	public:
+		bool KeyUp( int key ) override;
+	} msgBox1; // small msgbox
 
 	CMenuYesNoMessageBox msgBox2; // large msgbox
-
-	int bind_grab;
 } uiControls;
-
-void CMenuControls::PromptDialog( void )
-{
-	// show\hide quit dialog
-	msgBox1.ToggleVisibility();
-}
 
 /*
 =================
@@ -123,14 +116,11 @@ UI_Controls_GetKeyBindings
 */
 void CMenuControls::GetKeyBindings( const char *command, int *twoKeys )
 {
-	int		i, count = 0;
-	const char	*b;
-
 	twoKeys[0] = twoKeys[1] = -1;
 
-	for( i = 0; i < 256; i++ )
+	for( int i = 0, count = 0; i < 256; i++ )
 	{
-		b = EngFuncs::KEY_GetBinding( i );
+		const char *b = EngFuncs::KEY_GetBinding( i );
 		if( !b ) continue;
 
 		if( !stricmp( command, b ))
@@ -219,22 +209,32 @@ void CMenuKeysModel::Update( void )
 			else
 				snprintf( name[i], sizeof( name[i] ), "^6%s^7", token );
 
-			const char *firstKeyStr = NULL, *secondKeyStr = NULL;
+			if( keys[0] == keys[1] )
+				Con_DPrintf( "%i %i\n", keys[0], keys[1]);
 
-			if( keys[0] != -1 )	firstKeyStr = EngFuncs::KeynumToString( keys[0] );
-			if( keys[1] != -1 ) secondKeyStr = EngFuncs::KeynumToString( keys[1] );
+			if( keys[0] != -1 )
+			{
+				const char *str = EngFuncs::KeynumToString( keys[0] );
 
-			if( firstKeyStr )
-				if( !strnicmp( firstKeyStr, "MOUSE", 5 ) )
-					snprintf( firstKey[i], 20, "^5%s^7", firstKeyStr );
-				else snprintf( firstKey[i], 20, "^3%s^7", firstKeyStr );
-			else firstKey[i][0] = 0;
+				if( str )
+					if( !strnicmp( str, "MOUSE", 5 ) )
+						snprintf( firstKey[i], 20, "^5%s^7", str );
+					else snprintf( firstKey[i], 20, "^3%s^7", str );
+				else firstKey[i][0] = 0;
+			}
 
-			if( secondKeyStr )
-				if( !strnicmp( secondKeyStr, "MOUSE", 5 ) )
-					snprintf( secondKey[i], 20, "^5%s^7", secondKeyStr );
-				else snprintf( secondKey[i], 20, "^3%s^7", secondKeyStr );
-			else secondKey[i][0] = 0;
+			if( keys[1] != -1 )
+			{
+				const char *str = EngFuncs::KeynumToString( keys[1] );
+
+				if( str )
+					if( !strnicmp( str, "MOUSE", 5 ) )
+						snprintf( secondKey[i], 20, "^5%s^7", str );
+					else snprintf( secondKey[i], 20, "^3%s^7", str );
+				else secondKey[i][0] = 0;
+			}
+
+
 
 			i++;
 		}
@@ -276,7 +276,7 @@ void CMenuControls::ResetKeysList( void )
 		pfile = EngFuncs::COM_ParseFile( pfile, token );
 		if( !pfile ) break;	// technically an error
 
-		char	cmd[128];
+		char	cmd[4096];
 
 		if( key[0] == '\\' && key[1] == '\\' )
 		{
@@ -294,40 +294,33 @@ void CMenuControls::ResetKeysList( void )
 	keysListModel.Update();
 }
 
-/*
-=================
-UI_Controls_KeyFunc
-=================
-*/
-bool CMenuControls::KeyDown( int key )
+bool CMenuControls::CGrabKeyMessageBox::KeyUp( int key )
 {
-	char	cmd[128];
+	CMenuControls *parent = ((CMenuControls*)m_pParent);
 
-	if( msgBox1.IsVisible() && bind_grab ) // assume we are in grab-mode
+	// defining a key
+	if( key == '`' || key == '~' )
 	{
-		// defining a key
-		if( key == '`' || key == '~' || key == K_ESCAPE )
-		{
-			PlayLocalSound( uiSoundBuzz );
-			return true;
-		}
-		else
-		{
-			const char *bindName = keysListModel.keysBind[keysList.GetCurrentIndex()];
-			sprintf( cmd, "bind \"%s\" \"%s\"\n", EngFuncs::KeynumToString( key ), bindName );
-			EngFuncs::ClientCmd( TRUE, cmd );
-		}
-
-		bind_grab = false;
-		keysListModel.Update();
-
-		PromptDialog();
-
-		PlayLocalSound( uiSoundLaunch );
+		Hide();
+		PlayLocalSound( uiSoundBuzz );
 		return true;
 	}
-	
-	return CMenuFramework::KeyDown( key );
+	else if( key != K_ESCAPE )
+	{
+		char cmd[4096];
+
+		const char *bindName = parent->keysListModel.keysBind[parent->keysList.GetCurrentIndex()];
+		snprintf( cmd, sizeof( cmd ), "bind \"%s\" \"%s\"\n", EngFuncs::KeynumToString( key ), bindName );
+		EngFuncs::ClientCmd( TRUE, cmd );
+	}
+
+	parent->keysListModel.Update();
+
+	Hide();
+
+	PlayLocalSound( uiSoundLaunch );
+
+	return true;
 }
 
 void CMenuControls::UnbindEntry()
@@ -344,7 +337,8 @@ void CMenuControls::UnbindEntry()
 	PlayLocalSound( uiSoundRemoveKey );
 	keysListModel.Update();
 
-	PromptDialog();
+	// disabled: left command just unbinded
+	// msgBox1.Show();
 }
 
 void CMenuControls::EnterGrabMode()
@@ -364,9 +358,7 @@ void CMenuControls::EnterGrabMode()
 	if( keys[1] != -1 )
 		UnbindCommand( bindName );
 
-	bind_grab = true;
-
-	PromptDialog();
+	msgBox1.Show();
 
 	PlayLocalSound( uiSoundKey );
 }
@@ -387,6 +379,7 @@ void CMenuControls::_Init( void )
 	keysList.SetupColumn( 2, L( "GameUI_Alternate" ), 0.25f );
 
 	msgBox1.SetMessage( L( "Press a key or button" ) );
+	msgBox1.Link( this );
 
 	msgBox2.SetMessage( L( "GameUI_KeyboardSettingsText" ) );
 	msgBox2.onPositive = VoidCb( &CMenuControls::ResetKeysList );
