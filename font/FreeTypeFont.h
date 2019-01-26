@@ -27,8 +27,8 @@ extern "C"
     #include FT_FREETYPE_H
 }
 
-#include "miniutl/utlmemory.h"
-#include "miniutl/utlrbtree.h"
+#include "utlmemory.h"
+#include "utlrbtree.h"
 
 struct abc_t
 {

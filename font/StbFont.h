@@ -16,8 +16,8 @@ GNU General Public License for more details.
 
 #if defined(MAINUI_USE_CUSTOM_FONT_RENDER) && defined(MAINUI_USE_STB)
 #include "BaseFontBackend.h"
-#include "utl/utlmemory.h"
-#include "utl/utlrbtree.h"
+#include "utlmemory.h"
+#include "utlrbtree.h"
 #include "stb_truetype.h"
 
 struct abc_t
