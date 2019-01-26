@@ -103,7 +103,8 @@ set(MAINUI_FONT_RENDER_SOURCES
 )
 
 set(MAINUI_SOURCES
-	utl/unicode_strtools.cpp
+	miniutl/utlmemory.cpp
+	unicode_strtools.cpp
 	EventSystem.cpp
 	EngineCallback.cpp
 	BaseMenu.cpp
@@ -158,7 +159,7 @@ if(APPLE)
 	set(MAINUI_USE_STB TRUE)
 endif()
 
-include_directories(${XASH_SDK}/common ${XASH_SDK}/engine ${XASH_SDK}/pm_shared . controls/ menus/ utl/ font/ model/)
+include_directories(${XASH_SDK}/common ${XASH_SDK}/engine ${XASH_SDK}/pm_shared . controls/ menus/ miniutl/ font/ model/)
 
 if(MSVC)
 	add_definitions(-D_CRT_SECURE_NO_WARNINGS)

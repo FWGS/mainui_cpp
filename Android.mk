@@ -25,7 +25,7 @@ LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)/menus 				\
 	$(LOCAL_PATH)/controls 				\
 	$(LOCAL_PATH)/font 				\
-	$(LOCAL_PATH)/utl 				\
+	$(LOCAL_PATH)/miniutl 				\
 	$(LOCAL_PATH)/model				\
 
 LOCAL_SRC_FILES := \
@@ -83,7 +83,8 @@ LOCAL_SRC_FILES := \
 	font/BaseFontBackend.cpp			\
 	font/StbFont.cpp				\
 	font/BitmapFont.cpp				\
-	utl/unicode_strtools.cpp			\
+	miniutl/utlmemory.cpp				\
+	unicode_strtools.cpp				\
 	EventSystem.cpp                                 \
 	BaseMenu.cpp                                    \
 	Btns.cpp                                        \

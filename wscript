@@ -74,20 +74,16 @@ def build(bld):
 
 	source = bld.path.ant_glob([
 		'*.cpp',
-		'miniutl/utlvector.cpp',
 		'miniutl/utlmemory.cpp',
-		'miniutl/utlrbtree.cpp',
 		'font/*.cpp',
 		'menus/*.cpp',
 		'menus/dynamic/*.cpp',
 		'model/*.cpp',
-		'controls/*.cpp',
-		'utl/*.cpp'
+		'controls/*.cpp'
 	])
 
 	includes = [
 		'.',
-		'utl/',
 		'miniutl/',
 		'font/',
 		'controls/',
