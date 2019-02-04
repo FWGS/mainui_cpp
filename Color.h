@@ -20,8 +20,10 @@ GNU General Public License for more details.
 class CColor
 {
 public:
-	CColor( ) : rgba( 0 ), init( false ) { }
-	CColor( unsigned int rgba ) : rgba( rgba ), init( false ) { }
+	CColor( ) : rgba( 0 ), init( false ),
+		a(3,rgba), r(2,rgba), g(1,rgba), b(0,rgba) { }
+	CColor( unsigned int rgba_ ) : rgba( rgba_ ), init( false ),
+		a(3,rgba), r(2,rgba), g(1,rgba), b(0,rgba) { }
 
 	inline unsigned int operator =( unsigned int color )
 	{
@@ -47,7 +49,29 @@ public:
 
 	unsigned int rgba;
 private:
+	class ColorWrap
+	{
+	private:
+		const byte _byte;
+		unsigned int & _rgba;
+
+		ColorWrap(int bytenum, unsigned int &rgba): _byte(bytenum), _rgba(rgba) {}
+	public:
+		inline unsigned int operator =(unsigned int value) const
+		{
+			value &= 0xff;
+			_rgba = (_rgba & ~(0xff << (_byte*8)) ) | ( value << (_byte*8) );
+			return value;
+		}
+		inline operator unsigned int() const
+		{
+			return (_rgba >> _byte * 8) & 0xff;
+		}
+		friend class CColor;
+	};
 	bool init;
+public:
+		const ColorWrap r,g,b,a;
 };
 
 #endif // COLOR_H
