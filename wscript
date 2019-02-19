@@ -17,9 +17,6 @@ def options(opt):
 	return
 
 def configure(conf):
-	if conf.options.DEDICATED:
-		return
-
 	# conf.env.CXX11_MANDATORY = False
 	conf.load('cxx11')
 	if not conf.env.HAVE_CXX11:
@@ -60,9 +57,6 @@ def configure(conf):
 def build(bld):
 	bld.load_envs()
 	bld.env = bld.all_envs[get_subproject_name(bld)]
-
-	if bld.env.DEDICATED:
-		return
 
 	libs = []
 
