@@ -10,7 +10,8 @@ from fwgslib import get_subproject_name
 top = '.'
 
 def options(opt):
-	opt.add_option('--enable-stbtt', action = 'store_true', dest = 'USE_STBTT',
+	grp = opt.add_option_group('MainUI C++ options')
+	grp.add_option('--enable-stbtt', action = 'store_true', dest = 'USE_STBTT',
 		help = 'prefer stb_truetype.h over freetype')
 
 	return
