@@ -5,7 +5,6 @@
 from waflib import Logs
 import os
 from fwgslib import get_flags_by_compiler
-from fwgslib import get_subproject_name
 
 top = '.'
 
@@ -55,9 +54,6 @@ def configure(conf):
 			conf.env.append_unique('DEFINES', 'MAINUI_USE_FREETYPE');
 
 def build(bld):
-	bld.load_envs()
-	bld.env = bld.all_envs[get_subproject_name(bld)]
-
 	libs = []
 
 	# basic build: dedicated only, no dependencies
