@@ -35,5 +35,6 @@ ipch/
 # Use CMake for generating projects
 *.vcxproj.filters
 *.vcxproj
+*.vcproj
 *.sln
 *.pdb
