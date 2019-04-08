@@ -361,8 +361,10 @@ float CMenuPicButton::GetTitleTransFraction( void )
 
 void CMenuPicButton::SetTitleAnim( int anim_state )
 {
-	wrect_t r = { 0, uiStatic.buttons_width, 26, 51 };
+	static wrect_t r = { 0, 0, 26, 51 };
 	CMenuPicButton *button = NULL;
+
+	r.right = uiStatic.buttons_width;
 
 	// choose target button
 	if( anim_state == AS_TO_TITLE )
