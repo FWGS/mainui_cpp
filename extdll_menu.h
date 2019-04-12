@@ -24,12 +24,18 @@ GNU General Public License for more details.
 
 
 // shut-up compiler warnings
-#ifdef MSC_VER
+#ifdef _MSC_VER
 #pragma warning(disable : 4305)	// int or float data truncation
 #pragma warning(disable : 4201)	// nameless struct/union
 #pragma warning(disable : 4514)	// unreferenced inline function removed
 #pragma warning(disable : 4100)	// unreferenced formal parameter
 #pragma warning(disable : 4244)	// conversion from 'float' to 'int', possible loss of data
+#pragma warning(disable : 4520) // multiple default constructors specified
+#pragma warning(disable : 4996) // This function or variable may be unsafe
+// disable c++11 on old msvc
+#if _MSC_VER < 1800
+#define MY_COMPILER_SUCKS
+#endif
 #endif
 // Misc C-runtime library headers
 #include <assert.h>
