@@ -67,7 +67,7 @@ bool CWindowStack::IsVisible( const CMenuBaseWindow *menu ) const
 		return false;
 
 	// for some reason const_cast need here
-	if( !stack.Find( const_cast<CMenuBaseWindow*>( menu )) != stack.InvalidIndex())
+	if( stack.Find( const_cast<CMenuBaseWindow*>( menu )) == stack.InvalidIndex())
 		return false;
 
 	return true;
