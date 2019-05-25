@@ -30,10 +30,10 @@ class CMenuTouchEdit : public CMenuFramework
 public:
 	CMenuTouchEdit() : CMenuFramework( "CMenuTouchEdit" ) { }
 
-	void Show();
-	void Hide();
-	void Draw();
-	bool DrawAnimation();
+	void Show() override;
+	void Hide() override;
+	void Draw() override;
+	bool DrawAnimation() override;
 	bool KeyDown( int key ) override;
 private:
 	float saveTouchEnable;

@@ -14,7 +14,7 @@ public:
 	bool KeyDown( int key ) override;
 	bool MouseMove( int x, int y ) override;
 
-	Point GetPositionOffset() const;
+	Point GetPositionOffset() const override;
 
 private:
 	bool IsRectVisible( Point pt, Size sz );
