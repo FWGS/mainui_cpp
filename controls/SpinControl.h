@@ -43,7 +43,7 @@ public:
 	void SetCurrentValue( float curValue );
 
 	float GetCurrentValue( ) { return m_flCurValue; }
-	const char *GetCurrentString( ) { return m_pModel->GetText( (int)m_flCurValue ); }
+	const char *GetCurrentString( ) { return m_pModel ? m_pModel->GetText( (int)m_flCurValue ) : NULL; }
 
 	void ForceDisplayString( const char *display );
 
