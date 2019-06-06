@@ -4,7 +4,6 @@
 
 from waflib import Logs
 import os
-from fwgslib import get_flags_by_compiler
 
 top = '.'
 
@@ -17,7 +16,7 @@ def options(opt):
 
 def configure(conf):
 	# conf.env.CXX11_MANDATORY = False
-	conf.load('cxx11')
+	conf.load('fwgslib cxx11')
 	if not conf.env.HAVE_CXX11:
 		conf.env.append_unique('DEFINES', 'MY_COMPILER_SUCKS')
 
@@ -29,7 +28,7 @@ def configure(conf):
 		'default': ['-fno-rtti']
 	}
 
-	conf.env.append_unique('CXXFLAGS', get_flags_by_compiler(nortti, conf.env.COMPILER_CC))
+	conf.env.append_unique('CXXFLAGS', conf.get_flags_by_compiler(nortti, conf.env.COMPILER_CC))
 
 	if conf.env.DEST_OS == 'darwin' or conf.env.DEST_OS2 == 'android':
 		conf.env.USE_STBTT = True
