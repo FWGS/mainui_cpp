@@ -115,6 +115,7 @@ set(MAINUI_SOURCES
 	Utils.cpp
 	Scissor.cpp
 	udll_int.cpp
+	WindowSystem.cpp
 )
 
 if(CS16CLIENT)
