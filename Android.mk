@@ -93,6 +93,7 @@ LOCAL_SRC_FILES := \
 	Scissor.cpp                                     \
 	udll_int.cpp                                    \
 	CFGScript.cpp					\
-	EngineCallback.cpp
+	EngineCallback.cpp				\
+	WindowSystem.cpp
 
 include $(BUILD_SHARED_LIBRARY)
