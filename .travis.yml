@@ -13,4 +13,4 @@ before_script:
 script:
   - cmd "/c compile.bat"
 after_script:
-  - sh travis-deploy.sh menudll_orig menu.dll menu.pdb
+  - sh continious_upload.sh menudll_orig menu.dll menu.pdb
