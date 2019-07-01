@@ -16,12 +16,19 @@ GNU General Public License for more details.
 #ifndef EXTDLL_H
 #define EXTDLL_H
 
+// includes xash3d_types.h on Xash3D FWGS, which defines EXPORT
+// but harmless on any HLSDK or Xash3D
+#include "const.h"
+
+#ifndef EXPORT
 #ifdef _WIN32
 #define EXPORT __declspec(dllexport)
+#elif defined(__GNUC__)
+#define EXPORT __attribute__((visibility("default")))
 #else
 #define EXPORT
 #endif
-
+#endif
 
 // shut-up compiler warnings
 #ifdef _MSC_VER
