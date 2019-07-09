@@ -105,6 +105,7 @@ private:
 	{
 	public:
 		bool KeyUp( int key ) override;
+		bool KeyDown( int key ) override;
 	} msgBox1; // small msgbox
 
 	CMenuYesNoMessageBox msgBox2; // large msgbox
@@ -300,13 +301,13 @@ bool CMenuControls::CGrabKeyMessageBox::KeyUp( int key )
 	CMenuControls *parent = ((CMenuControls*)m_pParent);
 
 	// defining a key
-	if( key == '`' || key == '~' )
+	if( key == '`' || key == '~' || key == K_ESCAPE )
 	{
 		Hide();
 		PlayLocalSound( uiSoundBuzz );
 		return true;
 	}
-	else if( key != K_ESCAPE )
+	else
 	{
 		char cmd[4096];
 
@@ -321,6 +322,11 @@ bool CMenuControls::CGrabKeyMessageBox::KeyUp( int key )
 
 	PlayLocalSound( uiSoundLaunch );
 
+	return true;
+}
+
+bool CMenuControls::CGrabKeyMessageBox::KeyDown( int key )
+{
 	return true;
 }
 
