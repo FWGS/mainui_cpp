@@ -18,6 +18,8 @@ GNU General Public License for more details.
 #include "BaseMenu.h"
 #include "Utils.h"
 #include "MenuStrings.h"
+#include "utlhashmap.h"
+#include "generichash.h"
 #include "unicode_strtools.h"
 
 #define EMPTY_STRINGS_1 ""
@@ -28,13 +30,7 @@ GNU General Public License for more details.
 #define EMPTY_STRINGS_50 EMPTY_STRINGS_20, EMPTY_STRINGS_20, EMPTY_STRINGS_10
 #define EMPTY_STRINGS_100 EMPTY_STRINGS_50, EMPTY_STRINGS_50
 
-#define HASH_SIZE 256 // 256 * 4 * 4 == 4096 bytes
-static struct dictionary_t
-{
-	const char *name;
-	const char *value;
-	dictionary_t *next;
-} *hashed_cmds[HASH_SIZE];
+CUtlHashMap<const char *, const char *> hashed_cmds;
 
 const char *MenuStrings[IDS_LAST] =
 {
@@ -88,58 +84,14 @@ EMPTY_STRINGS_50, // 540..589
 EMPTY_STRINGS_10, // 590..599
 };
 
-/*
-=================
-Com_HashKey
-
-returns hash key for string
-=================
-*/
-static uint Com_HashKey( const char *string, uint hashSize )
+static void Dictionary_Insert( const char *key, const char *value )
 {
-	uint	i, hashKey = 0;
+	const char *first, *second;
 
-	for( i = 0; string[i]; i++ )
-	{
-		hashKey = (hashKey + i) * 37 + tolower( string[i] );
-	}
+	first = StringCopy( key );
+	second = StringCopy( value );
 
-	return (hashKey % hashSize);
-}
-
-static inline dictionary_t *Dictionary_FindInBucket( dictionary_t *bucket, const char *name )
-{
-	dictionary_t *i = bucket;
-	for( ; i && stricmp( name, i->name ); // filter out
-		 i = i->next );
-
-	return i;
-}
-
-static void Dictionary_Insert( const char *name, const char *second )
-{
-	uint hash = Com_HashKey( name, HASH_SIZE );
-	dictionary_t *elem;
-
-	elem = Dictionary_FindInBucket( hashed_cmds[hash], name );
-	if( elem )
-	{
-		delete [] (char*) elem->value;
-		elem->value = StringCopy( second );
-	}
-	else
-	{
-		elem = new dictionary_t;
-		elem->name = StringCopy(name);
-		elem->value = StringCopy(second);
-		elem->next   = hashed_cmds[hash];
-		hashed_cmds[hash] = elem;
-	}
-}
-
-static inline dictionary_t *Dictionary_GetBucket( const char *name )
-{
-	return hashed_cmds[ Com_HashKey( name, HASH_SIZE ) ];
+	hashed_cmds.InsertOrReplace( first, second );
 }
 
 static void UI_InitAliasStrings( void )
@@ -396,7 +348,7 @@ static void Localize_Init( void )
 {
 	EngFuncs::ClientCmd( TRUE, "exec mainui.cfg\n" );
 
-	memset( hashed_cmds, 0, sizeof( hashed_cmds ) );
+	hashed_cmds.Purge();
 
 	// strings.lst first
 	for( int i = 0; i < IDS_LAST; i++ )
@@ -431,23 +383,16 @@ static void Localize_Init( void )
 
 static void Localize_Free( void )
 {
-	for( int i = 0; i < HASH_SIZE; i++ )
+	FOR_EACH_HASHMAP( hashed_cmds, i )
 	{
-		dictionary_t *base = hashed_cmds[i];
-		while( base )
-		{
-			dictionary_t *next = base->next;
+		const char *first = hashed_cmds.Key( i );
+		const char *second = hashed_cmds.Element( i );
 
-			delete [] (char*)base->value;
-			delete [] (char*)base->name;
-
-			delete base;
-
-			base = next;
-		}
+		delete[] first;
+		delete[] second;
 	}
 
-	return;
+	hashed_cmds.Purge();
 }
 
 void UI_LoadCustomStrings( void )
@@ -492,11 +437,10 @@ const char *L( const char *szStr ) // L means Localize!
 		if( *szStr == '#' )
 			szStr++;
 
-		dictionary_t *base = Dictionary_GetBucket( szStr );
-		dictionary_t *found = Dictionary_FindInBucket( base, szStr );
+		int i = hashed_cmds.Find( szStr );
 
-		if( found )
-			return found->value;
+		if( i != hashed_cmds.InvalidIndex() )
+			return hashed_cmds[i];
 	}
 
 	return szStr;

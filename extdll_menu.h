@@ -40,7 +40,7 @@ GNU General Public License for more details.
 #pragma warning(disable : 4520) // multiple default constructors specified
 #pragma warning(disable : 4996) // This function or variable may be unsafe
 // disable c++11 on old msvc
-#if _MSC_VER < 1800
+#if _MSC_VER < 1800 && !defined MY_COMPILER_SUCKS
 #define MY_COMPILER_SUCKS
 #endif
 #endif
