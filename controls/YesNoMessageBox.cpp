@@ -223,12 +223,12 @@ static void ToggleInactiveInternalCb( CMenuBaseItem *pSelf, void * )
 	pSelf->ToggleVisibility();
 }
 
-void CMenuYesNoMessageBox::UI_ShowMessageBox( void )
+void UI_ShowMessageBox( const char *text )
 {
 	static char msg[1024];
 	static CMenuYesNoMessageBox msgBox( true );
 
-	Q_strncpy( msg, EngFuncs::CmdArgv(1), sizeof( msg ) );
+	Q_strncpy( msg, text, sizeof( msg ) );
 
 	if( !UI_IsVisible() )
 	{
@@ -260,4 +260,10 @@ void CMenuYesNoMessageBox::UI_ShowMessageBox( void )
 	msgBox.SetMessage( msg );
 	msgBox.Show();
 }
-ADD_COMMAND( menu_showmessagebox, CMenuYesNoMessageBox::UI_ShowMessageBox );
+
+void UI_ShowMessageBox_f( void )
+{
+	UI_ShowMessageBox( EngFuncs::CmdArgv(1) );
+}
+
+ADD_COMMAND( menu_showmessagebox, UI_ShowMessageBox_f );

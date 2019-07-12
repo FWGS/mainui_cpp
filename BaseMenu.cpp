@@ -30,8 +30,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Utils.h"
 #include "BtnsBMPTable.h"
 #include "YesNoMessageBox.h"
-#include "ConnectionProgress.h"
-#include "ConnectionWarning.h"
 #include "BackgroundBitmap.h"
 #include "FontManager.h"
 #ifdef CS16CLIENT
@@ -1148,31 +1146,37 @@ void UI_OpenUpdatePage( bool engine, bool preferstore )
 	EngFuncs::ShellExecute( updateUrl, NULL, TRUE );
 }
 
-static void UI_UpdateDialog_f( void )
+void UI_UpdateDialog( int preferStore )
 {
 	static CMenuYesNoMessageBox msgBox;
 	static bool ignore = false;
-	static bool preferStore;
+	static bool staticPreferStore;
 
 	if( ignore )
 		return;
 
-	if( !strcmp( EngFuncs::CmdArgv( 1 ), "nostore" ))
-		preferStore = false;
-	else
-		preferStore = true;
+	staticPreferStore = preferStore != 0;
 
 	msgBox.SetMessage( "A new update is available.\nPress Update to open download page." );
 	msgBox.SetPositiveButton( "Update", PC_UPDATE );
 	msgBox.SetNegativeButton( "Later", PC_CANCEL );
 
 	SET_EVENT( msgBox.onPositive, UI_OpenUpdatePage( true, *(bool*)pExtra ) );
-	msgBox.onPositive.pExtra = &preferStore;
+	msgBox.onPositive.pExtra = &staticPreferStore;
 
 	SET_EVENT( msgBox.onNegative, *(bool*)pExtra = true ); // set ignore
 	msgBox.onNegative.pExtra = &ignore;
 
 	msgBox.Show();
+
+}
+
+static void UI_UpdateDialog_f( void )
+{
+	if( !strcmp( EngFuncs::CmdArgv( 1 ), "nostore" ))
+		UI_UpdateDialog( false );
+	else
+		UI_UpdateDialog( true );
 }
 
 ADD_COMMAND( menu_updatedialog, UI_UpdateDialog_f );

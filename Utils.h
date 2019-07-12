@@ -64,6 +64,22 @@ extern int UI_IsVisible( void );
 extern int UI_CreditsActive( void );
 extern void UI_FinalCredits( void );
 
+// extended exports
+void UI_MenuResetPing_f( void );
+void UI_ConnectionWarning_f( void );
+void UI_ShowMessageBox( const char *text );
+void UI_UpdateDialog( int preferStore );
+void UI_ConnectionProgress_Disconnect( void );
+void UI_ConnectionProgress_Download( const char *pszFileName, const char *pszServerName, int iCurrent, int iTotal, const char *comment );
+void UI_ConnectionProgress_DownloadEnd( void );
+void UI_ConnectionProgress_Precache( void );
+void UI_ConnectionProgress_Connect( const char *server );
+void UI_ConnectionProgress_ChangeLevel( void );
+void UI_ConnectionProgress_ParseServerInfo( const char *server );
+
+// defined as exported to keep compatibility with old interface
+extern "C" EXPORT void AddTouchButtonToList( const char *name, const char *texture, const char *command, unsigned char *color, int flags );
+
 #include "cvardef.h"
 
 // ScreenHeight returns the height of the screen, in ppos.xels

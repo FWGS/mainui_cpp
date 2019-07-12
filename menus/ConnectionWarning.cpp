@@ -1,6 +1,5 @@
 #include "BaseWindow.h"
 #include "CheckBox.h"
-#include "ConnectionWarning.h"
 #include "PicButton.h"
 #include "Action.h"
 
@@ -130,7 +129,7 @@ void CMenuConnectionWarning::WriteSettings( const EPresets preset)
 	done.SetGrayed( false );
 }
 
-void UI_ConnectionWarning_f()
+void UI_ConnectionWarning_f( void )
 {
 	if( !UI_IsVisible() )
 		UI_Main_Menu();

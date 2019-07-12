@@ -49,15 +49,14 @@ public:
 	CEventCallback onPositive;
 	CEventCallback onNegative;
 
-	static void UI_ShowMessageBox( void );
-
 	bool bAutoHide;
-private:
-	static void OpenCb( CMenuBaseItem *, void *pExtra );
-
 	CMenuAction		dlgMessage1;
 	CMenuPicButton	yes;
 	CMenuPicButton	no;
+
+private:
+	static void OpenCb( CMenuBaseItem *, void *pExtra );
+
 	bool m_bSetYes, m_bSetNo;
 	bool m_bIsAlert;
 };
