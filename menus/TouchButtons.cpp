@@ -157,6 +157,8 @@ void CMenuTouchButtons::CButtonListModel::Update()
 	gettingList = true;
 	EngFuncs::ClientCmd( TRUE, "touch_list\n" );
 	gettingList = false;
+
+	uiTouchButtons.UpdateFields();
 }
 
 void CMenuTouchButtons::CMenuColor::Draw()
@@ -195,6 +197,8 @@ void CMenuTouchButtons::CMenuButtonPreview::Draw()
 
 void CMenuTouchButtons::DeleteButton()
 {
+	int i = buttonList.GetCurrentIndex();
+	if( i > 0 ) buttonList.SetCurrentIndex( i - 1 );
 	char command[512];
 	snprintf(command, 512, "touch_removebutton \"%s\"\n", selectedName );
 	EngFuncs::ClientCmd(1, command);
