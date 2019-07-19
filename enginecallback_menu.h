@@ -22,15 +22,6 @@ GNU General Public License for more details.
 #include "Primitive.h"
 #include "netadr.h"
 
-#ifdef NEW_ENGINE_INTERFACE
-#define ref_menu_params_t ref_viewpass_t
-#define ref_menu_params_s ref_viewpass_s
-#define ui_textfuncs_t    ui_extendedfuncs_t
-#else
-#define ref_menu_params_t ref_params_t
-#define ref_menu_params_s ref_params_s
-#endif
-
 class EngFuncs
 {
 public:
@@ -160,7 +151,7 @@ public:
 	{  engfuncs.pfnSetModel( ed, path ); }
 	static inline void	ClearScene( void )
 	{  engfuncs.pfnClearScene(); }
-	static inline void	RenderScene( const struct ref_menu_params_s *fd )
+	static inline void	RenderScene( const struct ref_viewpass_s *fd )
 	{  engfuncs.pfnRenderScene( fd ); }
 	static inline int	CL_CreateVisibleEntity( int type, struct cl_entity_s *ent )
 	{  return engfuncs.CL_CreateVisibleEntity( type, ent ); }
@@ -263,26 +254,14 @@ public:
 	static inline const char *GetModeString( int mode )
 	{ return engfuncs.pfnGetModeString( mode ); }
 	static inline int COM_SaveFile( const char *filename, const void *buffer, int len )
-	{
-#ifdef NEW_ENGINE_INTERFACE
-		return engfuncs.COM_SaveFile( filename, buffer, len );
-#else
-		return false;
-#endif
-	}
+	{ return engfuncs.COM_SaveFile( filename, buffer, len ); }
 	static inline int DeleteFile( const char *filename )
-	{
-#ifdef NEW_ENGINE_INTERFACE
-		return engfuncs.COM_RemoveFile( filename );
-#else
-		return false;
-#endif
-	}
+	{ return engfuncs.COM_RemoveFile( filename ); }
 	static ui_enginefuncs_t engfuncs;
 
 	// text funcs
 #ifndef XASH_DISABLE_FWGS_EXTENSIONS
-	static ui_textfuncs_t textfuncs;
+	static ui_extendedfuncs_t textfuncs;
 	static inline void EnableTextInput( int enable )
 	{ if( textfuncs.pfnEnableTextInput ) textfuncs.pfnEnableTextInput( enable ); }
 #else

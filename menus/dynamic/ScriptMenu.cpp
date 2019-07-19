@@ -302,21 +302,6 @@ void CMenuScriptConfig::SetScriptConfig(const char *path, bool earlyInit)
 		CSCR_FreeList( m_pVars );
 
 	m_pVars = CSCR_LoadDefaultCVars( m_szConfig, &m_iVarsCount );
-
-#if 0
-	if( earlyInit ) // create variables if engine does not support SCR
-	{
-		// Xash3D FWGS have internal SCR parser
-		// Unkle Mike's does not(as of 3598 build)
-		if( !EngFuncs::GetCvarFloat("host_build") && EngFuncs::GetCvarFloat("build"))
-		{
-			for( scrvardef_t *var = m_pVars; var; var = var->next )
-			{
-				EngFuncs::CvarRegister( var->name, var->value, var->flags );
-			}
-		}
-	}
-#endif
 }
 
 void CMenuScriptConfig::FlipMenu( void )

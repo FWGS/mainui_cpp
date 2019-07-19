@@ -60,9 +60,7 @@ public:
 	CMenuVidModes() : CMenuFramework( "CMenuVidModes" ) { testModeTimer = 0; }
 
 	void SetMode( int mode );
-#ifdef NEW_ENGINE_INTERFACE
 	void SetMode( int w, int h );
-#endif
 	void SetConfig( );
 	void RevertChanges();
 	void ApplyChanges();
@@ -76,10 +74,8 @@ public:
 	CMenuYesNoMessageBox testModeMsgBox;
 
 	int prevMode;
-#ifdef NEW_ENGINE_INTERFACE
 	int prevModeX;
 	int prevModeY;
-#endif
 	bool prevFullscreen;
 	float testModeTimer;
 	char testModeMsg[256];
@@ -107,7 +103,6 @@ void CMenuVidModesModel::Update( void )
 	m_iNumModes = i;
 }
 
-#ifdef NEW_ENGINE_INTERFACE
 void CMenuVidModes::SetMode( int w, int h )
 {
 	// only possible on Xash3D FWGS!
@@ -115,7 +110,6 @@ void CMenuVidModes::SetMode( int w, int h )
 	snprintf( cmd, sizeof( cmd ), "vid_setmode %i %i\n", w, h );
 	EngFuncs::ClientCmd( TRUE, cmd );
 }
-#endif // NEW_ENGINE_INTERFACE
 
 void CMenuVidModes::SetMode( int mode )
 {
@@ -124,13 +118,11 @@ void CMenuVidModes::SetMode( int mode )
 	// vid_setmode is a new command, which does not depends on 
 	// static resolution list but instead uses dynamic resolution
 	// list provided by video backend
-#ifdef NEW_ENGINE_INTERFACE
 	if( UI_IsXashFWGS( ) )
 	{
 		snprintf( cmd, sizeof( cmd ), "vid_setmode %i\n", mode );
 	}
 	else
-#endif
 	{
 		snprintf( cmd, sizeof( cmd ), "vid_mode %i\n", mode );
 	}
@@ -175,10 +167,8 @@ void CMenuVidModes::ApplyChanges()
 {
 	prevMode = EngFuncs::GetCvarFloat( "vid_mode" );
 	prevFullscreen = EngFuncs::GetCvarFloat( "fullscreen" );
-#ifdef NEW_ENGINE_INTERFACE
 	prevModeX = EngFuncs::GetCvarFloat( "width" );
 	prevModeY = EngFuncs::GetCvarFloat( "height" );
-#endif 
 }
 
 void CMenuVidModes::RevertChanges()
@@ -193,13 +183,11 @@ void CMenuVidModes::RevertChanges()
 		fullscreenChanged = true;
 	}
 
-#ifdef NEW_ENGINE_INTERFACE
 	if( UI_IsXashFWGS( ) )
 	{
 		SetMode( prevModeX, prevModeY );
 	}
 	else
-#endif
 	{
 		SetMode( prevMode );
 	}
@@ -258,11 +246,7 @@ void CMenuVidModes::_Init( void )
 
 	vsync.SetNameAndStatus( L( "GameUI_VSync" ), L( "GameUI_VSync" ) );
 	vsync.SetCoord( 360, 670 );
-#ifdef NEW_ENGINE_INTERFACE
 	vsync.LinkCvar( "gl_vsync" );
-#else
-	vsync.LinkCvar( "gl_swapInterval" );
-#endif
 
 	testModeMsgBox.SetMessage( testModeMsg );
 	testModeMsgBox.onPositive = VoidCb( &CMenuVidModes::ApplyChanges );

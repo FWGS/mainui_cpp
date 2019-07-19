@@ -169,11 +169,6 @@ void CMenuPlayerModelView::Draw()
 	{
 		EngFuncs::ClearScene();
 
-		// update renderer timings
-#ifndef NEW_ENGINE_INTERFACE
-		refdef.time = gpGlobals->time;
-		refdef.frametime = gpGlobals->frametime;
-#endif
 		if( uiStatic.enableAlphaFactor )
 		{
 			ent->curstate.rendermode = kRenderTransTexture;

@@ -311,7 +311,6 @@ void CMenuPlayerSetup::ApplyColorToLogoPreview()
 
 void CMenuPlayerSetup::WriteNewLogo( void )
 {
-#ifdef NEW_ENGINE_INTERFACE
 	char filename[1024];
 	CBMP *bmpFile;
 
@@ -333,7 +332,6 @@ void CMenuPlayerSetup::WriteNewLogo( void )
 	EngFuncs::COM_SaveFile( "logos/remapped.bmp", bmpFile->GetBitmap(), bmpFile->GetBitmapHdr()->fileSize );
 
 	delete bmpFile;
-#endif
 }
 
 /*
@@ -350,11 +348,6 @@ void CMenuPlayerSetup::_Init( void )
 	// disable playermodel preview for HLRally to prevent crash
 	if( !stricmp( gMenu.m_gameinfo.gamefolder, "hlrally" ))
 		hideModels = true;
-
-	// old engine cannot support logo customization, just don't add them
-#ifndef NEW_ENGINE_INTERFACE
-	hideLogos = true;
-#endif
 
 	if( gMenu.m_gameinfo.flags & GFL_NOMODELS )
 		addFlags |= QMF_INACTIVE;

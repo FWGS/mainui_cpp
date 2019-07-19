@@ -144,13 +144,8 @@ void CMenuGameOptions::_Init( void )
 	allowDownload.LinkCvar( "sv_allow_download" );
 	allowDownload.SetCoord( 240, 315 );
 
-#ifdef NEW_ENGINE_INTERFACE
 	cl_predict.SetNameAndStatus( L( "Disable predicting" ), L( "Disable player movement prediction" ) );
 	cl_predict.LinkCvar( "cl_nopred" );
-#else
-	cl_predict.SetNameAndStatus( L( "Predict movement" ), L( "Enable player movement prediction" ) );
-	cl_predict.LinkCvar( "cl_predict" );
-#endif
 	cl_predict.SetCoord( 240, 365 );
 
 	cl_lw.SetNameAndStatus( L( "Local weapons" ), L( "Enable local weapons" ) );
@@ -274,21 +269,13 @@ void CMenuGameOptions::_Init( void )
 	AddItem( compress );
 
 	// only for game/engine developers
-#ifdef NEW_ENGINE_INTERFACE
 	if( EngFuncs::GetCvarFloat( "developer" ) < 1 )
-#else
-	if( EngFuncs::GetCvarFloat( "developer" ) < 3 )
-#endif
 	{
 		maxpacket.Hide();
 		rate.Hide();
 	}
 
-#ifdef NEW_ENGINE_INTERFACE
 	if( EngFuncs::GetCvarFloat( "developer" ) < 2 )
-#else
-	if( EngFuncs::GetCvarFloat( "developer" ) < 4 )
-#endif
 	{
 		maxpayload.Hide();
 		cmdrate.Hide();
