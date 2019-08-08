@@ -22,14 +22,14 @@ class CMenuProgressBar : public CMenuBaseItem
 public:
 	typedef CMenuBaseItem BaseClass;
 
-    CMenuProgressBar();
+	CMenuProgressBar();
 	void Draw( void ) override;
 	void LinkCvar( const char *cvName, float flMin, float flMax );
 	void SetValue( float flValue );
 
 private:
 	float m_flMin, m_flMax, m_flValue;
-	cvar_t *m_pCvar;
+	const char *m_szCvarName;
 };
 
 #endif // CMENUPROGRESSBAR_H
