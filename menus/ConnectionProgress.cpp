@@ -75,6 +75,24 @@ public:
 		m_iState = STATE_DOWNLOAD;
 		commonProgress.SetValue( (float)iCurrent/iTotal +  0.01f / iTotal * EngFuncs::GetCvarFloat("scr_download") );
 	}
+	void HandleConnect( const char *pszText )
+	{
+		if( !pszText )
+		{
+			m_iSource = SOURCE_CREATEGAME;
+			SetServer( "" );
+			SetCommonText( L( "GameUI_StartingServer" ) );
+		}
+		else
+		{
+			m_iSource = SOURCE_SERVERBROWSER;
+			SetServer( pszText );
+			SetCommonText( L( "GameUI_EstablishingConnection" ) );
+		}
+
+		commonProgress.LinkCvar( "scr_loading", 0, 100 );
+	}
+
 	void SetCommonText( const char *pszText )
 	{
 		Q_strncpy( sCommonString, pszText, sizeof( sCommonString ) );
@@ -331,6 +349,7 @@ void UI_ConnectionProgress_Download( const char *pszFileName, const char *pszSer
 		return;
 
 	uiConnectionProgress.HandleDownload( pszFileName, pszServerName, iCurrent, iTotal, comment );
+	uiConnectionProgress.Show();
 }
 
 void UI_ConnectionProgress_DownloadEnd( void )
@@ -340,6 +359,7 @@ void UI_ConnectionProgress_DownloadEnd( void )
 
 	uiConnectionProgress.m_iState = STATE_CONNECTING;
 	uiConnectionProgress.HandleDisconnect();
+	uiConnectionProgress.Show();
 }
 
 void UI_ConnectionProgress_Precache( void )
@@ -348,6 +368,7 @@ void UI_ConnectionProgress_Precache( void )
 		return;
 
 	uiConnectionProgress.HandlePrecache();
+	uiConnectionProgress.Show();
 }
 
 void UI_ConnectionProgress_Connect( const char *server ) // NULL for local server
@@ -356,20 +377,7 @@ void UI_ConnectionProgress_Connect( const char *server ) // NULL for local serve
 		return;
 
 	uiConnectionProgress.m_iState = STATE_MENU;
-
-	if( !server )
-	{
-		uiConnectionProgress.m_iSource = SOURCE_CREATEGAME;
-		uiConnectionProgress.SetServer( "" );
-		uiConnectionProgress.SetCommonText( L( "GameUI_StartingServer" ) );
-	}
-	else
-	{
-		uiConnectionProgress.m_iSource = SOURCE_CREATEGAME;
-		uiConnectionProgress.SetServer( server );
-		uiConnectionProgress.SetCommonText( L( "GameUI_EstablishingConnection" ) );
-	}
-
+	uiConnectionProgress.HandleConnect( server );
 	uiConnectionProgress.Show();
 }
 
