@@ -16,9 +16,8 @@ GNU General Public License for more details.
 #include "BaseClientWindow.h"
 
 CMenuBaseClientWindow::CMenuBaseClientWindow( const  char *name ) :
-	BaseClass( name )
+	BaseClass( name, &uiStatic.client )
 {
-	m_pStack = &uiStatic.client;
 }
 
 bool CMenuBaseClientWindow::KeyDown( int key )

@@ -25,7 +25,7 @@ class CMenuBaseWindow : public CMenuItemsHolder
 {
 public:
 	typedef CMenuItemsHolder BaseClass;
-	CMenuBaseWindow( const char *name = "Unnamed Window" );
+	CMenuBaseWindow( const char *name = "Unnamed Window", CWindowStack *pStack = &uiStatic.menu );
 
 	// Overloaded functions
 	// Window visibility is switched through window stack

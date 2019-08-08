@@ -19,12 +19,12 @@ GNU General Public License for more details.
 #include "ItemsHolder.h"
 #include "BaseWindow.h"
 
-CMenuBaseWindow::CMenuBaseWindow(const char *name) : BaseClass()
+CMenuBaseWindow::CMenuBaseWindow( const char *name, CWindowStack *pStack ) : BaseClass()
 {
 	bAllowDrag = false; // UNDONE
 	m_bHolding = false;
 	szName = name;
-	m_pStack = &uiStatic.menu;
+	m_pStack = pStack;
 	DisableTransition();
 }
 
