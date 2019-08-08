@@ -354,7 +354,7 @@ void CMenuServerBrowser::Connect( server_t &server )
 	//BUGBUG: ClientJoin not guaranted to return, need use ClientCmd instead!!!
 	//BUGBUG: But server addres is known only as netadr_t here!!!
 	EngFuncs::ClientJoin( server.adr );
-	EngFuncs::ClientCmd( false, "menu_connectionprogress menu server\n" );
+	UI_ConnectionProgress_Connect( "" );
 }
 
 /*
