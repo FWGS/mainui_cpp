@@ -647,7 +647,8 @@ void UI_UpdateMenu( float flTime )
 
 	if( uiStatic.nextFrameActive )
 	{
-		UI_Main_Menu();
+		if( !uiStatic.menu.IsActive() )
+			UI_Main_Menu();
 
 		uiStatic.nextFrameActive = false;
 	}

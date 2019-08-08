@@ -184,7 +184,7 @@ void CWindowStack::Update( )
 	{
 		con_nprint_t con;
 		con.index = 0;
-		con.time_to_live = 0.1f;
+		con.time_to_live = 0.01f;
 		con.color[0] = con.color[1] = con.color[2] = 1.0f;
 
 		Con_NXPrintf( &con, "Stack:\n" );
@@ -240,14 +240,12 @@ void CWindowStack::Add( CMenuBaseWindow *menu )
 	}
 
 	// check if menu already in stack and set it active
+	int i;
+	if( ( i = stack.Find( menu )) != stack.InvalidIndex() )
 	{
-		int i;
-		if( ( i = stack.Find( menu )) != stack.InvalidIndex() )
-		{
-			active = i;
-			ClearBits( menu->iFlags, QMF_CLOSING );
-			return;
-		}
+		active = i;
+		ClearBits( menu->iFlags, QMF_CLOSING );
+		return;
 	}
 
 	active = stack.AddToTail( menu );
