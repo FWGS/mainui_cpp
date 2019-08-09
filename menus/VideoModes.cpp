@@ -26,6 +26,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "CheckBox.h"
 #include "Action.h"
 #include "YesNoMessageBox.h"
+#include "SpinControl.h"
+#include "utlvector.h"
 
 #define ART_BANNER		"gfx/shell/head_vidmodes"
 
@@ -50,6 +52,43 @@ private:
 	const char *m_szModes[64];
 };
 
+class CMenuRenderersModel : public CMenuBaseArrayModel
+{
+public:
+	void Update() override
+	{
+		refdll temp;
+
+		for( unsigned int i = 0;
+			EngFuncs::GetRenderers( i, temp.shortName, sizeof( temp.shortName ), temp.readable, sizeof( temp.readable ));
+			i++ )
+		{
+			m_refs.AddToTail( temp );
+		}
+	}
+	int GetRows() const override { return m_refs.Count(); }
+	const char *GetText( int i ) override { return m_refs[i].readable; }
+
+	const char *GetShortName( int i ) { return m_refs[i].shortName; }
+	void Add( const char *str )
+	{
+		refdll temp;
+
+		Q_strncpy( temp.shortName, str, sizeof( temp.shortName ));
+		Q_strncpy( temp.readable, str, sizeof( temp.readable ));
+
+		m_refs.AddToTail( temp );
+	}
+private:
+	struct refdll
+	{
+		char shortName[64];
+		char readable[64];
+	};
+
+	CUtlVector<refdll> m_refs;
+};
+
 class CMenuVidModes : public CMenuFramework
 {
 private:
@@ -64,6 +103,37 @@ public:
 	void SetConfig( );
 	void RevertChanges();
 	void ApplyChanges();
+	void GetRendererConfig()
+	{
+		const char *refdll = EngFuncs::GetCvarString( "r_refdll" );
+
+		if( !refdll[0] )
+		{
+			renderers.SetCurrentValue( 0.0f );
+		}
+
+		int i;
+		for( i = 0; i < renderersModel.GetRows(); i++ )
+		{
+			if( !stricmp( renderersModel.GetShortName( i ), refdll ) )
+			{
+				renderers.SetCurrentValue( i );
+				break;
+			}
+		}
+
+		if( i == renderersModel.GetRows() )
+		{
+			renderersModel.Add( refdll );
+			renderers.SetCurrentValue( i );
+		}
+	}
+
+	void WriteRendererConfig()
+	{
+		int i = renderers.GetCurrentValue();
+		EngFuncs::CvarSetString( "r_refdll", renderersModel.GetShortName( i ));
+	}
 
 	CMenuCheckBox	windowed;
 	CMenuCheckBox	vsync;
@@ -72,6 +142,9 @@ public:
 	CMenuVidModesModel vidListModel;
 
 	CMenuYesNoMessageBox testModeMsgBox;
+
+	CMenuRenderersModel renderersModel;
+	CMenuSpinControl renderers;
 
 	int prevMode;
 	int prevModeX;
@@ -160,6 +233,10 @@ void CMenuVidModes::SetConfig( )
 	{
 		testModeMsgBox.Show();
 		testModeTimer = gpGlobals->time + 10.0f; // ten seconds should be enough
+	}
+	else
+	{
+		Hide();
 	}
 }
 
@@ -253,13 +330,25 @@ void CMenuVidModes::_Init( void )
 	testModeMsgBox.onNegative = VoidCb( &CMenuVidModes::RevertChanges );
 	testModeMsgBox.Link( this );
 
+	renderersModel.Update();
+	renderers.szName = L( "GameUI_Renderer" );
+	renderers.Setup( &renderersModel );
+	renderers.SetRect( 80, 480, 250, 32 );
+	renderers.SetCharSize( QM_SMALLFONT );
+	renderers.onCvarGet = VoidCb( &CMenuVidModes::GetRendererConfig );
+	renderers.onCvarWrite = VoidCb( &CMenuVidModes::WriteRendererConfig );
+	renderers.bUpdateImmediately = true;
+
 	AddItem( background );
 	AddItem( banner );
 	AddButton( L( "GameUI_Apply" ), L( "Apply changes" ), PC_OK, VoidCb( &CMenuVidModes::SetConfig ) );
 	AddButton( L( "GameUI_Cancel" ), L( "Return back to previous menu" ), PC_CANCEL, VoidCb( &CMenuVidModes::Hide ) );
+	AddItem( renderers );
 	AddItem( windowed );
 	AddItem( vsync );
 	AddItem( vidList );
+
+	renderers.LinkCvar( "r_refdll", CMenuEditable::CVAR_STRING );
 }
 
 void CMenuVidModes::_VidInit()

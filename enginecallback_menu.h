@@ -270,6 +270,11 @@ public:
 	static int UtfProcessChar( int ch );
 	static int UtfMoveLeft( const char *str, int pos );
 	static int UtfMoveRight( const char *str, int pos, int length );
+
+	static inline bool GetRenderers( int num, char *sz1, size_t s1, char *sz2, size_t s2 )
+	{
+		return textfuncs.pfnGetRenderers( num, sz1, s1, sz2, s2 ) != 0;
+	}
 };
 
 
