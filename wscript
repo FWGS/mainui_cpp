@@ -30,11 +30,11 @@ def configure(conf):
 
 	conf.env.append_unique('CXXFLAGS', conf.get_flags_by_compiler(nortti, conf.env.COMPILER_CC))
 
-	if conf.env.DEST_OS == 'darwin' or conf.env.DEST_OS2 == 'android':
+	if conf.env.DEST_OS == 'darwin' or conf.env.DEST_OS == 'android':
 		conf.env.USE_STBTT = True
 		conf.env.append_unique('DEFINES', 'MAINUI_USE_STB')
 
-	if conf.env.DEST_OS2 == 'android':
+	if conf.env.DEST_OS == 'android':
 		conf.env.append_unique('DEFINES', 'NO_STL')
 		conf.env.append_unique('CXXFLAGS', '-fno-exceptions')
 
