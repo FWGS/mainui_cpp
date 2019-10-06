@@ -1081,7 +1081,7 @@ int UI_VidInit( void )
 	if (ScreenWidth * 3 < ScreenHeight * 4)
 	{
 		uiStatic.scaleX = uiStatic.scaleY = ScreenWidth / 1024.0f;
-		uiStatic.yOffset = ( ScreenHeight / 2.0 ) / uiStatic.scaleX - 768 / 2;
+		uiStatic.yOffset = ( ScreenHeight / 2.0f ) / uiStatic.scaleX - 768.0f / 2.0f;
 	}
 	else
 	{

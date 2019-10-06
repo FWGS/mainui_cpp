@@ -529,7 +529,7 @@ void CMenuField::Draw( void )
 	{
 		uint	color;
 
-		color = PackAlpha( colorBase, 255 * (0.5 + 0.5 * sin( (float)uiStatic.realTime / UI_PULSE_DIVISOR )));
+		color = PackAlpha( colorBase, 255 * (0.5f + 0.5f * sin( (float)uiStatic.realTime / UI_PULSE_DIVISOR )));
 		UI_DrawString( font, newPos, m_scSize, text, color, m_scChSize, eTextAlignment, textflags );
 
 		if(( uiStatic.realTime & 499 ) < 250 )

@@ -651,14 +651,14 @@ void CMenuTable::Draw()
 			cursorDY = 0;
 			if( ac_y > m_scChSize / 2.0f )
 			{
-				iTopItem -= ac_y/ m_scChSize - 0.5;
+				iTopItem -= ac_y/ m_scChSize - 0.5f;
 				if( iTopItem < 0 )
 					iTopItem = 0;
 				ac_y = 0;
 			}
 			if( ac_y < -m_scChSize / 2.0f )
 			{
-				iTopItem -= ac_y/ m_scChSize - 0.5 ;
+				iTopItem -= ac_y/ m_scChSize - 0.5f;
 				if( iTopItem > m_pModel->GetRows() - iNumRows )
 					iTopItem = m_pModel->GetRows() - iNumRows;
 				ac_y = 0;
@@ -671,14 +671,14 @@ void CMenuTable::Draw()
 			cursorDY = 0;
 			if( ac_y < -step )
 			{
-				iTopItem += ac_y / step + 0.5;
+				iTopItem += ac_y / step + 0.5f;
 				if( iTopItem < 0 )
 					iTopItem = 0;
 				ac_y = 0;
 			}
 			if( ac_y > step )
 			{
-				iTopItem += ac_y / step + 0.5;
+				iTopItem += ac_y / step + 0.5f;
 				if( iTopItem > m_pModel->GetRows() - iNumRows )
 					iTopItem = m_pModel->GetRows() - iNumRows;
 				ac_y = 0;
@@ -760,7 +760,7 @@ void CMenuTable::Draw()
 			{
 				int	color;
 
-				color = PackAlpha( colorBase, 255 * (0.5 + 0.5 * sin( (float)uiStatic.realTime / UI_PULSE_DIVISOR )));
+				color = PackAlpha( colorBase, 255 * (0.5f + 0.5f * sin( (float)uiStatic.realTime / UI_PULSE_DIVISOR )));
 
 				UI_DrawPic( upArrow, arrow, (upFocus) ? color : (int)colorBase, (upFocus) ? szUpArrowFocus : szUpArrow );
 				UI_DrawPic( downArrow, arrow, (downFocus) ? color : (int)colorBase, (downFocus) ? szDownArrowFocus : szDownArrow );
@@ -791,7 +791,7 @@ void CMenuTable::Draw()
 				if( eFocusAnimation == QM_HIGHLIGHTIFFOCUS )
 					color = colorFocus;
 				else if( eFocusAnimation == QM_PULSEIFFOCUS )
-					color = PackAlpha( colorBase, 255 * (0.5 + 0.5 * sin( (float)uiStatic.realTime / UI_PULSE_DIVISOR )));
+					color = PackAlpha( colorBase, 255 * (0.5f + 0.5f * sin( (float)uiStatic.realTime / UI_PULSE_DIVISOR )));
 
 				fillColor = selColor;
 			}

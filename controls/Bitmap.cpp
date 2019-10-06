@@ -120,7 +120,7 @@ void CMenuBitmap::Draw( void )
 	{
 		int	color;
 
-		color = PackAlpha( colorBase, 255 * (0.5 + 0.5 * sin( (float)uiStatic.realTime / UI_PULSE_DIVISOR )));
+		color = PackAlpha( colorBase, 255 * (0.5f + 0.5f * sin( (float)uiStatic.realTime / UI_PULSE_DIVISOR )));
 		UI_DrawPic( m_scPos, m_scSize, color, szFocusPic, eFocusRenderMode );
 		break;
 	}

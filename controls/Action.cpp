@@ -19,7 +19,6 @@ GNU General Public License for more details.
 #include "Action.h"
 #include "Utils.h"
 
-
 CMenuAction::CMenuAction() : BaseClass()
 {
 	m_szBackground = NULL;
@@ -171,7 +170,7 @@ void CMenuAction::Draw( )
 	{
 		int	color;
 
-		color = PackAlpha( colorBase, 255 * (0.5 + 0.5 * sin( (float)uiStatic.realTime / UI_PULSE_DIVISOR )));
+		color = PackAlpha( colorBase, 255 * (0.5f + 0.5f * sin( (float)uiStatic.realTime / UI_PULSE_DIVISOR )));
 
 		UI_DrawString( font, m_scPos, m_scSize, szName, color, m_scChSize, eTextAlignment, textflags );
 	}

@@ -300,7 +300,7 @@ void CMenuGameListModel::AddServerToList(netadr_t adr, const char *info)
 
 	server.adr = adr;
 	server.ping = Sys_DoubleTime() - serversRefreshTime;
-	server.ping = bound( 0, server.ping, 9.999 );
+	server.ping = bound( 0, server.ping, 9.999f );
 	Q_strncpy( server.info, info, sizeof( server.info ));
 
 

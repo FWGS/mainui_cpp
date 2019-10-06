@@ -67,7 +67,7 @@ void CMenuFramework::Draw()
 
 		UnpackRGB( r, g, b, uiColorHelp );
 		EngFuncs::DrawSetTextColor( r, g, b, alpha * 255 );
-		x = ( ScreenWidth - len ) * 0.5; // centering
+		x = ( ScreenWidth - len ) * 0.5f; // centering
 
 		EngFuncs::DrawConsoleString( x, uiStatic.yOffset + 720 * uiStatic.scaleY, statusText );
 	}
