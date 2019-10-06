@@ -23,7 +23,7 @@ GNU General Public License for more details.
 #include "gameinfo.h"
 #include "FontManager.h"
 #include "BMPUtils.h"
-#ifdef HAVE_TGMATH_H
+#if 0
 #include <tgmath.h>
 #endif
 
