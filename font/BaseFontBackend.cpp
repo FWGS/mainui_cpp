@@ -317,7 +317,7 @@ void CBaseFont::ApplyBlur(Size rgbaSz, byte *rgba)
 	for( int x = 0; x <= m_iBlur * 2; x++ )
 	{
 		int val = x - m_iBlur;
-		distribution[x] = (float)(1.0f / sqrt(2 * 3.14 * sigma2)) * pow(2.7, -1 * (val * val) / (2 * sigma2));
+		distribution[x] = (float)(1.0f / sqrt(2 * 3.14f * sigma2)) * pow(2.7f, -1 * (val * val) / (2 * sigma2));
 
 		// brightening factor
 		distribution[x] *= m_fBrighten;

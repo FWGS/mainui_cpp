@@ -269,7 +269,7 @@ void CMenuPicButton::Draw( )
 		}
 		else if( eFocusAnimation == QM_PULSEIFFOCUS )
 		{
-			float pulsar = 0.5 + 0.5 * sin( (float)uiStatic.realTime / UI_PULSE_DIVISOR );
+			float pulsar = 0.5f + 0.5f * sin( (float)uiStatic.realTime / UI_PULSE_DIVISOR );
 #ifdef MAINUI_RENDER_PICBUTTON_TEXT
 
 			UI_DrawString( uiStatic.hHeavyBlur, m_scPos, m_scSize, szName,
