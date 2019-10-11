@@ -18,10 +18,10 @@ def configure(conf):
 	# conf.env.CXX11_MANDATORY = False
 	conf.load('fwgslib cxx11')
 	if not conf.env.HAVE_CXX11:
-		conf.env.append_unique('DEFINES', 'MY_COMPILER_SUCKS')
+		conf.define('MY_COMPILER_SUCKS')
 
 	conf.env.USE_STBTT = conf.options.USE_STBTT
-	conf.env.append_unique('DEFINES', 'MAINUI_USE_CUSTOM_FONT_RENDER')
+	conf.define('MAINUI_USE_CUSTOM_FONT_RENDER', 1)
 
 	nortti = {
 		'msvc': ['/GR-'],
@@ -32,10 +32,10 @@ def configure(conf):
 
 	if conf.env.DEST_OS == 'darwin' or conf.env.DEST_OS == 'android':
 		conf.env.USE_STBTT = True
-		conf.env.append_unique('DEFINES', 'MAINUI_USE_STB')
+		conf.define('MAINUI_USE_STB', 1)
 
 	if conf.env.DEST_OS == 'android':
-		conf.env.append_unique('DEFINES', 'NO_STL')
+		conf.define('NO_STL', 1)
 		conf.env.append_unique('CXXFLAGS', '-fno-exceptions')
 
 	if conf.env.DEST_OS != 'win32':
@@ -50,7 +50,7 @@ def configure(conf):
 				conf.check_cfg(package='fontconfig', args='--cflags --libs', uselib_store='FC')
 			except conf.errors.ConfigurationError:
 				conf.fatal(errormsg.format('fontconfig'))
-			conf.env.append_unique('DEFINES', 'MAINUI_USE_FREETYPE');
+			conf.define('MAINUI_USE_FREETYPE', 1)
 
 def build(bld):
 	libs = []
