@@ -9,8 +9,8 @@ top = '.'
 
 def options(opt):
 	grp = opt.add_option_group('MainUI C++ options')
-	grp.add_option('--enable-stbtt', action = 'store_true', dest = 'USE_STBTT',
-		help = 'prefer stb_truetype.h over freetype')
+	grp.add_option('--enable-stbtt', action = 'store_true', dest = 'USE_STBTT', default = False,
+		help = 'prefer stb_truetype.h over freetype [default: %default]')
 
 	return
 
