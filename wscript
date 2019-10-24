@@ -50,7 +50,7 @@ def configure(conf):
 	# conf.env.CXX11_MANDATORY = False
 	conf.load('fwgslib cxx11')
 	if not conf.env.HAVE_CXX11:
-		conf.define('MY_COMPILER_SUCKS')
+		conf.define('MY_COMPILER_SUCKS', 1)
 
 	conf.env.USE_STBTT = conf.options.USE_STBTT
 	conf.define('MAINUI_USE_CUSTOM_FONT_RENDER', 1)
