@@ -48,7 +48,7 @@ def options(opt):
 
 def configure(conf):
 	# conf.env.CXX11_MANDATORY = False
-	conf.load('fwgslib cxx11')
+	conf.load('fwgslib')
 	if not conf.env.HAVE_CXX11:
 		conf.define('MY_COMPILER_SUCKS', 1)
 
@@ -61,6 +61,9 @@ def configure(conf):
 	}
 
 	conf.env.append_unique('CXXFLAGS', conf.get_flags_by_compiler(nortti, conf.env.COMPILER_CC))
+
+	if conf.env.DEST_OS == 'linux':
+		conf.check_cxx(lib='rt')
 
 	if conf.env.DEST_OS == 'darwin' or conf.env.DEST_OS == 'android':
 		conf.env.USE_STBTT = True
@@ -85,6 +88,9 @@ def build(bld):
 			libs += ['FT2', 'FC']
 	else:
 		libs += ['GDI32', 'USER32']
+
+	if bld.env.DEST_OS == 'linux':
+		libs += ['RT']
 
 	source = bld.path.ant_glob([
 		'*.cpp',
