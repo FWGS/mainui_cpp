@@ -14,7 +14,6 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 
-#pragma once
 #ifndef MENU_SLIDER_H
 #define MENU_SLIDER_H
 #define UI_SLIDER_MAIN		"gfx/shell/slider"
