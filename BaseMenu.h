@@ -35,6 +35,10 @@ GNU General Public License for more details.
 #define UI_OUTLINE_WIDTH		uiStatic.outlineWidth	// outline thickness
 
 #define UI_MAXGAMES			1024	// slots for savegame/demos
+
+#if XASH_LOW_MEMORY
+#define UI_MAXGAMES			32
+#endif
 #define UI_MAX_BGMAPS		32
 
 #define MAX_HINT_TEXT		512
