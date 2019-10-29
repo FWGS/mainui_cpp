@@ -49,8 +49,9 @@ def options(opt):
 def configure(conf):
 	# conf.env.CXX11_MANDATORY = False
 	conf.load('fwgslib cxx11')
+
 	if not conf.env.HAVE_CXX11:
-		conf.define('MY_COMPILER_SUCKS')
+		conf.define('MY_COMPILER_SUCKS',1)
 
 	conf.env.USE_STBTT = conf.options.USE_STBTT
 	conf.define('MAINUI_USE_CUSTOM_FONT_RENDER', 1)
@@ -71,10 +72,11 @@ def configure(conf):
 		conf.env.append_unique('CXXFLAGS', '-fno-exceptions')
 
 	if conf.env.DEST_OS != 'win32':
-		if not conf.env.USE_STBTT:
+		if not conf.env.USE_STBTT and not conf.options.LOW_MEMORY:
 			conf.check_pkg('freetype2', 'FT2', FT2_CHECK)
 			conf.check_pkg('fontconfig', 'FC', FC_CHECK)
 			conf.define('MAINUI_USE_FREETYPE', 1)
+		conf.check_cc(lib='rt')
 
 def build(bld):
 	libs = []
@@ -83,6 +85,7 @@ def build(bld):
 	if bld.env.DEST_OS != 'win32':
 		if not bld.env.USE_STBTT:
 			libs += ['FT2', 'FC']
+		libs += ['RT']
 	else:
 		libs += ['GDI32', 'USER32']
 
