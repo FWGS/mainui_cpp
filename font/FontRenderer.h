@@ -29,6 +29,21 @@ enum EFontFlags
 #define UI_BIG_CHAR_HEIGHT		40
 #endif
 
+#ifdef MAINUI_SMALL_SCREEN
+
+#define UI_CONSOLE_CHAR_WIDTH	30
+#define UI_CONSOLE_CHAR_HEIGHT  60
+
+#define UI_SMALL_CHAR_WIDTH		30
+#define UI_SMALL_CHAR_HEIGHT	60
+
+#define UI_MED_CHAR_WIDTH		35
+#define UI_MED_CHAR_HEIGHT		70
+
+#define UI_BIG_CHAR_WIDTH		35
+#define UI_BIG_CHAR_HEIGHT		70
+#endif
+
 enum EFontSizes
 {
 #ifdef CLIENT_DLL // hack!
