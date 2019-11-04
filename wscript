@@ -48,7 +48,7 @@ def options(opt):
 
 def configure(conf):
 	# conf.env.CXX11_MANDATORY = False
-	conf.load('fwgslib')
+	conf.load('fwgslib cxx11')
 	if not conf.env.HAVE_CXX11:
 		conf.define('MY_COMPILER_SUCKS', 1)
 
