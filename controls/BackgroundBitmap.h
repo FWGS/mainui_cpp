@@ -14,7 +14,6 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 
-#pragma once
 #ifndef MENU_BACKGROUNDBITMAP_H
 #define MENU_BACKGROUNDBITMAP_H
 
