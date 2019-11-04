@@ -11,7 +11,7 @@ enum EFontFlags
 	FONT_UNDERLINE = 1 << 1,
 	FONT_STRIKEOUT = 1 << 2
 };
-
+#ifndef MAINUI_SMALL_SCREEN
 #define UI_CONSOLE_CHAR_WIDTH	9
 #define UI_CONSOLE_CHAR_HEIGHT  18
 
@@ -27,7 +27,22 @@ enum EFontFlags
 #else
 #define UI_BIG_CHAR_WIDTH		20
 #define UI_BIG_CHAR_HEIGHT		40
+#endif // CS16CLIENT
+#else // MAINUI_SMALL_SCREEN
+
+#define UI_CONSOLE_CHAR_WIDTH	30
+#define UI_CONSOLE_CHAR_HEIGHT  60
+
+#define UI_SMALL_CHAR_WIDTH		30
+#define UI_SMALL_CHAR_HEIGHT	60
+
+#define UI_MED_CHAR_WIDTH		35
+#define UI_MED_CHAR_HEIGHT		70
+
+#define UI_BIG_CHAR_WIDTH		35
+#define UI_BIG_CHAR_HEIGHT		70
 #endif
+
 
 enum EFontSizes
 {

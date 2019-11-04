@@ -71,6 +71,9 @@ void UI_LoadBmpButtons( void )
 {
 	memset( uiStatic.buttonsPics, 0, sizeof( uiStatic.buttonsPics ));
 
+#if XASH_LOW_MEMORY
+	return;
+#endif
 	int bmp_filesize, palette_sz = 0;
 	byte *bmp_buffer = EngFuncs::COM_LoadFile( ART_BUTTONS_MAIN, &bmp_filesize );
 
