@@ -63,9 +63,6 @@ def configure(conf):
 
 	conf.env.append_unique('CXXFLAGS', conf.get_flags_by_compiler(nortti, conf.env.COMPILER_CC))
 
-	if conf.env.DEST_OS == 'linux':
-		conf.check_cxx(lib='rt')
-
 	if conf.env.DEST_OS == 'darwin' or conf.env.DEST_OS == 'android':
 		conf.env.USE_STBTT = True
 		conf.define('MAINUI_USE_STB', 1)
@@ -79,7 +76,7 @@ def configure(conf):
 			conf.check_pkg('freetype2', 'FT2', FT2_CHECK)
 			conf.check_pkg('fontconfig', 'FC', FC_CHECK)
 			conf.define('MAINUI_USE_FREETYPE', 1)
-		conf.check_cc(lib='rt')
+		conf.check_cxx(lib='rt', mandatory=False))
 
 def build(bld):
 	libs = []
