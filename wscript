@@ -76,7 +76,7 @@ def configure(conf):
 			conf.check_pkg('freetype2', 'FT2', FT2_CHECK)
 			conf.check_pkg('fontconfig', 'FC', FC_CHECK)
 			conf.define('MAINUI_USE_FREETYPE', 1)
-		conf.check_cxx(lib='rt', mandatory=False))
+		conf.check_cxx(lib='rt', mandatory=False)
 
 def build(bld):
 	libs = []
