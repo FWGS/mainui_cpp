@@ -63,7 +63,7 @@ def configure(conf):
 
 	conf.env.append_unique('CXXFLAGS', conf.get_flags_by_compiler(nortti, conf.env.COMPILER_CC))
 
-	if conf.env.DEST_OS == 'darwin' or conf.env.DEST_OS == 'android':
+	if conf.env.DEST_OS == 'darwin' or conf.env.DEST_OS == 'android' or conf.env.MAGX:
 		conf.env.USE_STBTT = True
 		conf.define('MAINUI_USE_STB', 1)
 
