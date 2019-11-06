@@ -73,7 +73,7 @@ void CBitmapFont::GetCharABCWidths(int ch, int &a, int &b, int &c)
 		b = m_iHeight/2-1;
 	else
 	{
-		char str[2] = {ch, 0};
+		char str[2] = {(char)ch, 0};
 		EngFuncs::engfuncs.pfnDrawConsoleStringLen( str, &b, NULL );
 	}
 }
@@ -141,7 +141,7 @@ int CBitmapFont::DrawCharacter(int ch, Point pt, int charH, const unsigned int c
 	}
 	else
 	{
-		char str[2] = {ch, 0};
+		char str[2] = {(char)ch, 0};
 		EngFuncs::engfuncs.pfnDrawSetTextColor( Red( color ), Green( color ), Blue( color ), Alpha( color ) );
 
 		return EngFuncs::engfuncs.pfnDrawConsoleString( pt.x, pt.y, str ) - pt.x;
