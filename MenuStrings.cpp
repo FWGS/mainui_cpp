@@ -34,22 +34,13 @@ CUtlHashMap<const char *, const char *> hashed_cmds;
 
 const char *MenuStrings[IDS_LAST] =
 {
-EMPTY_STRINGS_100, // 0..9
-EMPTY_STRINGS_20, // 100..119
-EMPTY_STRINGS_10, // 120..129
-EMPTY_STRINGS_2, // 130..131
-"Display mode", // 132
-EMPTY_STRINGS_5, // 133..137
-EMPTY_STRINGS_2, // 138..139
-EMPTY_STRINGS_20, // 140..159
-EMPTY_STRINGS_10, // 160..169
-EMPTY_STRINGS_1, // 170
-"Reverse mouse", // 171
-EMPTY_STRINGS_10, // 172..181
-EMPTY_STRINGS_2, // 182..183
-"Mouse sensitivity", // 184
-EMPTY_STRINGS_1, // 185
-EMPTY_STRINGS_2, // 186..187
+EMPTY_STRINGS_100, // 0..99
+EMPTY_STRINGS_50, // 100..149
+EMPTY_STRINGS_20, // 150..169
+EMPTY_STRINGS_10, // 170..179
+EMPTY_STRINGS_5, // 180..184
+EMPTY_STRINGS_2, // 185..186
+EMPTY_STRINGS_1, // 187
 "Return to game.", // 188
 "Start a new game.", // 189
 EMPTY_STRINGS_1,	// 190
@@ -59,10 +50,7 @@ EMPTY_STRINGS_1,	// 190
 EMPTY_STRINGS_20, // 194..213
 EMPTY_STRINGS_20, // 214..233
 "Starting a Hazard Course will exit\nany current game, OK to exit?", // 234
-EMPTY_STRINGS_1, // 235
-"Are you sure you want to quit?", // 236
-EMPTY_STRINGS_2, // 237..238
-EMPTY_STRINGS_1, // 239
+EMPTY_STRINGS_5, // 235..239
 "Starting a new game will exit\nany current game, OK to exit?",	// 240
 EMPTY_STRINGS_5, // 241..245
 EMPTY_STRINGS_2, // 246..247
@@ -243,11 +231,14 @@ int UTFToCP1251( char *out, const char *instr, int len, int maxoutlen )
 
 static void Localize_AddToDictionary( const char *name, const char *lang )
 {
-	char filename[64];
+	char filename[64], token[4096];
+	char *pfile, *afile = NULL, *pFileBuf;
+	int i = 0, len;
+	bool isUtf16 = false;
+
 	snprintf( filename, sizeof( filename ), "resource/%s_%s.txt", name, lang );
 
-	int unicodeLength;
-	char *pFileBuf = (char*)EngFuncs::COM_LoadFile( filename, &unicodeLength );
+	pFileBuf = (char*)EngFuncs::COM_LoadFile( filename, &len );
 
 	if( !pFileBuf )
 	{
@@ -255,21 +246,46 @@ static void Localize_AddToDictionary( const char *name, const char *lang )
 		return;
 	}
 
-	int ansiLength = unicodeLength + 1;
-	char *afile = new char[ansiLength]; // save original pointer, so we can free it later
-	uchar16 *autf16 = new uchar16[unicodeLength/2 + 1];
-	char *pfile = afile;
-	char token[4096];
-	int i = 0;
+	// support only utf-16le
+	if( pFileBuf[0] == '\xFF' && pFileBuf[1] == '\xFE' )
+	{
+		if( len > 3 && !pFileBuf[2] && !pFileBuf[3] )
+		{
+			Con_Printf( "Couldn't parse file %s. UTF-32 little endian isn't supported\n", filename );
+			goto error;
+		}
+		isUtf16 = true;
+	}
+	else if( pFileBuf[0] == '\xFE' && pFileBuf[1] == '\xFF' )
+	{
+		Con_Printf( "Couldn't parse file %s. UTF-16/UTF-32 big endian isn't supported\n" );
+		goto error;
+	}
 
-	memcpy( autf16, pFileBuf + 2, unicodeLength - 1 );
-	autf16[unicodeLength/2-1] = 0; //null terminator
+	if( isUtf16 )
+	{
+		int ansiLength = len + 1;
+		uchar16 *autf16 = new uchar16[len/2 + 1];
 
-	Q_UTF16ToUTF8( autf16, afile, ansiLength, STRINGCONVERT_ASSERT_REPLACE );
+		memcpy( autf16, pFileBuf + 2, len - 1 );
+		autf16[len/2-1] = 0; //null terminator
 
-#ifdef XASH_DISABLE_FWGS_EXTENSIONS
-	UTFToCP1251( afile, afile, ansiLength, ansiLength );
-#endif // XASH_DISABLE_FWGS_EXTENSIONS
+		afile = new char[ansiLength]; // save original pointer, so we can free it later
+
+		Q_UTF16ToUTF8( autf16, afile, ansiLength, STRINGCONVERT_ASSERT_REPLACE );
+
+		delete[] autf16;
+	}
+	else
+	{
+		afile = pFileBuf;
+
+		// strip UTF-8 BOM
+		if( afile[0] == '\xEF' && afile[1] == '\xBB' && afile[2] == '\xBF')
+			afile += 3;
+	}
+
+	pfile = afile;
 
 	pfile = EngFuncs::COM_ParseFile( pfile, token );
 
@@ -333,11 +349,11 @@ static void Localize_AddToDictionary( const char *name, const char *lang )
 		}
 	}
 
-	Con_Printf( "Localize_AddToDict: loaded %i words from %s\n", i, filename );
+	Con_Printf( "Localize_AddToDict: loaded %i words from %s(%s encoding)\n", i, filename, isUtf16 ? "UTF-16" : "UTF-8" );
 
 error:
-	delete[] afile;
-	delete[] autf16;
+	if( isUtf16 && afile )
+		delete[] afile;
 
 	EngFuncs::COM_FreeFile( pFileBuf );
 }
@@ -360,6 +376,9 @@ static void Localize_Init( void )
 
 		Dictionary_Insert( buf, MenuStrings[i] );
 	}
+
+	// strings.lst compatible aliasstrings then
+	UI_InitAliasStrings ();
 
 	const char *language = EngFuncs::GetCvarString( "ui_language" );
 	const char *gamedir = gMenu.m_gameinfo.gamefolder;
@@ -425,7 +444,6 @@ void UI_LoadCustomStrings( void )
 
 localize_init:
 	Localize_Init();
-	UI_InitAliasStrings ();
 }
 
 const char *L( const char *szStr ) // L means Localize!
