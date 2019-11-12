@@ -124,7 +124,7 @@ void CMenuAudio::_Init( void )
 {
 	static const char *lerpingStr[] =
 	{
-		L( "Disabled" ), L( "Balance" ), L( "Quality" )
+		L( "GameUI_Disable" ), L( "Balance" ), L( "Quality" )
 	};
 
 	banner.SetPicture(ART_BANNER);

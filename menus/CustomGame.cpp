@@ -148,8 +148,7 @@ void CMenuCustomGame::_Init( void )
 	AddItem( background );
 	AddItem( banner );
 	load = AddButton( L( "Activate" ), L( "Activate selected custom game" ), PC_ACTIVATE,
-		MenuCb( &CMenuCustomGame::ChangeGame ) );
-	load->onReleasedClActive = msgBox.MakeOpenEvent();
+		msgBox.MakeOpenEvent() );
 
 	go2url = AddButton( L( "Visit web site" ), L( "Visit the web site of game developers" ), PC_VISIT_WEB_SITE,
 		MenuCb( &CMenuCustomGame::Go2Site ) );
@@ -164,7 +163,7 @@ void CMenuCustomGame::_Init( void )
 	modList.SetModel( &modListModel );
 	modList.SetRect( 360, 230, -20, 465 );
 
-	msgBox.SetMessage( L( "Leave current game?" ) );
+	msgBox.SetMessage( L( "GameUI_ForceGameRestart" ) );
 	msgBox.onPositive = MenuCb( &CMenuCustomGame::ChangeGame );
 	msgBox.Link( this );
 

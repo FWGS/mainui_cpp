@@ -112,7 +112,7 @@ void CMenuMain::QuitDialog(void *pExtra)
 	if( CL_IsActive() && EngFuncs::GetCvarFloat( "host_serverstate" ) && EngFuncs::GetCvarFloat( "maxplayers" ) == 1.0f )
 		dialog.SetMessage( L( "StringsList_235" ) );
 	else
-		dialog.SetMessage( L( "StringsList_236" ) );
+		dialog.SetMessage( L( "GameUI_QuitConfirmationText" ) );
 
 	dialog.onPositive.SetCommand( FALSE, "quit\n" );
 	dialog.Show();
@@ -248,7 +248,7 @@ void CMenuMain::_Init( void )
 	previews.iFlags |= QMF_NOTIFY;
 	SET_EVENT( previews.onReleased, EngFuncs::ShellExecute( MenuStrings[ IDS_MEDIA_PREVIEWURL ], NULL, false ) );
 
-	quit.SetNameAndStatus( L( "GameUI_GameMenu_Quit" ), L( "StringsList_236" ) );
+	quit.SetNameAndStatus( L( "GameUI_GameMenu_Quit" ), L( "GameUI_QuitConfirmationText" ) );
 	quit.SetPicture( PC_QUIT );
 	quit.iFlags |= QMF_NOTIFY;
 	quit.onReleased = MenuCb( &CMenuMain::QuitDialog );
