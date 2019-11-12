@@ -24,7 +24,7 @@ VALID_TOKENS = ["test1", "test2", "testtest"]
 class DictGenTest(unittest.TestCase):
 
 	def test_parsing_srcs(self):
-		tokens = dictgen.process_file(os.path.join('tests', 'testfile.cpp'))
+		tokens = dictgen.process_file(os.path.join('tests', 'testfile'))
 		for i in VALID_UNPARSED_TOKENS:
 			self.assertTrue(i in tokens)
 
