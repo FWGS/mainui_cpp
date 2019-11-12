@@ -386,14 +386,14 @@ static void Localize_Init( void )
 	if( !language[0] )
 		language = "english"; // fallback to just english
 
-	if( strcmp( gamedir, "mainui" ))
-		Localize_AddToDictionary( "mainui", language );
-
 	if( strcmp( gamedir, "gameui" ))
 		Localize_AddToDictionary( "gameui", language );
 
 	if( strcmp( gamedir, "valve" ))
 		Localize_AddToDictionary( "valve",  language );
+
+	if( strcmp( gamedir, "mainui" ))
+		Localize_AddToDictionary( "mainui", language );
 
 	Localize_AddToDictionary( gamedir,  language );
 }
