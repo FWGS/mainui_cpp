@@ -24,7 +24,7 @@ HEADER = '''// How to work with this file:
 // 1) This file must be called mainui_x.txt, where x is your language in lower case
 // 2) Tokens on left are original strings, on right is translation
 // 3) StringsList_x where x is number is strings from strings.lst.
-// Leave them empty if you want to use values from strings.lst
+// Remove them if you want to use values from strings.lst
 // 4) _everything.txt version of this file is intended to be used if you
 // don't want to rely on strings.lst nor on non-free translations
 // 5) _nostringslst.txt version of this file is intended to be used if you
