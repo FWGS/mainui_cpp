@@ -46,7 +46,10 @@ private:
 	void _Init() override;
 	void _VidInit( ) override;
 
+	void VidInit(bool connected);
+
 	void QuitDialog( void *pExtra = NULL );
+	void DisconnectCb();
 	void DisconnectDialogCb();
 	void HazardCourseDialogCb();
 	void HazardCourseCb();
@@ -115,9 +118,15 @@ void CMenuMain::QuitDialog(void *pExtra)
 	dialog.Show();
 }
 
+void CMenuMain::DisconnectCb()
+{
+	EngFuncs::ClientCmd( FALSE, "disconnect\n" );
+	VidInit( false );
+}
+
 void CMenuMain::DisconnectDialogCb()
 {
-	dialog.onPositive.SetCommand( FALSE, "cmd disconnect;endgame disconnect;wait;wait;wait;menu_options;menu_main\n" );
+	dialog.onPositive = VoidCb( &CMenuMain::DisconnectCb );
 	dialog.SetMessage( L( "Really disconnect?" ) );
 	dialog.Show();
 }
@@ -160,7 +169,7 @@ UI_Main_HazardCourse
 void CMenuMain::HazardCourseCb()
 {
 	if( EngFuncs::GetCvarFloat( "host_serverstate" ) && EngFuncs::GetCvarFloat( "maxplayers" ) > 1 )
-		EngFuncs::HostEndGame( L( "end of the game" ) );
+		EngFuncs::HostEndGame( "end of the game" );
 
 	EngFuncs::CvarSetValue( "skill", 1.0f );
 	EngFuncs::CvarSetValue( "deathmatch", 0.0f );
@@ -266,6 +275,12 @@ void CMenuMain::_Init( void )
 		hazardCourse.SetGrayed( true );
 	}
 
+	// too short execute string - not a real command
+	if( strlen( MenuStrings[IDS_MEDIA_PREVIEWURL] ) <= 3 )
+	{
+		previews.SetGrayed( true );
+	}
+
 	// server.dll needs for reading savefiles or startup newgame
 	if( !EngFuncs::CheckGameDll( ))
 	{
@@ -307,33 +322,22 @@ void CMenuMain::_Init( void )
 UI_Main_Init
 =================
 */
-void CMenuMain::_VidInit( void )
+void CMenuMain::VidInit( bool connected )
 {
-	if ( CL_IsActive( ))
-	{
-		resumeGame.Show();
-		disconnect.Show();
-	}
-	else
-	{
-		resumeGame.Hide();
-		disconnect.Hide();
-	}
-
-	if( EngFuncs::GetCvarFloat( "developer" ) )
-	{
-		console.pos.y = CL_IsActive() ? 130 : 230;
-	}
-
 	CMenuPicButton::ClearButtonStack();
 
-	console.pos.x = 72;
-	resumeGame.SetCoord( 72, 230 );
+	// statically positioned items
+	minimizeBtn.SetRect( uiStatic.width - 72, 13, 32, 32 );
+	quitButton.SetRect( uiStatic.width - 36, 13, 32, 32 );
 	disconnect.SetCoord( 72, 180 );
+	resumeGame.SetCoord( 72, 230 );
 	newGame.SetCoord( 72, 280 );
 	hazardCourse.SetCoord( 72, 330 );
 
-	if( CL_IsActive( ))
+	bool isGameLoaded = EngFuncs::GetCvarFloat( "host_gameloaded" ) != 0.0f;
+	bool isSingle = EngFuncs::GetCvarFloat( "maxplayers" ) <= 1.0f;
+
+	if( isGameLoaded && isSingle )
 	{
 		saveRestore.SetNameAndStatus( L( "Save\\Load Game" ), L( "StringsList_192" ) );
 		saveRestore.SetPicture( PC_SAVE_LOAD_GAME );
@@ -344,23 +348,36 @@ void CMenuMain::_VidInit( void )
 		saveRestore.SetPicture( PC_LOAD_GAME );
 	}
 
+	if( connected )
+	{
+		resumeGame.Show();
+		if( !isGameLoaded || !isSingle )
+		{
+			disconnect.Show();
+			console.pos.y = 130;
+		}
+		else console.pos.y = 180;
+	}
+	else
+	{
+		resumeGame.Hide();
+		disconnect.Hide();
+		console.pos.y = 230;
+	}
+
+	console.pos.x = 72;
+	console.CalcPosition();
 	saveRestore.SetCoord( 72, bTrainMap ? 380 : 330 );
 	configuration.SetCoord( 72, bTrainMap ? 430 : 380 );
 	multiPlayer.SetCoord( 72, bTrainMap ? 480 : 430 );
-
 	customGame.SetCoord( 72, bTrainMap ? 530 : 480 );
-
 	previews.SetCoord( 72, (bCustomGame) ? (bTrainMap ? 580 : 530) : (bTrainMap ? 530 : 480) );
-
-	// too short execute string - not a real command
-	if( strlen( MenuStrings[IDS_MEDIA_PREVIEWURL] ) <= 3 )
-		previews.SetGrayed( true );
-
 	quit.SetCoord( 72, (bCustomGame) ? (bTrainMap ? 630 : 580) : (bTrainMap ? 580 : 530));
+}
 
-	minimizeBtn.SetRect( uiStatic.width - 72, 13, 32, 32 );
-
-	quitButton.SetRect( uiStatic.width - 36, 13, 32, 32 );
+void CMenuMain::_VidInit()
+{
+	VidInit( CL_IsActive() );
 }
 
 /*
