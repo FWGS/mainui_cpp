@@ -1,0 +1,10 @@
+"lang"
+{
+"Language" "<YOUR_LANGUAGE_HERE>"
+"Tokens"
+{
+"test1"    ""
+"test2"    ""
+"testtest" ""
+}
+}

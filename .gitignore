@@ -38,3 +38,7 @@ ipch/
 *.vcproj
 *.sln
 *.pdb
+
+__pycache__
+temp.txt
+nonfree_translations
