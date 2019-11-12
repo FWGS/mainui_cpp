@@ -216,11 +216,11 @@ void CMenuGamePad::_Init( void )
 	invFwd.SetNameAndStatus( L( "Invert" ), L( "Invert forward movement axis" ) );
 
 	pitch.Setup( 0.0f, 200.0f, 0.1f );
-	pitch.SetNameAndStatus( L( "Pitch" ), L( "Pitch rotating sensitivity" ) );
+	pitch.SetNameAndStatus( L( "Look X" ), L( "Horizontal look sensitivity" ) );
 	invPitch.SetNameAndStatus( L( "Invert" ), L( "Invert pitch axis" ) );
 
 	yaw.Setup( 0.0f, 200.0f, 0.1f );
-	yaw.SetNameAndStatus( L( "Yaw" ), L( "Yaw rotating sensitivity" ) );
+	yaw.SetNameAndStatus( L( "Look Y" ), L( "Yaw rotating sensitivity" ) );
 	invYaw.SetNameAndStatus( L( "Invert" ), L( "Invert yaw axis" ) );
 
 	AddItem( background );

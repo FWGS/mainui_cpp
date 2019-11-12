@@ -321,11 +321,11 @@ void CMenuTouchOptions::_Init( void )
 	lookY.Setup( 50, 500, 5 );
 	lookY.LinkCvar( "touch_pitch" );
 
-	moveX.SetNameAndStatus( L( "Side" ), L( "Side move sensitivity" ) );
+	moveX.SetNameAndStatus( L( "Side" ), L( "Side movement sensitity" ) );
 	moveX.Setup( 0.02, 1.0, 0.05 );
 	moveX.LinkCvar( "touch_sidezone" );
 
-	moveY.SetNameAndStatus( L( "Forward" ), L( "Forward move sensitivity" ) );
+	moveY.SetNameAndStatus( L( "Forward" ), L( "Forward movement sensitivity" ) );
 	moveY.Setup( 0.02, 1.0, 0.05 );
 	moveY.LinkCvar( "touch_forwardzone" );
 

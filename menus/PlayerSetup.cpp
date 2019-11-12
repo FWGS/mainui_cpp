@@ -420,7 +420,7 @@ void CMenuPlayerSetup::_Init( void )
 		UI_AdvUserOptions_Menu();
 	});
 
-	AddButton( L( "Adv options" ), "", PC_ADV_OPT, UI_GameOptions_Menu );
+	AddButton( L( "Adv. Options" ), "", PC_ADV_OPT, UI_GameOptions_Menu );
 	gameOpt->SetGrayed( !UI_AdvUserOptions_IsAvailable() );
 
 

@@ -218,12 +218,12 @@ void CMenuCreateGame::_Init( void )
 	uiStatic.needMapListUpdate = true;
 	banner.SetPicture( ART_BANNER );
 
-	nat.SetNameAndStatus( L( "NAT" ), L( "Use NAT Bypass instead of direct mode" ) );
+	nat.SetNameAndStatus( "NAT", L( "Use NAT Bypass instead of direct mode" ) );
 	nat.bChecked = true;
 
 	dedicatedServer.SetNameAndStatus( L( "Dedicated server" ), L( "faster, but you can't join the server from this machine" ) );
 
-	hltv.SetNameAndStatus( L( "HLTV" ), L( "Enable HLTV mode in Multiplayer" ) );
+	hltv.SetNameAndStatus( "HLTV", L( "Enable HLTV mode in Multiplayer" ) );
 	hltv.LinkCvar( "hltv" );
 
 	// add them here, so "done" button can be used by mapsListModel::Update

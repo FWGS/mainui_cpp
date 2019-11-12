@@ -65,7 +65,7 @@ void CMenuConnectionWarning::_Init()
 	done.bEnableTransitions = false;
 
 	options.SetPicture( PC_ADV_OPT );
-	options.szName = L( "Adv Options" );
+	options.szName = L( "Adv. Options" );
 	SET_EVENT_MULTI( options.onReleased,
 	{
 		UI_GameOptions_Menu();

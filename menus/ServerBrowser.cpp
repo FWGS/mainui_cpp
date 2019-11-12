@@ -463,7 +463,7 @@ void CMenuServerBrowser::_Init( void )
 	gameList.bAllowSorting = true;
 
 	natOrDirect.AddSwitch( L( "Direct" ) );
-	natOrDirect.AddSwitch( L( "NAT" ) );							// Уже встречалось ранее.......
+	natOrDirect.AddSwitch( "NAT" );
 	natOrDirect.eTextAlignment = QM_CENTER;
 	natOrDirect.bMouseToggle = false;
 	natOrDirect.LinkCvar( "cl_nat" );
