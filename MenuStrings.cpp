@@ -249,99 +249,97 @@ static void Localize_AddToDictionary( const char *name, const char *lang )
 	int unicodeLength;
 	char *pFileBuf = (char*)EngFuncs::COM_LoadFile( filename, &unicodeLength );
 
-	if( pFileBuf ) // no problem, so read it.
-	{
-		int ansiLength = unicodeLength + 1;
-		char *afile = new char[ansiLength]; // save original pointer, so we can free it later
-		uchar16 *autf16 = new uchar16[unicodeLength/2 + 1];
-		char *pfile = afile;
-		char token[4096];
-		int i = 0;
-
-		memcpy( autf16, pFileBuf + 2, unicodeLength - 1 );
-		autf16[unicodeLength/2-1] = 0; //null terminator
-
-		Q_UTF16ToUTF8( autf16, afile, ansiLength, STRINGCONVERT_ASSERT_REPLACE );
-
-#ifdef XASH_DISABLE_FWGS_EXTENSIONS
-		UTFToCP1251( afile, afile, ansiLength, ansiLength );
-#endif // XASH_DISABLE_FWGS_EXTENSIONS
-
-		pfile = EngFuncs::COM_ParseFile( pfile, token );
-
-		if( stricmp( token, "lang" ))
-		{
-			Con_Printf( "Localize_AddToDict( %s, %s ): invalid header, got %s", name, lang, token );
-			goto error;
-		}
-
-		pfile = EngFuncs::COM_ParseFile( pfile, token );
-
-		if( strcmp( token, "{" ))
-		{
-			Con_Printf( "Localize_AddToDict( %s, %s ): want {, got %s", name, lang, token );
-			goto error;
-		}
-
-		pfile = EngFuncs::COM_ParseFile( pfile, token );
-
-		if( stricmp( token, "Language" ))
-		{
-			Con_Printf( "Localize_AddToDict( %s, %s ): want Language, got %s", name, lang, token );
-			goto error;
-		}
-
-		// skip language actual name
-		pfile = EngFuncs::COM_ParseFile( pfile, token );
-
-		pfile = EngFuncs::COM_ParseFile( pfile, token );
-
-		if( stricmp( token, "Tokens" ))
-		{
-			Con_Printf( "Localize_AddToDict( %s, %s ): want Tokens, got %s", name, lang, token );
-			goto error;
-		}
-
-		pfile = EngFuncs::COM_ParseFile( pfile, token );
-
-		if( strcmp( token, "{" ))
-		{
-			Con_Printf( "Localize_AddToDict( %s, %s ): want { after Tokens, got %s", name, lang, token );
-			goto error;
-		}
-
-		while( (pfile = EngFuncs::COM_ParseFile( pfile, token )))
-		{
-			if( !strcmp( token, "}" ))
-				break;
-
-			char szLocString[4096];
-			pfile = EngFuncs::COM_ParseFile( pfile, szLocString );
-
-			if( !strcmp( szLocString, "}" ))
-				break;
-
-
-			if( pfile )
-			{
-				// Con_DPrintf("New token: %s %s\n", token, szLocString );
-				Dictionary_Insert( token, szLocString );
-				i++;
-			}
-		}
-
-		Con_Printf( "Localize_AddToDict: loaded %i words from %s\n", i, filename );
-
-error:
-		delete[] afile;
-		delete[] autf16;
-
-		EngFuncs::COM_FreeFile( pFileBuf );
-	}
-	else
+	if( !pFileBuf )
 	{
 		Con_Printf( "Couldn't open file %s. Some strings will not be localized!.\n", filename );
+		return;
 	}
+
+	int ansiLength = unicodeLength + 1;
+	char *afile = new char[ansiLength]; // save original pointer, so we can free it later
+	uchar16 *autf16 = new uchar16[unicodeLength/2 + 1];
+	char *pfile = afile;
+	char token[4096];
+	int i = 0;
+
+	memcpy( autf16, pFileBuf + 2, unicodeLength - 1 );
+	autf16[unicodeLength/2-1] = 0; //null terminator
+
+	Q_UTF16ToUTF8( autf16, afile, ansiLength, STRINGCONVERT_ASSERT_REPLACE );
+
+#ifdef XASH_DISABLE_FWGS_EXTENSIONS
+	UTFToCP1251( afile, afile, ansiLength, ansiLength );
+#endif // XASH_DISABLE_FWGS_EXTENSIONS
+
+	pfile = EngFuncs::COM_ParseFile( pfile, token );
+
+	if( stricmp( token, "lang" ))
+	{
+		Con_Printf( "Localize_AddToDict( %s, %s ): invalid header, got %s", name, lang, token );
+		goto error;
+	}
+
+	pfile = EngFuncs::COM_ParseFile( pfile, token );
+
+	if( strcmp( token, "{" ))
+	{
+		Con_Printf( "Localize_AddToDict( %s, %s ): want {, got %s", name, lang, token );
+		goto error;
+	}
+
+	pfile = EngFuncs::COM_ParseFile( pfile, token );
+
+	if( stricmp( token, "Language" ))
+	{
+		Con_Printf( "Localize_AddToDict( %s, %s ): want Language, got %s", name, lang, token );
+		goto error;
+	}
+
+	// skip language actual name
+	pfile = EngFuncs::COM_ParseFile( pfile, token );
+
+	pfile = EngFuncs::COM_ParseFile( pfile, token );
+
+	if( stricmp( token, "Tokens" ))
+	{
+		Con_Printf( "Localize_AddToDict( %s, %s ): want Tokens, got %s", name, lang, token );
+		goto error;
+	}
+
+	pfile = EngFuncs::COM_ParseFile( pfile, token );
+
+	if( strcmp( token, "{" ))
+	{
+		Con_Printf( "Localize_AddToDict( %s, %s ): want { after Tokens, got %s", name, lang, token );
+		goto error;
+	}
+
+	while( (pfile = EngFuncs::COM_ParseFile( pfile, token )))
+	{
+		if( !strcmp( token, "}" ))
+			break;
+
+		char szLocString[4096];
+		pfile = EngFuncs::COM_ParseFile( pfile, szLocString );
+
+		if( !strcmp( szLocString, "}" ))
+			break;
+
+		if( pfile )
+		{
+			// Con_DPrintf("New token: %s %s\n", token, szLocString );
+			Dictionary_Insert( token, szLocString );
+			i++;
+		}
+	}
+
+	Con_Printf( "Localize_AddToDict: loaded %i words from %s\n", i, filename );
+
+error:
+	delete[] afile;
+	delete[] autf16;
+
+	EngFuncs::COM_FreeFile( pFileBuf );
 }
 
 static void Localize_Init( void )
