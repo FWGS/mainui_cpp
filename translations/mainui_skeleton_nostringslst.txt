@@ -341,8 +341,5 @@
 "faster, but you can't join the server from this machine"                                                                           ""
 "let engine replace 8-bit textures with full color hi-res prototypes (if present)"                                                  ""
 "save changed and go back to the Customize Menu"                                                                                    ""
-"test1"                                                                                                                             ""
-"test2"                                                                                                                             ""
-"testtest"                                                                                                                          ""
 }
 }
