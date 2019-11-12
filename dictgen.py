@@ -20,7 +20,18 @@ EXTENSIONS = ('.cpp', '.h')
 TRANSLATABLE_PATTERN = re.compile('L\s*\(\s*\".*?\"\s*\)')
 STRING_LITERAL_PATTERN = re.compile('\".*?\"')
 
-HEADER = '''"lang"
+HEADER = '''// How to work with this file:
+// 1) This file must be called mainui_x.txt, where x is your language in lower case
+// 2) Tokens on left are original strings, on right is translation
+// 3) StringsList_x where x is number is strings from strings.lst.
+// Leave them empty if you want to use values from strings.lst
+// 4) _everything.txt version of this file is intended to be used if you
+// don't want to rely on strings.lst nor on non-free translations
+// 5) _nostringslst.txt version of this file is intended to be used if you
+// WANT to rely on strings.lst but still don't want non-free translations
+// 6) _stripped.txt version of this file is intended to be used if you
+// WANT to rely on original game files(both strings.lst and non-free translations)
+"lang"
 {
 "Language" "<YOUR_LANGUAGE_HERE>"
 "Tokens"
@@ -54,9 +65,6 @@ def process_trans(trans):
 	# #2: filter unique
 	trans = list(set(trans))
 
-	# #3: remove strings.lst compatible strings
-	trans = [t for t in trans if not t.startswith('StringsList_')]
-
 	# #4: sort :)
 	trans.sort()
 
@@ -65,7 +73,13 @@ def process_trans(trans):
 def vgui_translation_parse(name):
 	trans = []
 	parsing = False
-	with open(name, "r", encoding = 'utf-16') as f:
+	isUtf16 = False
+	with open(name, "rb") as f:
+		BOM = f.read(2)
+		if BOM == b'\xFF\xFE':
+			isUtf16 = True
+
+	with open(name, "r", encoding = 'utf-16' if isUtf16 else 'utf-8') as f:
 		contents = f.read()
 		strings = re.findall(STRING_LITERAL_PATTERN, contents)
 		is_trans = True
@@ -99,9 +113,6 @@ def create_translations_file(name, trans):
 		print('Created skeleton translation file at %s' % name)
 
 def main():
-	outfilefull = os.path.join('translations', 'gameui_skeleton_full.txt')
-	outfile = os.path.join('translations', 'gameui_skeleton.txt')
-
 	files = [ os.path.join(folder, name)
 		for (folder, subs, files) in os.walk('.')
 		for name in files + subs
@@ -114,8 +125,12 @@ def main():
 		trans += process_file(f)
 
 	trans = process_trans(trans)
-	print('%d strings needs to be translated(without non-free translations)' % len(trans))
-	create_translations_file(outfilefull, trans)
+	print('%d strings needs to be translated(WITHOUT strings.lst compatibiltiy and WITHOUT non-free translations)' % len(trans))
+	create_translations_file(os.path.join('translations', 'mainui_skeleton_everything.txt'), trans)
+
+	trans = [t for t in trans if not t.startswith('StringsList_')]
+	print('%d strings needs to be translated(WITH strings.lst compatibiltiy and WITHOUT non-free translations)' % len(trans))
+	create_translations_file(os.path.join('translations', 'mainui_skeleton_nostringslst.txt'), trans)
 
 	nonfree_translations = None
 	try:
@@ -131,15 +146,15 @@ def main():
 
 		print('%d translated strings available from original GameUI/HL translations' % len(avail_trans))
 		trans = [t for t in trans if not t in avail_trans]
-		print('%d strings needs to be translated' % len(trans))
-		create_translations_file(outfile, trans)
+		print('%d strings needs to be translated(WITH strings.lst compaitibility and WITH non-free translations)' % len(trans))
+		create_translations_file(os.path.join('translations', 'mainui_skeleton_stripped.txt'), trans)
 	else:
 		def check_nonfree(s):
 			return (s.startswith('GameUI_') or s.startswith('Valve_') or s.startswith('Cstrike_'))
 
 		trans = [t for t in trans if not check_nonfree(t)]
-		print('%d strings needs to be translated' % len(trans))
-		create_translations_file(outfile, trans)
+		print('%d strings needs to be translated(WITH strings.lst compaitibility and WITH non-free translations)' % len(trans))
+		create_translations_file(os.path.join('translations', 'mainui_skeleton_stripped.txt'), trans)
 
 if __name__ == '__main__':
 	main()

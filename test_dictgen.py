@@ -41,7 +41,9 @@ class DictGenTest(unittest.TestCase):
 
 	def test_dictgen(self):
 		dictgen.create_translations_file('temp.txt', VALID_TOKENS)
-		self.assertTrue(filecmp.cmp('temp.txt', os.path.join('tests', 'test_skeleton.txt')))
+		tokens = dictgen.vgui_translation_parse('temp.txt')
+		os.remove('temp.txt')
+		self.assertEqual(tokens, VALID_TOKENS)
 
 if __name__ == '__main__':
 	unittest.main()
