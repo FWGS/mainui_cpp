@@ -260,13 +260,10 @@ public:
 	static ui_enginefuncs_t engfuncs;
 
 	// text funcs
-#ifndef XASH_DISABLE_FWGS_EXTENSIONS
 	static ui_extendedfuncs_t textfuncs;
 	static inline void EnableTextInput( int enable )
 	{ if( textfuncs.pfnEnableTextInput ) textfuncs.pfnEnableTextInput( enable ); }
-#else
-	static inline void EnableTextInput( int enable ) { }
-#endif
+
 	static int UtfProcessChar( int ch );
 	static int UtfMoveLeft( const char *str, int pos );
 	static int UtfMoveRight( const char *str, int pos, int length );

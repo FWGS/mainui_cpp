@@ -126,7 +126,6 @@ typedef struct
 	float	alphaFactor;
 	int xOffset, yOffset;
 
-	bool isForkedEngine;
 	bool needMapListUpdate;
 
 	bool nextFrameActive;
@@ -134,6 +133,7 @@ typedef struct
 
 extern float	cursorDY;			// use for touch scroll
 extern bool g_bCursorDown;
+extern bool g_bIsForkedEngine;
 extern uiStatic_t		uiStatic;
 
 #define DLG_X ((uiStatic.width - 640) / 2 - 192) // Dialogs are 640px in width

@@ -19,11 +19,10 @@ GNU General Public License for more details.
 #include "Utils.h"
 
 ui_enginefuncs_t EngFuncs::engfuncs;
-#ifndef XASH_DISABLE_FWGS_EXTENSIONS
-ui_extendedfuncs_t	EngFuncs::textfuncs;
-#endif
+ui_extendedfuncs_t EngFuncs::textfuncs;
 ui_globalvars_t	*gpGlobals;
 CMenu gMenu;
+bool g_bIsForkedEngine;
 
 static UI_FUNCTIONS gFunctionTable = 
 {
@@ -58,15 +57,18 @@ extern "C" EXPORT int GetMenuAPI(UI_FUNCTIONS *pFunctionTable, ui_enginefuncs_t*
 	// copy HUD_FUNCTIONS table to engine, copy engfuncs table from engine
 	memcpy( pFunctionTable, &gFunctionTable, sizeof( UI_FUNCTIONS ));
 	memcpy( &EngFuncs::engfuncs, pEngfuncsFromEngine, sizeof( ui_enginefuncs_t ));
-#ifndef XASH_DISABLE_FWGS_EXTENSIONS
 	memset( &EngFuncs::textfuncs, 0, sizeof( ui_extendedfuncs_t ));
-#endif
+
 	gpGlobals = pGlobals;
+
+	// can be hijacked, but please, don't do it
+	const char *version = EngFuncs::GetCvarString( "host_ver" );
+
+	g_bIsForkedEngine = version && version[0];
 
 	return TRUE;
 }
 
-#ifndef XASH_DISABLE_FWGS_EXTENSIONS
 static UI_EXTENDED_FUNCTIONS gExtendedTable =
 {
 	AddTouchButtonToList,
@@ -101,4 +103,3 @@ extern "C" EXPORT int GetExtAPI( int version, UI_EXTENDED_FUNCTIONS *pFunctionTa
 
 	return TRUE;
 }
-#endif // XASH_DISABLE_FWGS_EXTENSIONS

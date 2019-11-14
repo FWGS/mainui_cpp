@@ -90,7 +90,7 @@ const unsigned int g_iColorTable[8] =
 
 bool UI_IsXashFWGS( void )
 {
-	return uiStatic.isForkedEngine;
+	return g_bIsForkedEngine;
 }
 
 CMenuEntry::CMenuEntry(const char *cmd, void (*pfnPrecache)(), void (*pfnShow)()) :
@@ -1125,26 +1125,25 @@ int UI_VidInit( void )
 #undef ShellExecute //  "thanks", windows.h!
 void UI_OpenUpdatePage( bool engine, bool preferstore )
 {
-	const char *updateUrl;
+	const char *updateUrl = NULL;
 
 	if( engine || !gMenu.m_gameinfo.update_url[0] )
 	{
-#ifndef XASH_DISABLE_FWGS_EXTENSIONS
-		if( preferstore )
-			updateUrl = PLATFORM_UPDATE_PAGE;
-		else
-			updateUrl = GENERIC_UPDATE_PAGE;
-#else
-		// TODO: Replace by macro for mainui_cpp modders?
-		updateUrl = "https://github.com/FWGS/xash3d/releases/latest";
-#endif
+		if( UI_IsXashFWGS() )
+		{
+			if( preferstore )
+				updateUrl = PLATFORM_UPDATE_PAGE;
+			else
+				updateUrl = GENERIC_UPDATE_PAGE;
+		}
 	}
 	else
 	{
 		updateUrl = gMenu.m_gameinfo.update_url;
 	}
 
-	EngFuncs::ShellExecute( updateUrl, NULL, TRUE );
+	if( updateUrl )
+		EngFuncs::ShellExecute( updateUrl, NULL, TRUE );
 }
 
 void UI_UpdateDialog( int preferStore )
@@ -1215,11 +1214,6 @@ void UI_Init( void )
 	EngFuncs::CreateMapsList( TRUE );
 
 	uiStatic.initialized = true;
-
-	// can be hijacked, but please, don't do it
-	const char *version = EngFuncs::GetCvarString( "host_ver" );
-
-	uiStatic.isForkedEngine = version && version[0];
 
 	// setup game info
 	EngFuncs::GetGameInfo( &gMenu.m_gameinfo );
