@@ -108,7 +108,7 @@ public:
 
 		byte *newData = new byte[bhdr.fileSize];
 		memcpy( newData, &bhdr, sizeof( bhdr ));
-		memset( newData + bhdr.bitmapDataOffset, 0, sizeof( bhdr.bitmapDataSize ));
+		memset( newData + bhdr.bitmapDataOffset, 0, bhdr.bitmapDataSize );
 	
 		// now copy texture
 		byte *src = GetTextureData();
