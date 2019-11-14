@@ -250,11 +250,8 @@ void CMenuPlayerSetup::UpdateModel()
 	}
 
 	snprintf( image, 256, "models/player/%s/%s.bmp", mdl, mdl );
-#ifdef PIC_KEEP_SOURCE
 	view.hPlayerImage = EngFuncs::PIC_Load( image, PIC_KEEP_SOURCE );
-#else
-	view.hPlayerImage = EngFuncs::PIC_Load( image, PIC_KEEP_8BIT );
-#endif
+
 	ApplyColorToImagePreview();
 	EngFuncs::CvarSetString( "model", mdl );
 	if( !strcmp( mdl, "player" ) )
@@ -304,9 +301,10 @@ void CMenuPlayerSetup::ApplyColorToLogoPreview()
 		}
 	}
 
-	logoImage.r = 255;
-	logoImage.g = 255;
-	logoImage.b = 255;
+	logoColor.SetCurrentValue( L( g_LogoColors[0].name ) );
+	logoImage.r = g_LogoColors[0].r;
+	logoImage.g = g_LogoColors[0].g;
+	logoImage.b = g_LogoColors[0].b;
 }
 
 void CMenuPlayerSetup::WriteNewLogo( void )
