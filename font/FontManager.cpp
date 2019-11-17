@@ -39,7 +39,7 @@ GNU General Public License for more details.
 #define DEFAULT_WEIGHT   500
 #endif
 
-CFontManager g_FontMgr;
+CFontManager *g_FontMgr;
 
 CFontManager::CFontManager()
 {
@@ -479,9 +479,9 @@ HFont CFontBuilder::Create()
 	// check existing font at first
 	if( !m_hForceHandle )
 	{
-		for( int i = 0; i < g_FontMgr.m_Fonts.Count(); i++ )
+		for( int i = 0; i < g_FontMgr->m_Fonts.Count(); i++ )
 		{
-			font = g_FontMgr.m_Fonts[i];
+			font = g_FontMgr->m_Fonts[i];
 
 			if( font->IsEqualTo( m_szName, m_iTall, m_iWeight, m_iBlur, m_iFlags ) )
 				return i + 1;
@@ -515,20 +515,20 @@ HFont CFontBuilder::Create()
 		}
 	}
 
-	g_FontMgr.UploadTextureForFont( font );
+	g_FontMgr->UploadTextureForFont( font );
 
 	double endtime = Sys_DoubleTime();
 
 	Con_DPrintf( "Rendering %s(%i, %i) took %f seconds\n", font->GetName(), m_iTall, m_iWeight, endtime - starttime );
 
-	if( m_hForceHandle != -1 && g_FontMgr.m_Fonts.Count() != m_hForceHandle )
+	if( m_hForceHandle != -1 && g_FontMgr->m_Fonts.Count() != m_hForceHandle )
 	{
-		if( g_FontMgr.m_Fonts.IsValidIndex( m_hForceHandle ) )
+		if( g_FontMgr->m_Fonts.IsValidIndex( m_hForceHandle ) )
 		{
-			g_FontMgr.m_Fonts.FastRemove( m_hForceHandle );
-			return g_FontMgr.m_Fonts.InsertBefore( m_hForceHandle, font );
+			g_FontMgr->m_Fonts.FastRemove( m_hForceHandle );
+			return g_FontMgr->m_Fonts.InsertBefore( m_hForceHandle, font );
 		}
 	}
 
-	return g_FontMgr.m_Fonts.AddToTail(font) + 1;
+	return g_FontMgr->m_Fonts.AddToTail(font) + 1;
 }

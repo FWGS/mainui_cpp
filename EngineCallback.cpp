@@ -63,19 +63,19 @@ int EngFuncs::DrawConsoleString(int x, int y, const char *string)
 	sz.w = ScreenWidth - pt.x;
 	sz.h = ScreenHeight - pt.y;
 
-	charSz = g_FontMgr.GetFontTall( uiStatic.hConsoleFont );
+	charSz = g_FontMgr->GetFontTall( uiStatic.hConsoleFont );
 
 	return UI_DrawString( uiStatic.hConsoleFont, pt, sz, string, color, charSz, QM_TOPLEFT );
 }
 
 void EngFuncs::ConsoleStringLen(const char *string, int *length, int *height)
 {
-	g_FontMgr.GetTextSize( uiStatic.hConsoleFont, string, length, height );
+	g_FontMgr->GetTextSize( uiStatic.hConsoleFont, string, length, height );
 }
 
 int EngFuncs::ConsoleCharacterHeight()
 {
-	return g_FontMgr.GetFontTall( uiStatic.hConsoleFont );
+	return g_FontMgr->GetFontTall( uiStatic.hConsoleFont );
 }
 
 // We have full unicode support now

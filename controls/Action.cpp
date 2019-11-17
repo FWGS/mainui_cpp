@@ -52,10 +52,10 @@ void CMenuAction::VidInit( )
 		else
 		{
 			if( forceCalcW )
-				size.w = g_FontMgr.GetTextWideScaled( font, szName, charSize ) / uiStatic.scaleX;
+				size.w = g_FontMgr->GetTextWideScaled( font, szName, charSize ) / uiStatic.scaleX;
 
 			if( forceCalcY )
-				size.h = g_FontMgr.GetTextHeightExt( font, szName, charSize, size.w ) / uiStatic.scaleX;
+				size.h = g_FontMgr->GetTextHeightExt( font, szName, charSize, size.w ) / uiStatic.scaleX;
 		}
 
 		m_bLimitBySize = false;

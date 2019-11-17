@@ -319,7 +319,7 @@ int UI_DrawString( HFont font, int x, int y, int w, int h,
 	}
 
 	int i = 0;
-	int ellipsisWide = g_FontMgr.GetEllipsisWide( font );
+	int ellipsisWide = g_FontMgr->GetEllipsisWide( font );
 	bool giveup = false;
 
 	while( string[i] && !giveup )
@@ -380,7 +380,7 @@ int UI_DrawString( HFont font, int x, int y, int w, int h,
 					}
 				}
 
-				charWide = g_FontMgr.GetCharacterWidthScaled( font, uch, charH );
+				charWide = g_FontMgr->GetCharacterWidthScaled( font, uch, charH );
 
 				if( !(flags & ETF_NOSIZELIMIT) && pixelWide + charWide > w )
 				{
@@ -477,18 +477,18 @@ int UI_DrawString( HFont font, int x, int y, int w, int h,
 				continue;
 
 			if( flags & ETF_SHADOW )
-				g_FontMgr.DrawCharacter( font, ch, Point( xx + ofsX, yy + ofsY ), charH, shadowModulate, flags & ETF_ADDITIVE );
+				g_FontMgr->DrawCharacter( font, ch, Point( xx + ofsX, yy + ofsY ), charH, shadowModulate, flags & ETF_ADDITIVE );
 
 #ifdef DEBUG_WHITESPACE
 			if( ch == ' ' )
 			{
-				g_FontMgr.DrawCharacter( font, '_', Point( xx, yy ), charH, modulate, flags & ETF_ADDITIVE );
-				xx += g_FontMgr.GetCharacterWidthScaled( font, ch, charH );
+				g_FontMgr->DrawCharacter( font, '_', Point( xx, yy ), charH, modulate, flags & ETF_ADDITIVE );
+				xx += g_FontMgr->GetCharacterWidthScaled( font, ch, charH );
 				continue;
 			}
 #endif
 
-			xx += g_FontMgr.DrawCharacter( font, ch, Point( xx, yy ), charH, modulate, flags & ETF_ADDITIVE );
+			xx += g_FontMgr->DrawCharacter( font, ch, Point( xx, yy ), charH, modulate, flags & ETF_ADDITIVE );
 
 			maxX = Q_max( xx, maxX );
 		}
@@ -1113,7 +1113,7 @@ int UI_VidInit( void )
 	UI_LoadBmpButtons ();
 
 	// VidInit FontManager
-	g_FontMgr.VidInit();
+	g_FontMgr->VidInit();
 
 	uiStatic.menu.VidInit( calledOnce );
 
@@ -1210,6 +1210,8 @@ void UI_Init( void )
 		}
 	}
 
+	g_FontMgr = new CFontManager();
+
 	// EngFuncs::Cmd_AddCommand( "menu_zoo", UI_Zoo_Menu );
 	EngFuncs::CreateMapsList( TRUE );
 
@@ -1244,6 +1246,8 @@ void UI_Shutdown( void )
 	}
 
 	UI_FreeCustomStrings();
+
+	delete g_FontMgr;
 
 	memset( &uiStatic, 0, sizeof( uiStatic_t ));
 }

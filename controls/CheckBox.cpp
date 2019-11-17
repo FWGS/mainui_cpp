@@ -50,7 +50,7 @@ void CMenuCheckBox::VidInit( void )
 	m_scTextPos.x = m_scPos.x + (m_scSize.w * 1.5f );
 	m_scTextPos.y = m_scPos.y;
 
-	m_scTextSize.w = g_FontMgr.GetTextWideScaled( font, szName, m_scChSize );
+	m_scTextSize.w = g_FontMgr->GetTextWideScaled( font, szName, m_scChSize );
 	m_scTextSize.h = m_scChSize;
 }
 

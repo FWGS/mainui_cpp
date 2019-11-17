@@ -80,7 +80,7 @@ private:
 
 // lazy to fix code everywhere
 #ifndef CLIENT_DLL
-extern CFontManager g_FontMgr;
+extern CFontManager *g_FontMgr;
 #endif
 
 #endif // FONTMANAGER_H

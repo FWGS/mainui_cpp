@@ -91,7 +91,7 @@ void CMenuSwitch::VidInit()
 	for( i = 0; i < m_iSwitches; i++ )
 	{
 		if( m_szNames[i] != NULL && !bKeepToggleWidth )
-			sizes[i] = g_FontMgr.GetTextWideScaled( font, m_szNames[i], m_scChSize );
+			sizes[i] = g_FontMgr->GetTextWideScaled( font, m_szNames[i], m_scChSize );
 		else sizes[i] = (float)m_scSize.w / (float)m_iSwitches;
 
 		sum += sizes[i];
@@ -113,7 +113,7 @@ void CMenuSwitch::VidInit()
 	m_scTextPos.x = m_scPos.x + (m_scSize.w * 1.5f );
 	m_scTextPos.y = m_scPos.y;
 
-	m_scTextSize.w = g_FontMgr.GetTextWideScaled( font, szName, m_scChSize );
+	m_scTextSize.w = g_FontMgr->GetTextWideScaled( font, szName, m_scChSize );
 	m_scTextSize.h = m_scChSize;
 }
 

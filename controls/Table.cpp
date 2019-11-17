@@ -438,7 +438,7 @@ void CMenuTable::DrawLine( Point p, const char **psz, size_t size, uint textColo
 				Point picPos = pt;
 				Size picSize = EngFuncs::PIC_Size( hPic ) * uiStatic.scaleX;
 
-				picPos.y += g_FontMgr.GetFontAscent( font );
+				picPos.y += g_FontMgr->GetFontAscent( font );
 
 				if( IsAscend() )
 					picPos.y -= picSize.h;

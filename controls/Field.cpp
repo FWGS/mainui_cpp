@@ -56,7 +56,7 @@ void CMenuField::VidInit( void )
 	BaseClass::VidInit();
 
 	iCursor = strlen( szBuffer );
-	iScroll = g_FontMgr.CutText( font, szBuffer, m_scChSize, iRealWidth, true );
+	iScroll = g_FontMgr->CutText( font, szBuffer, m_scChSize, iRealWidth, true );
 
 	iRealWidth = m_scSize.w - UI_OUTLINE_WIDTH * 2;
 }
@@ -165,7 +165,7 @@ bool CMenuField::KeyDown( int key )
 		{
 			bool remaining;
 
-			int maxIdx = g_FontMgr.CutText( font, szBuffer + iScroll, m_scChSize, iRealWidth, false, false, NULL, &remaining );
+			int maxIdx = g_FontMgr->CutText( font, szBuffer + iScroll, m_scChSize, iRealWidth, false, false, NULL, &remaining );
 
 			if( iCursor < len ) iCursor = EngFuncs::UtfMoveRight( szBuffer, iCursor, len );
 			if( remaining && iCursor > maxIdx ) iScroll = EngFuncs::UtfMoveRight( szBuffer, iScroll, len );
@@ -180,7 +180,7 @@ bool CMenuField::KeyDown( int key )
 			break;
 		case K_END: // last character
 			iCursor = len;
-			iScroll = g_FontMgr.CutText( font, szBuffer, m_scChSize, iRealWidth, true );
+			iScroll = g_FontMgr->CutText( font, szBuffer, m_scChSize, iRealWidth, true );
 			handled = true; // handled
 			break;
 		case K_BACKSPACE:
@@ -200,7 +200,7 @@ bool CMenuField::KeyDown( int key )
 				int pos = EngFuncs::UtfMoveRight( szBuffer, iCursor, len );
 				memmove( szBuffer + iCursor, szBuffer + pos, len - pos + 1 );
 
-				iScroll = g_FontMgr.CutText( font, szBuffer, m_scChSize, iRealWidth, true );
+				iScroll = g_FontMgr->CutText( font, szBuffer, m_scChSize, iRealWidth, true );
 			}
 			handled = true; // handled
 			break;
@@ -218,7 +218,7 @@ bool CMenuField::KeyDown( int key )
 				bool remaining;
 				int newScroll = iScroll;
 
-				int iWidthInChars = g_FontMgr.CutText( font, szBuffer + iScroll, m_scChSize, iRealWidth, false, false, &w, &remaining );
+				int iWidthInChars = g_FontMgr->CutText( font, szBuffer + iScroll, m_scChSize, iRealWidth, false, false, &w, &remaining );
 
 				if( eTextAlignment & QM_LEFT )
 				{
@@ -240,7 +240,7 @@ bool CMenuField::KeyDown( int key )
 				{
 					x = m_scPos.x + (m_scSize.w - w) / 2;
 				}
-				charpos = g_FontMgr.CutText(font, szBuffer + newScroll, m_scChSize, uiStatic.cursorX - x, false, false, &w, &remaining );
+				charpos = g_FontMgr->CutText(font, szBuffer + newScroll, m_scChSize, uiStatic.cursorX - x, false, false, &w, &remaining );
 
 				iCursor = charpos + iScroll;
 				if( iCursor > 0 )
@@ -306,7 +306,7 @@ void CMenuField::Char( int key )
 	{
 		// ctrl-e is end
 		iCursor = len;
-		iScroll = g_FontMgr.CutText( font, szBuffer, m_scChSize, iRealWidth, true );
+		iScroll = g_FontMgr->CutText( font, szBuffer, m_scChSize, iRealWidth, true );
 	}
 	else if( key == '^' && !( bAllowColorstrings ))
 	{
@@ -360,7 +360,7 @@ void CMenuField::Char( int key )
 	if( iCursor > len )
 	{
 		szBuffer[iCursor] = 0;
-		iScroll = g_FontMgr.CutText( font, szBuffer, m_scChSize, iRealWidth, true );
+		iScroll = g_FontMgr->CutText( font, szBuffer, m_scChSize, iRealWidth, true );
 		changed = true;
 	}
 
@@ -411,7 +411,7 @@ void CMenuField::Draw( void )
 		cursor_char[0] = 11;
 	else cursor_char[0] = '_';
 
-	drawLen = g_FontMgr.CutText( font, szBuffer + iScroll, m_scChSize, m_scSize.w, false );
+	drawLen = g_FontMgr->CutText( font, szBuffer + iScroll, m_scChSize, m_scSize.w, false );
 	len = strlen( szBuffer ) + 1;
 
 	// guarantee that cursor will be visible
@@ -498,20 +498,20 @@ void CMenuField::Draw( void )
 	}
 	else if( eTextAlignment & QM_RIGHT )
 	{
-		x = newPos.x + (m_scSize.w - g_FontMgr.GetTextWideScaled( font, text, m_scChSize ) );
+		x = newPos.x + (m_scSize.w - g_FontMgr->GetTextWideScaled( font, text, m_scChSize ) );
 	}
 	else
 	{
-		x = newPos.x + (m_scSize.w - g_FontMgr.GetTextWideScaled( font, text, m_scChSize )) / 2;
+		x = newPos.x + (m_scSize.w - g_FontMgr->GetTextWideScaled( font, text, m_scChSize )) / 2;
 	}
 
 	UI_DrawString( font, newPos, m_scSize, text, colorBase, m_scChSize, eTextAlignment, textflags );
 
-	int cursorOffset = cursor? g_FontMgr.GetTextWideScaled( font, text, m_scChSize, cursor ):0;
+	int cursorOffset = cursor? g_FontMgr->GetTextWideScaled( font, text, m_scChSize, cursor ):0;
 
 	// int cursorOffset = 0;
 
-	int cursor_char_width = g_FontMgr.GetTextWideScaled( font, cursor_char, m_scChSize );
+	int cursor_char_width = g_FontMgr->GetTextWideScaled( font, cursor_char, m_scChSize );
 
 	if(( uiStatic.realTime & 499 ) < 250 )
 		UI_DrawString( font, x + cursorOffset, y, cursor_char_width, m_scSize.h, cursor_char, colorBase, m_scChSize, QM_LEFT, textflags | ETF_FORCECOL );
