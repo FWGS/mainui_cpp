@@ -502,18 +502,14 @@ int UI_DrawString( HFont font, int x, int y, int w, int h,
 	return maxX;
 }
 
-#ifdef _WIN32
-#include <windows.h> // DrawMouseCursor
-#endif
-
 /*
 =================
 UI_DrawMouseCursor
 =================
 */
 void UI_DrawMouseCursor( void )
-{	
-#ifdef _WIN32
+{
+#if 0 // a1ba: disable until we will manage to provide an API for crossplatform cursor replacing
 	CMenuBaseItem	*item;
 	HICON		hCursor = NULL;
 	int		i;
@@ -554,9 +550,7 @@ void UI_DrawMouseCursor( void )
 		hCursor = (HICON)LoadCursor( NULL, (LPCTSTR)OCR_NORMAL );
 
 	EngFuncs::SetCursor( hCursor );
-#else // _WIN32
-	// TODO: Unified LoadCursor interface extension
-#endif // _WIN32
+#endif
 }
 
 const char *COM_ExtractExtension( const char *s )
