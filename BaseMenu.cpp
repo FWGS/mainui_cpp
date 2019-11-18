@@ -36,6 +36,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Scoreboard.h"
 #endif
 
+#ifdef WINAPI_FAMILY
+#if (!WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP) && WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_APP))
+#define XASH_WINRT
+#endif
+#endif
+
 cvar_t		*ui_showmodels;
 cvar_t		*ui_show_window_stack;
 cvar_t		*ui_borderclip;
@@ -513,7 +519,7 @@ UI_DrawMouseCursor
 */
 void UI_DrawMouseCursor( void )
 {	
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(XASH_WINRT)
 	CMenuBaseItem	*item;
 	HICON		hCursor = NULL;
 	int		i;
