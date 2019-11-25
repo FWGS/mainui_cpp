@@ -26,9 +26,9 @@ class EngFuncs
 {
 public:
 	// image handlers
-	static inline HIMAGE PIC_Load( const char *szPicName, const byte *ucRawImage, long ulRawImageSize, long flags = 0)
+	static inline HIMAGE PIC_Load( const char *szPicName, const byte *ucRawImage, int ulRawImageSize, int flags = 0)
 	{ return engfuncs.pfnPIC_Load( szPicName, ucRawImage, ulRawImageSize, flags );	}
-	static inline HIMAGE PIC_Load( const char *szPicName, long flags = 0)
+	static inline HIMAGE PIC_Load( const char *szPicName, int flags = 0)
 	{ return engfuncs.pfnPIC_Load( szPicName, 0, 0, flags ); }
 	static inline void	PIC_Free( const char *szPicName )
 	{ engfuncs.pfnPIC_Free( szPicName ); }
