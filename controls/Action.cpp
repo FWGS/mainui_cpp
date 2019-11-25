@@ -21,7 +21,7 @@ GNU General Public License for more details.
 
 CMenuAction::CMenuAction() : BaseClass()
 {
-	m_szBackground = NULL;
+	m_szBackground = 0;
 	m_bfillBackground = false;
 	forceCalcW = forceCalcY = false;
 }
@@ -45,9 +45,8 @@ void CMenuAction::VidInit( )
 	{
 		if( m_szBackground )
 		{
-			HIMAGE handle = EngFuncs::PIC_Load( m_szBackground );
-			size.w = EngFuncs::PIC_Width( handle );
-			size.h = EngFuncs::PIC_Height( handle );
+			size.w = EngFuncs::PIC_Width( m_szBackground );
+			size.h = EngFuncs::PIC_Height( m_szBackground );
 		}
 		else
 		{
@@ -186,7 +185,7 @@ void CMenuAction::SetBackground(const char *path, unsigned int color)
 void CMenuAction::SetBackground(unsigned int color, unsigned int focused )
 {
 	m_bfillBackground = true;
-	m_szBackground = NULL;
+	m_szBackground = 0;
 	m_iBackcolor = color;
 	m_iBackColorFocused = focused;
 }

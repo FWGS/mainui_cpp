@@ -25,7 +25,7 @@ CMenuSpinControl::CMenuSpinControl()  : BaseClass(), m_szBackground(),
 		m_flMinValue(0), m_flMaxValue(1), m_flCurValue(0), m_flRange(0.1), m_pModel( NULL ),
 		m_iFloatPrecision(0), m_szDisplay()
 {
-	m_szBackground = NULL;
+	m_szBackground = 0;
 	m_szLeftArrow = UI_LEFTARROW;
 	m_szLeftArrowFocus = UI_LEFTARROWFOCUS;
 	m_szRightArrow = UI_RIGHTARROW;

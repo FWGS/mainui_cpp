@@ -51,15 +51,15 @@ private:
 	const char *MoveRight();
 	void Display();
 
-	const char	*m_szBackground;
-	const char	*m_szLeftArrow;
-	const char	*m_szRightArrow;
-	const char	*m_szLeftArrowFocus;
-	const char	*m_szRightArrowFocus;
-	float		m_flMinValue;
-	float		m_flMaxValue;
-	float		m_flCurValue;
-	float		m_flRange;
+	CImage m_szBackground;
+	CImage m_szLeftArrow;
+	CImage m_szRightArrow;
+	CImage m_szLeftArrowFocus;
+	CImage m_szRightArrowFocus;
+	float  m_flMinValue;
+	float  m_flMaxValue;
+	float  m_flCurValue;
+	float  m_flRange;
 
 	CMenuBaseArrayModel *m_pModel;
 	short m_iFloatPrecision;

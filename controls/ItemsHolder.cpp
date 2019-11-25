@@ -23,7 +23,7 @@ GNU General Public License for more details.
 CMenuItemsHolder::CMenuItemsHolder() :
 	BaseClass(), m_iCursor( 0 ), m_iCursorPrev( 0 ), m_pItems( ),
 	m_events(), m_bInit( false ),
-	m_bWrapCursor( true ), m_szResFile( 0 )
+	m_bWrapCursor( true ), m_szResFile( 0 ), m_pItemAtCursorOnDown( 0 )
 {
 	;
 }

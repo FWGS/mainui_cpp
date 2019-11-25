@@ -35,7 +35,7 @@ CMenuField::CMenuField() : BaseClass(), szBuffer()
 	iCursor = 0;
 	iScroll = 0;
 	iRealWidth = 0;
-	szBackground = NULL;
+	szBackground = 0;
 }
 
 void CMenuField::Init()

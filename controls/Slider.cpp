@@ -33,6 +33,8 @@ CMenuSlider::CMenuSlider() : BaseClass(), m_flMinValue(), m_flMaxValue(), m_flCu
 
 	SetCharSize( QM_DEFAULTFONT );
 
+	imgSlider = UI_SLIDER_MAIN;
+
 	iFlags |= QMF_DROPSHADOW;
 }
 
@@ -193,9 +195,9 @@ void CMenuSlider::Draw( void )
 
 	UI_DrawRectangleExt( m_scPos.x + m_iSliderOutlineWidth / 2, m_scPos.y + m_iSliderOutlineWidth, m_scSize.w - m_iSliderOutlineWidth, m_scCenterBox.h, uiInputBgColor, m_iSliderOutlineWidth );
 	if( eFocusAnimation == QM_HIGHLIGHTIFFOCUS && this == m_pParent->ItemAtCursor())
-		UI_DrawPic( sliderX, m_scPos.y, m_scCenterBox.w, m_scSize.h, uiColorHelp, UI_SLIDER_MAIN );
+		UI_DrawPic( sliderX, m_scPos.y, m_scCenterBox.w, m_scSize.h, uiColorHelp, imgSlider );
 	else
-		UI_DrawPic( sliderX, m_scPos.y, m_scCenterBox.w, m_scSize.h, uiColorWhite, UI_SLIDER_MAIN );
+		UI_DrawPic( sliderX, m_scPos.y, m_scCenterBox.w, m_scSize.h, uiColorWhite, imgSlider );
 
 
 	textHeight = m_scPos.y - (m_scChSize * 1.5f);

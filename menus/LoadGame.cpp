@@ -41,12 +41,14 @@ class CMenuLoadGame;
 class CMenuSavePreview : public CMenuBaseItem
 {
 public:
-	CMenuSavePreview() : CMenuBaseItem()
+	CMenuSavePreview() : CMenuBaseItem(), fallback( "{GRAF001" )
 	{
 		iFlags = QMF_INACTIVE;
 	}
 
 	void Draw() override;
+
+	CImage fallback;
 };
 
 class CMenuSavesListModel : public CMenuBaseModel
@@ -123,8 +125,6 @@ private:
 
 void CMenuSavePreview::Draw()
 {
-	const char *fallback = "{GRAF001";
-
 	if( szName && *szName )
 	{
 		char saveshot[128];

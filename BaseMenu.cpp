@@ -180,9 +180,9 @@ void UI_DisableAlphaFactor()
 UI_DrawPic
 =================
 */
-void UI_DrawPic( int x, int y, int width, int height, const unsigned int color, const char *pic, const ERenderMode eRenderMode )
+void UI_DrawPic( int x, int y, int width, int height, const unsigned int color, CImage &pic, const ERenderMode eRenderMode )
 {
-	HIMAGE hPic = EngFuncs::PIC_Load( pic );
+	HIMAGE hPic = pic.Handle();
 
 	if( !hPic )
 		return;

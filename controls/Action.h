@@ -39,7 +39,7 @@ public:
 private:
 	CColor m_iBackcolor;
 	CColor m_iBackColorFocused;
-	const char *m_szBackground;
+	CImage m_szBackground;
 	bool m_bfillBackground;
 	bool forceCalcW, forceCalcY;
 };

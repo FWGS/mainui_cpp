@@ -54,11 +54,11 @@ public:
 	bool bInvertMask;
 	bool bChangeOnPressed;
 
-	const char	*szEmptyPic;
-	const char	*szFocusPic;
-	const char	*szPressPic;
-	const char	*szCheckPic;
-	const char	*szGrayedPic;	// when QMF_GRAYED is set
+	CImage szEmptyPic;
+	CImage szFocusPic;
+	CImage szPressPic;
+	CImage szCheckPic;
+	CImage szGrayedPic;	// when QMF_GRAYED is set
 
 	unsigned int iMask; // used only for BitMaskCb
 	static void BitMaskCb( CMenuBaseItem *pSelf, void *pExtra )

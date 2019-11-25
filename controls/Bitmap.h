@@ -44,13 +44,14 @@ public:
 		ePressRenderMode = pressRenderMode;
 	}
 
-	const char *szPic;
+protected:
+	CImage szPic;
 	ERenderMode eRenderMode;
 
-	const char *szFocusPic;
+	CImage szFocusPic;
 	ERenderMode eFocusRenderMode;
 
-	const char *szPressPic;
+	CImage szPressPic;
 	ERenderMode ePressRenderMode;
 };
 

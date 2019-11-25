@@ -17,7 +17,7 @@ GNU General Public License for more details.
 #include "BaseMenu.h"
 #include "Utils.h"
 
-void EngFuncs::PIC_Set(HIMAGE hPic, int r, int g, int b, int a)
+void EngFuncs::PIC_Set( HIMAGE hPic, int r, int g, int b, int a)
 {
 	if( uiStatic.enableAlphaFactor )
 		a *= uiStatic.alphaFactor;

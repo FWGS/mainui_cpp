@@ -52,6 +52,8 @@ public:
 	// void SetDrawStep( float drawStep, int numSteps );
 
 	void SetKeepSlider( int keepSlider ) { m_iKeepSlider = keepSlider; }
+
+	CImage imgSlider;
 private:
 	float	m_flMinValue;
 	float	m_flMaxValue;

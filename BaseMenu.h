@@ -26,6 +26,7 @@ GNU General Public License for more details.
 #include "FontManager.h"
 #include "BtnsBMPTable.h"
 #include "WindowSystem.h"
+#include "Image.h"
 
 #define UI_MAX_MENUDEPTH		64
 #define UI_MAX_MENUITEMS		64
@@ -192,10 +193,20 @@ inline int UI_DrawString( HFont font, Point pos, Size size, const char *str, con
 	return UI_DrawString( font, pos.x, pos.y, size.w, size.h, str, col, charH, justify, flags );
 }
 
-void UI_DrawPic(int x, int y, int w, int h, const unsigned int color, const char *pic, const ERenderMode eRenderMode = QM_DRAWNORMAL );
-inline void UI_DrawPic( Point pos, Size size, const unsigned int color, const char *pic, const ERenderMode eRenderMode = QM_DRAWNORMAL )
+void UI_DrawPic( int x, int y, int w, int h, const unsigned int color, CImage &pic, const ERenderMode eRenderMode = QM_DRAWNORMAL );
+inline void UI_DrawPic( Point pos, Size size, const unsigned int color, CImage &pic, const ERenderMode eRenderMode = QM_DRAWNORMAL )
 {
 	UI_DrawPic( pos.x, pos.y, size.w, size.h, color, pic, eRenderMode );
+}
+inline void UI_DrawPic( int x, int y, int w, int h, const unsigned int color, const char *pic, const ERenderMode eRenderMode = QM_DRAWNORMAL )
+{
+	CImage img = pic;
+	UI_DrawPic( x, y, w, h, color, img, eRenderMode );
+}
+inline void UI_DrawPic( Point pos, Size size, const unsigned int color, const char *pic, const ERenderMode eRenderMode = QM_DRAWNORMAL )
+{
+	CImage img = pic;
+	UI_DrawPic( pos, size, color, img, eRenderMode );
 }
 void UI_FillRect( int x, int y, int w, int h, const unsigned int color );
 inline void UI_FillRect( Point pos, Size size, const unsigned int color )

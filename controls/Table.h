@@ -149,13 +149,13 @@ private:
 
 	float flFixedSumm, flDynamicSumm;
 
-	const char	*szBackground;
-	const char	*szUpArrow;
-	const char	*szUpArrowFocus;
-	const char  *szUpArrowPressed;
-	const char	*szDownArrow;
-	const char	*szDownArrowFocus;
-	const char  *szDownArrowPressed;
+	CImage szBackground;
+	CImage szUpArrow;
+	CImage szUpArrowFocus;
+	CImage szUpArrowPressed;
+	CImage szDownArrow;
+	CImage szDownArrowFocus;
+	CImage szDownArrowPressed;
 
 	int		iTopItem;
 	int     iNumRows;
