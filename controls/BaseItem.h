@@ -156,7 +156,7 @@ public:
 	}
 
 	CMenuItemsHolder* Parent() const			{ return m_pParent; }
-	template <class T> T* Parent() const	{ return (T*) m_pParent; } // a shortcut to parent
+	template <class T> T* Parent() const	{ return static_cast<T*>(m_pParent); } // a shortcut to parent
 	bool IsPressed() const { return m_bPressed; }
 	int LastFocusTime() const { return m_iLastFocusTime; }
 

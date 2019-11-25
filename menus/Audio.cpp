@@ -57,8 +57,6 @@ private:
 	float oldVibrate;
 };
 
-static CMenuAudio		uiAudio;
-
 /*
 =================
 CMenuAudio::GetConfig
@@ -195,23 +193,4 @@ void CMenuAudio::_VidInit( )
 	GetConfig();
 }
 
-/*
-=================
-UI_Audio_Precache
-=================
-*/
-void UI_Audio_Precache( void )
-{
-	EngFuncs::PIC_Load( ART_BANNER );
-}
-
-/*
-=================
-UI_Audio_Menu
-=================
-*/
-void UI_Audio_Menu( void )
-{
-	uiAudio.Show();
-}
-ADD_MENU( menu_audio, UI_Audio_Precache, UI_Audio_Menu );
+ADD_MENU( menu_audio, CMenuAudio, UI_Audio_Menu );

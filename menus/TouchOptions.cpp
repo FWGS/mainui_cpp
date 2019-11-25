@@ -31,7 +31,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define ART_BANNER	  	"gfx/shell/head_touch_options"
 
-static class CMenuTouchOptions : public CMenuFramework
+class CMenuTouchOptions : public CMenuFramework
 {
 private:
 	void _Init();
@@ -87,7 +87,7 @@ public:
 	// prompt dialog
 	CMenuYesNoMessageBox msgBox;
 	void UpdateProfilies();
-} uiTouchOptions;
+};
 
 void CMenuTouchOptions::CProfiliesListModel::Update( void )
 {
@@ -440,23 +440,4 @@ void CMenuTouchOptions::_VidInit( void )
 
 }
 
-/*
-=================
-UI_TouchOptions_Precache
-=================
-*/
-void UI_TouchOptions_Precache( void )
-{
-	EngFuncs::PIC_Load( ART_BANNER );
-}
-
-/*
-=================
-UI_TouchOptions_Menu
-=================
-*/
-void UI_TouchOptions_Menu( void )
-{
-	uiTouchOptions.Show();
-}
-ADD_MENU( menu_touchoptions, UI_TouchOptions_Precache, UI_TouchOptions_Menu );
+ADD_MENU( menu_touchoptions, CMenuTouchOptions, UI_TouchOptions_Menu );

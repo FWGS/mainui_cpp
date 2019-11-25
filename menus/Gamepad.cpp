@@ -51,7 +51,7 @@ static const char *axisNames[7] =
 	"NOT BOUND"
 };
 
-static class CMenuGamePad : public CMenuFramework
+class CMenuGamePad : public CMenuFramework
 {
 public:
 	CMenuGamePad() : CMenuFramework("CMenuGamePad") { }
@@ -68,8 +68,7 @@ private:
 	CMenuSpinControl axisBind[6];
 
 	CMenuAction axisBind_label;
-} uiGamePad;
-
+};
 
 /*
 =================
@@ -274,23 +273,4 @@ void CMenuGamePad::_VidInit()
 	GetConfig();
 }
 
-/*
-=================
-CMenuGamePad::Precache
-=================
-*/
-void UI_GamePad_Precache( void )
-{
-	EngFuncs::PIC_Load( ART_BANNER );
-}
-
-/*
-=================
-CMenuGamePad::Menu
-=================
-*/
-void UI_GamePad_Menu( void )
-{
-	uiGamePad.Show();
-}
-ADD_MENU( menu_gamepad, UI_GamePad_Precache, UI_GamePad_Menu );
+ADD_MENU( menu_gamepad, CMenuGamePad, UI_GamePad_Menu );

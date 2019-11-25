@@ -36,9 +36,6 @@ private:
 	char		hintText[MAX_HINT_TEXT];
 };
 
-static CMenuSaveLoad	uiSaveLoad;
-
-
 /*
 =================
 UI_SaveLoad_Init
@@ -68,29 +65,4 @@ void CMenuSaveLoad::_Init( void )
 	AddItem( hintMessage );
 }
 
-/*
-=================
-UI_SaveLoad_Precache
-=================
-*/
-void UI_SaveLoad_Precache( void )
-{
-	EngFuncs::PIC_Load( ART_BANNER );
-}
-
-/*
-=================
-UI_SaveLoad_Menu
-=================
-*/
-void UI_SaveLoad_Menu( void )
-{
-	if( gMenu.m_gameinfo.gamemode == GAME_MULTIPLAYER_ONLY )
-	{
-		// completely ignore save\load menus for multiplayer_only
-		return;
-	}
-
-	uiSaveLoad.Show();
-}
-ADD_MENU( menu_saveload, UI_SaveLoad_Precache, UI_SaveLoad_Menu );
+ADD_MENU( menu_saveload, CMenuSaveLoad, UI_SaveLoad_Menu );

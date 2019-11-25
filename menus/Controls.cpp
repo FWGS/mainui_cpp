@@ -30,9 +30,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define ART_BANNER		"gfx/shell/head_controls"
 #define MAX_KEYS 256
 
+class CMenuControls;
+
 class CMenuKeysModel : public CMenuBaseModel
 {
 public:
+	CMenuKeysModel( CMenuControls *parent ) : parent( parent ) { }
+
 	void Update();
 	void OnActivateEntry( int line );
 	void OnDeleteEntry( int line );
@@ -71,12 +75,14 @@ public:
 	char firstKey[MAX_KEYS][20];
 	char secondKey[MAX_KEYS][20];
 	int m_iNumItems;
+private:
+	CMenuControls *parent;
 };
 
-static class CMenuControls : public CMenuFramework
+class CMenuControls : public CMenuFramework
 {
 public:
-	CMenuControls() : CMenuFramework("CMenuControls") { }
+	CMenuControls() : CMenuFramework("CMenuControls"), keysListModel( this ) { }
 
 	void _Init();
 	void _VidInit();
@@ -109,7 +115,7 @@ private:
 	} msgBox1; // small msgbox
 
 	CMenuYesNoMessageBox msgBox2; // large msgbox
-} uiControls;
+};
 
 /*
 =================
@@ -249,12 +255,12 @@ void CMenuKeysModel::Update( void )
 
 void CMenuKeysModel::OnActivateEntry(int line)
 {
-	uiControls.EnterGrabMode();
+	parent->EnterGrabMode();
 }
 
 void CMenuKeysModel::OnDeleteEntry(int line)
 {
-	uiControls.UnbindEntry();
+	parent->UnbindEntry();
 }
 
 void CMenuControls::ResetKeysList( void )
@@ -412,23 +418,4 @@ void CMenuControls::_VidInit()
 	keysListModel.Update();
 }
 
-/*
-=================
-UI_Controls_Precache
-=================
-*/
-void UI_Controls_Precache( void )
-{
-	EngFuncs::PIC_Load( ART_BANNER );
-}
-
-/*
-=================
-UI_Controls_Menu
-=================
-*/
-void UI_Controls_Menu( void )
-{
-	uiControls.Show();
-}
-ADD_MENU( menu_controls, UI_Controls_Precache, UI_Controls_Menu );
+ADD_MENU( menu_controls, CMenuControls, UI_Controls_Menu );

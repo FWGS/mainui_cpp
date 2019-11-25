@@ -5,7 +5,7 @@
 
 enum EPresets { EPRESET_NORMAL = 0, EPRESET_DSL, EPRESET_SLOW, EPRESET_LAST };
 
-static class CMenuConnectionWarning : public CMenuBaseWindow
+class CMenuConnectionWarning : public CMenuBaseWindow
 {
 public:
 	CMenuConnectionWarning() : CMenuBaseWindow( "ConnectionWarning" )
@@ -23,7 +23,7 @@ private:
 	CMenuPicButton options;
 	CMenuCheckBox normal, dsl, slowest;
 	CMenuAction title, message;
-} uiConnectionWarning;
+};
 
 bool CMenuConnectionWarning::KeyDown( int key )
 {
@@ -68,8 +68,9 @@ void CMenuConnectionWarning::_Init()
 	options.szName = L( "Adv. Options" );
 	SET_EVENT_MULTI( options.onReleased,
 	{
+		CMenuConnectionWarning *p = pSelf->Parent<CMenuConnectionWarning>();
 		UI_GameOptions_Menu();
-		uiConnectionWarning.done.SetGrayed( false );
+		p->done.SetGrayed( false );
 	});
 	options.SetRect( 154, 320, UI_BUTTONS_WIDTH, UI_BUTTONS_HEIGHT );
 	options.bEnableTransitions = false;
@@ -129,10 +130,10 @@ void CMenuConnectionWarning::WriteSettings( const EPresets preset)
 	done.SetGrayed( false );
 }
 
+ADD_MENU3( menu_connectionwarning, CMenuConnectionWarning, UI_ConnectionWarning_f );
 void UI_ConnectionWarning_f( void )
 {
 	if( !UI_IsVisible() )
 		UI_Main_Menu();
-	uiConnectionWarning.Show();
+	menu_connectionwarning->Show();
 }
-ADD_COMMAND( menu_connectionwarning, UI_ConnectionWarning_f );

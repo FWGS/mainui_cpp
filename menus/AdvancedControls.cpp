@@ -56,8 +56,6 @@ private:
 	CMenuSlider	sensitivity;
 };
 
-static CAdvancedControls	uiAdvControls;
-
 /*
 =================
 UI_AdvControls_GetConfig
@@ -213,23 +211,4 @@ void CAdvancedControls::_VidInit()
 	GetConfig();
 }
 
-/*
-=================
-UI_AdvControls_Precache
-=================
-*/
-void UI_AdvControls_Precache( void )
-{
-	EngFuncs::PIC_Load( ART_BANNER );
-}
-
-/*
-=================
-UI_AdvControls_Menu
-=================
-*/
-void UI_AdvControls_Menu( void )
-{
-	uiAdvControls.Show();
-}
-ADD_MENU( menu_advcontrols, UI_AdvControls_Precache, UI_AdvControls_Menu );
+ADD_MENU( menu_advcontrols, CAdvancedControls, UI_AdvControls_Menu );

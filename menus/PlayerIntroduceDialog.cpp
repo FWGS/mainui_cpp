@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Field.h"
 #include "PlayerIntroduceDialog.h"
 
-static class CMenuPlayerIntroduceDialog : public CMenuYesNoMessageBox
+class CMenuPlayerIntroduceDialog : public CMenuYesNoMessageBox
 {
 public:
 	CMenuPlayerIntroduceDialog() : CMenuYesNoMessageBox( false ), msgBox( true )
@@ -42,7 +42,7 @@ public:
 private:
 	CMenuField name;
 	CMenuYesNoMessageBox msgBox;
-} uiIntroduceDialog;
+};
 
 void CMenuPlayerIntroduceDialog::WriteOrDiscard()
 {
@@ -101,8 +101,12 @@ void CMenuPlayerIntroduceDialog::_Init()
 	AddItem( name );
 }
 
+ADD_MENU3( menu_playerintroducedialog, CMenuPlayerIntroduceDialog, UI_PlayerIntroduceDialog_Show );
+
+void UI_PlayerIntroduceDialog_Show() { }
+
 void UI_PlayerIntroduceDialog_Show( CMenuBaseWindow *pCaller )
 {
-	uiIntroduceDialog.pCaller = pCaller;
-	uiIntroduceDialog.Show();
+	menu_playerintroducedialog->pCaller = pCaller;
+	menu_playerintroducedialog->Show();
 }

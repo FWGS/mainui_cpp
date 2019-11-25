@@ -46,8 +46,6 @@ public:
 	CMenuCheckBox mouse, touch, joystick;
 };
 
-static CMenuInputDevices	uiInputDevices;
-
 /*
 =================
 UI_AdvControls_GetConfig
@@ -97,7 +95,7 @@ void CMenuInputDevices::_Init( void )
 				"Are you sure to disable mouse?" ) );
 			SET_EVENT_MULTI( msgbox.onNegative,
 			{
-				uiInputDevices.mouse.bChecked = false;
+				pSelf->Parent<CMenuInputDevices>()->mouse.bChecked = false;
 			});
 
 			msgbox.Show();
@@ -138,12 +136,4 @@ void CMenuInputDevices::_VidInit()
 	GetConfig();
 }
 
-/*
-=================
-UI_AdvControls_Menu
-=================
-*/
-void UI_InputDevices_Menu( void )
-{
-	uiInputDevices.Show();
-}
+ADD_MENU( menu_inputdevices, CMenuInputDevices, UI_InputDevices_Menu );

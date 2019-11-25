@@ -40,8 +40,6 @@ public:
 	CMenuYesNoMessageBox msgBox;
 };
 
-static CMenuOptions	uiOptions;
-
 /*
 =================
 CMenuOptions::Init
@@ -77,23 +75,4 @@ void CMenuOptions::_Init( void )
 		PC_DONE, VoidCb( &CMenuOptions::Hide ), QMF_NOTIFY );
 }
 
-/*
-=================
-CMenuOptions::Precache
-=================
-*/
-void UI_Options_Precache( void )
-{
-	EngFuncs::PIC_Load( ART_BANNER );
-}
-
-/*
-=================
-CMenuOptions::Menu
-=================
-*/
-void UI_Options_Menu( void )
-{
-	uiOptions.Show();
-}
-ADD_MENU( menu_options, UI_Options_Precache, UI_Options_Menu );
+ADD_MENU( menu_options, CMenuOptions, UI_Options_Menu );

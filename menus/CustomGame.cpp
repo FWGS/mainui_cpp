@@ -69,8 +69,6 @@ private:
 	CMenuModListModel modListModel;
 };
 
-static CMenuCustomGame	uiCustomGame;
-
 void CMenuCustomGame::ChangeGame( void *pExtra )
 {
 	char cmd[128];
@@ -181,27 +179,4 @@ void CMenuCustomGame::_Init( void )
 	}
 }
 
-/*
-=================
-UI_CustomGame_Precache
-=================
-*/
-void UI_CustomGame_Precache( void )
-{
-	EngFuncs::PIC_Load( ART_BANNER );
-}
-
-/*
-=================
-UI_CustomGame_Menu
-=================
-*/
-void UI_CustomGame_Menu( void )
-{
-	// current instance is not support game change
-	if( !EngFuncs::GetCvarFloat( "host_allow_changegame" ))
-		return;
-
-	uiCustomGame.Show();
-}
-ADD_MENU( menu_customgame, UI_CustomGame_Precache, UI_CustomGame_Menu );
+ADD_MENU( menu_customgame, CMenuCustomGame, UI_CustomGame_Menu );

@@ -36,6 +36,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define MAX_CELLSTRING 64
 
+class CMenuLoadGame;
+
 class CMenuSavePreview : public CMenuBaseItem
 {
 public:
@@ -50,6 +52,8 @@ public:
 class CMenuSavesListModel : public CMenuBaseModel
 {
 public:
+	CMenuSavesListModel( CMenuLoadGame *parent ) : parent( parent ) { }
+
 	void Update() override;
 	int GetColumns() const override
 	{
@@ -76,14 +80,15 @@ public:
 	char		delName[UI_MAXGAMES][CS_SIZE];
 
 private:
+	CMenuLoadGame *parent;
 	char		m_szCells[UI_MAXGAMES][3][MAX_CELLSTRING];
 	int			m_iNumItems;
 };
 
-static class CMenuLoadGame : public CMenuFramework
+class CMenuLoadGame : public CMenuFramework
 {
 public:
-	CMenuLoadGame() : CMenuFramework( "CMenuLoadGame" ) { }
+	CMenuLoadGame() : CMenuFramework( "CMenuLoadGame" ), savesListModel( this ) { }
 
 	// true to turn this menu into save mode, false to turn into load mode
 	void SetSaveMode( bool saveMode );
@@ -114,7 +119,7 @@ private:
 	CMenuSavesListModel savesListModel;
 
 	friend class CMenuSavesListModel;
-} uiLoadGame;
+};
 
 void CMenuSavePreview::Draw()
 {
@@ -155,7 +160,7 @@ void CMenuSavesListModel::Update( void )
 	// sort the saves in reverse order (oldest past at the end)
 	qsort( filenames, numFiles, sizeof( char* ), (cmpfunc)COM_CompareSaves );
 
-	if ( uiLoadGame.IsSaveMode() && CL_IsActive() )
+	if ( parent->IsSaveMode() && CL_IsActive() )
 	{
 		// create new entry for current save game
 		Q_strncpy( saveName[i], L( "GameUI_SaveGame_New" ), CS_SIZE );
@@ -199,26 +204,26 @@ void CMenuSavesListModel::Update( void )
 
 	if ( saveName[0][0] == 0 )
 	{
-		uiLoadGame.load.SetGrayed( true );
+		parent->load.SetGrayed( true );
 	}
 	else
 	{
-		uiLoadGame.levelShot.szName = saveName[0];
-		uiLoadGame.load.SetGrayed( false );
+		parent->levelShot.szName = saveName[0];
+		parent->load.SetGrayed( false );
 	}
 
 	if ( saveName[0][0] == 0 || !CL_IsActive() )
-		uiLoadGame.save.SetGrayed( true );
-	else uiLoadGame.save.SetGrayed( false );
+		parent->save.SetGrayed( true );
+	else parent->save.SetGrayed( false );
 
 	if ( delName[0][0] == 0 )
-		uiLoadGame.remove.SetGrayed( true );
-	else uiLoadGame.remove.SetGrayed( false );
+		parent->remove.SetGrayed( true );
+	else parent->remove.SetGrayed( false );
 }
 
 void CMenuSavesListModel::OnDeleteEntry(int line)
 {
-	uiLoadGame.msgBox.Show();
+	parent->msgBox.Show();
 }
 
 /*
@@ -360,13 +365,16 @@ void CMenuLoadGame::SetSaveMode(bool saveMode)
 	}
 }
 
+static CMenuLoadGame *menu_loadgame = NULL;
+
 /*
 =================
 UI_LoadGame_Precache
 =================
 */
-void UI_LoadGame_Precache( void )
+void UI_LoadSaveGame_Precache( void )
 {
+	menu_loadgame = new CMenuLoadGame();
 	EngFuncs::PIC_Load( ART_BANNER_SAVE );
 	EngFuncs::PIC_Load( ART_BANNER_LOAD );
 }
@@ -381,9 +389,14 @@ void UI_LoadSaveGame_Menu( bool saveMode )
 
 	if( !EngFuncs::CheckGameDll( )) return;
 
-	uiLoadGame.Show();
-	uiLoadGame.SetSaveMode( saveMode );
-	uiLoadGame.UpdateList();
+	menu_loadgame->Show();
+	menu_loadgame->SetSaveMode( saveMode );
+	menu_loadgame->UpdateList();
+}
+
+void UI_LoadSaveGame_Shutdown( void )
+{
+	delete menu_loadgame;
 }
 
 /*
@@ -400,5 +413,5 @@ void UI_SaveGame_Menu( void )
 {
 	UI_LoadSaveGame_Menu( true );
 }
-ADD_MENU( menu_loadgame, UI_LoadGame_Precache, UI_LoadGame_Menu );
-ADD_MENU( menu_savegame, NULL, UI_SaveGame_Menu );
+ADD_MENU4( menu_loadgame, UI_LoadSaveGame_Precache, UI_LoadGame_Menu, UI_LoadSaveGame_Shutdown );
+ADD_MENU4( menu_savegame, NULL, UI_SaveGame_Menu, NULL );

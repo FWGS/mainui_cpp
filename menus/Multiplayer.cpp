@@ -32,6 +32,19 @@ public:
 	CMenuMultiplayer() : CMenuFramework( "CMenuMultiplayer" ) { }
 
 	void AskPredictEnable() { msgBox.Show(); }
+	void Show() override
+	{
+		CMenuFramework::Show();
+
+		if( EngFuncs::GetCvarFloat( "menu_mp_firsttime" ) && !EngFuncs::GetCvarFloat( "cl_predict" ) )
+		{
+			AskPredictEnable();
+		}
+		else if( !UI::Names::CheckIsNameValid( EngFuncs::GetCvarString( "name" ) ) )
+		{
+			UI_PlayerIntroduceDialog_Show( this );
+		}
+	}
 
 private:
 	void _Init() override;
@@ -39,9 +52,6 @@ private:
 	// prompt dialog
 	CMenuYesNoMessageBox msgBox;
 };
-
-static CMenuMultiplayer	uiMultiPlayer;
-
 
 /*
 =================
@@ -72,47 +82,16 @@ void CMenuMultiplayer::_Init( void )
 		EngFuncs::CvarSetValue( "cl_predict", 1.0f );
 		EngFuncs::CvarSetValue( "menu_mp_firsttime", 0.0f );
 
-		UI_PlayerIntroduceDialog_Show( &uiMultiPlayer );
+		UI_PlayerIntroduceDialog_Show( pSelf->Parent<CMenuBaseWindow>() );
 	});
 	SET_EVENT_MULTI( msgBox.onNegative,
 	{
 		EngFuncs::CvarSetValue( "menu_mp_firsttime", 0.0f );
 
-		UI_PlayerIntroduceDialog_Show( &uiMultiPlayer );
+		UI_PlayerIntroduceDialog_Show( pSelf->Parent<CMenuBaseWindow>() );
 	});
 	msgBox.Link( this );
 
 }
 
-/*
-=================
-CMenuMultiplayer::Precache
-=================
-*/
-void UI_MultiPlayer_Precache( void )
-{
-	EngFuncs::PIC_Load( ART_BANNER );
-}
-
-/*
-=================
-UI_MultiPlayer_Menu
-=================
-*/
-void UI_MultiPlayer_Menu( void )
-{
-	if ( gMenu.m_gameinfo.gamemode == GAME_SINGLEPLAYER_ONLY )
-		return;
-
-	uiMultiPlayer.Show();
-
-	if( EngFuncs::GetCvarFloat( "menu_mp_firsttime" ) && !EngFuncs::GetCvarFloat( "cl_predict" ) )
-	{
-		uiMultiPlayer.AskPredictEnable();
-	}
-	else if( !UI::Names::CheckIsNameValid( EngFuncs::GetCvarString( "name" ) ) )
-	{
-		UI_PlayerIntroduceDialog_Show( &uiMultiPlayer );
-	}
-}
-ADD_MENU( menu_multiplayer, UI_MultiPlayer_Precache, UI_MultiPlayer_Menu );
+ADD_MENU( menu_multiplayer, CMenuMultiplayer, UI_MultiPlayer_Menu );

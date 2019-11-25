@@ -32,6 +32,16 @@ class CMenuNewGame : public CMenuFramework
 public:
 	CMenuNewGame() : CMenuFramework( "CMenuNewGame" ) { }
 	static void StartGameCb( float skill );
+	void Show() override
+	{
+		if( gMenu.m_gameinfo.flags & GFL_NOSKILLS )
+		{
+			StartGameCb( 1.0f );
+			return;
+		}
+
+		CMenuFramework::Show();
+	}
 private:
 	void _Init() override;
 
@@ -43,8 +53,6 @@ private:
 	CEventCallback normCallback;
 	CEventCallback hardCallback;
 };
-
-static CMenuNewGame	uiNewGame;
 
 /*
 =================
@@ -111,35 +119,4 @@ void CMenuNewGame::_Init( void )
 
 }
 
-/*
-=================
-UI_NewGame_Precache
-=================
-*/
-void UI_NewGame_Precache( void )
-{
-	EngFuncs::PIC_Load( ART_BANNER );
-}
-
-/*
-=================
-UI_NewGame_Menu
-=================
-*/
-void UI_NewGame_Menu( void )
-{
-	// completely ignore save\load menus for multiplayer_only
-	if( gMenu.m_gameinfo.gamemode == GAME_MULTIPLAYER_ONLY || !EngFuncs::CheckGameDll() )
-		return;
-
-#ifdef GFL_NOSKILLS
-	if( gMenu.m_gameinfo.flags & GFL_NOSKILLS )
-	{
-		uiNewGame.StartGameCb( 1.0f );
-		return;
-	}
-#endif
-
-	uiNewGame.Show();
-}
-ADD_MENU( menu_newgame, UI_NewGame_Precache, UI_NewGame_Menu );
+ADD_MENU( menu_newgame, CMenuNewGame, UI_NewGame_Menu );

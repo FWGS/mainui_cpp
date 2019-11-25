@@ -30,6 +30,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define ART_BANNER_LAN		"gfx/shell/head_lan"
 #define ART_BANNER_LOCK		"gfx/shell/lock"
 
+class CMenuServerBrowser;
+
 struct server_t
 {
 	netadr_t adr;
@@ -99,7 +101,7 @@ struct server_t
 class CMenuGameListModel : public CMenuBaseModel
 {
 public:
-	CMenuGameListModel() : CMenuBaseModel(), m_iSortingColumn(-1) {}
+	CMenuGameListModel( CMenuServerBrowser *parent ) : CMenuBaseModel(), parent( parent ), m_iSortingColumn(-1) {}
 
 	void Update() override;
 	int GetColumns() const override
@@ -161,6 +163,8 @@ public:
 	float serversRefreshTime;
 	CUtlVector<server_t> servers;
 private:
+	CMenuServerBrowser *parent;
+
 	int m_iSortingColumn;
 	bool m_bAscend;
 };
@@ -168,7 +172,7 @@ private:
 class CMenuServerBrowser: public CMenuFramework
 {
 public:
-	CMenuServerBrowser() : CMenuFramework( "CMenuServerBrowser" ) { }
+	CMenuServerBrowser() : CMenuFramework( "CMenuServerBrowser" ), gameListModel( this ) { }
 	void Draw() override;
 	void Show() override;
 
@@ -213,7 +217,43 @@ private:
 static server_t staticServerSelect;
 static bool staticWaitingPassword = false;
 
-static CMenuServerBrowser	uiServerBrowser;
+ADD_MENU3( menu_internetgames, CMenuServerBrowser, UI_InternetGames_Menu );
+ADD_MENU4( menu_langame, NULL, UI_LanGame_Menu, NULL );
+
+/*
+=================
+CMenuServerBrowser::Menu
+=================
+*/
+void UI_ServerBrowser_Menu( void )
+{
+	if ( gMenu.m_gameinfo.gamemode == GAME_SINGLEPLAYER_ONLY )
+		return;
+
+	// stop demos to allow network sockets to open
+	if ( gpGlobals->demoplayback && EngFuncs::GetCvarFloat( "cl_background" ))
+	{
+		uiStatic.m_iOldMenuDepth = uiStatic.menu.Count();
+		EngFuncs::ClientCmd( FALSE, "stop\n" );
+		uiStatic.m_fDemosPlayed = true;
+	}
+
+	menu_internetgames->Show();
+}
+
+void UI_InternetGames_Menu( void )
+{
+	menu_internetgames->SetLANOnly( false );
+
+	UI_ServerBrowser_Menu();
+}
+
+void UI_LanGame_Menu( void )
+{
+	menu_internetgames->SetLANOnly( true );
+
+	UI_ServerBrowser_Menu();
+}
 
 bool CMenuGameListModel::Sort(int column, bool ascend)
 {
@@ -274,7 +314,7 @@ void CMenuGameListModel::Update( void )
 
 	if( servers.Count() )
 	{
-		uiServerBrowser.joinGame->SetGrayed( false );
+		parent->joinGame->SetGrayed( false );
 		if( m_iSortingColumn != -1 )
 			Sort( m_iSortingColumn, m_bAscend );
 	}
@@ -325,7 +365,7 @@ void CMenuGameListModel::AddServerToList(netadr_t adr, const char *info)
 void CMenuServerBrowser::Connect( server_t &server )
 {
 	// prevent refresh during connect
-	uiServerBrowser.refreshTime = uiStatic.realTime + 999999;
+	menu_internetgames->refreshTime = uiStatic.realTime + 999999;
 
 	// ask user for password
 	if( server.havePassword )
@@ -338,7 +378,7 @@ void CMenuServerBrowser::Connect( server_t &server )
 			staticWaitingPassword = true;
 
 			// show password request window
-			uiServerBrowser.askPassword.Show();
+			menu_internetgames->askPassword.Show();
 
 			return;
 		}
@@ -574,63 +614,15 @@ void CMenuServerBrowser::AddServerToList(netadr_t adr, const char *info)
 
 /*
 =================
-CMenuServerBrowser::Precache
-=================
-*/
-void UI_ServerBrowser_Precache( void )
-{
-	EngFuncs::PIC_Load( ART_BANNER_INET );
-	EngFuncs::PIC_Load( ART_BANNER_LAN );
-}
-
-/*
-=================
-CMenuServerBrowser::Menu
-=================
-*/
-void UI_ServerBrowser_Menu( void )
-{
-	if ( gMenu.m_gameinfo.gamemode == GAME_SINGLEPLAYER_ONLY )
-		return;
-
-	// stop demos to allow network sockets to open
-	if ( gpGlobals->demoplayback && EngFuncs::GetCvarFloat( "cl_background" ))
-	{
-		uiStatic.m_iOldMenuDepth = uiStatic.menu.Count();
-		EngFuncs::ClientCmd( FALSE, "stop\n" );
-		uiStatic.m_fDemosPlayed = true;
-	}
-
-	uiServerBrowser.Show();
-}
-
-void UI_InternetGames_Menu( void )
-{
-	uiServerBrowser.SetLANOnly( false );
-
-	UI_ServerBrowser_Menu();
-}
-
-void UI_LanGame_Menu( void )
-{
-	uiServerBrowser.SetLANOnly( true );
-
-	UI_ServerBrowser_Menu();
-}
-ADD_MENU( menu_langame, NULL, UI_LanGame_Menu );
-ADD_MENU( menu_internetgames, UI_ServerBrowser_Precache, UI_InternetGames_Menu );
-
-/*
-=================
 UI_AddServerToList
 =================
 */
 void UI_AddServerToList( netadr_t adr, const char *info )
 {
-	if( !uiStatic.initialized )
+	if( !menu_internetgames )
 		return;
 
-	uiServerBrowser.AddServerToList( adr, info );
+	menu_internetgames->AddServerToList( adr, info );
 }
 
 /*
@@ -641,6 +633,7 @@ UI_MenuResetPing_f
 void UI_MenuResetPing_f( void )
 {
 	Con_Printf("UI_MenuResetPing_f\n");
-	uiServerBrowser.ResetPing();
+	if( menu_internetgames )
+		menu_internetgames->ResetPing();
 }
 ADD_COMMAND( menu_resetping, UI_MenuResetPing_f );

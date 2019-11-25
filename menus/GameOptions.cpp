@@ -54,8 +54,6 @@ private:
 	CMenuCheckBox split, compress;
 };
 
-static CMenuGameOptions	uiGameOptions;
-
 /*
 =================
 UI_GameOptions_KeyFunc
@@ -217,7 +215,7 @@ void CMenuGameOptions::_Init( void )
 	normal.szName = L( "Normal internet connection" ); 	// Такая строка где-то уже была, поэтому в отдельный файл НЕ ВЫНОШУ !
 	SET_EVENT_MULTI( normal.onChanged,
 	{
-		uiGameOptions.SetNetworkMode( 1400, 0, 30, 60, 25000 );
+		pSelf->Parent<CMenuGameOptions>()->SetNetworkMode( 1400, 0, 30, 60, 25000 );
 		((CMenuCheckBox*)pSelf)->bChecked = true;
 	});
 
@@ -225,7 +223,7 @@ void CMenuGameOptions::_Init( void )
 	dsl.szName = L( "DSL or PPTP with limited packet size" );	// И такое тоже уже было !
 	SET_EVENT_MULTI( dsl.onChanged,
 	{
-		uiGameOptions.SetNetworkMode( 1200, 1000, 30, 60, 25000 );
+		pSelf->Parent<CMenuGameOptions>()->SetNetworkMode( 1200, 1000, 30, 60, 25000 );
 		((CMenuCheckBox*)pSelf)->bChecked = true;
 	});
 
@@ -234,7 +232,7 @@ void CMenuGameOptions::_Init( void )
 	slowest.szName = L( "Slow connection mode (64kbps)" );	// Было, повтор !
 	SET_EVENT_MULTI( slowest.onChanged,
 	{
-		uiGameOptions.SetNetworkMode( 900, 700, 25, 30, 7500 );
+		pSelf->Parent<CMenuGameOptions>()->SetNetworkMode( 900, 700, 25, 30, 7500 );
 		((CMenuCheckBox*)pSelf)->bChecked = true;
 	});
 	compress.SetNameAndStatus( L( "Compress" ), L( "Compress splitted packets (need split to work)" ) );
@@ -284,23 +282,4 @@ void CMenuGameOptions::_Init( void )
 	}
 }
 
-/*
-=================
-UI_GameOptions_Precache
-=================
-*/
-void UI_GameOptions_Precache( void )
-{
-	EngFuncs::PIC_Load( ART_BANNER );
-}
-
-/*
-=================
-UI_GameOptions_Menu
-=================
-*/
-void UI_GameOptions_Menu( void )
-{
-	uiGameOptions.Show();
-}
-ADD_MENU( menu_gameoptions, UI_GameOptions_Precache, UI_GameOptions_Menu );
+ADD_MENU( menu_gameoptions, CMenuGameOptions, UI_GameOptions_Menu );

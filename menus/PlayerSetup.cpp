@@ -52,7 +52,7 @@ static struct
 { "#Valve_Dkgray", 36,  36,  36  }, // L( "#Valve_Dkgray" )
 };
 
-static class CMenuPlayerSetup : public CMenuFramework
+class CMenuPlayerSetup : public CMenuFramework
 {
 private:
 	void _Init() override;
@@ -112,7 +112,7 @@ public:
 	CMenuYesNoMessageBox msgBox;
 
 	bool hideModels, hideLogos;
-} uiPlayerSetup;
+};
 
 void CMenuPlayerSetup::CMenuLogoPreview::Draw()
 {
@@ -481,26 +481,4 @@ void CMenuPlayerSetup::Reload()
 	if( !hideModels ) UpdateModel();
 }
 
-/*
-=================
-UI_PlayerSetup_Precache
-=================
-*/
-void UI_PlayerSetup_Precache( void )
-{
-	EngFuncs::PIC_Load( ART_BANNER );
-}
-
-/*
-=================
-UI_PlayerSetup_Menu
-=================
-*/
-void UI_PlayerSetup_Menu( void )
-{
-	if ( gMenu.m_gameinfo.gamemode == GAME_SINGLEPLAYER_ONLY )
-		return;
-
-	uiPlayerSetup.Show();
-}
-ADD_MENU( menu_playersetup, UI_PlayerSetup_Precache, UI_PlayerSetup_Menu );
+ADD_MENU( menu_playersetup, CMenuPlayerSetup, UI_PlayerSetup_Menu );

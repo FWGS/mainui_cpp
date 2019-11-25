@@ -134,8 +134,6 @@ private:
 	char sCommonString[512];
 };
 
-static CMenuConnectionProgress uiConnectionProgress;
-
 CMenuConnectionProgress::CMenuConnectionProgress() : CMenuBaseWindow( "ConnectionProgress" )
 {
 	sDownloadString[0] = sCommonString[0] = sTitleString[0] = '\0';
@@ -337,69 +335,71 @@ void CMenuConnectionProgress::Draw( void )
 	CMenuBaseWindow::Draw();
 }
 
+ADD_MENU3( menu_connectionprogress, CMenuConnectionProgress, UI_ConnectionProgress_f );
+
 // exports
 void UI_ConnectionProgress_Disconnect( void )
 {
-	uiConnectionProgress.HandleDisconnect();
+	menu_connectionprogress->HandleDisconnect();
 }
 
 void UI_ConnectionProgress_Download( const char *pszFileName, const char *pszServerName, int iCurrent, int iTotal, const char *comment )
 {
-	if( uiConnectionProgress.m_iState == STATE_CONSOLE )
+	if( menu_connectionprogress->m_iState == STATE_CONSOLE )
 		return;
 
-	uiConnectionProgress.HandleDownload( pszFileName, pszServerName, iCurrent, iTotal, comment );
-	uiConnectionProgress.Show();
+	menu_connectionprogress->HandleDownload( pszFileName, pszServerName, iCurrent, iTotal, comment );
+	menu_connectionprogress->Show();
 }
 
 void UI_ConnectionProgress_DownloadEnd( void )
 {
-	if( uiConnectionProgress.m_iState == STATE_CONSOLE )
+	if( menu_connectionprogress->m_iState == STATE_CONSOLE )
 		return;
 
-	uiConnectionProgress.m_iState = STATE_CONNECTING;
-	uiConnectionProgress.HandleDisconnect();
-	uiConnectionProgress.Show();
+	menu_connectionprogress->m_iState = STATE_CONNECTING;
+	menu_connectionprogress->HandleDisconnect();
+	menu_connectionprogress->Show();
 }
 
 void UI_ConnectionProgress_Precache( void )
 {
-	if( uiConnectionProgress.m_iState == STATE_CONSOLE )
+	if( menu_connectionprogress->m_iState == STATE_CONSOLE )
 		return;
 
-	uiConnectionProgress.HandlePrecache();
-	uiConnectionProgress.Show();
+	menu_connectionprogress->HandlePrecache();
+	menu_connectionprogress->Show();
 }
 
 void UI_ConnectionProgress_Connect( const char *server ) // NULL for local server
 {
-	if( uiConnectionProgress.m_iState == STATE_CONSOLE )
+	if( menu_connectionprogress->m_iState == STATE_CONSOLE )
 		return;
 
-	uiConnectionProgress.m_iState = STATE_MENU;
-	uiConnectionProgress.HandleConnect( server );
-	uiConnectionProgress.Show();
+	menu_connectionprogress->m_iState = STATE_MENU;
+	menu_connectionprogress->HandleConnect( server );
+	menu_connectionprogress->Show();
 }
 
 void UI_ConnectionProgress_ChangeLevel( void )
 {
-	if( uiConnectionProgress.m_iState == STATE_CONSOLE )
+	if( menu_connectionprogress->m_iState == STATE_CONSOLE )
 		return;
 
-	uiConnectionProgress.m_iState = STATE_MENU;
-	uiConnectionProgress.SetCommonText( L( "Changing level on server" ) );
-	uiConnectionProgress.Show();
+	menu_connectionprogress->m_iState = STATE_MENU;
+	menu_connectionprogress->SetCommonText( L( "Changing level on server" ) );
+	menu_connectionprogress->Show();
 }
 
 void UI_ConnectionProgress_ParseServerInfo( const char *server )
 {
-	if( uiConnectionProgress.m_iState == STATE_CONSOLE )
+	if( menu_connectionprogress->m_iState == STATE_CONSOLE )
 		return;
 
-	uiConnectionProgress.SetServer( server );
-	uiConnectionProgress.m_iState = STATE_CONNECTING;
-	uiConnectionProgress.SetCommonText( L( "GameUI_ParseServerInfo" ) );
-	uiConnectionProgress.Show();
+	menu_connectionprogress->SetServer( server );
+	menu_connectionprogress->m_iState = STATE_CONNECTING;
+	menu_connectionprogress->SetCommonText( L( "GameUI_ParseServerInfo" ) );
+	menu_connectionprogress->Show();
 }
 
 void UI_ConnectionProgress_f( void )
@@ -418,7 +418,7 @@ void UI_ConnectionProgress_f( void )
 	}
 	else if( !strcmp( EngFuncs::CmdArgv(1), "stufftext" ) )
 	{
-		uiConnectionProgress.HandleStufftext( atof( EngFuncs::CmdArgv( 2 ) ), EngFuncs::CmdArgv( 3 ) );
+		menu_connectionprogress->HandleStufftext( atof( EngFuncs::CmdArgv( 2 ) ), EngFuncs::CmdArgv( 3 ) );
 	}
 	else if( !strcmp( EngFuncs::CmdArgv(1), "precache" ) )
 	{
@@ -441,4 +441,3 @@ void UI_ConnectionProgress_f( void )
 		UI_ConnectionProgress_ParseServerInfo( EngFuncs::CmdArgv(2) );
 	}
 }
-ADD_COMMAND( menu_connectionprogress, UI_ConnectionProgress_f );

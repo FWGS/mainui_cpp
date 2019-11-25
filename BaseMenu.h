@@ -231,15 +231,37 @@ void UI_LoadScriptConfig( void );
 class CMenuEntry
 {
 public:
-	CMenuEntry( const char *cmd, void (*pfnPrecache)( void ), void (*pfnShow)( void ));
+	CMenuEntry( const char *cmd, void (*pfnPrecache)( void ), void (*pfnShow)( void ), void (*pfnShutdown)( void ) = NULL);
 	const char *m_szCommand;
 	void (*m_pfnPrecache)( void );
 	void (*m_pfnShow)( void );
+	void (*m_pfnShutdown)( void );
 	CMenuEntry *m_pNext;
 };
 
-#define ADD_MENU( cmd, precachefunc, showfunc ) \
-	static CMenuEntry cmd( #cmd, precachefunc, showfunc )
+#define ADD_MENU4( cmd, precachefunc, showfunc, shutdownfunc ) \
+	void showfunc( void ); \
+	static CMenuEntry entry_##cmd( #cmd, precachefunc, showfunc, shutdownfunc )
+
+#define ADD_MENU3( cmd, type, showfunc ) \
+	static type * cmd = NULL; \
+	void cmd##_Precache( void ) \
+	{ \
+		cmd = new type(); \
+	} \
+	void cmd##_Shutdown( void ) \
+	{ \
+		delete cmd; \
+	} \
+	ADD_MENU4( cmd, cmd##_Precache, showfunc, cmd##_Shutdown )
+
+#define ADD_MENU( cmd, type, showfunc ) \
+	void showfunc( void ); \
+	ADD_MENU3( cmd, type, showfunc ); \
+	void showfunc( void ) \
+	{ \
+		cmd->Show(); \
+	}
 
 #define ADD_COMMAND( cmd, showfunc ) \
 	static CMenuEntry cmd( #cmd, NULL, showfunc )

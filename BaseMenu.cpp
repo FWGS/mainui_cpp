@@ -93,10 +93,11 @@ bool UI_IsXashFWGS( void )
 	return g_bIsForkedEngine;
 }
 
-CMenuEntry::CMenuEntry(const char *cmd, void (*pfnPrecache)(), void (*pfnShow)()) :
+CMenuEntry::CMenuEntry(const char *cmd, void (*pfnPrecache)(), void (*pfnShow)(), void (*pfnShutdown)() ) :
 	m_szCommand( cmd ),
 	m_pfnPrecache( pfnPrecache ),
 	m_pfnShow( pfnShow ),
+	m_pfnShutdown( pfnShutdown ),
 	m_pNext( s_pEntries )
 {
 	s_pEntries = this;
@@ -1236,6 +1237,11 @@ void UI_Shutdown( void )
 		if( entry->m_szCommand && entry->m_pfnShow )
 		{
 			EngFuncs::Cmd_RemoveCommand( entry->m_szCommand );
+		}
+
+		if( entry->m_pfnShutdown )
+		{
+			entry->m_pfnShutdown();
 		}
 	}
 

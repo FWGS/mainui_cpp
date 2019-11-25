@@ -39,8 +39,6 @@ private:
 	float saveTouchEnable;
 };
 
-static CMenuTouchEdit uiTouchEdit;
-
 void CMenuTouchEdit::Show()
 {
 	saveTouchEnable = EngFuncs::GetCvarFloat( "touch_enable" );
@@ -96,23 +94,4 @@ bool CMenuTouchEdit::KeyDown( int key )
 	return false;
 }
 
-/*
-=================
-UI_TouchEdit_Precache
-=================
-*/
-void UI_TouchEdit_Precache( void )
-{
-
-}
-
-/*
-=================
-UI_TouchEdit_Menu
-=================
-*/
-void UI_TouchEdit_Menu( void )
-{
-	uiTouchEdit.Show();
-}
-ADD_MENU( menu_touchedit, UI_TouchEdit_Precache, UI_TouchEdit_Menu );
+ADD_MENU( menu_touchedit, CMenuTouchEdit, UI_TouchEdit_Menu );

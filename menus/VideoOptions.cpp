@@ -57,8 +57,7 @@ public:
 	CMenuCheckBox   bump;
 
 	HIMAGE		hTestImage;
-} uiVidOptions;
-
+};
 
 /*
 =================
@@ -67,19 +66,19 @@ CMenuVidOptions::GammaUpdate
 */
 void CMenuVidOptions::GammaUpdate( void )
 {
-	float val = RemapVal( uiVidOptions.gammaIntensity.GetCurrentValue(), 0.0, 1.0, 1.8, 7.0 );
+	float val = RemapVal( gammaIntensity.GetCurrentValue(), 0.0, 1.0, 1.8, 7.0 );
 	EngFuncs::CvarSetValue( "gamma", val );
-	EngFuncs::ProcessImage( uiVidOptions.hTestImage, val );
+	EngFuncs::ProcessImage( hTestImage, val );
 }
 
 void CMenuVidOptions::GammaGet( void )
 {
 	float val = EngFuncs::GetCvarFloat( "gamma" );
 
-	uiVidOptions.gammaIntensity.SetCurrentValue( RemapVal( val, 1.8f, 7.0f, 0.0f, 1.0f ) );
-	EngFuncs::ProcessImage( uiVidOptions.hTestImage, val );
+	gammaIntensity.SetCurrentValue( RemapVal( val, 1.8f, 7.0f, 0.0f, 1.0f ) );
+	EngFuncs::ProcessImage( hTestImage, val );
 
-	uiVidOptions.gammaIntensity.SetOriginalValue( val );
+	gammaIntensity.SetOriginalValue( val );
 }
 
 void CMenuVidOptions::SaveAndPopMenu( void )
@@ -229,23 +228,4 @@ void CMenuVidOptions::_VidInit()
 	UI_ScaleCoords( NULL, NULL, &outlineWidth, NULL );
 }
 
-/*
-=================
-CMenuVidOptions::Precache
-=================
-*/
-void UI_VidOptions_Precache( void )
-{
-	EngFuncs::PIC_Load( ART_BANNER );
-}
-
-/*
-=================
-CMenuVidOptions::Menu
-=================
-*/
-void UI_VidOptions_Menu( void )
-{
-	uiVidOptions.Show();
-}
-ADD_MENU( menu_vidoptions, UI_VidOptions_Precache, UI_VidOptions_Menu );
+ADD_MENU( menu_vidoptions, CMenuVidOptions, UI_VidOptions_Menu );

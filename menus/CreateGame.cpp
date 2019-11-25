@@ -31,9 +31,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define ART_BANNER		"gfx/shell/head_creategame"
 
+class CMenuCreateGame;
 class CMenuMapListModel : public CMenuBaseModel
 {
 public:
+	CMenuMapListModel( CMenuCreateGame *parent ) : parent( parent ) { }
+
 	void Update() override;
 	int GetColumns() const override { return 2; }
 	int GetRows() const override { return m_iNumItems; }
@@ -51,12 +54,13 @@ public:
 	char		mapName[UI_MAXGAMES][64];
 	char		mapsDescription[UI_MAXGAMES][64];
 	int	m_iNumItems;
+	CMenuCreateGame *parent;
 };
 
 class CMenuCreateGame : public CMenuFramework
 {
 public:
-	CMenuCreateGame() : CMenuFramework("CMenuCreateGame") { }
+	CMenuCreateGame() : CMenuFramework("CMenuCreateGame"), mapsListModel( this ) { }
 	static void Begin( CMenuBaseItem *pSelf, void *pExtra );
 
 	void Reload( void ) override;
@@ -81,8 +85,6 @@ private:
 	void _Init() override;
 	void _VidInit() override;
 };
-
-static CMenuCreateGame	uiCreateGame;
 
 /*
 =================
@@ -175,7 +177,7 @@ void CMenuMapListModel::Update( void )
 
 	if( !EngFuncs::CreateMapsList( TRUE ) || (afile = (char *)EngFuncs::COM_LoadFile( "maps.lst", NULL )) == NULL )
 	{
-		uiCreateGame.done->SetGrayed( true );
+		parent->done->SetGrayed( true );
 		m_iNumItems = 0;
 		Con_Printf( "Cmd_GetMapsList: can't open maps.lst\n" );
 		return;
@@ -202,7 +204,7 @@ void CMenuMapListModel::Update( void )
 		numMaps++;
 	}
 
-	if( !( numMaps - 1) ) uiCreateGame.done->SetGrayed( true );
+	if( !( numMaps - 1) ) parent->done->SetGrayed( true );
 	m_iNumItems = numMaps;
 	EngFuncs::COM_FreeFile( afile );
 	uiStatic.needMapListUpdate = false;
@@ -317,26 +319,4 @@ void CMenuCreateGame::Reload( void )
 	mapsListModel.Update();
 }
 
-/*
-=================
-CMenuCreateGame::Precache
-=================
-*/
-void UI_CreateGame_Precache( void )
-{
-	EngFuncs::PIC_Load( ART_BANNER );
-}
-
-/*
-=================
-CMenuCreateGame::Menu
-=================
-*/
-void UI_CreateGame_Menu( void )
-{
-	if ( gMenu.m_gameinfo.gamemode == GAME_SINGLEPLAYER_ONLY )
-		return;
-
-	uiCreateGame.Show();
-}
-ADD_MENU( menu_creategame, UI_CreateGame_Precache, UI_CreateGame_Menu );
+ADD_MENU( menu_creategame, CMenuCreateGame, UI_CreateGame_Menu );

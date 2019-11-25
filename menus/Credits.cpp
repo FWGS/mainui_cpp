@@ -32,7 +32,7 @@ static const char *uiCreditsDefault[] =
 	0
 };
 
-static class CMenuCredits : public CMenuBaseWindow
+class CMenuCredits : public CMenuBaseWindow
 {
 public:
 	CMenuCredits() : CMenuBaseWindow( "Credits" ) { }
@@ -60,11 +60,10 @@ private:
 	int		finalCredits;
 	char		*index[UI_CREDITS_MAXLINES];
 	char		*buffer;
-} uiCredits;
+};
 
 CMenuCredits::~CMenuCredits()
 {
-	delete buffer;
 }
 
 void CMenuCredits::Show()
@@ -94,32 +93,32 @@ void CMenuCredits::Draw( void )
 	// now draw the credits
 	UI_ScaleCoords( NULL, NULL, NULL, &h );
 
-	y = ScreenHeight - (((gpGlobals->time * 1000) - uiCredits.startTime ) / speed );
+	y = ScreenHeight - (((gpGlobals->time * 1000) - startTime ) / speed );
 
 	// draw the credits
-	for ( i = 0; i < uiCredits.numLines && uiCredits.credits[i]; i++, y += h )
+	for ( i = 0; i < numLines && credits[i]; i++, y += h )
 	{
 		// skip not visible lines, but always draw end line
-		if( y <= -h && i != uiCredits.numLines - 1 ) continue;
+		if( y <= -h && i != numLines - 1 ) continue;
 
-		if(( y < ( ScreenHeight - h ) / 2 ) && i == uiCredits.numLines - 1 )
+		if(( y < ( ScreenHeight - h ) / 2 ) && i == numLines - 1 )
 		{
-			if( !uiCredits.fadeTime ) uiCredits.fadeTime = (gpGlobals->time * 1000);
-			color = UI_FadeAlpha( uiCredits.fadeTime, uiCredits.showTime );
+			if( !fadeTime ) fadeTime = (gpGlobals->time * 1000);
+			color = UI_FadeAlpha( fadeTime, showTime );
 			if( UnpackAlpha( color ))
-				UI_DrawString( uiStatic.hDefaultFont, 0, ( ScreenHeight - h ) / 2, ScreenWidth, h, uiCredits.credits[i], color, h, QM_CENTER, ETF_SHADOW | ETF_FORCECOL );
+				UI_DrawString( uiStatic.hDefaultFont, 0, ( ScreenHeight - h ) / 2, ScreenWidth, h, credits[i], color, h, QM_CENTER, ETF_SHADOW | ETF_FORCECOL );
 		}
-		else UI_DrawString( uiStatic.hDefaultFont, 0, y, ScreenWidth, h, uiCredits.credits[i], uiColorWhite, h, QM_CENTER, ETF_SHADOW );
+		else UI_DrawString( uiStatic.hDefaultFont, 0, y, ScreenWidth, h, credits[i], uiColorWhite, h, QM_CENTER, ETF_SHADOW );
 	}
 
 	if( y < 0 && UnpackAlpha( color ) == 0 )
 	{
-		uiCredits.active = false; // end of credits
-		if( uiCredits.finalCredits )
+		active = false; // end of credits
+		if( finalCredits )
 			EngFuncs::HostEndGame( gMenu.m_gameinfo.title );
 	}
 
-	if( !uiCredits.active && !uiCredits.finalCredits ) // for final credits we don't show the window, just drawing
+	if( !active && !finalCredits ) // for final credits we don't show the window, just drawing
 		Hide();
 }
 
@@ -136,10 +135,10 @@ CMenuCredits::Key
 bool CMenuCredits::KeyDown( int key )
 {
 	// final credits can't be intterupted
-	if( uiCredits.finalCredits )
+	if( finalCredits )
 		return true;
 
-	uiCredits.active = false;
+	active = false;
 	return true;
 }
 
@@ -150,30 +149,30 @@ CMenuCredits::_Init
 */
 void CMenuCredits::_Init( void )
 {
-	if( !uiCredits.buffer )
+	if( !buffer )
 	{
 		int	count;
 		char	*p;
 
 		// load credits if needed
-		uiCredits.buffer = (char *)EngFuncs::COM_LoadFile( UI_CREDITS_PATH, &count );
+		buffer = (char *)EngFuncs::COM_LoadFile( UI_CREDITS_PATH, &count );
 		if( count )
 		{
-			if( uiCredits.buffer[count - 1] != '\n' && uiCredits.buffer[count - 1] != '\r' )
+			if( buffer[count - 1] != '\n' && buffer[count - 1] != '\r' )
 			{
 				char *tmp = new char[count + 2];
-				memcpy( tmp, uiCredits.buffer, count ); 
-				EngFuncs::COM_FreeFile( uiCredits.buffer );
-				uiCredits.buffer = tmp; 
-				strncpy( uiCredits.buffer + count, "\r", 1 ); // add terminator
+				memcpy( tmp, buffer, count );
+				EngFuncs::COM_FreeFile( buffer );
+				buffer = tmp;
+				strncpy( buffer + count, "\r", 1 ); // add terminator
 				count += 2; // added "\r\0"
 			}
-			p = uiCredits.buffer;
+			p = buffer;
 
 			// convert customs credits to 'ideal' strings array
-			for ( uiCredits.numLines = 0; uiCredits.numLines < UI_CREDITS_MAXLINES; uiCredits.numLines++ )
+			for ( numLines = 0; numLines < UI_CREDITS_MAXLINES; numLines++ )
 			{
-				uiCredits.index[uiCredits.numLines] = p;
+				index[numLines] = p;
 				while ( *p != '\r' && *p != '\n' )
 				{
 					p++;
@@ -190,53 +189,45 @@ void CMenuCredits::_Init( void )
 				*p++ = 0;
 				if( --count == 0 ) break;
 			}
-			uiCredits.index[++uiCredits.numLines] = 0;
-			uiCredits.credits = (const char **)uiCredits.index;
+			index[++numLines] = 0;
+			credits = (const char **)index;
 		}
 		else
 		{
 			// use built-in credits
-			uiCredits.credits =  uiCreditsDefault;
-			uiCredits.numLines = ( sizeof( uiCreditsDefault ) / sizeof( uiCreditsDefault[0] )) - 1; // skip term
+			credits =  uiCreditsDefault;
+			numLines = ( sizeof( uiCreditsDefault ) / sizeof( uiCreditsDefault[0] )) - 1; // skip term
 		}
 	}
 
 	// run credits
-	uiCredits.startTime = (gpGlobals->time * 1000) + 500; // make half-seconds delay
-	uiCredits.showTime = bound( 1000, strlen( uiCredits.credits[uiCredits.numLines - 1]) * 1000, 10000 );
-	uiCredits.fadeTime = 0; // will be determined later
-	uiCredits.active = true;
+	startTime = (gpGlobals->time * 1000) + 500; // make half-seconds delay
+	showTime = bound( 1000, strlen( credits[numLines - 1]) * 1000, 10000 );
+	fadeTime = 0; // will be determined later
+	active = true;
 }
+
+ADD_MENU3( menu_credits, CMenuCredits, UI_FinalCredits );
 
 void UI_DrawFinalCredits( void )
 {
 	if( UI_CreditsActive() )
-		uiCredits.Draw ();
+		menu_credits->Draw ();
 }
 
 int UI_CreditsActive( void )
 {
-	return uiCredits.active && uiCredits.finalCredits;
-}
-
-/*
-=================
-UI_Credits_Menu
-=================
-*/
-void UI_Credits_Menu( void )
-{
-	uiCredits.Show();
+	return menu_credits->active && menu_credits->finalCredits;
 }
 
 void UI_FinalCredits( void )
 {
-	uiCredits.Init();
-	uiCredits.VidInit();
-	uiCredits.Reload(); // take a chance to reload info for items
+	menu_credits->Init();
+	menu_credits->VidInit();
+	menu_credits->Reload(); // take a chance to reload info for items
 
-	uiCredits.active = true;
-	uiCredits.finalCredits = true;
+	menu_credits->active = true;
+	menu_credits->finalCredits = true;
 	// don't create a window
-	// uiCredits.Show();
+	// menu_credits->Show();
 }
