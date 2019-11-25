@@ -169,18 +169,9 @@ void CMenuVidOptions::_Init( void )
 	gammaIntensity.LinkCvar( "gamma" );
 
 	glareReduction.SetCoord( 72, 400 );
-	if( UI_IsXashFWGS() )
-	{
-		glareReduction.SetNameAndStatus( L( "Glare reduction" ), L( "Set glare reduction level" ) );
-		glareReduction.Setup( 100, 300, 15 );
-		glareReduction.LinkCvar( "r_flaresize" );
-	}
-	else
-	{
-		glareReduction.SetNameAndStatus( L( "GameUI_Brightness" ), L( "Set brightness level" ) );
-		glareReduction.Setup( 0, 3, 0.1 );
-		glareReduction.LinkCvar( "brightness" );
-	}
+	glareReduction.SetNameAndStatus( L( "GameUI_Brightness" ), L( "Set brightness level" ) );
+	glareReduction.Setup( 0, 3, 0.1 );
+	glareReduction.LinkCvar( "brightness" );
 
 	bump.SetNameAndStatus( L( "Bump-mapping" ), L( "Enable bump mapping" ) );
 	bump.SetCoord( 72, 515 );
