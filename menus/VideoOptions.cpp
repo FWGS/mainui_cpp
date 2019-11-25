@@ -52,7 +52,6 @@ public:
 	CMenuSlider	gammaIntensity;
 	CMenuSlider	glareReduction;
 	CMenuCheckBox	fastSky;
-	CMenuCheckBox	hiTextures;
 	CMenuCheckBox   vbo;
 	CMenuCheckBox   bump;
 
@@ -86,7 +85,6 @@ void CMenuVidOptions::SaveAndPopMenu( void )
 	screenSize.WriteCvar();
 	glareReduction.WriteCvar();
 	fastSky.WriteCvar();
-	hiTextures.WriteCvar();
 	vbo.WriteCvar();
 	bump.WriteCvar();
 	// gamma is already written
@@ -202,10 +200,6 @@ void CMenuVidOptions::_Init( void )
 	fastSky.SetCoord( 72, 615 );
 	fastSky.LinkCvar( "r_fastsky" );
 
-	hiTextures.SetNameAndStatus( L( "Allow materials" ), L( "let engine replace 8-bit textures with full color hi-res prototypes (if present)" ) );
-	hiTextures.SetCoord( 72, 665 );
-	hiTextures.LinkCvar( "host_allow_materials" );
-
 	AddItem( background );
 	AddItem( banner );
 	AddItem( done );
@@ -218,7 +212,6 @@ void CMenuVidOptions::_Init( void )
 		AddItem( vbo );
 	}
 	AddItem( fastSky );
-	AddItem( hiTextures );
 	AddItem( testImage );
 }
 
