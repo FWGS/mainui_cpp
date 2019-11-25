@@ -317,36 +317,36 @@ void CMenuScriptConfig::FlipMenu( void )
 	m_iCurrentPage = newIndex;
 }
 
-static CMenuScriptConfig staticServerOptions;
-static CMenuScriptConfig staticUserOptions;
+ADD_MENU3( menu_serveroptions, CMenuScriptConfig, UI_AdvServerOptions_Menu );
+ADD_MENU3( menu_useroptions, CMenuScriptConfig, UI_AdvUserOptions_Menu );
 
 void UI_AdvServerOptions_Menu()
 {
-	staticServerOptions.banner.SetPicture( ART_BANNER_SERVER );
-	staticUserOptions.szName = L( "Server Options" );
-	staticServerOptions.Show();
+	menu_serveroptions->banner.SetPicture( ART_BANNER_SERVER );
+	menu_serveroptions->szName = L( "Server Options" );
+	menu_serveroptions->Show();
 }
 
 void UI_AdvUserOptions_Menu()
 {
-	staticUserOptions.banner.SetPicture( ART_BANNER_USER );
-	staticUserOptions.szName = L( "GameUI_MultiplayerAdvanced" );
-	staticUserOptions.Show();
+	menu_useroptions->banner.SetPicture( ART_BANNER_USER );
+	menu_useroptions->szName = L( "GameUI_MultiplayerAdvanced" );
+	menu_useroptions->Show();
 }
 
 void UI_LoadScriptConfig()
 {
 	// yes, create cvars if needed
-	staticServerOptions.SetScriptConfig( "settings.scr", true );
-	staticUserOptions.SetScriptConfig( "user.scr", true );
+	menu_serveroptions->SetScriptConfig( "settings.scr", true );
+	menu_useroptions->SetScriptConfig( "user.scr", true );
 }
 
 bool UI_AdvUserOptions_IsAvailable()
 {
-	return staticUserOptions.m_pVars != NULL;
+	return menu_useroptions->m_pVars != NULL;
 }
 
 bool UI_AdvServerOptions_IsAvailable()
 {
-	return staticServerOptions.m_pVars != NULL;
+	return menu_serveroptions->m_pVars != NULL;
 }

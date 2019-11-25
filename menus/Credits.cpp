@@ -35,7 +35,15 @@ static const char *uiCreditsDefault[] =
 class CMenuCredits : public CMenuBaseWindow
 {
 public:
-	CMenuCredits() : CMenuBaseWindow( "Credits" ) { }
+	CMenuCredits() : CMenuBaseWindow( "Credits" )
+	{
+		credits = NULL;
+		finalCredits = false;
+		active = false;
+		buffer = NULL;
+		numLines = 0;
+		memset( index, 0, sizeof( index ));
+	}
 	~CMenuCredits() override;
 
 	void Draw() override;
@@ -56,8 +64,8 @@ private:
 	int		showTime;
 	int		fadeTime;
 	int		numLines;
-	int		active;
-	int		finalCredits;
+	bool		active;
+	bool		finalCredits;
 	char		*index[UI_CREDITS_MAXLINES];
 	char		*buffer;
 };

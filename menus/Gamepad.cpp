@@ -42,10 +42,10 @@ enum engineAxis_t
 
 static const char *axisNames[7] =
 {
-	"Side Movement",
-	"Forward Movement",
-	"Camera Vertical Turn",
-	"Camera Horizontal Turn",
+	"Side",
+	"Forward",
+	"Yaw",
+	"Pitch",
 	"Right Trigger",
 	"Left Trigger",
 	"NOT BOUND"

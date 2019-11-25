@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Field.h"
 #include "ScrollView.h"
 
-static class CMenuZoo : public CMenuFramework
+class CMenuZoo : public CMenuFramework
 {
 public:
 	CMenuZoo() : CMenuFramework( "Example" ) { }
@@ -55,7 +55,7 @@ private:
 
 	CMenuAction bmp[35];
 	CMenuScrollView scrollView;
-} g_Zoo;
+};
 
 #define SET_TAG_BY_MEMBER_NAME( member ) \
 	member.szTag = STR( member ); \
@@ -153,13 +153,4 @@ void CMenuZoo::_VidInit()
 
 }
 
-void UI_Zoo_Precache()
-{
-	// g_Zoo.SetResourceFilename("resource/CDKeyEntryDialog.res");
-}
-
-void UI_Zoo_Menu()
-{
-	UI_Zoo_Precache();
-	g_Zoo.Show();
-}
+ADD_MENU( menu_zoo, CMenuZoo, UI_Zoo_Menu )
