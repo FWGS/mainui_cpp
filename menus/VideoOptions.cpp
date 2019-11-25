@@ -158,7 +158,6 @@ void CMenuVidOptions::_Init( void )
 	screenSize.SetNameAndStatus( L( "Screen size" ), L( "Set the screen size" ) );
 	screenSize.SetCoord( 72, 280 );
 	screenSize.Setup( 30, 120, 10 );
-	screenSize.LinkCvar( "viewsize" );
 	screenSize.onChanged = CMenuEditable::WriteCvarCb;
 
 	gammaIntensity.SetNameAndStatus( L( "GameUI_Gamma" ), L( "Set gamma value (0.5 - 2.3)" ) );
@@ -166,22 +165,18 @@ void CMenuVidOptions::_Init( void )
 	gammaIntensity.Setup( 0.0, 1.0, 0.025 );
 	gammaIntensity.onChanged = VoidCb( &CMenuVidOptions::GammaUpdate );
 	gammaIntensity.onCvarGet = VoidCb( &CMenuVidOptions::GammaGet );
-	gammaIntensity.LinkCvar( "gamma" );
 
 	glareReduction.SetCoord( 72, 400 );
 	glareReduction.SetNameAndStatus( L( "GameUI_Brightness" ), L( "Set brightness level" ) );
 	glareReduction.Setup( 0, 3, 0.1 );
-	glareReduction.LinkCvar( "brightness" );
 
 	bump.SetNameAndStatus( L( "Bump-mapping" ), L( "Enable bump mapping" ) );
 	bump.SetCoord( 72, 515 );
-	bump.LinkCvar( "r_bump" );
 	if( !EngFuncs::GetCvarFloat( "r_vbo" ) )
 		bump.SetGrayed( true );
 
 	vbo.SetNameAndStatus( L( "Use VBO" ), L( "Use new world renderer. Faster, but rarely glitchy" ) );
 	vbo.SetCoord( 72, 565 );
-	vbo.LinkCvar( "r_vbo" );
 	vbo.onChanged = CMenuCheckBox::BitMaskCb;
 	vbo.onChanged.pExtra = &bump.iFlags;
 	vbo.bInvertMask = true;
@@ -189,7 +184,6 @@ void CMenuVidOptions::_Init( void )
 
 	fastSky.SetNameAndStatus( L( "Draw simple sky" ), L( "enable/disable fast sky rendering (for old computers)" ) );
 	fastSky.SetCoord( 72, 615 );
-	fastSky.LinkCvar( "r_fastsky" );
 
 	AddItem( background );
 	AddItem( banner );
@@ -204,6 +198,13 @@ void CMenuVidOptions::_Init( void )
 	}
 	AddItem( fastSky );
 	AddItem( testImage );
+	screenSize.LinkCvar( "viewsize" );
+	gammaIntensity.LinkCvar( "gamma" );
+	glareReduction.LinkCvar( "brightness" );
+	bump.LinkCvar( "r_bump" );
+	vbo.LinkCvar( "r_vbo" );
+	fastSky.LinkCvar( "r_fastsky" );
+
 }
 
 void CMenuVidOptions::_VidInit()
