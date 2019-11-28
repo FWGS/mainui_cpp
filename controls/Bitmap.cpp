@@ -23,7 +23,6 @@ GNU General Public License for more details.
 
 CMenuBitmap::CMenuBitmap() : BaseClass()
 {
-	SetPicture( NULL );
 	SetRenderMode( QM_DRAWNORMAL );
 }
 
