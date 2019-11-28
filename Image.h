@@ -49,6 +49,12 @@ public:
 		m_szPath = szPath;
 	}
 
+	void Reset( void )
+	{
+		m_szPath = NULL;
+		m_hPic   = 0;
+	}
+
 	// a1ba: why there is no destructor?
 	// Engine doesn't track the reference count of texture
 	// so unloading texture may behave not as you may expect
@@ -63,7 +69,9 @@ public:
 
 	const char * operator =( const char *path )
 	{
-		Load( path );
+		// don't pass NULL to engine
+		if( path ) Load( path );
+		else Reset();
 		return path;
 	}
 
