@@ -333,7 +333,7 @@ void CMenuMain::VidInit( bool connected )
 	hazardCourse.SetCoord( 72, 330 );
 
 	bool isGameLoaded = EngFuncs::GetCvarFloat( "host_gameloaded" ) != 0.0f;
-	bool isSingle = EngFuncs::GetCvarFloat( "maxplayers" ) <= 1.0f;
+	bool isSingle = EngFuncs::GetCvarFloat( "maxplayers" ) < 2.0f;
 
 	if( isGameLoaded && isSingle )
 	{
@@ -349,7 +349,7 @@ void CMenuMain::VidInit( bool connected )
 	if( connected )
 	{
 		resumeGame.Show();
-		if( !isGameLoaded || !isSingle )
+		if( !isGameLoaded && !isSingle )
 		{
 			disconnect.Show();
 			console.pos.y = 130;
