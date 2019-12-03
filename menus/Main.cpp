@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -354,7 +354,11 @@ void CMenuMain::VidInit( bool connected )
 			disconnect.Show();
 			console.pos.y = 130;
 		}
-		else console.pos.y = 180;
+		else
+		{
+			disconnect.Hide();
+			console.pos.y = 180;
+		}
 	}
 	else
 	{
