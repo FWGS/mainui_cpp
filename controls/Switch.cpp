@@ -121,7 +121,7 @@ bool CMenuSwitch::KeyUp( int key )
 {
 	const char *sound = NULL;
 	bool haveNewState = false;
-	int state;
+	int state = 0;
 
 	switch( key )
 	{
@@ -162,7 +162,7 @@ bool CMenuSwitch::KeyDown( int key )
 {
 	const char *sound = NULL;
 	bool haveNewState = false;
-	int state;
+	int state = 0;
 
 	switch( key )
 	{
