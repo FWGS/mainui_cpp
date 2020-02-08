@@ -71,7 +71,7 @@ def configure(conf):
 		conf.define('NO_STL', 1)
 		conf.env.append_unique('CXXFLAGS', '-fno-exceptions')
 
-	if conf.env.DEST_OS != 'win32':
+	if conf.env.DEST_OS != 'win32' and conf.env.DEST_OS != 'dos':
 		if not conf.env.USE_STBTT and not conf.options.LOW_MEMORY:
 			conf.check_pkg('freetype2', 'FT2', FT2_CHECK)
 			conf.check_pkg('fontconfig', 'FC', FC_CHECK)

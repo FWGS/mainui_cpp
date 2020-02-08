@@ -6,7 +6,7 @@
 static class CScissorState
 {
 public:
-	CScissorState() : iDepth( 0 ), coordStack(), sizeStack() { }
+	CScissorState() : iDepth( 0 ) { }
 
 	int iDepth;
 	Point coordStack[MAX_SCISSORS];

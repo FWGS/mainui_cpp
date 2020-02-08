@@ -871,6 +871,12 @@ double Sys_DoubleTime( void )
 	gettimeofday(&tv, NULL);
 	return (double) tv.tv_sec + (double) tv.tv_usec/1000000.0;
 }
+#elif defined __DOS__
+double Sys_DoubleTime( void )
+{
+	// fallback when no time api
+	return gpGlobals->time + 0.01;
+}
 #else
 typedef unsigned long long longtime_t;
 #include <time.h>

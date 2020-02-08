@@ -20,7 +20,7 @@ GNU General Public License for more details.
 #include "Utils.h"
 
 
-CMenuField::CMenuField() : BaseClass(), szBuffer()
+CMenuField::CMenuField() : BaseClass()
 {
 	bAllowColorstrings = true;
 	bHideInput = false;
@@ -36,6 +36,7 @@ CMenuField::CMenuField() : BaseClass(), szBuffer()
 	iScroll = 0;
 	iRealWidth = 0;
 	szBackground = 0;
+	szBuffer[0] = 0;
 }
 
 void CMenuField::Init()

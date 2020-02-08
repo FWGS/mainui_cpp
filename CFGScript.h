@@ -55,8 +55,9 @@ typedef struct
 struct scrvardef_t
 {
 	scrvardef_t() :
-		flags(0), name(), value(), desc(),
-		type(T_NONE), next(0) {}
+		flags(0),
+		type(T_NONE), next(0) {
+		name[0] = value[0] = desc[0] = 0;}
 
 	int flags;
 	char name[MAX_STRING];

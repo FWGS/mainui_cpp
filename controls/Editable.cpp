@@ -17,10 +17,9 @@ GNU General Public License for more details.
 
 CMenuEditable::CMenuEditable() : BaseClass(),
 	m_szCvarName(), m_eType(), m_bForceUpdate( false ),
-	m_szString(), m_szOriginalString(),
 	m_flValue(), m_flOriginalValue()
 {
-
+	m_szString[0] = m_szOriginalString[0] = 0;
 }
 
 void CMenuEditable::LinkCvar(const char *)

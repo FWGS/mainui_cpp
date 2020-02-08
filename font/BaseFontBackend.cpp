@@ -18,12 +18,13 @@ GNU General Public License for more details.
 #include "Utils.h"
 
 CBaseFont::CBaseFont()
-	: m_szName( ), m_iTall(), m_iWeight(), m_iFlags(),
+	: m_iTall(), m_iWeight(), m_iFlags(),
 	m_iHeight(), m_iMaxCharWidth(), m_iAscent(),
 	m_iBlur(), m_fBrighten(),
 	m_iEllipsisWide( 0 ),
 	m_glyphs(0, 0)
 {
+	m_szName[0] = 0;
 	SetDefLessFunc( m_glyphs );
 }
 

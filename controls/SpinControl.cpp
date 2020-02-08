@@ -23,18 +23,18 @@ GNU General Public License for more details.
 CMenuSpinControl::CMenuSpinControl()  : BaseClass(), m_szBackground(),
 		m_szLeftArrow(), m_szRightArrow(), m_szLeftArrowFocus(), m_szRightArrowFocus(),
 		m_flMinValue(0), m_flMaxValue(1), m_flCurValue(0), m_flRange(0.1), m_pModel( NULL ),
-		m_iFloatPrecision(0), m_szDisplay()
+		m_iFloatPrecision(0)
 {
 	m_szBackground = 0;
 	m_szLeftArrow = UI_LEFTARROW;
 	m_szLeftArrowFocus = UI_LEFTARROWFOCUS;
 	m_szRightArrow = UI_RIGHTARROW;
 	m_szRightArrowFocus = UI_RIGHTARROWFOCUS;
+	m_szDisplay[0] = 0;
 
 	eTextAlignment = QM_CENTER;
 	eFocusAnimation = QM_HIGHLIGHTIFFOCUS;
 	iFlags |= QMF_DROPSHADOW;
-
 }
 
 /*

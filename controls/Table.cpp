@@ -26,7 +26,6 @@ CMenuTable::CMenuTable() : BaseClass(),
 	bFramedHintText( false ),
 	bAllowSorting( false ),
 	bShowScrollBar( true ),
-	szHeaderTexts(),
 	szBackground(),
 	szUpArrow( UI_UPARROW ), szUpArrowFocus( UI_UPARROWFOCUS ), szUpArrowPressed( UI_UPARROWPRESSED ),
 	szDownArrow( UI_DOWNARROW ), szDownArrowFocus( UI_DOWNARROWFOCUS ), szDownArrowPressed( UI_DOWNARROWPRESSED ),
@@ -37,6 +36,7 @@ CMenuTable::CMenuTable() : BaseClass(),
 	m_iSortingColumn( -1 ),
 	m_pModel( NULL )
 {
+	memset( szHeaderTexts, 0, sizeof(szHeaderTexts) );
 	eFocusAnimation = QM_HIGHLIGHTIFFOCUS;
 	SetCharSize( QM_SMALLFONT );
 	bDrawStroke = true;
