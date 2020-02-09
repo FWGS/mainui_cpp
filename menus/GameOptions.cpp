@@ -215,7 +215,7 @@ void CMenuGameOptions::_Init( void )
 	normal.szName = L( "Normal internet connection" ); 	// Такая строка где-то уже была, поэтому в отдельный файл НЕ ВЫНОШУ !
 	SET_EVENT_MULTI( normal.onChanged,
 	{
-		((CMenuGameOptions*)pSelf->Parent())->SetNetworkMode( 1400, 0, 30, 60, 25000 );
+		pSelf->GetParent(CMenuGameOptions)->SetNetworkMode( 1400, 0, 30, 60, 25000 );
 		((CMenuCheckBox*)pSelf)->bChecked = true;
 	});
 
@@ -223,7 +223,7 @@ void CMenuGameOptions::_Init( void )
 	dsl.szName = L( "DSL or PPTP with limited packet size" );	// И такое тоже уже было !
 	SET_EVENT_MULTI( dsl.onChanged,
 	{
-		((CMenuGameOptions*)pSelf->Parent())->SetNetworkMode( 1200, 1000, 30, 60, 25000 );
+		pSelf->GetParent(CMenuGameOptions)->SetNetworkMode( 1200, 1000, 30, 60, 25000 );
 		((CMenuCheckBox*)pSelf)->bChecked = true;
 	});
 
@@ -232,7 +232,7 @@ void CMenuGameOptions::_Init( void )
 	slowest.szName = L( "Slow connection mode (64kbps)" );	// Было, повтор !
 	SET_EVENT_MULTI( slowest.onChanged,
 	{
-		((CMenuGameOptions*)pSelf->Parent())->SetNetworkMode( 900, 700, 25, 30, 7500 );
+		pSelf->GetParent(CMenuGameOptions)->SetNetworkMode( 900, 700, 25, 30, 7500 );
 		((CMenuCheckBox*)pSelf)->bChecked = true;
 	});
 	compress.SetNameAndStatus( L( "Compress" ), L( "Compress splitted packets (need split to work)" ) );

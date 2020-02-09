@@ -156,8 +156,14 @@ public:
 	}
 
 	CMenuItemsHolder* Parent() const			{ return m_pParent; }
-	// breaks msvc6/owocc
-//	template <class T> T* Parent() const	{ return static_cast<T*>(m_pParent); } // a shortcut to parent
+
+	#ifndef MY_COMPILER_SUCKS
+	template <class T> T* _Parent() const	{ return static_cast<T*>(m_pParent); } // a shortcut to parent
+	#define GetParent(type) _Parent<type>()
+	#else
+	template <class T> T* _Parent(T*) const	{ return static_cast<T*>(m_pParent); } // a shortcut to parent
+	#define GetParent(type) _Parent((type*)(NULL))
+	#endif
 	bool IsPressed() const { return m_bPressed; }
 	int LastFocusTime() const { return m_iLastFocusTime; }
 

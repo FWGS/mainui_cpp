@@ -311,14 +311,14 @@ void CMenuVidModes::_Init( void )
 	windowed.SetCoord( 360, 620 );
 	SET_EVENT_MULTI( windowed.onChanged,
 	{
-		CMenuVidModes *parent = (CMenuVidModes*)pSelf->Parent();
+		CMenuVidModes *parent = pSelf->GetParent(CMenuVidModes);
 		if( !parent->windowed.bChecked && parent->vidList.GetCurrentIndex() < VID_AUTOMODE_POS )
 			parent->vidList.SetCurrentIndex( VID_AUTOMODE_POS );
 	});
 
 	SET_EVENT_MULTI( vidList.onChanged,
 	{
-		CMenuVidModes *parent = (CMenuVidModes*)pSelf->Parent();
+		CMenuVidModes *parent = pSelf->GetParent(CMenuVidModes);
 		if( !parent->windowed.bChecked && parent->vidList.GetCurrentIndex() < VID_AUTOMODE_POS )
 			parent->vidList.SetCurrentIndex( VID_AUTOMODE_POS );
 	});

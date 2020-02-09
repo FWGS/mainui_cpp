@@ -82,13 +82,13 @@ void CMenuMultiplayer::_Init( void )
 		EngFuncs::CvarSetValue( "cl_predict", 1.0f );
 		EngFuncs::CvarSetValue( "menu_mp_firsttime", 0.0f );
 
-		UI_PlayerIntroduceDialog_Show( (CMenuBaseWindow*)pSelf->Parent() );
+		UI_PlayerIntroduceDialog_Show( pSelf->GetParent(CMenuBaseWindow) );
 	});
 	SET_EVENT_MULTI( msgBox.onNegative,
 	{
 		EngFuncs::CvarSetValue( "menu_mp_firsttime", 0.0f );
 
-		UI_PlayerIntroduceDialog_Show( (CMenuBaseWindow*)pSelf->Parent() );
+		UI_PlayerIntroduceDialog_Show( pSelf->GetParent(CMenuBaseWindow) );
 	});
 	msgBox.Link( this );
 
