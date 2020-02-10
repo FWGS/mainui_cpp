@@ -1,5 +1,5 @@
 /*
-PlayerModelView.cpp -- player model view
+PlayerModelView.h -- player model view
 Copyright (C) 2018 a1batross
 
 This program is free software: you can redistribute it and/or modify
@@ -16,12 +16,12 @@ GNU General Public License for more details.
 #define CMENUPLAYERMODELVIEW_H
 
 // HLSDK includes
-#include "mathlib.h"
 #include "const.h"
 #include "keydefs.h"
 #include "ref_params.h"
 #include "cl_entity.h"
 #include "com_model.h"
+#include "mathlib.h"
 #include "entity_types.h"
 // HLSDK includes end
 #include "BaseItem.h"
