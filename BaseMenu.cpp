@@ -1,4 +1,5 @@
 /*
+ui_menu.c -- main menu interface
 Copyright (C) 1997-2001 Id Software, Inc.
 Copyright (C) 2017 a1batross
 
@@ -18,11 +19,6 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
-
-
-// ui_menu.c -- main menu interface
-#define OEMRESOURCE		// for OCR_* cursor junk
-
 #include "extdll_menu.h"
 #include "BaseMenu.h"
 #include "PicButton.h"
@@ -834,65 +830,6 @@ void UI_SetActiveMenu( int fActive )
 	}
 }
 
-#if defined _WIN32
-#include <windows.h>
-#include <winbase.h>
-/*
-================
-Sys_DoubleTime
-================
-*/
-double Sys_DoubleTime( void )
-{
-	static LARGE_INTEGER g_PerformanceFrequency;
-	static LARGE_INTEGER g_ClockStart;
-	LARGE_INTEGER CurrentTime;
-
-	if( !g_PerformanceFrequency.QuadPart )
-	{
-		QueryPerformanceFrequency( &g_PerformanceFrequency );
-		QueryPerformanceCounter( &g_ClockStart );
-	}
-
-	QueryPerformanceCounter( &CurrentTime );
-	return (double)( CurrentTime.QuadPart - g_ClockStart.QuadPart ) / (double)( g_PerformanceFrequency.QuadPart );
-}
-#elif defined __APPLE__
-typedef unsigned long long longtime_t;
-#include <sys/time.h>
-/*
-================
-Sys_DoubleTime
-================
-*/
-double Sys_DoubleTime( void )
-{
-	struct timeval tv;
-	gettimeofday(&tv, NULL);
-	return (double) tv.tv_sec + (double) tv.tv_usec/1000000.0;
-}
-#elif defined __DOS__
-double Sys_DoubleTime( void )
-{
-	// fallback when no time api
-	return gpGlobals->time + 0.01;
-}
-#else
-typedef unsigned long long longtime_t;
-#include <time.h>
-/*
-================
-Sys_DoubleTime
-================
-*/
-double Sys_DoubleTime( void )
-{
-	struct timespec ts;
-	clock_gettime(CLOCK_MONOTONIC, &ts);
-	return (double) ts.tv_sec + (double) ts.tv_nsec/1000000000.0;
-}
-#endif
-
 /*
 =================
 UI_IsVisible
@@ -1123,7 +1060,6 @@ int UI_VidInit( void )
 	return 1;
 }
 
-#undef ShellExecute //  "thanks", windows.h!
 void UI_OpenUpdatePage( bool engine, bool preferstore )
 {
 	const char *updateUrl = NULL;
@@ -1256,4 +1192,55 @@ void UI_Shutdown( void )
 	delete g_FontMgr;
 
 	memset( &uiStatic, 0, sizeof( uiStatic_t ));
+}
+
+#if defined _WIN32
+	#undef GetParent
+	#include <winlite.h>
+#elif defined __APPLE__
+	typedef unsigned long long longtime_t;
+	#include <sys/time.h>
+#elif defined __DOS__
+	// nothing
+#else
+	typedef unsigned long long longtime_t;
+	#include <time.h>
+#endif
+/*
+================
+Sys_DoubleTime
+================
+*/
+double Sys_DoubleTime( void )
+{
+	if( UI_IsXashFWGS())
+	{
+		return EngFuncs::DoubleTime();
+	}
+	
+#if defined _WIN32
+	static LARGE_INTEGER g_PerformanceFrequency;
+	static LARGE_INTEGER g_ClockStart;
+	LARGE_INTEGER CurrentTime;
+	
+	if( !g_PerformanceFrequency.QuadPart )
+	{
+		QueryPerformanceFrequency( &g_PerformanceFrequency );
+		QueryPerformanceCounter( &g_ClockStart );
+	}
+
+	QueryPerformanceCounter( &CurrentTime );
+	return (double)( CurrentTime.QuadPart - g_ClockStart.QuadPart ) / (double)( g_PerformanceFrequency.QuadPart );
+#elif defined __DOS__
+	// fallback when no time api
+	return gpGlobals->time + 0.01;
+#elif defined __APPLE__
+	struct timeval tv;
+	gettimeofday(&tv, NULL);
+	return (double) tv.tv_sec + (double) tv.tv_usec/1000000.0;
+#else
+	struct timespec ts;
+	clock_gettime(CLOCK_MONOTONIC, &ts);
+	return (double) ts.tv_sec + (double) ts.tv_nsec/1000000000.0;
+#endif
 }

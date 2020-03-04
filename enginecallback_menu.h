@@ -272,6 +272,11 @@ public:
 	{
 		return textfuncs.pfnGetRenderers( num, sz1, s1, sz2, s2 ) != 0;
 	}
+	
+	static inline double DoubleTime()
+	{
+		return textfuncs.pfnDoubleTime();
+	}
 };
 
 
