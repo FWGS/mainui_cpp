@@ -23,6 +23,7 @@ GNU General Public License for more details.
 #include "gameinfo.h"
 #include "FontManager.h"
 #include "BMPUtils.h"
+#include "miniutl.h"
 #if 0
 #include <tgmath.h>
 #endif
@@ -197,8 +198,6 @@ inline size_t Q_strncpy( char *dst, const char *src, size_t size )
 	}
 	return ( s - src - 1 ); // count does not include NULL
 }
-
-#define ARRAYSIZE( x ) ( sizeof( x ) / sizeof( x[0] ) )
 
 #ifdef register
 #undef register

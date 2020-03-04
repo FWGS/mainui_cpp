@@ -290,7 +290,7 @@ void CMenuPlayerSetup::ApplyColorToLogoPreview()
 {
 	const char *logoColorStr = logoColor.GetCurrentString();
 
-	for( size_t i = 0; i < ARRAYSIZE( g_LogoColors ) && logoColorStr; i++ )
+	for( size_t i = 0; i < V_ARRAYSIZE( g_LogoColors ) && logoColorStr; i++ )
 	{
 		if( !stricmp( logoColorStr, L( g_LogoColors[i].name )))
 		{
@@ -432,9 +432,9 @@ void CMenuPlayerSetup::_Init( void )
 		}
 		else
 		{
-			static const char *itemlist[ARRAYSIZE( g_LogoColors )];
-			static CStringArrayModel colors( itemlist, ARRAYSIZE( g_LogoColors ) );
-			for( size_t i = 0; i < ARRAYSIZE( g_LogoColors ); i++ )
+			static const char *itemlist[V_ARRAYSIZE( g_LogoColors )];
+			static CStringArrayModel colors( itemlist, V_ARRAYSIZE( g_LogoColors ) );
+			for( size_t i = 0; i < V_ARRAYSIZE( g_LogoColors ); i++ )
 				itemlist[i] = L( g_LogoColors[i].name );
 
 			logoImage.SetRect( 72, 230 + m_iBtnsNum * 50 + 10, 200, 200 );

@@ -99,7 +99,7 @@ static void UI_InitAliasStrings( void )
 	{ "Search for %s servers, configure character", IDS_MAIN_MULTIPLAYERHELP },
 	};
 
-	for( int i = 0; i < ARRAYSIZE( aliasStrings ); i++ )
+	for( int i = 0; i < V_ARRAYSIZE( aliasStrings ); i++ )
 	{
 		if( MenuStrings[aliasStrings[i].idx][0]) // check if not initialized by strings.lst
 			continue;

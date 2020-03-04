@@ -142,7 +142,7 @@ void CMenuAudio::_Init( void )
 	suitVolume.onChanged = CMenuEditable::WriteCvarCb;
 	suitVolume.SetCoord( 320, 400 );
 
-	static CStringArrayModel model( lerpingStr, ARRAYSIZE( lerpingStr ));
+	static CStringArrayModel model( lerpingStr, V_ARRAYSIZE( lerpingStr ));
 	lerping.SetNameAndStatus( L( "Sound interpolation" ), L( "Enable/disable interpolation on sound output" ) );
 	lerping.Setup( &model );
 	lerping.onChanged = CMenuEditable::WriteCvarCb;

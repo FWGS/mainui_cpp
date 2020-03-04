@@ -579,7 +579,7 @@ bool UI::Names::CheckIsNameValid(const char *name)
 	{ "Nero Claudius", true }, // *purrrt* you found a secret area!
 	};
 
-	for( size_t i = 0; i < ARRAYSIZE( prohibitedNames ); i++ )
+	for( size_t i = 0; i < V_ARRAYSIZE( prohibitedNames ); i++ )
 	{
 		if( prohibitedNames[i].substring )
 		{

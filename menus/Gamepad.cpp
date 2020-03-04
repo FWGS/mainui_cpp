@@ -191,7 +191,7 @@ void CMenuGamePad::_Init( void )
 {
 	int i, y;
 
-	static CStringArrayModel model( axisNames, ARRAYSIZE( axisNames ) );
+	static CStringArrayModel model( axisNames, V_ARRAYSIZE( axisNames ) );
 
 	banner.SetPicture( ART_BANNER );
 
