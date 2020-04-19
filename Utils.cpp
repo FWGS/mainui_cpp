@@ -28,6 +28,17 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "keydefs.h"
 #include "BtnsBMPTable.h"
 
+#if defined _WIN32
+	#undef GetParent
+	#include <winlite.h>
+#elif defined __APPLE__
+	#include <sys/time.h>
+#elif defined __DOS__
+	// nothing
+#else
+	#include <time.h>
+#endif
+
 #ifdef _DEBUG
 void DBG_AssertFunction( bool fExpr, const char* szExpr, const char* szFile, int szLine, const char* szMessage )
 {
@@ -627,3 +638,41 @@ void Com_EscapeCommand( char *newCommand, const char *oldCommand, int len )
 	*newCommand++ = 0;
 }
 
+/*
+================
+Sys_DoubleTime
+================
+*/
+double Sys_DoubleTime( void )
+{
+	if( UI_IsXashFWGS())
+	{
+		return EngFuncs::DoubleTime();
+	}
+
+#if defined _WIN32
+	static LARGE_INTEGER g_PerformanceFrequency;
+	static LARGE_INTEGER g_ClockStart;
+	LARGE_INTEGER CurrentTime;
+
+	if( !g_PerformanceFrequency.QuadPart )
+	{
+		QueryPerformanceFrequency( &g_PerformanceFrequency );
+		QueryPerformanceCounter( &g_ClockStart );
+	}
+
+	QueryPerformanceCounter( &CurrentTime );
+	return (double)( CurrentTime.QuadPart - g_ClockStart.QuadPart ) / (double)( g_PerformanceFrequency.QuadPart );
+#elif defined __DOS__
+	// fallback when no time api
+	return gpGlobals->time + 0.01;
+#elif defined __APPLE__
+	struct timeval tv;
+	gettimeofday(&tv, NULL);
+	return (double) tv.tv_sec + (double) tv.tv_usec/1000000.0;
+#else
+	struct timespec ts;
+	clock_gettime(CLOCK_MONOTONIC, &ts);
+	return (double) ts.tv_sec + (double) ts.tv_nsec/1000000000.0;
+#endif
+}
