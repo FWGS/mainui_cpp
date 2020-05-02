@@ -168,7 +168,7 @@ struct Size
 
 	bool operator ==( const Size &a ) const
 	{
-		return w == a.w && w == a.w;
+		return w == a.w && h == a.h;
 	}
 
 	Size AddVertical( const Size &a )
