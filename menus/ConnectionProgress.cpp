@@ -283,7 +283,7 @@ void CMenuConnectionProgress::_VidInit( void )
 	consoleButton.SetRect( 188, cursor, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
 	disconnectButton.SetRect( 338, cursor, UI_BUTTONS_WIDTH / 2, UI_BUTTONS_HEIGHT );
 
-	if( EngFuncs::GetCvarFloat( "developer" ) != 0.0f )
+	if( gpGlobals->developer )
 		consoleButton.Hide();
 
 	cursor -= 30;

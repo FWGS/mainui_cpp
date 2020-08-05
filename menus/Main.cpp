@@ -292,7 +292,7 @@ void CMenuMain::_Init( void )
 	AddItem( background );
 	AddItem( banner );
 
-	if ( EngFuncs::GetCvarFloat( "developer" ))
+	if ( gpGlobals->developer )
 		AddItem( console );
 
 	AddItem( disconnect );
