@@ -232,7 +232,7 @@ void CMenuTouchButtons::OpenFileDialog()
 	// TODO: Remove uiFileDialogGlobal
 	// TODO: Make uiFileDialog menu globally known
 	// TODO: Make FileDialogCallback as event
-	uiFileDialogGlobal.npatterns = 7;
+	uiFileDialogGlobal.npatterns = 6;
 	strcpy( uiFileDialogGlobal.patterns[0], "touch/*.tga");
 	strcpy( uiFileDialogGlobal.patterns[1], "touch_default/*.tga");
 	strcpy( uiFileDialogGlobal.patterns[2], "gfx/touch/*");
