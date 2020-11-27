@@ -233,8 +233,6 @@ void CMenuMain::_Init( void )
 	configuration.onReleased = UI_Options_Menu;
 
 	saveRestore.iFlags |= QMF_NOTIFY;
-	saveRestore.onReleasedClActive = UI_SaveLoad_Menu;
-	saveRestore.onReleased = UI_LoadGame_Menu;
 
 	customGame.SetNameAndStatus( L( "GameUI_ChangeGame" ), L( "StringsList_530" ) );
 	customGame.SetPicture( PC_CUSTOM_GAME );
@@ -339,26 +337,20 @@ void CMenuMain::VidInit( bool connected )
 	{
 		saveRestore.SetNameAndStatus( L( "Save\\Load Game" ), L( "StringsList_192" ) );
 		saveRestore.SetPicture( PC_SAVE_LOAD_GAME );
+		saveRestore.onReleased = UI_SaveLoad_Menu;
 	}
 	else
 	{
 		saveRestore.SetNameAndStatus( L( "GameUI_LoadGame" ), L( "StringsList_191" ) );
 		saveRestore.SetPicture( PC_LOAD_GAME );
+		saveRestore.onReleased = UI_LoadGame_Menu;
 	}
 
 	if( connected )
 	{
 		resumeGame.Show();
-		if( !isGameLoaded && !isSingle )
-		{
-			disconnect.Show();
-			console.pos.y = 130;
-		}
-		else
-		{
-			disconnect.Hide();
-			console.pos.y = 180;
-		}
+		disconnect.Show();
+		console.pos.y = 130;
 	}
 	else
 	{
