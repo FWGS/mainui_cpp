@@ -102,8 +102,10 @@ bool CMenuItemsHolder::Key( const int key, const bool down )
 		{
 		case K_UPARROW:
 		case K_KP_UPARROW:
+		case K_DPAD_UP:
 		case K_LEFTARROW:
 		case K_KP_LEFTARROW:
+		case K_DPAD_LEFT:
 			cursorPrev = m_iCursorPrev = m_iCursor;
 
 			m_iCursor--;
@@ -126,8 +128,10 @@ bool CMenuItemsHolder::Key( const int key, const bool down )
 			break;
 		case K_DOWNARROW:
 		case K_KP_DOWNARROW:
+		case K_DPAD_DOWN:
 		case K_RIGHTARROW:
 		case K_KP_RIGHTARROW:
+		case K_DPAD_RIGHT:
 		case K_TAB:
 			cursorPrev = m_iCursorPrev = m_iCursor;
 			m_iCursor++;

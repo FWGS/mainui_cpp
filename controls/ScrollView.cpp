@@ -37,17 +37,21 @@ bool CMenuScrollView::KeyDown( int key )
 		{
 		case K_MWHEELUP:
 		case K_UPARROW:
+		case K_DPAD_UP:
 			newPos -= 20;
 			break;
 		case K_MWHEELDOWN:
 		case K_DOWNARROW:
+		case K_DPAD_DOWN:
 			newPos += 20;
 			break;
 
 		case K_PGUP:
+		case K_L1_BUTTON:
 			newPos -= 100;
 			break;
 		case K_PGDN:
+		case K_R1_BUTTON:
 			newPos += 100;
 			break;
 		case K_MOUSE1:
