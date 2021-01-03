@@ -350,19 +350,23 @@ bool CMenuTable::KeyDown( int key )
 		break;
 	case K_PGDN:
 	case K_KP_PGDN:
+	case K_R1_BUTTON:
 		sound = MoveCursor( 2 ) ? uiSoundMove : uiSoundBuzz;
 		break;
 	case K_PGUP:
 	case K_KP_PGUP:
+	case K_L1_BUTTON:
 		sound = MoveCursor( -2 ) ? uiSoundMove : uiSoundBuzz;
 		break;
 	case K_UPARROW:
 	case K_KP_UPARROW:
+	case K_DPAD_UP:
 	case K_MWHEELUP:
 		sound = MoveCursor( -1 ) ? uiSoundMove : uiSoundBuzz;
 		break;
 	case K_DOWNARROW:
 	case K_KP_DOWNARROW:
+	case K_DPAD_DOWN:
 	case K_MWHEELDOWN:
 		sound = MoveCursor( 1 ) ? uiSoundMove : uiSoundBuzz;
 		break;
