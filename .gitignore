@@ -42,3 +42,4 @@ ipch/
 __pycache__
 temp.txt
 nonfree_translations
+/.vs

@@ -211,19 +211,29 @@ UI_VidModes_SetConfig
 void CMenuVidModes::SetConfig( )
 {
 	bool testMode = false;
-	if( prevMode != vidList.GetCurrentIndex() - VID_MODES_POS )
-	{
-		SetMode( vidList.GetCurrentIndex( ) - VID_MODES_POS );
+	int  currentModeIndex = vidList.GetCurrentIndex() - VID_MODES_POS;
+	bool isVidModeChanged = prevMode != currentModeIndex;
+	bool isWindowedModeChanged = prevFullscreen != !windowed.bChecked;
 
-		// have changed resolution, but enable test mode only in fullscreen
+	/*
+	checking windowed mode first because it'll be checked next in
+	screen resolution changing code, otherwise when user try to
+	change screen resolution and windowed flag at same time,
+	only resolution will be changed.
+	*/
+	if( isWindowedModeChanged )
+	{
+		EngFuncs::CvarSetValue( "fullscreen", !windowed.bChecked );
+		// moved to fullscreen, enable test mode
 		testMode |= !windowed.bChecked;
 	}
 
-	if( prevFullscreen == windowed.bChecked )
+	if( isVidModeChanged )
 	{
-		EngFuncs::CvarSetValue( "fullscreen", !windowed.bChecked );
-
-		// moved to fullscreen, enable test mode
+		SetMode( currentModeIndex );
+		EngFuncs::CvarSetValue( "vid_mode", currentModeIndex );
+		vidList.SetCurrentIndex( currentModeIndex + VID_MODES_POS );
+		// have changed resolution, but enable test mode only in fullscreen
 		testMode |= !windowed.bChecked;
 	}
 
