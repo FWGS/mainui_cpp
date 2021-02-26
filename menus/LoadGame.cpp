@@ -34,7 +34,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define LEVELSHOT_W		192
 #define LEVELSHOT_H		160
 
-#define MAX_CELLSTRING 64
+#define MAX_CELLSTRING CS_SIZE
 
 class CMenuLoadGame;
 
@@ -174,7 +174,7 @@ void CMenuSavesListModel::Update( void )
 	for ( j = 0; j < numFiles; i++, j++ )
 	{
 		if( i >= UI_MAXGAMES ) break;
-		
+
 		if( !EngFuncs::GetSaveComment( filenames[j], comment ))
 		{
 			if( comment[0] )
@@ -196,7 +196,22 @@ void CMenuSavesListModel::Update( void )
 
 		// fill save desc
 		snprintf( m_szCells[i][0], MAX_CELLSTRING, "%s %s", comment + CS_SIZE, comment + CS_SIZE + CS_TIME );
-		Q_strncpy( m_szCells[i][1], comment, MAX_CELLSTRING );
+		if( comment[0] == '#' )
+		{
+			// strip everything after first space
+			char s[CS_SIZE];
+			char *p = strchr( comment, ' ' );
+			size_t len;
+
+			len = p ? p - comment + 1 : CS_SIZE;
+
+			Q_strncpy( s, comment, len );
+			Q_strncpy( m_szCells[i][1], L( s ), MAX_CELLSTRING );
+		}
+		else
+		{
+			Q_strncpy( m_szCells[i][1], comment, MAX_CELLSTRING );
+		}
 		Q_strncpy( m_szCells[i][2], comment + CS_SIZE + (CS_TIME * 2), MAX_CELLSTRING );
 	}
 
