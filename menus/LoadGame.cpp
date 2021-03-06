@@ -194,25 +194,44 @@ void CMenuSavesListModel::Update( void )
 		COM_FileBase( filenames[j], saveName[i] );
 		COM_FileBase( filenames[j], delName[i] );
 
-		// fill save desc
-		snprintf( m_szCells[i][0], MAX_CELLSTRING, "%s %s", comment + CS_SIZE, comment + CS_SIZE + CS_TIME );
-		if( comment[0] == '#' )
+		// they are defined by comment string format
+		const char *time = comment + CS_SIZE;
+		const char *date = comment + CS_SIZE + CS_TIME;
+		const char *elapsedTime = comment + CS_SIZE + CS_TIME * 2;
+
+		char *title = comment;
+		char type[CS_SIZE] = {}, *p = nullptr;
+		const char *translated_title = nullptr;
+
+		// if comments begin with [ and there is second ]
+		if( comment[0] == '[' && ( p = strchr( comment, ']' )))
+		{
+			title = p + 1;
+			Q_strncpy( type, comment, title - comment + 1 );
+		}
+
+		if( *title == '#' )
 		{
 			// strip everything after first space
 			char s[CS_SIZE];
-			char *p = strchr( comment, ' ' );
-			size_t len;
 
-			len = p ? p - comment + 1 : CS_SIZE;
+			p = strchr( title, ' ' );
 
-			Q_strncpy( s, comment, len );
-			Q_strncpy( m_szCells[i][1], L( s ), MAX_CELLSTRING );
+			size_t len = p ? (p - title + 1) : ( CS_SIZE - ( title - comment ));
+
+			Q_strncpy( s, title, len );
+			translated_title = L( s );
 		}
 		else
 		{
-			Q_strncpy( m_szCells[i][1], comment, MAX_CELLSTRING );
+			translated_title = title;
 		}
-		Q_strncpy( m_szCells[i][2], comment + CS_SIZE + (CS_TIME * 2), MAX_CELLSTRING );
+
+		// fill save desc
+		snprintf( m_szCells[i][0], MAX_CELLSTRING, "%s %s", time, date );
+		snprintf( m_szCells[i][1], MAX_CELLSTRING, "%s%s", type, translated_title );
+		Q_strncpy( m_szCells[i][2], elapsedTime, MAX_CELLSTRING );
+
 	}
 
 	m_iNumItems = i;
