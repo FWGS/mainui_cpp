@@ -69,7 +69,7 @@ bool CMenuBitmap::KeyDown( int key )
 		handled = true;
 
 	if( handled )
-		_Event( QM_PRESSED );
+		_Event( QM_RELEASED );
 
 	return handled;
 }
