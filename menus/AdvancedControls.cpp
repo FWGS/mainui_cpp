@@ -53,6 +53,7 @@ private:
 	CMenuCheckBox	lookStrafe;
 	CMenuCheckBox	lookFilter;
 	CMenuCheckBox	autoaim;
+	CMenuCheckBox	rawinput;
 	CMenuSlider	sensitivity;
 };
 
@@ -88,6 +89,7 @@ void CAdvancedControls::GetConfig( )
 	lookFilter.LinkCvar( "look_filter" );
 
 	autoaim.LinkCvar( "sv_aim" );
+	rawinput.LinkCvar( "m_rawinput" );
 	sensitivity.LinkCvar( "sensitivity" );
 
 	ToggleLookCheckboxes( false );
@@ -127,6 +129,7 @@ void CAdvancedControls::SaveAndPopMenu()
 	if( EngFuncs::GetCvarString("m_filter")[0] )
 		EngFuncs::CvarSetValue( "m_filter", lookFilter.bChecked );
 	autoaim.WriteCvar();
+	rawinput.WriteCvar();
 	sensitivity.WriteCvar();
 
 	ToggleLookCheckboxes( true );
@@ -142,6 +145,7 @@ UI_AdvControls_Init
 void CAdvancedControls::_Init( void )
 {
 	banner.SetPicture( ART_BANNER );
+	banner.SetCoord( 72, 30 );
 
 	done.SetNameAndStatus( L( "Done" ), L( "save changed and go back to the Customize Menu" ) );
 	done.SetPicture( PC_DONE );
@@ -150,34 +154,38 @@ void CAdvancedControls::_Init( void )
 
 	crosshair.SetNameAndStatus( L( "Crosshair" ), L( "Enable the weapon aiming crosshair" ) );
 	crosshair.iFlags |= QMF_NOTIFY;
-	crosshair.SetCoord( 72, 280 );
+	crosshair.SetCoord( 72, 230 );
 
 	invertMouse.SetNameAndStatus( L( "GameUI_ReverseMouse" ), L( "GameUI_ReverseMouseLabel" ) );
 	invertMouse.iFlags |= QMF_NOTIFY;
 	invertMouse.onChanged = VoidCb( &CAdvancedControls::PitchInvert );
-	invertMouse.SetCoord( 72, 330 );
+	invertMouse.SetCoord( 72, 280 );
 
 	mouseLook.SetNameAndStatus( L( "GameUI_MouseLook" ), L( "GameUI_MouseLookLabel" ) );
 	mouseLook.iFlags |= QMF_NOTIFY;
 	SET_EVENT( mouseLook.onChanged,
 		((CAdvancedControls*)pSelf->Parent())->ToggleLookCheckboxes( true ) );
-	mouseLook.SetCoord( 72, 380 );
+	mouseLook.SetCoord( 72, 330 );
 
 	lookSpring.SetNameAndStatus( L( "Look spring" ), L( "Causes the screen to 'spring' back to looking straight ahead when you move forward" ) );
 	lookSpring.iFlags |= QMF_NOTIFY;
-	lookSpring.SetCoord( 72, 430 );
+	lookSpring.SetCoord( 72, 380 );
 
 	lookStrafe.SetNameAndStatus( L( "Look strafe" ), L( "In combination with your mouse look modifier, causes left-right movements to strafe instead of turn" ) );
 	lookStrafe.iFlags |= QMF_NOTIFY;
-	lookStrafe.SetCoord( 72, 480 );
+	lookStrafe.SetCoord( 72, 430 );
 
 	lookFilter.SetNameAndStatus( L( "GameUI_MouseFilter" ), L( "GameUI_MouseFilterLabel" ) );
 	lookFilter.iFlags |= QMF_NOTIFY;
-	lookFilter.SetCoord( 72, 530 );
+	lookFilter.SetCoord( 72, 480 );
 
 	autoaim.SetNameAndStatus( L( "GameUI_AutoAim" ), L( "GameUI_AutoaimLabel" ) );
 	autoaim.iFlags |= QMF_NOTIFY;
-	autoaim.SetCoord( 72, 580 );
+	autoaim.SetCoord( 72, 530 );
+	
+	rawinput.SetNameAndStatus( L( "GameUI_RawInput" ), L( "GameUI_RawInputLabel" ) );
+	rawinput.iFlags |= QMF_NOTIFY;
+	rawinput.SetCoord( 72, 580 );
 
 	sensitivity.SetNameAndStatus( L( "GameUI_MouseSensitivity" ), L( "Set in-game mouse sensitivity" ) );
 	sensitivity.Setup( 0.0, 20.0f, 0.1 );
@@ -189,7 +197,7 @@ void CAdvancedControls::_Init( void )
 	if( CL_IsActive() && !EngFuncs::GetCvarFloat( "host_serverstate" ))
 		inputDev.SetGrayed( true );
 	//inputDev.SetRect( 72, 230, UI_BUTTONS_WIDTH, UI_BUTTONS_HEIGHT );
-	inputDev.SetCoord( 72, 230 );
+	inputDev.SetCoord( 72, 180 );
 
 	AddItem( background );
 	AddItem( banner );
@@ -202,6 +210,7 @@ void CAdvancedControls::_Init( void )
 	AddItem( lookStrafe );
 	AddItem( lookFilter );
 	AddItem( autoaim );
+	AddItem( rawinput );
 	AddItem( sensitivity );
 }
 
