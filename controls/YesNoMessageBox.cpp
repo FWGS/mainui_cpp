@@ -74,10 +74,10 @@ CMenuYesNoMessageBox::Init
 void CMenuYesNoMessageBox::_Init( void )
 {
 	if( !m_bSetYes )
-		SetPositiveButton( "Ok", PC_OK );
+		SetPositiveButton( L( "GameUI_OK" ), PC_OK );
 
 	if( !m_bSetNo )
-		SetNegativeButton( "Cancel", PC_CANCEL );
+		SetNegativeButton( L( "GameUI_Cancel" ), PC_CANCEL );
 
 	if( !(bool)onNegative )
 		onNegative = CEventCallback::NoopCb;
@@ -243,8 +243,8 @@ void UI_ShowMessageBox( const char *text )
 
 		if( !init )
 		{
-			msgBoxInputDev.SetPositiveButton("Ok", PC_OK, 100 );
-			msgBoxInputDev.SetNegativeButton("Config", PC_CONFIG, -20 );
+			msgBoxInputDev.SetPositiveButton( L( "GameUI_OK" ), PC_OK, 100 );
+			msgBoxInputDev.SetNegativeButton( L( "GameUI_Options" ), PC_CONFIG, -20 );
 			msgBoxInputDev.onNegative = UI_InputDevices_Menu;
 			msgBoxInputDev.yes.SetCoord( 200, 204 );
 
