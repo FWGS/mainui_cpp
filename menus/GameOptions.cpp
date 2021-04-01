@@ -173,7 +173,7 @@ void CMenuGameOptions::_Init( void )
 	maxpayload.SetRect( 650, 370, 200, 32 );
 	maxpayload.Setup( 150, 1550, 50 );
 	maxpayload.LinkCvar( "cl_maxpayload", CMenuEditable::CVAR_VALUE );
-	maxpayload.SetNameAndStatus( L( "Singon size (cl_maxpayload)" ), L( "Singon cnain split decrease if cl_maxpacket does not help" ) );
+	maxpayload.SetNameAndStatus( L( "Signon size (cl_maxpayload)" ), L( "Signon chain split decrease if cl_maxpacket does not help" ) );
 	SET_EVENT_MULTI( maxpayload.onChanged,
 	{
 		CMenuSpinControl *self = (CMenuSpinControl *)pSelf;
@@ -193,7 +193,7 @@ void CMenuGameOptions::_Init( void )
 	cmdrate.SetRect( 650, 470, 200, 32 );
 	cmdrate.Setup( 20, 60, 5 );
 	cmdrate.LinkCvar( "cl_cmdrate", CMenuEditable::CVAR_VALUE );
-	cmdrate.SetNameAndStatus( L( "Command rate (cl_cmdrate)" ), L( "How many commands sent to server in second" ) );
+	cmdrate.SetNameAndStatus( L( "Command rate (cl_cmdrate)" ), L( "How many commands sent to server per second" ) );
 
 	updaterate.SetRect( 650, 570, 200, 32 );
 	updaterate.Setup( 20, 100, 5 );
