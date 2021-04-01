@@ -1006,14 +1006,14 @@ UI_VidInit
 */
 int UI_VidInit( void )
 {
-	static bool calledOnce = true;
+	static bool calledOnce = false;
 	if( uiStatic.textInput )
 	{
 		uiStatic.menu.InputMethodResized();
 		
 		return 0;
 	}
-	UI_Precache ();
+	if(!calledOnce) UI_Precache();
 	// don't allow screenwidth is slower than 4:3 screens
 	// it's really not intended to use, just for keeping menu working
 	if (ScreenWidth * 3 < ScreenHeight * 4)
