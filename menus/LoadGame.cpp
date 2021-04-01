@@ -267,7 +267,7 @@ UI_LoadGame_Init
 */
 void CMenuLoadGame::_Init( void )
 {
-	save.SetNameAndStatus( L( "GameUI_Save" ), L( "Save curret game" ) );
+	save.SetNameAndStatus( L( "GameUI_Save" ), L( "Save current game" ) );
 	save.SetPicture( PC_SAVE_GAME );
 	save.onReleased = VoidCb( &CMenuLoadGame::SaveGame );
 	save.SetCoord( 72, 230 );
