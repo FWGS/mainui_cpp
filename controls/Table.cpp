@@ -31,7 +31,7 @@ CMenuTable::CMenuTable() : BaseClass(),
 	szDownArrow( UI_DOWNARROW ), szDownArrowFocus( UI_DOWNARROWFOCUS ), szDownArrowPressed( UI_DOWNARROWPRESSED ),
 	iTopItem( 0 ),
 	iScrollBarSliding( false ),
-	iHighlight( -1 ), iCurItem( 0 ),
+	iHighlight( -1 ), iCurItem( 0 ), iNumRows( 0 ),
 	m_iLastItemMouseChange( 0 ),
 	m_iSortingColumn( -1 ),
 	m_pModel( NULL )
