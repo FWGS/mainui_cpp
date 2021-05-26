@@ -158,11 +158,13 @@ bool CMenuField::KeyDown( int key )
 			handled = true; // handled
 			break;
 		case K_LEFTARROW:
+		case K_DPAD_LEFT:
 			if( iCursor > 0 ) iCursor = EngFuncs::UtfMoveLeft( szBuffer, iCursor );
 			if( iCursor < iScroll ) iScroll = EngFuncs::UtfMoveLeft( szBuffer, iScroll );
 			handled = true; // handled
 			break;
 		case K_RIGHTARROW:
+		case K_DPAD_RIGHT:
 		{
 			bool remaining;
 
@@ -185,6 +187,7 @@ bool CMenuField::KeyDown( int key )
 			handled = true; // handled
 			break;
 		case K_BACKSPACE:
+		case K_X_BUTTON:
 			if( iCursor > 0 )
 			{
 				int pos = EngFuncs::UtfMoveLeft( szBuffer, iCursor );
