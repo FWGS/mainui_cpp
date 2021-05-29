@@ -166,6 +166,12 @@ void CMenuPlayerSetup::CModelListModel::Update( void )
 	{
 		COM_FileBase( filenames[i], name );
 		Q_strncpy( models[m_iCount], name, sizeof( models[0] ) );
+		
+		// check if the path is a valid model
+		snprintf( name, sizeof( name ), "models/player/%s/%s.mdl", models[m_iCount], models[m_iCount] );
+		if( !EngFuncs::FileExists( name ) )
+			continue;
+		
 		m_iCount++;
 	}
 }
