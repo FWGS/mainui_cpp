@@ -75,7 +75,7 @@ bool CMenuPicButton::KeyUp( int key )
 #if !defined(TA_ALT_MODE2)
 		SetTransPicForLast( hPic );
 #endif
-		PlayLocalSound( sound );
+		//PlayLocalSound( sound );
 	}
 
 	return sound != NULL;
