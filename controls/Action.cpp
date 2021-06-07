@@ -83,7 +83,7 @@ bool CMenuAction::KeyUp( int key )
 
 	if( sound )
 	{
-		_Event( QM_PRESSED );
+		_Event( QM_RELEASED );
 		//PlayLocalSound( sound );
 	}
 
