@@ -91,7 +91,10 @@ bool CMenuPicButton::KeyDown( int key )
 		handled = true;
 
 	if( handled )
+		{
+		PlayLocalSound( uiSoundLaunch );
 		_Event( QM_PRESSED );
+		}
 
 	return handled;
 }
