@@ -22,23 +22,6 @@ FC_CHECK='''extern "C" {
 int main() { return (int)FcInit(); }
 '''
 
-@Configure.conf
-def check_pkg(conf, package, uselib_store, fragment, *k, **kw):
-	errormsg = '{0} not available! Install {0} development package. Also you may need to set PKG_CONFIG_PATH environment variable'.format(package)
-	confmsg = 'Checking for \'{0}\' sanity'.format(package)
-	errormsg2 = '{0} isn\'t installed correctly. Make sure you installed proper development package for target architecture'.format(package)
-
-	try:
-		conf.check_cfg(package=package, args='--cflags --libs', uselib_store=uselib_store, *k, **kw )
-	except conf.errors.ConfigurationError:
-		conf.fatal(errormsg)
-
-	try:
-		conf.check_cxx(fragment=fragment, use=uselib_store, msg=confmsg, *k, **kw)
-	except conf.errors.ConfigurationError:
-		conf.fatal(errormsg2)
-
-
 def options(opt):
 	grp = opt.add_option_group('MainUI C++ options')
 	grp.add_option('--enable-stbtt', action = 'store_true', dest = 'USE_STBTT', default = False,
