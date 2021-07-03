@@ -55,6 +55,7 @@ GNU General Public License for more details.
 #define final
 #define constexpr
 #define override
+#define nullptr NULL
 #endif
 
 #ifdef bound
