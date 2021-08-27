@@ -33,7 +33,6 @@
 "Adv. Options"                                                                                                                      ""
 "Allow download"                                                                                                                    ""
 "Allow download of files from servers"                                                                                              ""
-"Allow materials"                                                                                                                   ""
 "Alpha:"                                                                                                                            ""
 "Apply changes"                                                                                                                     ""
 "Apply selected profile"                                                                                                            ""
@@ -105,7 +104,6 @@
 "Forward movement sensitivity"                                                                                                      ""
 "Game options"                                                                                                                      ""
 "Get detail game info"                                                                                                              ""
-"Glare reduction"                                                                                                                   ""
 "Go back to the Configuration Menu"                                                                                                 ""
 "Go back to the Customize Menu"                                                                                                     ""
 "Go back to the Main menu"                                                                                                          ""
@@ -210,7 +208,6 @@
 "Set brightness level"                                                                                                              ""
 "Set button additive draw mode"                                                                                                     ""
 "Set gamma value (0.5 - 2.3)"                                                                                                       ""
-"Set glare reduction level"                                                                                                         ""
 "Set grid size"                                                                                                                     ""
 "Set in-game mouse sensitivity"                                                                                                     ""
 "Set master volume level"                                                                                                           ""
@@ -272,7 +269,6 @@
 "Yaw rotating sensitivity"                                                                                                          ""
 "enable/disable fast sky rendering (for old computers)"                                                                             ""
 "faster, but you can't join the server from this machine"                                                                           ""
-"let engine replace 8-bit textures with full color hi-res prototypes (if present)"                                                  ""
 "save changed and go back to the Customize Menu"                                                                                    ""
 }
 }
