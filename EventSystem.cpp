@@ -29,7 +29,8 @@ CEventCallback::CEventCallback( EventCallback cb, void *ex ) :
 	u.cb = cb;
 }
 
-CEventCallback::CEventCallback(int execute_now, const char *sz)
+CEventCallback::CEventCallback(int execute_now, const char *sz) :
+	szName( 0 )
 {
 	memset(&u, 0, sizeof(u));
 	SetCommand( execute_now, sz );
@@ -103,12 +104,12 @@ void CEventCallback::SetCommand( int execute_now, const char *sz )
 	pExtra = (void*)sz;
 }
 
-size_t        CEventCallback::operator =( size_t null )
+size_t CEventCallback::operator =( size_t null )
 {
 	Reset();
 	return 0;
 }
-void*         CEventCallback::operator =( void *null )
+void* CEventCallback::operator =( void *null )
 {
 	Reset();
 	return NULL;

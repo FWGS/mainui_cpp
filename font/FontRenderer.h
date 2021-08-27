@@ -118,7 +118,6 @@ private:
 	float m_fBrighten;
 
 	int m_iOutlineSize;
-	int m_iPreferredType;
 
 	int m_iScanlineOffset;
 	float m_fScanlineScale;
