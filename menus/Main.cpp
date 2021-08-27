@@ -330,10 +330,9 @@ void CMenuMain::VidInit( bool connected )
 	newGame.SetCoord( 72, 280 );
 	hazardCourse.SetCoord( 72, 330 );
 
-	bool isGameLoaded = EngFuncs::GetCvarFloat( "host_gameloaded" ) != 0.0f;
 	bool isSingle = gpGlobals->maxClients < 2;
 
-	if( isGameLoaded && isSingle )
+	if( CL_IsActive() && isSingle )
 	{
 		saveRestore.SetNameAndStatus( L( "Save\\Load Game" ), L( "StringsList_192" ) );
 		saveRestore.SetPicture( PC_SAVE_LOAD_GAME );
