@@ -36,8 +36,8 @@ private:
 public:
 	CMenuVidOptions() : CMenuFramework( "CMenuVidOptions" ) { }
 	void SaveAndPopMenu() override;
-	void GammaUpdate();
-	void GammaGet();
+	void UpdateConfig();
+	void GetConfig();
 
 	int		outlineWidth;
 
@@ -60,34 +60,38 @@ public:
 
 /*
 =================
-CMenuVidOptions::GammaUpdate
+CMenuVidOptions::UpdateConfig
 =================
 */
-void CMenuVidOptions::GammaUpdate( void )
+void CMenuVidOptions::UpdateConfig( void )
 {
-	float val = RemapVal( gammaIntensity.GetCurrentValue(), 0.0, 1.0, 1.8, 7.0 );
-	EngFuncs::CvarSetValue( "gamma", val );
-	EngFuncs::ProcessImage( hTestImage, val );
+	float val1 = RemapVal( gammaIntensity.GetCurrentValue(), 0.0, 1.0, 1.8, 3.0 );
+	float val2 = RemapVal( glareReduction.GetCurrentValue(), 0.0, 1.0, 0.0, 3.0 );
+	EngFuncs::CvarSetValue( "gamma", val1 );
+	EngFuncs::CvarSetValue( "brightness", val2 );
+	EngFuncs::ProcessImage( hTestImage, val1, val2 );
 }
 
-void CMenuVidOptions::GammaGet( void )
+void CMenuVidOptions::GetConfig( void )
 {
-	float val = EngFuncs::GetCvarFloat( "gamma" );
+	float val1 = EngFuncs::GetCvarFloat( "gamma" );
+	float val2 = EngFuncs::GetCvarFloat( "brightness" );
 
-	gammaIntensity.SetCurrentValue( RemapVal( val, 1.8f, 7.0f, 0.0f, 1.0f ) );
-	EngFuncs::ProcessImage( hTestImage, val );
+	gammaIntensity.SetCurrentValue( RemapVal( val1, 1.8f, 3.0f, 0.0f, 1.0f ) );
+	glareReduction.SetCurrentValue( RemapVal( val2, 0.0f, 3.0f, 0.0f, 1.0f ) );
+	EngFuncs::ProcessImage( hTestImage, val1, val2 );
 
-	gammaIntensity.SetOriginalValue( val );
+	gammaIntensity.SetOriginalValue( val1 );
+	glareReduction.SetOriginalValue( val2 );
 }
 
 void CMenuVidOptions::SaveAndPopMenu( void )
 {
 	screenSize.WriteCvar();
-	glareReduction.WriteCvar();
 	fastSky.WriteCvar();
 	vbo.WriteCvar();
 	bump.WriteCvar();
-	// gamma is already written
+	// gamma and brightness is already written
 
 	CMenuFramework::SaveAndPopMenu();
 }
@@ -160,15 +164,17 @@ void CMenuVidOptions::_Init( void )
 	screenSize.Setup( 30, 120, 10 );
 	screenSize.onChanged = CMenuEditable::WriteCvarCb;
 
-	gammaIntensity.SetNameAndStatus( L( "GameUI_Gamma" ), L( "Set gamma value (0.5 - 2.3)" ) );
+	gammaIntensity.SetNameAndStatus( L( "GameUI_Gamma" ), L( "Set gamma value" ) );
 	gammaIntensity.SetCoord( 72, 340 );
 	gammaIntensity.Setup( 0.0, 1.0, 0.025 );
-	gammaIntensity.onChanged = VoidCb( &CMenuVidOptions::GammaUpdate );
-	gammaIntensity.onCvarGet = VoidCb( &CMenuVidOptions::GammaGet );
+	gammaIntensity.onChanged = VoidCb( &CMenuVidOptions::UpdateConfig );
+	gammaIntensity.onCvarGet = VoidCb( &CMenuVidOptions::GetConfig );
 
 	glareReduction.SetCoord( 72, 400 );
 	glareReduction.SetNameAndStatus( L( "GameUI_Brightness" ), L( "Set brightness level" ) );
-	glareReduction.Setup( 0, 3, 0.1 );
+	glareReduction.Setup( 0, 1.0, 0.025 );
+	glareReduction.onChanged = VoidCb( &CMenuVidOptions::UpdateConfig );
+	glareReduction.onCvarGet = VoidCb( &CMenuVidOptions::GetConfig );
 
 	bump.SetNameAndStatus( L( "Bump-mapping" ), L( "Enable bump mapping" ) );
 	bump.SetCoord( 72, 515 );
