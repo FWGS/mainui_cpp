@@ -285,7 +285,7 @@
 "Set background music volume level"                                                                                                 ""
 "Set brightness level"                                                                                                              ""
 "Set button additive draw mode"                                                                                                     ""
-"Set gamma value (0.5 - 2.3)"                                                                                                       ""
+"Set gamma value"                                                                                                                   ""
 "Set grid size"                                                                                                                     ""
 "Set in-game mouse sensitivity"                                                                                                     ""
 "Set master volume level"                                                                                                           ""
