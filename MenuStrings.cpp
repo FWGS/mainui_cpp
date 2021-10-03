@@ -324,7 +324,7 @@ static void Localize_AddToDictionary( const char *name, const char *lang )
 
 	pfile = afile;
 
-	pfile = EngFuncs::COM_ParseFile( pfile, token );
+	pfile = EngFuncs::COM_ParseFile( pfile, token, sizeof( token ));
 
 	if( stricmp( token, "lang" ))
 	{
@@ -332,7 +332,7 @@ static void Localize_AddToDictionary( const char *name, const char *lang )
 		goto error;
 	}
 
-	pfile = EngFuncs::COM_ParseFile( pfile, token );
+	pfile = EngFuncs::COM_ParseFile( pfile, token, sizeof( token ) );
 
 	if( strcmp( token, "{" ))
 	{
@@ -340,7 +340,7 @@ static void Localize_AddToDictionary( const char *name, const char *lang )
 		goto error;
 	}
 
-	pfile = EngFuncs::COM_ParseFile( pfile, token );
+	pfile = EngFuncs::COM_ParseFile( pfile, token, sizeof( token ) );
 
 	if( stricmp( token, "Language" ))
 	{
@@ -349,9 +349,9 @@ static void Localize_AddToDictionary( const char *name, const char *lang )
 	}
 
 	// skip language actual name
-	pfile = EngFuncs::COM_ParseFile( pfile, token );
+	pfile = EngFuncs::COM_ParseFile( pfile, token, sizeof( token ) );
 
-	pfile = EngFuncs::COM_ParseFile( pfile, token );
+	pfile = EngFuncs::COM_ParseFile( pfile, token, sizeof( token ) );
 
 	if( stricmp( token, "Tokens" ))
 	{
@@ -359,7 +359,7 @@ static void Localize_AddToDictionary( const char *name, const char *lang )
 		goto error;
 	}
 
-	pfile = EngFuncs::COM_ParseFile( pfile, token );
+	pfile = EngFuncs::COM_ParseFile( pfile, token, sizeof( token ) );
 
 	if( strcmp( token, "{" ))
 	{
@@ -367,13 +367,13 @@ static void Localize_AddToDictionary( const char *name, const char *lang )
 		goto error;
 	}
 
-	while( (pfile = EngFuncs::COM_ParseFile( pfile, token )))
+	while( (pfile = EngFuncs::COM_ParseFile( pfile, token, sizeof( token ))))
 	{
 		if( !strcmp( token, "}" ))
 			break;
 
 		char szLocString[4096];
-		pfile = EngFuncs::COM_ParseFile( pfile, szLocString );
+		pfile = EngFuncs::COM_ParseFile( pfile, szLocString, sizeof( szLocString ));
 
 		if( !strcmp( szLocString, "}" ))
 			break;
@@ -470,7 +470,7 @@ void UI_LoadCustomStrings( void )
 	if( !afile )
 		goto localize_init;
 
-	while(( pfile = EngFuncs::COM_ParseFile( pfile, token )) != NULL )
+	while(( pfile = EngFuncs::COM_ParseFile( pfile, token, sizeof( token ))) != NULL )
 	{
 		if( isdigit( token[0] ))
 		{
@@ -484,7 +484,7 @@ void UI_LoadCustomStrings( void )
 		else continue; // invalid declaration ?
 
 		// parse new string
-		pfile = EngFuncs::COM_ParseFile( pfile, token );
+		pfile = EngFuncs::COM_ParseFile( pfile, token, sizeof( token ));
 		MenuStrings[string_num] = StringCopy( token ); // replace default string with custom
 	}
 

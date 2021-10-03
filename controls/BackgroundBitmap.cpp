@@ -224,22 +224,22 @@ bool CMenuBackgroundBitmap::LoadBackgroundImage( bool gamedirOnly )
 
 	pfile = afile;
 
-	pfile = EngFuncs::COM_ParseFile( pfile, token );
+	pfile = EngFuncs::COM_ParseFile( pfile, token, sizeof( token ) );
 	if( !pfile || strcmp( token, "resolution" )) // resolution at first!
 		goto freefile;
 
-	pfile = EngFuncs::COM_ParseFile( pfile, token );
+	pfile = EngFuncs::COM_ParseFile( pfile, token, sizeof( token ) );
 	if( !pfile ) goto freefile;
 
 	s_BackgroundImageSize.w = atoi( token );
 
-	pfile = EngFuncs::COM_ParseFile( pfile, token );
+	pfile = EngFuncs::COM_ParseFile( pfile, token, sizeof( token ) );
 	if( !pfile ) goto freefile;
 
 	s_BackgroundImageSize.h = atoi( token );
 
 	// Now read all tiled background list
-	while(( pfile = EngFuncs::COM_ParseFile( pfile, token )))
+	while(( pfile = EngFuncs::COM_ParseFile( pfile, token, sizeof( token ) )))
 	{
 		bimage_t img;
 
@@ -251,14 +251,14 @@ bool CMenuBackgroundBitmap::LoadBackgroundImage( bool gamedirOnly )
 		if( !img.hImage ) goto freefile;
 
 		// ignore "scaled" attribute. What does it mean?
-		pfile = EngFuncs::COM_ParseFile( pfile, token );
+		pfile = EngFuncs::COM_ParseFile( pfile, token, sizeof( token ) );
 		if( !pfile ) goto freefile;
 
-		pfile = EngFuncs::COM_ParseFile( pfile, token );
+		pfile = EngFuncs::COM_ParseFile( pfile, token, sizeof( token ) );
 		if( !pfile ) goto freefile;
 		img.coord.x = atoi( token );
 
-		pfile = EngFuncs::COM_ParseFile( pfile, token );
+		pfile = EngFuncs::COM_ParseFile( pfile, token, sizeof( token ) );
 		if( !pfile ) goto freefile;
 		img.coord.y = atoi( token );
 

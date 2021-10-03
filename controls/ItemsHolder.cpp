@@ -534,7 +534,7 @@ bool RES_ExpectString( char **data, const char *expect, bool skip = true )
 	if( !data || !*data )
 		return true;
 
-	tmp = EngFuncs::COM_ParseFile( *data, token );
+	tmp = EngFuncs::COM_ParseFile( *data, token, sizeof( token ) );
 
 	if( skip )
 		*data = tmp;
@@ -566,7 +566,7 @@ bool CMenuItemsHolder::LoadRES(const char *filename)
 	if( !pfile )
 		return false;
 
-	afile = EngFuncs::COM_ParseFile( afile, token );
+	afile = EngFuncs::COM_ParseFile( afile, token, sizeof( token ) );
 
 	Con_DPrintf( "Loading res file from %s, name %s\n", filename, token );
 
@@ -583,7 +583,7 @@ bool CMenuItemsHolder::LoadRES(const char *filename)
 	{
 		CMenuBaseItem *item;
 
-		afile = EngFuncs::COM_ParseFile( afile, token );
+		afile = EngFuncs::COM_ParseFile( afile, token, sizeof( token ) );
 
 		if( !afile )
 			return FreeFile( pfile, false );
@@ -603,11 +603,11 @@ bool CMenuItemsHolder::LoadRES(const char *filename)
 				char key[1024];
 				char value[1024];
 
-				afile = EngFuncs::COM_ParseFile( afile, key );
+				afile = EngFuncs::COM_ParseFile( afile, key, sizeof( key ));
 				if( !afile )
 					return FreeFile( pfile, false );
 
-				afile = EngFuncs::COM_ParseFile( afile, value );
+				afile = EngFuncs::COM_ParseFile( afile, value, sizeof( value ));
 				if( !afile )
 					return FreeFile( pfile, false );
 

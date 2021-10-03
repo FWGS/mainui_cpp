@@ -902,7 +902,7 @@ void UI_ParseColor( char *&pfile, unsigned int *outColor )
 
 	for( int i = 0; i < 3; i++ )
 	{
-		pfile = EngFuncs::COM_ParseFile( pfile, token );
+		pfile = EngFuncs::COM_ParseFile( pfile, token, sizeof( token ));
 		if( !pfile ) break;
 		color[i] = atoi( token );
 	}
@@ -923,7 +923,7 @@ void UI_ApplyCustomColors( void )
 		return;
 	}
 
-	while(( pfile = EngFuncs::COM_ParseFile( pfile, token )) != NULL )
+	while(( pfile = EngFuncs::COM_ParseFile( pfile, token, sizeof( token ))) != NULL )
 	{
 		if( !stricmp( token, "HELP_COLOR" ))
 		{
@@ -984,7 +984,7 @@ static void UI_LoadBackgroundMapList( void )
 		return;
 	}
 
-	while(( pfile = EngFuncs::COM_ParseFile( pfile, token )) != NULL )
+	while(( pfile = EngFuncs::COM_ParseFile( pfile, token, sizeof( token ))) != NULL )
 	{
 		// skip the numbers (old format list)
 		if( isdigit( token[0] )) continue;

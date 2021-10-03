@@ -185,7 +185,7 @@ void CMenuKeysModel::Update( void )
 	memset( firstKey, 0, sizeof( firstKey ));
 	memset( secondKey, 0, sizeof( secondKey ));
 
-	while(( pfile = EngFuncs::COM_ParseFile( pfile, token )) != NULL )
+	while(( pfile = EngFuncs::COM_ParseFile( pfile, token, sizeof( token ))) != NULL )
 	{
 		if( !stricmp( token, "blank" ))
 		{
@@ -209,7 +209,7 @@ void CMenuKeysModel::Update( void )
 			CMenuControls::GetKeyBindings( token, keys );
 			Q_strncpy( keysBind[i], token, sizeof( keysBind[i] ));
 
-			pfile = EngFuncs::COM_ParseFile( pfile, token );
+			pfile = EngFuncs::COM_ParseFile( pfile, token, sizeof( token ));
 			if( !pfile ) break; // technically an error
 
 			if( token[0] == '#' )
@@ -275,13 +275,13 @@ void CMenuControls::ResetKeysList( void )
 		return;
 	}
 
-	while(( pfile = EngFuncs::COM_ParseFile( pfile, token )) != NULL )
+	while(( pfile = EngFuncs::COM_ParseFile( pfile, token, sizeof( token ))) != NULL )
 	{
 		char	key[32];
 
 		Q_strncpy( key, token, sizeof( key ));
 
-		pfile = EngFuncs::COM_ParseFile( pfile, token );
+		pfile = EngFuncs::COM_ParseFile( pfile, token, sizeof( token ));
 		if( !pfile ) break;	// technically an error
 
 		char	cmd[4096];

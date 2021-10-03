@@ -190,12 +190,12 @@ void CMenuMapListModel::Update( void )
 	strcpy( mapName[0], L( "GameUI_RandomMap" ) );
 	mapsDescription[0][0] = 0;
 	
-	while(( pfile = EngFuncs::COM_ParseFile( pfile, token )) != NULL )
+	while(( pfile = EngFuncs::COM_ParseFile( pfile, token, sizeof( token ))) != NULL )
 	{
 		if( numMaps >= UI_MAXGAMES ) break;
 
 		Q_strncpy( mapName[numMaps], token, 64 );
-		if(( pfile = EngFuncs::COM_ParseFile( pfile, token )) == NULL )
+		if(( pfile = EngFuncs::COM_ParseFile( pfile, token, sizeof( token ))) == NULL )
 		{
 			Q_strncpy( mapsDescription[numMaps], mapName[numMaps], 64 );
 			break; // unexpected end of file
