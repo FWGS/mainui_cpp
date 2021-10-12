@@ -34,7 +34,6 @@ option(MAINUI_USE_CUSTOM_FONT_RENDER "Use custom font rendering" ON)
 option(MAINUI_USE_STB "Use stb_truetype.h for rendering(*nix-only)" OFF)
 option(MAINUI_RENDER_PICBUTTON_TEXT "Use custom font render to render picbuttons (experimental)" OFF)
 option(MAINUI_FONT_SCALE "Scale fonts by height" OFF)
-option(MAINUI_FORCE_PIE "Force enable -fpie/-fPIC" OFF) # may be required by some systems, although not recommended for i386
 
 file(GLOB MAINUI_CONTROLS_SOURCES "controls/*.cpp")
 file(GLOB MAINUI_MENUS_SOURCES "menus/*.cpp" "menus/dynamic/*.cpp")
@@ -60,7 +59,6 @@ add_library(${MAINUI_LIBRARY} MODULE ${MAINUI_SOURCES})
 if(NOT WIN32 AND NOT MINGW)
 	add_compile_options(-Wall -Wextra -Wno-unused-parameter -Wno-unused-variable)
 else()
-
 	# Only for MSVC6 compatibility mode! Newer VC does fail with this define
 	# add_definitions(-DMY_COMPILER_SUCKS)
 endif()
@@ -79,7 +77,7 @@ endif()
 
 # Force stb_truetype for Apple devices, as there is no Apple native font renderer
 # And freetype&fontconfig isn't used on this platform by default
-if(APPLE OR ANDROID)
+if(ANDROID)
 	set(MAINUI_USE_STB TRUE)
 endif()
 
@@ -128,14 +126,6 @@ if(XASH_64BIT AND NOT ANDROID)
 	endif()
 	set_target_properties(${MAINUI_LIBRARY} PROPERTIES 
 		OUTPUT_NAME ${MAINUI_NAME}64)
-endif()
-
-if(MAINUI_FORCE_PIE OR (APPLE AND CMAKE_OSX_ARCHITECTURES) OR NOT (ARCH STREQUAL "i386"))
-	message(STATUS "Enabled PIE for ${MAINUI_LIBRARY}")
-	set_target_properties(${MAINUI_LIBRARY} PROPERTIES
-		POSITION_INDEPENDENT_CODE 1)
-else()
-	message(STATUS "Disabled PIE for ${MAINUI_LIBRARY}")
 endif()
 
 install(TARGETS ${MAINUI_LIBRARY} DESTINATION .)
