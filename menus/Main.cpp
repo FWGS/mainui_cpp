@@ -348,7 +348,7 @@ void CMenuMain::VidInit( bool connected )
 	if( connected )
 	{
 		resumeGame.Show();
-		if( !EngFuncs::GetCvarFloat( "host_gameloaded" ) && !isSingle )
+		if( CL_IsActive() && !isSingle )
 		{
 			disconnect.Show();
 			console.pos.y = 130;
