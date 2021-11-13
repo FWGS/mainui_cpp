@@ -47,22 +47,24 @@ CFreeTypeFont::~CFreeTypeFont()
  *
  * Ripped from skia source code
  */
-FcPattern* FontMatch(const char* type, FcType vtype, const void* value, ...)
+FcPattern* FontMatch(const char* type, ...)
 {
+	FcValue fcvalue;
 	va_list ap;
-	va_start(ap, value);
+
+	va_start(ap, type);
 
 	FcPattern* pattern = FcPatternCreate();
 
 	for (;;) {
-		FcValue fcvalue;
-		fcvalue.type = vtype;
-		switch (vtype) {
+		// FcType is promoted to int when passed through ...
+		fcvalue.type = static_cast<FcType>(va_arg(ap, int));
+		switch (fcvalue.type) {
 			case FcTypeString:
-				fcvalue.u.s = (FcChar8*) value;
+				fcvalue.u.s = va_arg(ap, const FcChar8 *);
 				break;
 			case FcTypeInteger:
-				fcvalue.u.i = (int)(intptr_t)value;
+				fcvalue.u.i = va_arg(ap, int);
 				break;
 			default:
 				ASSERT(("FontMatch unhandled type"));
@@ -72,9 +74,6 @@ FcPattern* FontMatch(const char* type, FcType vtype, const void* value, ...)
 		type = va_arg(ap, const char *);
 		if (!type)
 			break;
-		// FcType is promoted to int when passed through ...
-		vtype = static_cast<FcType>(va_arg(ap, int));
-		value = va_arg(ap, const void *);
 	};
 	va_end(ap);
 
@@ -264,10 +263,10 @@ void CFreeTypeFont::GetCharABCWidths(int ch, int &a, int &b, int &c)
 			 face->glyph->metrics.horiBearingX -
 			 face->glyph->metrics.width);
 	}
-	
+
 	find.a -= m_iBlur + m_iOutlineSize;
 	find.b += m_iBlur + m_iOutlineSize;
-	
+
 	if( m_iOutlineSize )
 	{
 		if( find.a < 0 )
