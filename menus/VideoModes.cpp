@@ -131,8 +131,12 @@ public:
 
 	void WriteRendererConfig()
 	{
-		int i = renderers.GetCurrentValue();
-		EngFuncs::CvarSetString( "r_refdll", renderersModel.GetShortName( i ));
+		const int   index = renderers.GetCurrentValue();
+		const char *short_name = renderersModel.GetShortName( index );
+
+		rtx.SetVisibility(strcmp(short_name, "vk") == 0);
+
+		EngFuncs::CvarSetString( "r_refdll", short_name );
 	}
 
 	CMenuCheckBox	windowed;
@@ -145,6 +149,7 @@ public:
 
 	CMenuRenderersModel renderersModel;
 	CMenuSpinControl renderers;
+	CMenuCheckBox	 rtx;
 
 	int prevMode;
 	int prevModeX;
@@ -236,6 +241,8 @@ void CMenuVidModes::SetConfig( )
 		// have changed resolution, but enable test mode only in fullscreen
 		testMode |= !windowed.bChecked;
 	}
+
+	rtx.WriteCvar();
 
 	vsync.WriteCvar();
 
@@ -333,6 +340,7 @@ void CMenuVidModes::_Init( void )
 			parent->vidList.SetCurrentIndex( VID_AUTOMODE_POS );
 	});
 
+
 	vsync.SetNameAndStatus( L( "GameUI_VSync" ), L( "GameUI_VSync" ) );
 	vsync.SetCoord( 360, 670 );
 	vsync.LinkCvar( "gl_vsync" );
@@ -351,11 +359,18 @@ void CMenuVidModes::_Init( void )
 	renderers.onCvarWrite = VoidCb( &CMenuVidModes::WriteRendererConfig );
 	renderers.bUpdateImmediately = true;
 
+	const char *r_refdll_value = EngFuncs::GetCvarString("r_refdll");
+	rtx.SetVisibility(strcmp(r_refdll_value, "vk") == 0);
+	rtx.SetNameAndStatus( L( "GameUI_RTX" ), L( "Enable realtime ray tracing for vulkan render" ) );
+	rtx.SetCoord( 80, 540 );
+	rtx.LinkCvar( "vk_rtx" );
+
 	AddItem( background );
 	AddItem( banner );
 	AddButton( L( "GameUI_Apply" ), L( "Apply changes" ), PC_OK, VoidCb( &CMenuVidModes::SetConfig ) );
 	AddButton( L( "GameUI_Cancel" ), L( "Return back to previous menu" ), PC_CANCEL, VoidCb( &CMenuVidModes::Hide ) );
 	AddItem( renderers );
+	AddItem( rtx );
 	AddItem( windowed );
 	AddItem( vsync );
 	AddItem( vidList );
