@@ -361,7 +361,7 @@ void CMenuVidModes::_Init( void )
 
 	const char *r_refdll_value = EngFuncs::GetCvarString("r_refdll");
 	rtx.SetVisibility(strcmp(r_refdll_value, "vk") == 0);
-	rtx.SetNameAndStatus( L( "GameUI_RTX" ), L( "Enable realtime ray tracing for vulkan render" ) );
+	rtx.SetNameAndStatus( L( "Enable RTX" ), L( "Enable realtime ray tracing" ) );
 	rtx.SetCoord( 80, 540 );
 	rtx.LinkCvar( "vk_rtx" );
 
