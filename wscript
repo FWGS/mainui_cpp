@@ -94,7 +94,8 @@ def build(bld):
 		'model/',
 		'../common',
 		'../engine',
-		'../pm_shared'
+		'../pm_shared',
+		'../public'
 	]
 
 	bld.shlib(
