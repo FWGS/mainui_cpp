@@ -256,11 +256,11 @@ public:
 
 #define ADD_MENU3( cmd, type, showfunc ) \
 	static type * cmd = NULL; \
-	void cmd##_Precache( void ) \
+	static void cmd##_Precache( void ) \
 	{ \
 		cmd = new type(); \
 	} \
-	void cmd##_Shutdown( void ) \
+	static void cmd##_Shutdown( void ) \
 	{ \
 		delete cmd; \
 	} \
