@@ -84,11 +84,6 @@ const unsigned int g_iColorTable[8] =
 0xFFFFFFFF, // white
 };
 
-bool UI_IsXashFWGS( void )
-{
-	return g_bIsForkedEngine;
-}
-
 CMenuEntry::CMenuEntry(const char *cmd, void (*pfnPrecache)(), void (*pfnShow)(), void (*pfnShutdown)() ) :
 	m_szCommand( cmd ),
 	m_pfnPrecache( pfnPrecache ),
@@ -1066,13 +1061,10 @@ void UI_OpenUpdatePage( bool engine, bool preferstore )
 
 	if( engine || !gMenu.m_gameinfo.update_url[0] )
 	{
-		if( UI_IsXashFWGS() )
-		{
-			if( preferstore )
-				updateUrl = PLATFORM_UPDATE_PAGE;
-			else
-				updateUrl = GENERIC_UPDATE_PAGE;
-		}
+		if( preferstore )
+			updateUrl = PLATFORM_UPDATE_PAGE;
+		else
+			updateUrl = GENERIC_UPDATE_PAGE;
 	}
 	else
 	{

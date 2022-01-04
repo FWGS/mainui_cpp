@@ -445,86 +445,71 @@ Converting to single-byte not necessary anymore, as UI uses custom font render w
 */
 int Con_UtfProcessChar( int in )
 {
-	if( UI_IsXashFWGS() )
+	static int m = -1, k = 0; //multibyte state
+	static int uc = 0; //unicode char
+
+	if( !in )
 	{
-		static int m = -1, k = 0; //multibyte state
-		static int uc = 0; //unicode char
-
-		if( !in )
-		{
-			m = -1;
-			k = 0;
-			uc = 0;
-			return 0;
-		}
-
-		// Get character length
-		if(m == -1)
-		{
-			uc = 0;
-			if( in >= 0xF8 )
-			{
-				return 0;
-			}
-			else if( in >= 0xF0 )
-			{
-				uc = in & 0x07;
-				m = 3;
-			}
-			else if( in >= 0xE0 )
-			{
-				uc = in & 0x0F;
-				m = 2;
-			}
-			else if( in >= 0xC0 )
-			{
-				uc = in & 0x1F;
-				m = 1;
-			}
-			else if( in <= 0x7F )
-			{
-				return in; // ascii
-			}
-			// return 0 if we need more chars to decode one
-			k = 0;
-			return 0;
-		}
-		// get more chars
-		else if( k <= m )
-		{
-			uc <<= 6;
-			uc += in & 0x3F;
-			k++;
-		}
-		if( in > 0xBF || m < 0 )
-		{
-			m = -1;
-			return 0;
-		}
-		if( k == m )
-		{
-			k = m = -1;
-
-			return uc;
-
-			// not implemented yet
-			// return '?';
-		}
+		m = -1;
+		k = 0;
+		uc = 0;
 		return 0;
 	}
-	else
-	{
-		if( in >= 0x80 && in <= 0xBF )
-		{
-			return table_cp1251[in - 0x80];
-		}
-		else if( in >= 0xC0 && in <= 0xFF )
-		{
-			return in - 0xC0 + 0x410;
-		}
 
-		return in;
+	// Get character length
+	if(m == -1)
+	{
+		uc = 0;
+		if( in >= 0xF8 )
+		{
+			return 0;
+		}
+		else if( in >= 0xF0 )
+		{
+			uc = in & 0x07;
+			m = 3;
+		}
+		else if( in >= 0xE0 )
+		{
+			uc = in & 0x0F;
+			m = 2;
+		}
+		else if( in >= 0xC0 )
+		{
+			uc = in & 0x1F;
+			m = 1;
+		}
+		else if( in <= 0x7F )
+		{
+			return in; // ascii
+		}
+		// return 0 if we need more chars to decode one
+		k = 0;
+		return 0;
 	}
+	// get more chars
+	else if( k <= m )
+	{
+		uc <<= 6;
+		uc += in & 0x3F;
+		k++;
+	}
+	if( in > 0xBF || m < 0 )
+	{
+		m = -1;
+		return 0;
+	}
+
+	if( k == m )
+	{
+		k = m = -1;
+
+		return uc;
+
+		// not implemented yet
+		// return '?';
+	}
+	return 0;
 }
 
 /*
@@ -636,43 +621,4 @@ void Com_EscapeCommand( char *newCommand, const char *oldCommand, int len )
 	}
 
 	*newCommand++ = 0;
-}
-
-/*
-================
-Sys_DoubleTime
-================
-*/
-double Sys_DoubleTime( void )
-{
-	if( UI_IsXashFWGS())
-	{
-		return EngFuncs::DoubleTime();
-	}
-
-#if defined _WIN32
-	static LARGE_INTEGER g_PerformanceFrequency;
-	static LARGE_INTEGER g_ClockStart;
-	LARGE_INTEGER CurrentTime;
-
-	if( !g_PerformanceFrequency.QuadPart )
-	{
-		QueryPerformanceFrequency( &g_PerformanceFrequency );
-		QueryPerformanceCounter( &g_ClockStart );
-	}
-
-	QueryPerformanceCounter( &CurrentTime );
-	return (double)( CurrentTime.QuadPart - g_ClockStart.QuadPart ) / (double)( g_PerformanceFrequency.QuadPart );
-#elif defined __DOS__
-	// fallback when no time api
-	return gpGlobals->time + 0.01;
-#elif defined __APPLE__
-	struct timeval tv;
-	gettimeofday(&tv, NULL);
-	return (double) tv.tv_sec + (double) tv.tv_usec/1000000.0;
-#else
-	struct timespec ts;
-	clock_gettime(CLOCK_MONOTONIC, &ts);
-	return (double) ts.tv_sec + (double) ts.tv_nsec/1000000000.0;
-#endif
 }

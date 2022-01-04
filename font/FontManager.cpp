@@ -498,7 +498,7 @@ HFont CFontBuilder::Create()
 	font = new CBitmapFont();
 #endif
 
-	double starttime = Sys_DoubleTime();
+	double starttime = EngFuncs::DoubleTime();
 
 	if( !font->Create( m_szName, m_iTall, m_iWeight, m_iBlur, m_fBrighten, m_iOutlineSize, m_iScanlineOffset, m_fScanlineScale, m_iFlags ) )
 	{
@@ -517,7 +517,7 @@ HFont CFontBuilder::Create()
 
 	g_FontMgr->UploadTextureForFont( font );
 
-	double endtime = Sys_DoubleTime();
+	double endtime = EngFuncs::DoubleTime();
 
 	Con_DPrintf( "Rendering %s(%i, %i) took %f seconds\n", font->GetName(), m_iTall, m_iWeight, endtime - starttime );
 

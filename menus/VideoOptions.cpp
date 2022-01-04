@@ -197,11 +197,8 @@ void CMenuVidOptions::_Init( void )
 	AddItem( screenSize );
 	AddItem( gammaIntensity );
 	AddItem( glareReduction );
-	if( UI_IsXashFWGS() )
-	{
-		AddItem( bump );
-		AddItem( vbo );
-	}
+	AddItem( bump );
+	AddItem( vbo );
 	AddItem( fastSky );
 	AddItem( testImage );
 	screenSize.LinkCvar( "viewsize" );

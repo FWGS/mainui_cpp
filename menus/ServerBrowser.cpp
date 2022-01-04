@@ -186,7 +186,7 @@ public:
 	void JoinGame( void );
 	void ResetPing( void )
 	{
-		gameListModel.serversRefreshTime = Sys_DoubleTime();
+		gameListModel.serversRefreshTime = EngFuncs::DoubleTime();
 	}
 
 	void AddServerToList( netadr_t adr, const char *info );
@@ -339,7 +339,7 @@ void CMenuGameListModel::AddServerToList(netadr_t adr, const char *info)
 	server_t server;
 
 	server.adr = adr;
-	server.ping = Sys_DoubleTime() - serversRefreshTime;
+	server.ping = EngFuncs::DoubleTime() - serversRefreshTime;
 	server.ping = bound( 0, server.ping, 9.999f );
 	Q_strncpy( server.info, info, sizeof( server.info ));
 
