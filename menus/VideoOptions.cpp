@@ -27,6 +27,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define ART_BANNER	  	"gfx/shell/head_vidoptions"
 #define ART_GAMMA		"gfx/shell/gamma"
 
+#define LEGACY_VIEWSIZE 0
+
 class CMenuVidOptions : public CMenuFramework
 {
 private:
@@ -48,12 +50,12 @@ public:
 
 	CMenuPicButton	done;
 
+#if LEGACY_VIEWSIZE
 	CMenuSlider	screenSize;
+#endif
 	CMenuSlider	gammaIntensity;
 	CMenuSlider	glareReduction;
-	CMenuCheckBox	fastSky;
 	CMenuCheckBox   vbo;
-	CMenuCheckBox   bump;
 
 	HIMAGE		hTestImage;
 };
@@ -87,10 +89,10 @@ void CMenuVidOptions::GetConfig( void )
 
 void CMenuVidOptions::SaveAndPopMenu( void )
 {
+#if LEGACY_VIEWSIZE
 	screenSize.WriteCvar();
-	fastSky.WriteCvar();
+#endif
 	vbo.WriteCvar();
-	bump.WriteCvar();
 	// gamma and brightness is already written
 
 	CMenuFramework::SaveAndPopMenu();
@@ -107,7 +109,11 @@ void CMenuVidOptions::CMenuVidPreview::Draw( )
 	int		viewport[4];
 	int		viewsize, size, sb_lines;
 
+#if LEGACY_VIEWSIZE
 	viewsize = EngFuncs::GetCvarFloat( "viewsize" );
+#else
+	viewsize = 120;
+#endif
 
 	if( viewsize >= 120 )
 		sb_lines = 0;	// no status bar at all
@@ -159,55 +165,52 @@ void CMenuVidOptions::_Init( void )
 	done.SetPicture( PC_DONE );
 	done.onReleased = VoidCb( &CMenuVidOptions::SaveAndPopMenu );
 
+	int height = 280;
+
+#if LEGACY_VIEWSIZE
 	screenSize.SetNameAndStatus( L( "Screen size" ), L( "Set the screen size" ) );
-	screenSize.SetCoord( 72, 280 );
+	screenSize.SetCoord( 72, height );
 	screenSize.Setup( 30, 120, 10 );
 	screenSize.onChanged = CMenuEditable::WriteCvarCb;
 
+	height += 60;
+#endif
+
 	gammaIntensity.SetNameAndStatus( L( "GameUI_Gamma" ), L( "Set gamma value" ) );
-	gammaIntensity.SetCoord( 72, 340 );
+	gammaIntensity.SetCoord( 72, height );
 	gammaIntensity.Setup( 0.0, 1.0, 0.025 );
 	gammaIntensity.onChanged = VoidCb( &CMenuVidOptions::UpdateConfig );
 	gammaIntensity.onCvarGet = VoidCb( &CMenuVidOptions::GetConfig );
+	height += 60;
 
-	glareReduction.SetCoord( 72, 400 );
+	glareReduction.SetCoord( 72, height );
 	glareReduction.SetNameAndStatus( L( "GameUI_Brightness" ), L( "Set brightness level" ) );
 	glareReduction.Setup( 0, 1.0, 0.025 );
 	glareReduction.onChanged = VoidCb( &CMenuVidOptions::UpdateConfig );
 	glareReduction.onCvarGet = VoidCb( &CMenuVidOptions::GetConfig );
-
-	bump.SetNameAndStatus( L( "Bump-mapping" ), L( "Enable bump mapping" ) );
-	bump.SetCoord( 72, 515 );
-	if( !EngFuncs::GetCvarFloat( "r_vbo" ) )
-		bump.SetGrayed( true );
+	height += 60;
 
 	vbo.SetNameAndStatus( L( "Use VBO" ), L( "Use new world renderer. Faster, but rarely glitchy" ) );
 	vbo.SetCoord( 72, 565 );
-	vbo.onChanged = CMenuCheckBox::BitMaskCb;
-	vbo.onChanged.pExtra = &bump.iFlags;
-	vbo.bInvertMask = true;
-	vbo.iMask = QMF_GRAYED;
-
-	fastSky.SetNameAndStatus( L( "Draw simple sky" ), L( "enable/disable fast sky rendering (for old computers)" ) );
-	fastSky.SetCoord( 72, 615 );
 
 	AddItem( background );
 	AddItem( banner );
 	AddItem( done );
+#if LEGACY_VIEWSIZE
 	AddItem( screenSize );
+#endif
 	AddItem( gammaIntensity );
 	AddItem( glareReduction );
-	AddItem( bump );
 	AddItem( vbo );
-	AddItem( fastSky );
 	AddItem( testImage );
+
+#if LEGACY_VIEWSIZE
 	screenSize.LinkCvar( "viewsize" );
+#endif
+
 	gammaIntensity.LinkCvar( "gamma" );
 	glareReduction.LinkCvar( "brightness" );
-	bump.LinkCvar( "r_bump" );
 	vbo.LinkCvar( "r_vbo" );
-	fastSky.LinkCvar( "r_fastsky" );
-
 }
 
 void CMenuVidOptions::_VidInit()
