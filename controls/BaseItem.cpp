@@ -105,10 +105,6 @@ void CMenuBaseItem::SetCharSize( EFontSizes fs )
 	{
 	case QM_DEFAULTFONT:
 	case QM_BOLDFONT:
-#ifdef MAINUI_RENDER_PICBUTTON_TEXT
-	case QM_LIGHTBLUR:
-	case QM_HEAVYBLUR:
-#endif
 		charSize = UI_MED_CHAR_HEIGHT;
 		break;
 	case QM_SMALLFONT:

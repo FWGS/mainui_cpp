@@ -1146,6 +1146,8 @@ void UI_Init( void )
 
 	uiStatic.initialized = true;
 
+	uiStatic.lowmemory = (int)EngFuncs::GetCvarFloat( "host_lowmemorymode" );
+
 	// setup game info
 	EngFuncs::GetGameInfo( &gMenu.m_gameinfo );
 

@@ -308,12 +308,9 @@ bool CMenuBackgroundBitmap::CheckBackgroundSplash( bool gamedirOnly )
 
 void CMenuBackgroundBitmap::LoadBackground()
 {
-	if( s_iBackgroundCount != 0 )
+	if( s_iBackgroundCount != 0 || uiStatic.lowmemory )
 		return;
 
-#if XASH_LOW_MEMORY
-	return;
-#endif
 	// try to load backgrounds from mod
 	if( LoadBackgroundImage( true ) )
 	{

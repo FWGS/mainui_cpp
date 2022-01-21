@@ -32,7 +32,6 @@ set(MAINUI_LIBRARY menu)
 
 option(MAINUI_USE_CUSTOM_FONT_RENDER "Use custom font rendering" ON)
 option(MAINUI_USE_STB "Use stb_truetype.h for rendering(*nix-only)" OFF)
-option(MAINUI_RENDER_PICBUTTON_TEXT "Use custom font render to render picbuttons (experimental)" OFF)
 option(MAINUI_FONT_SCALE "Scale fonts by height" OFF)
 
 file(GLOB MAINUI_CONTROLS_SOURCES "controls/*.cpp")
@@ -107,9 +106,6 @@ if(MAINUI_USE_CUSTOM_FONT_RENDER)
 	endif()
 
 	add_definitions(-DMAINUI_USE_CUSTOM_FONT_RENDER)
-	if(MAINUI_RENDER_PICBUTTON_TEXT)
-		add_definitions(-DMAINUI_RENDER_PICBUTTON_TEXT)
-	endif()
 endif()
 
 install(TARGETS ${MAINUI_LIBRARY} DESTINATION .)

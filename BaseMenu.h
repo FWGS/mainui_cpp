@@ -91,10 +91,9 @@ typedef struct
 	HFont hBigFont;
 	HFont hConsoleFont;
 	HFont hBoldFont;
-#ifdef MAINUI_RENDER_PICBUTTON_TEXT
 	HFont hLightBlur;
 	HFont hHeavyBlur;
-#endif
+
 	bool	m_fDemosPlayed;
 	bool	m_fNoOldBackground;
 	int 	m_iOldMenuDepth;
@@ -130,6 +129,8 @@ typedef struct
 	bool needMapListUpdate;
 
 	bool nextFrameActive;
+
+	int lowmemory;
 } uiStatic_t;
 
 extern float	cursorDY;			// use for touch scroll

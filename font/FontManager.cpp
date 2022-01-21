@@ -84,17 +84,17 @@ void CFontManager::VidInit( void )
 			.SetHandleNum( QM_BOLDFONT )
 			.Create();
 
-#ifdef MAINUI_RENDER_PICBUTTON_TEXT
-		uiStatic.hLightBlur = CFontBuilder( DEFAULT_MENUFONT, UI_MED_CHAR_HEIGHT * scale, 1000 )
-			.SetHandleNum( QM_LIGHTBLUR )
-			.SetBlurParams( 2, 1.0f )
-			.Create();
+		if( !uiStatic.lowmemory )
+		{
+			uiStatic.hLightBlur = CFontBuilder( DEFAULT_MENUFONT, UI_MED_CHAR_HEIGHT * scale, 1000 )
+				.SetBlurParams( 2, 1.0f )
+				.Create();
 
-		uiStatic.hHeavyBlur = CFontBuilder( DEFAULT_MENUFONT, UI_MED_CHAR_HEIGHT * scale, 1000 )
-			.SetHandleNum( QM_HEAVYBLUR )
-			.SetBlurParams( 8, 1.75f )
-			.Create();
-#endif
+			uiStatic.hHeavyBlur = CFontBuilder( DEFAULT_MENUFONT, UI_MED_CHAR_HEIGHT * scale, 1000 )
+				.SetBlurParams( 8, 1.75f )
+				.Create();
+		}
+
 		uiStatic.hConsoleFont = CFontBuilder( DEFAULT_CONFONT, UI_CONSOLE_CHAR_HEIGHT * scale, 500 )
 			.SetOutlineSize()
 			.Create();

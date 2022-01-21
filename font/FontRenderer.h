@@ -54,10 +54,6 @@ enum EFontSizes
 	QM_SMALLFONT,       // small
 	QM_BIGFONT,         // big
 	QM_BOLDFONT,
-#ifdef MAINUI_RENDER_PICBUTTON_TEXT
-	QM_LIGHTBLUR,
-	QM_HEAVYBLUR
-#endif
 };
 
 class CFontBuilder

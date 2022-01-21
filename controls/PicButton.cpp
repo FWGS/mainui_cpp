@@ -46,9 +46,7 @@ CMenuPicButton::CMenuPicButton() : BaseClass()
 
 	SetSize( UI_BUTTONS_WIDTH, UI_BUTTONS_HEIGHT );
 
-#ifdef MAINUI_RENDER_PICBUTTON_TEXT
-	SetCharSize( QM_LIGHTBLUR );
-#endif
+	SetCharSize( QM_DEFAULTFONT );
 
 	TransPic = 0;
 	memset( TitleLerpQuads, 0, sizeof( TitleLerpQuads ));
@@ -221,64 +219,73 @@ void CMenuPicButton::Draw( )
 			}
 		}
 	}
-	else
+	else if( !uiStatic.lowmemory )
 	{
-		uint textflags = 0;
-#ifndef MAINUI_RENDER_PICBUTTON_TEXT
-		textflags |= ((iFlags & QMF_DROPSHADOW) ? ETF_SHADOW : 0 );
-#else
-		textflags |= ETF_ADDITIVE;
-#endif
+		uint textflags = ETF_NOSIZELIMIT | ETF_FORCECOL;
 
-		textflags |= ETF_NOSIZELIMIT | ETF_FORCECOL;
+		SetBits( textflags, ETF_ADDITIVE );
 
 		if( iFlags & QMF_GRAYED )
 		{
-#ifdef MAINUI_RENDER_PICBUTTON_TEXT
 			if( a > 0 )
 			{
 				UI_DrawString( uiStatic.hHeavyBlur, m_scPos, m_scSize, szName,
 					InterpColor( uiColorBlack, uiColorDkGrey, a / 255.0f ), m_scChSize, eTextAlignment, textflags );
 			}
-#endif
-			UI_DrawString( font, m_scPos, m_scSize, szName, uiColorDkGrey, m_scChSize, eTextAlignment, textflags );
-			return; // grayed
-		}
-
-		if(this != m_pParent->ItemAtCursor())
+			UI_DrawString( uiStatic.hLightBlur, m_scPos, m_scSize, szName, uiColorDkGrey, m_scChSize, eTextAlignment, textflags );
+		} else if( this != m_pParent->ItemAtCursor() )
 		{
-#ifdef MAINUI_RENDER_PICBUTTON_TEXT
 			if( a > 0 )
 			{
 				UI_DrawString( uiStatic.hHeavyBlur, m_scPos, m_scSize, szName,
 					InterpColor( uiColorBlack, colorBase, a / 255.0f ), m_scChSize, eTextAlignment, textflags );
 			}
-#endif
-			UI_DrawString( font, m_scPos, m_scSize, szName, colorBase, m_scChSize, eTextAlignment, textflags );
-			return; // no focus
+			UI_DrawString( uiStatic.hLightBlur, m_scPos, m_scSize, szName, colorBase, m_scChSize, eTextAlignment, textflags );
 		}
-
-		if( eFocusAnimation == QM_HIGHLIGHTIFFOCUS )
+		else if( m_bPressed )
 		{
-#ifdef MAINUI_RENDER_PICBUTTON_TEXT
 			UI_DrawString( uiStatic.hHeavyBlur, m_scPos, m_scSize, szName, colorBase, m_scChSize, eTextAlignment, textflags );
-			UI_DrawString( font, m_scPos, m_scSize, szName, colorBase, m_scChSize, eTextAlignment, textflags );
-#else
-			UI_DrawString( font, m_scPos, m_scSize, szName, colorFocus, m_scChSize, eTextAlignment, textflags );
-#endif
+			ClearBits( textflags, ETF_ADDITIVE );
+			UI_DrawString( uiStatic.hLightBlur, m_scPos, m_scSize, szName, 0xFF000000, m_scChSize, eTextAlignment, textflags );
+		}
+		else if( eFocusAnimation == QM_HIGHLIGHTIFFOCUS )
+		{
+			UI_DrawString( uiStatic.hHeavyBlur, m_scPos, m_scSize, szName, colorBase, m_scChSize, eTextAlignment, textflags );
+			UI_DrawString( uiStatic.hLightBlur, m_scPos, m_scSize, szName, colorBase, m_scChSize, eTextAlignment, textflags );
 		}
 		else if( eFocusAnimation == QM_PULSEIFFOCUS )
 		{
 			float pulsar = 0.5f + 0.5f * sin( (float)uiStatic.realTime / UI_PULSE_DIVISOR );
-#ifdef MAINUI_RENDER_PICBUTTON_TEXT
 
 			UI_DrawString( uiStatic.hHeavyBlur, m_scPos, m_scSize, szName,
 				InterpColor( uiColorBlack, colorBase, pulsar ), m_scChSize, eTextAlignment, textflags );
+			UI_DrawString( uiStatic.hLightBlur, m_scPos, m_scSize, szName, colorBase, m_scChSize, eTextAlignment, textflags );
+		}
+	}
+	else
+	{
+		uint textflags = ETF_NOSIZELIMIT | ETF_FORCECOL;
+
+		SetBits( textflags, (iFlags & QMF_DROPSHADOW) ? ETF_SHADOW : 0 );
+
+		if( iFlags & QMF_GRAYED )
+		{
+			UI_DrawString( font, m_scPos, m_scSize, szName, uiColorDkGrey, m_scChSize, eTextAlignment, textflags );
+		}
+		else if( this != m_pParent->ItemAtCursor() )
+		{
 			UI_DrawString( font, m_scPos, m_scSize, szName, colorBase, m_scChSize, eTextAlignment, textflags );
-#else
+		}
+		else if( eFocusAnimation == QM_HIGHLIGHTIFFOCUS )
+		{
+			UI_DrawString( font, m_scPos, m_scSize, szName, colorFocus, m_scChSize, eTextAlignment, textflags );
+		}
+		else if( eFocusAnimation == QM_PULSEIFFOCUS )
+		{
+			float pulsar = 0.5f + 0.5f * sin( (float)uiStatic.realTime / UI_PULSE_DIVISOR );
+
 			UI_DrawString( font, m_scPos, m_scSize, szName,
 				InterpColor( colorBase, colorFocus, pulsar ), m_scChSize, eTextAlignment, textflags );
-#endif
 		}
 	}
 
@@ -287,21 +294,17 @@ void CMenuPicButton::Draw( )
 
 void CMenuPicButton::SetPicture( EDefaultBtns ID )
 {
-#ifndef MAINUI_RENDER_PICBUTTON_TEXT
 	if( ID < 0 || ID > PC_BUTTONCOUNT )
 		return; // bad id
 
 	hPic = uiStatic.buttonsPics[ID];
 
 	button_id = ID;
-#endif
 }
 
 void CMenuPicButton::SetPicture( const char *filename )
 {
-#ifndef MAINUI_RENDER_PICBUTTON_TEXT
 	hPic = EngFuncs::PIC_Load( filename );
-#endif
 }
 
 // =========================== Animations ===========================
