@@ -159,7 +159,7 @@ void CWindowStack::Update( )
 	{
 		CMenuBaseWindow *window = drawList[k];
 
-		if( window->eTransitionType > CMenuBaseWindow::ANIM_OUT )
+		if( window->eTransitionType > CMenuBaseWindow::ANIM_CLOSING )
 		{
 			if( window->DrawAnimation( ) )
 				window->DisableTransition();
@@ -172,7 +172,7 @@ void CWindowStack::Update( )
 		{
 			window = drawList[k+1];
 
-			if( window->eTransitionType == CMenuBaseWindow::ANIM_OUT )
+			if( window->eTransitionType == CMenuBaseWindow::ANIM_CLOSING )
 			{
 				if( window->DrawAnimation( ) )
 					window->DisableTransition();
@@ -235,7 +235,7 @@ void CWindowStack::Add( CMenuBaseWindow *menu )
 	{
 		if( stack[active]->IsRoot() && menu->IsRoot() )
 		{
-			stack[active]->EnableTransition( CMenuBaseWindow::ANIM_OUT );
+			stack[active]->EnableTransition( CMenuBaseWindow::ANIM_CLOSING );
 		}
 	}
 
@@ -286,7 +286,7 @@ void CWindowStack::Remove( CMenuBaseWindow *menu )
 				active = i; // maybe isn't best solution
 
 				if( stack[active]->IsRoot() && menu->IsRoot() )
-					stack[active]->EnableTransition( CMenuBaseWindow::ANIM_IN );
+					stack[active]->EnableTransition( CMenuBaseWindow::ANIM_OPENING );
 
 				break;
 			}

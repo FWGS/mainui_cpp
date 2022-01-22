@@ -131,7 +131,7 @@ void CMenuBackgroundBitmap::Draw()
 		{
 			alphaFactor.Override();
 
-			if( window->eTransitionType == CMenuBaseWindow::ANIM_OUT )
+			if( window->eTransitionType == CMenuBaseWindow::ANIM_CLOSING )
 				return;
 		}
 	}

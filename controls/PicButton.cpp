@@ -492,7 +492,7 @@ bool CMenuPicButton::DrawTitleAnim( CMenuBaseWindow::EAnimation state )
 		return true;
 	}
 
-	if( state == CMenuBaseWindow::ANIM_OUT )
+	if( state == CMenuBaseWindow::ANIM_CLOSING )
 		return false; // but request more frame for animation
 
 	if( !s_hCurrentTransPic )

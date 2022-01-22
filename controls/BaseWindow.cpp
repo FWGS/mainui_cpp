@@ -58,7 +58,7 @@ void CMenuBaseWindow::Show()
 		break;
 	}
 #endif
-	EnableTransition( ANIM_IN );
+	EnableTransition( ANIM_OPENING );
 }
 
 void CMenuBaseWindow::Hide()
@@ -69,7 +69,7 @@ void CMenuBaseWindow::Hide()
 	}
 
 	m_pStack->Remove( this );
-	EnableTransition( ANIM_OUT );
+	EnableTransition( ANIM_CLOSING );
 }
 
 bool CMenuBaseWindow::IsVisible() const
@@ -133,17 +133,17 @@ bool CMenuBaseWindow::DrawAnimation()
 {
 	float alpha;
 
-	if( eTransitionType == ANIM_IN )
+	if( eTransitionType == ANIM_OPENING )
 	{
 		alpha = ( uiStatic.realTime - m_iTransitionStartTime ) / TTT_PERIOD;
 	}
-	else if( eTransitionType == ANIM_OUT )
+	else if( eTransitionType == ANIM_CLOSING )
 	{
 		alpha = 1.0f - ( uiStatic.realTime - m_iTransitionStartTime ) / TTT_PERIOD;
 	}
 
-	if(        ( eTransitionType == ANIM_IN  && alpha < 1.0f )
-		|| ( eTransitionType == ANIM_OUT && alpha > 0.0f ) )
+	if(        ( eTransitionType == ANIM_OPENING  && alpha < 1.0f )
+		|| ( eTransitionType == ANIM_CLOSING && alpha > 0.0f ) )
 	{
 		UI_EnableAlphaFactor( alpha );
 
