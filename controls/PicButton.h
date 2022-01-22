@@ -43,33 +43,8 @@ public:
 
 	bool bEnableTransitions;
 	bool bPulse;
-
-	static bool DrawTitleAnim( CMenuBaseWindow::EAnimation anim );
-	static void ClearButtonStack( void );
-	static float GetTitleTransFraction( void );
-
-	static void SetupTitleQuadForLast( int x,int y, int w, int h);
-	static void SetTransPicForLast( HIMAGE pic );
-
-	void SetupTitleQuad( int x,int y, int w, int h);
-	void SetTransPic( HIMAGE pic );
-
-	static void RootChanged( bool isForward );
 private:
 	bool bRollOver;
-
-	enum animState_e { AS_TO_TITLE = 0, AS_TO_BUTTON };
-	struct Quad
-	{
-		Quad(): x(0), y(0), lx(0), ly(0) {}
-		float x, y, lx, ly;
-	};
-
-	static void SetTitleAnim( int state );
-	void TACheckMenuDepth( void );
-	void PushPButtonStack( void );
-	static void PopPButtonStack( void );
-	static const char *GetLastButtonText( void );
 
 	void DrawButton( int r, int g, int b, int a, wrect_t *rects, int state );
 
@@ -77,21 +52,6 @@ private:
 	int button_id;
 	int iFocusStartTime;
 	int iOldState;
-
-	Quad TitleLerpQuads[2];
-	HIMAGE TransPic;
-
-	static CMenuPicButton *temp;
-
-	static Quad LerpQuad( Quad a, Quad b, float frac );
-
-	static int transition_initial_time;
-	static int transition_state;
-
-	static HIMAGE s_hCurrentTransPic;
-	static wrect_t s_pCurrentTransRect;
-	static Quad s_CurrentLerpQuads[2];
-	friend class CMenuBannerBitmap;
 };
 
 #endif

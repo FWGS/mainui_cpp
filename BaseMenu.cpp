@@ -596,7 +596,6 @@ UI_CloseMenu
 void UI_CloseMenu( void )
 {
 	uiStatic.menu.Clean();
-	CMenuPicButton::ClearButtonStack();
 
 //	EngFuncs::KEY_ClearStates ();
 	if( !uiStatic.client.IsActive() )
@@ -1153,9 +1152,6 @@ void UI_Init( void )
 
 	// trying to load colors.lst
 	UI_ApplyCustomColors ();
-
-	//CR
-	CMenuPicButton::ClearButtonStack();
 }
 
 /*

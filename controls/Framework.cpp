@@ -33,7 +33,6 @@ CMenuFramework::~CMenuFramework()
 
 void CMenuFramework::Show()
 {
-	CMenuPicButton::RootChanged( true );
 	BaseClass::Show();
 }
 
@@ -77,11 +76,6 @@ void CMenuFramework::Draw()
 void CMenuFramework::Hide()
 {
 	BaseClass::Hide();
-
-	if( m_pStack->Current() && m_pStack->Current()->IsRoot() )
-	{
-		CMenuPicButton::RootChanged( false );
-	}
 }
 
 void CMenuFramework::Init()
@@ -150,12 +144,6 @@ CMenuPicButton * CMenuFramework::AddButton(const char *szName, const char *szSta
 bool CMenuFramework::DrawAnimation()
 {
 	bool b = CMenuBaseWindow::DrawAnimation( );
-
-#ifndef CS16CLIENT
-	if( IsRoot() )
-		b = CMenuPicButton::DrawTitleAnim( eTransitionType );
-#endif
-
 	return b;
 }
 

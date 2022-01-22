@@ -74,7 +74,6 @@ public:
 		SetRenderMode( QM_DRAWADDITIVE );
 	}
 	void Draw( void ) override;
-	void VidInit( void ) override;
 	void SetInactive(bool) override { }
 	void ToggleInactive() override { }
 };
