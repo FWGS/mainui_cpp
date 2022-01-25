@@ -83,8 +83,8 @@ bool CMenuAction::KeyUp( int key )
 
 	if( sound )
 	{
-		_Event( QM_PRESSED );
-		PlayLocalSound( sound );
+		_Event( QM_RELEASED );
+		//PlayLocalSound( sound );
 	}
 
 	return sound != NULL;
@@ -100,7 +100,10 @@ bool CMenuAction::KeyDown( int key )
 		handled = true;
 
 	if( handled )
+		{
+		PlayLocalSound( uiSoundLaunch );
 		_Event( QM_PRESSED );
+		}
 
 	return handled;
 }

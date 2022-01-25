@@ -685,7 +685,7 @@ void UI_UpdateMenu( float flTime )
 
 	// delay playing the enter sound until after the menu has been
 	// drawn, to avoid delay while caching images
-	if( uiStatic.enterSound > 0.0f && uiStatic.enterSound <= gpGlobals->time )
+	if( uiStatic.enterSound > 0.0f /*&& uiStatic.enterSound <= gpGlobals->time okay, see.. I don't know if this fix is okay, maybe the devs know a better solution maybe this fix IS okay, but it gets rid of the delay! */ )
 	{
 		EngFuncs::PlayLocalSound( uiSoundIn );
 		uiStatic.enterSound = -1;

@@ -73,7 +73,7 @@ bool CMenuPicButton::KeyUp( int key )
 #if !defined(TA_ALT_MODE2)
 		SetTransPicForLast( hPic );
 #endif
-		PlayLocalSound( sound );
+		//PlayLocalSound( sound );
 	}
 
 	return sound != NULL;
@@ -89,7 +89,10 @@ bool CMenuPicButton::KeyDown( int key )
 		handled = true;
 
 	if( handled )
+		{
+		PlayLocalSound( uiSoundLaunch );
 		_Event( QM_PRESSED );
+		}
 
 	return handled;
 }
