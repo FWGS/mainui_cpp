@@ -210,7 +210,7 @@ void CMenuVidOptions::_Init( void )
 
 	gammaIntensity.LinkCvar( "gamma" );
 	glareReduction.LinkCvar( "brightness" );
-	vbo.LinkCvar( "r_vbo" );
+	vbo.LinkCvar( "gl_vbo" );
 }
 
 void CMenuVidOptions::_VidInit()
