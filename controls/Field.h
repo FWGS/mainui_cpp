@@ -48,6 +48,7 @@ public:
 		Q_strncpy( szBuffer, buffer, UI_MAX_FIELD_LINE );
 		iCursor = strlen( szBuffer );
 		iScroll = g_FontMgr->CutText( font, szBuffer, m_scChSize, iRealWidth, true );
+		SetCvarString( szBuffer );
 	}
 
 	const char *GetBuffer()
