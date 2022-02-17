@@ -116,7 +116,7 @@ void CFontManager::DeleteFont(HFont hFont)
 	CBaseFont *font = GetIFontFromHandle(hFont);
 	if( font )
 	{
-		m_Fonts[hFont] = NULL;
+		m_Fonts[hFont-1] = NULL;
 
 		delete font;
 	}
