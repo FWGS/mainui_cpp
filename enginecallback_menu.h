@@ -283,6 +283,9 @@ public:
 
 	static inline char*	COM_ParseFile( char *data, char *token, const int size, int flags, int *len )
 	{ return textfuncs.pfnParseFile( data, token, size, flags, len ); }
+
+	static inline const char *NET_AdrToString( const netadr_t adr )
+	{ return textfuncs.pfnAdrToString( adr ); }
 };
 
 

@@ -364,6 +364,8 @@ void CMenuGameListModel::AddServerToList(netadr_t adr, const char *info)
 
 void CMenuServerBrowser::Connect( server_t &server )
 {
+	char buf[256];
+
 	// prevent refresh during connect
 	menu_internetgames->refreshTime = uiStatic.realTime + 999999;
 
@@ -391,9 +393,12 @@ void CMenuServerBrowser::Connect( server_t &server )
 
 	staticWaitingPassword = false;
 
-	//BUGBUG: ClientJoin not guaranted to return, need use ClientCmd instead!!!
-	//BUGBUG: But server addres is known only as netadr_t here!!!
-	EngFuncs::ClientJoin( server.adr );
+	snprintf( buf, sizeof( buf ), "connect %s %s",
+		EngFuncs::NET_AdrToString( server.adr ),
+		server.isLegacy ? "legacy" : "" );
+	buf[sizeof( buf ) - 1] = 0;
+
+	EngFuncs::ClientCmd( FALSE, buf );
 	UI_ConnectionProgress_Connect( "" );
 }
 
