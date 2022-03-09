@@ -204,7 +204,7 @@ void CMenuPicButton::Draw( )
 
 	int a = (512 - (uiStatic.realTime - m_iLastFocusTime)) >> 1;
 
-	if( hPic )
+	if( hPic && !uiStatic.renderPicbuttonText )
 	{
 		int r, g, b;
 

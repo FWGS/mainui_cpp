@@ -1150,6 +1150,8 @@ void UI_Init( void )
 	// setup game info
 	EngFuncs::GetGameInfo( &gMenu.m_gameinfo );
 
+	uiStatic.renderPicbuttonText = gMenu.m_gameinfo.flags & GFL_RENDER_PICBUTTON_TEXT;
+
 	// trying to load colors.lst
 	UI_ApplyCustomColors ();
 }

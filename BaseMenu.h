@@ -127,8 +127,8 @@ typedef struct
 	int xOffset, yOffset;
 
 	bool needMapListUpdate;
-
 	bool nextFrameActive;
+	bool renderPicbuttonText;
 
 	int lowmemory;
 } uiStatic_t;
