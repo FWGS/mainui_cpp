@@ -53,7 +53,7 @@ public:
 	virtual bool DrawAnimation();
 
 	// Check current window is a root
-	virtual bool IsRoot() { return false; }
+	virtual bool IsRoot() const { return false; }
 
 	// Hide current window and save changes
 	virtual void SaveAndPopMenu();

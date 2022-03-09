@@ -195,6 +195,7 @@ struct Rect
 		pt( x, y ), sz( w, h ) { }
 	Rect( Point pt, Size sz ) :
 		pt( pt ), sz( sz ) { }
+	Rect() : pt(), sz() { }
 
 	// true if this rect overlaps
 	// false otherwise
@@ -209,6 +210,16 @@ struct Rect
 		    l2.y >= l1.y && r2.y <= r1.y )
 			return true;
 		return false;
+	}
+
+	static Rect Lerp( Rect a, Rect b, float frac )
+	{
+		Rect c = a;
+
+		c.pt = c.pt + ( b.pt - a.pt ) * frac;
+		c.sz = c.sz + ( b.sz - a.sz ) * frac;
+
+		return c;
 	}
 
 	Point pt;

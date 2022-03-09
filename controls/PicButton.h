@@ -46,6 +46,8 @@ public:
 private:
 	bool bRollOver;
 
+	void CheckWindowChanged( void );
+
 	void DrawButton( int r, int g, int b, int a, wrect_t *rects, int state );
 
 	HIMAGE hPic;

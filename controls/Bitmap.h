@@ -55,28 +55,4 @@ protected:
 	ERenderMode ePressRenderMode;
 };
 
-// menu banners used fiexed rectangle (virtual screenspace at 640x480)
-#define UI_BANNER_POSX		72
-#define UI_BANNER_POSY		72
-#define UI_BANNER_WIDTH		736
-#define UI_BANNER_HEIGHT		128
-
-class CMenuBannerBitmap : public CMenuBitmap
-{
-public:
-	typedef CMenuBitmap BaseClass;
-
-	CMenuBannerBitmap() : BaseClass()
-	{
-		iFlags = QMF_INACTIVE;
-		SetCharSize( QM_BIGFONT );
-		SetRect( UI_BANNER_POSX, UI_BANNER_POSY, UI_BANNER_WIDTH, UI_BANNER_HEIGHT );
-		SetRenderMode( QM_DRAWADDITIVE );
-	}
-	void Draw( void ) override;
-	void SetInactive(bool) override { }
-	void ToggleInactive() override { }
-};
-
-
 #endif // MENU_BITMAP_H

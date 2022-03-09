@@ -22,6 +22,7 @@ GNU General Public License for more details.
 #include "Scissor.h"
 #include "BtnsBMPTable.h"
 #include <stdlib.h>
+#include "Framework.h"
 
 CMenuPicButton::CMenuPicButton() : BaseClass()
 {
@@ -62,9 +63,53 @@ bool CMenuPicButton::KeyUp( int key )
 	{
 		_Event( QM_RELEASED );
 		PlayLocalSound( sound );
+
+		CheckWindowChanged();
 	}
 
 	return sound != NULL;
+}
+
+void CMenuPicButton::CheckWindowChanged()
+{
+	// parent is not a window, ignore
+	if( !m_pParent->IsWindow())
+		return;
+
+	CMenuBaseWindow *parentWindow = (CMenuBaseWindow*)m_pParent;
+	CMenuBaseWindow *newWindow = parentWindow->WindowStack()->Current();
+
+	// menu is closed, ignore
+	if( !newWindow )
+		return;
+
+	// no change, ignore
+	if( parentWindow == newWindow )
+		return;
+
+	// parent and new are not a root windows, ignore
+	if( !parentWindow->IsRoot() || !newWindow->IsRoot() )
+		return;
+
+	// decide transition direction
+	if( FBitSet( parentWindow->iFlags, QMF_CLOSING ))
+	{
+		// our parent window is closing right now
+		// play backward animation
+		// Con_NPrintf( 10, "%s banner down", parentWindow->szName );
+
+		CMenuFramework *f = (CMenuFramework*)parentWindow;
+		f->PrepareBannerAnimation( CMenuFramework::ANIM_CLOSING, nullptr );
+	}
+	else
+	{
+		// new window overlaps parent window
+		// play forward animation
+		// Con_NPrintf( 10, "%s banner up", newWindow->szName );
+
+		CMenuFramework *f = (CMenuFramework*)newWindow;
+		f->PrepareBannerAnimation( CMenuFramework::ANIM_OPENING, this );
+	}
 }
 
 bool CMenuPicButton::KeyDown( int key )

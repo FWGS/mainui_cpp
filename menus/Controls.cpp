@@ -103,9 +103,6 @@ private:
 		Hide();
 	}
 
-	CMenuBannerBitmap banner;
-
-
 	// redefine key wait dialog
 	class CGrabKeyMessageBox : public CMenuMessageBox
 	{

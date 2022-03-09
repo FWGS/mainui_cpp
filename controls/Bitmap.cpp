@@ -128,17 +128,3 @@ void CMenuBitmap::Draw( void )
 		break;
 	}
 }
-
-void CMenuBannerBitmap::Draw()
-{
-#ifdef CS16CLIENT
-	const char *text = CMenuPicButton::GetLastButtonText();
-
-	if( !text )
-		return;
-
-	UI_DrawString( uiStatic.hBigFont, m_scPos, m_scSize, text, uiPromptTextColor, m_scChSize, QM_LEFT, ETF_SHADOW | ETF_NOSIZELIMIT );
-#else
-	BaseClass::Draw();
-#endif
-}
