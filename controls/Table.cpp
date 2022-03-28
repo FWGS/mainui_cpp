@@ -37,6 +37,7 @@ CMenuTable::CMenuTable() : BaseClass(),
 	m_pModel( NULL )
 {
 	memset( szHeaderTexts, 0, sizeof(szHeaderTexts) );
+	memset( columns, 0, sizeof(columns) );
 	eFocusAnimation = QM_HIGHLIGHTIFFOCUS;
 	SetCharSize( QM_SMALLFONT );
 	bDrawStroke = true;
