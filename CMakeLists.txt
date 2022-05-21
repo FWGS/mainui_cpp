@@ -34,6 +34,10 @@ option(MAINUI_USE_CUSTOM_FONT_RENDER "Use custom font rendering" ON)
 option(MAINUI_USE_STB "Use stb_truetype.h for rendering(*nix-only)" OFF)
 option(MAINUI_FONT_SCALE "Scale fonts by height" OFF)
 
+if(NOT XASH_SDK)
+	set(XASH_SDK "../")
+endif()
+
 file(GLOB MAINUI_CONTROLS_SOURCES "controls/*.cpp")
 file(GLOB MAINUI_MENUS_SOURCES "menus/*.cpp" "menus/dynamic/*.cpp")
 file(GLOB MAINUI_FONT_RENDER_SOURCES "font/*.cpp")
@@ -60,10 +64,6 @@ if(NOT WIN32 AND NOT MINGW)
 else()
 	# Only for MSVC6 compatibility mode! Newer VC does fail with this define
 	# add_definitions(-DMY_COMPILER_SUCKS)
-endif()
-
-if(NOT XASH_SDK)
-	set(XASH_SDK "../")
 endif()
 
 if(XASH_SAILFISH)
