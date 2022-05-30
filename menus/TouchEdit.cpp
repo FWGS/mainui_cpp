@@ -88,7 +88,7 @@ bool CMenuTouchEdit::KeyDown( int key )
 	if( UI::Key::IsEscape( key ) )
 	{
 		Hide();
-		PlayLocalSound( uiSoundOut );
+		PlayLocalSound( uiStatic.sounds[SND_OUT] );
 		return true;
 	}
 	return false;

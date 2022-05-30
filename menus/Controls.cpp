@@ -307,7 +307,7 @@ bool CMenuControls::CGrabKeyMessageBox::KeyUp( int key )
 	if( key == '`' || key == '~' || key == K_ESCAPE )
 	{
 		Hide();
-		PlayLocalSound( uiSoundBuzz );
+		PlayLocalSound( uiStatic.sounds[SND_BUZZ] );
 		return true;
 	}
 	else
@@ -323,7 +323,7 @@ bool CMenuControls::CGrabKeyMessageBox::KeyUp( int key )
 
 	Hide();
 
-	PlayLocalSound( uiSoundLaunch );
+	PlayLocalSound( uiStatic.sounds[SND_LAUNCH] );
 
 	return true;
 }
@@ -337,14 +337,14 @@ void CMenuControls::UnbindEntry()
 {
 	if( !keysListModel.IsLineUsable( keysList.GetCurrentIndex() ) )
 	{
-		PlayLocalSound( uiSoundBuzz );
+		PlayLocalSound( uiStatic.sounds[SND_BUZZ] );
 		return; // not a key
 	}
 
 	const char *bindName = keysListModel.keysBind[keysList.GetCurrentIndex()];
 
 	UnbindCommand( bindName );
-	PlayLocalSound( uiSoundRemoveKey );
+	PlayLocalSound( uiStatic.sounds[SND_REMOVEKEY] );
 	keysListModel.Update();
 
 	// disabled: left command just unbinded
@@ -355,7 +355,7 @@ void CMenuControls::EnterGrabMode()
 {
 	if( !keysListModel.IsLineUsable( keysList.GetCurrentIndex() ) )
 	{
-		PlayLocalSound( uiSoundBuzz );
+		PlayLocalSound( uiStatic.sounds[SND_BUZZ] );
 		return;
 	}
 
@@ -370,7 +370,7 @@ void CMenuControls::EnterGrabMode()
 
 	msgBox1.Show();
 
-	PlayLocalSound( uiSoundKey );
+	PlayLocalSound( uiStatic.sounds[SND_KEY] );
 }
 
 /*

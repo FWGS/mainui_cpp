@@ -65,7 +65,7 @@ void CMenuBaseWindow::Hide()
 {
 	if( m_pStack == &uiStatic.menu ) // hack!
 	{
-		EngFuncs::PlayLocalSound( uiSoundOut );
+		EngFuncs::PlayLocalSound( uiStatic.sounds[SND_OUT] );
 	}
 
 	m_pStack->Remove( this );
@@ -98,7 +98,7 @@ bool CMenuBaseWindow::KeyDown( int key )
 	if( UI::Key::IsEscape( key ) )
 	{
 		Hide( );
-		PlayLocalSound( uiSoundOut );
+		PlayLocalSound( uiStatic.sounds[SND_OUT] );
 		return true;
 	}
 

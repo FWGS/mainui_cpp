@@ -77,9 +77,9 @@ bool CMenuAction::KeyUp( int key )
 	const char *sound = 0;
 
 	if( UI::Key::IsEnter( key ) && !(iFlags & QMF_MOUSEONLY) )
-		sound = uiSoundLaunch;
+		sound = uiStatic.sounds[SND_LAUNCH];
 	else if( UI::Key::IsLeftMouse( key ) && ( iFlags & QMF_HASMOUSEFOCUS ) )
-		sound = uiSoundLaunch;
+		sound = uiStatic.sounds[SND_LAUNCH];
 
 	if( sound )
 	{

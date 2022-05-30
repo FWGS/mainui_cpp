@@ -40,23 +40,27 @@ cvar_t		*ui_language;
 uiStatic_t	uiStatic;
 static CMenuEntry	*s_pEntries = NULL;
 
+const char	*uiSoundOldPrefix	= "media/";
+const char	*uiSoundNewPrefix	= "sound/common/";
+const char	*uiSounds[] = {
 #ifdef CS16CLIENT
-const char	*uiSoundIn			= "";
-const char	*uiSoundOut         = "";
-const char	*uiSoundLaunch      = "sound/UI/buttonclickrelease.wav";
-const char	*uiSoundRollOver	= "sound/UI/buttonrollover.wav";
+	"",
+	"",
+	"sound/UI/buttonclickrelease.wav",
+	"sound/UI/buttonrollover.wav",
 #else
-const char	*uiSoundIn			= "media/launch_upmenu1.wav";
-const char	*uiSoundOut			= "media/launch_dnmenu1.wav";
-const char	*uiSoundLaunch		= "media/launch_select2.wav";
-const char	*uiSoundRollOver	= "";
+	"media/launch_upmenu1.wav",
+	"media/launch_dnmenu1.wav",
+	"media/launch_select2.wav",
+	"",
 #endif
-const char	*uiSoundGlow        = "media/launch_glow1.wav";
-const char	*uiSoundBuzz        = "media/launch_deny2.wav";
-const char	*uiSoundKey         = "media/launch_select1.wav";
-const char	*uiSoundRemoveKey   = "media/launch_deny1.wav";
-const char	*uiSoundMove        = "";		// Xash3D not use movesound
-const char	*uiSoundNull        = "";
+	"media/launch_glow1.wav",
+	"media/launch_deny2.wav",
+	"media/launch_select1.wav",
+	"media/launch_deny1.wav",
+	"",
+	""
+};
 
 // they match default WON colors.lst now, except alpha
 unsigned int		uiColorHelp         = 0xFF7F7F7F;	// 127, 127, 127, 255	// hint letters color
@@ -686,7 +690,7 @@ void UI_UpdateMenu( float flTime )
 	// drawn, to avoid delay while caching images
 	if( uiStatic.enterSound > 0.0f && uiStatic.enterSound <= gpGlobals->time )
 	{
-		EngFuncs::PlayLocalSound( uiSoundIn );
+		EngFuncs::PlayLocalSound( uiStatic.sounds[SND_IN] );
 		uiStatic.enterSound = -1;
 	}
 
@@ -991,7 +995,29 @@ static void UI_LoadBackgroundMapList( void )
 	EngFuncs::COM_FreeFile( afile );
 }
 
+static void UI_LoadSounds( void )
+{
+	memset( uiStatic.sounds, 0, sizeof( uiStatic.sounds ) );
 
+	if ( uiStatic.lowmemory )
+		return;
+
+	for ( int i = 0; i < SND_COUNT; i++ )
+	{
+		if ( !uiSounds[i] || *uiSounds[i] == '\0' )
+			continue;
+
+		if ( !EngFuncs::FileExists( uiSounds[i] ) )
+		{
+			size_t len = strlen( uiSoundOldPrefix );
+
+			if ( !strncmp( uiSounds[i], uiSoundOldPrefix, len ) )
+				snprintf( uiStatic.sounds[i], sizeof( uiStatic.sounds[i] ), "%s%s", uiSoundNewPrefix, uiSounds[i] + len );
+		}
+		else
+			Q_strncpy( uiStatic.sounds[i], uiSounds[i], sizeof( uiStatic.sounds[i] ) );
+	}
+}
 
 /*
 =================
@@ -1046,6 +1072,9 @@ int UI_VidInit( void )
 
 	// VidInit FontManager
 	g_FontMgr->VidInit();
+
+	// load button sounds
+	UI_LoadSounds();
 
 	uiStatic.menu.VidInit( calledOnce );
 

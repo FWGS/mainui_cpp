@@ -77,6 +77,21 @@ extern cvar_t   *ui_show_window_stack;
 extern cvar_t	*ui_borderclip;
 extern cvar_t	*ui_language;
 
+enum EUISounds
+{
+	SND_IN = 0,
+	SND_OUT,
+	SND_LAUNCH,
+	SND_ROLLOVER,
+	SND_GLOW,
+	SND_BUZZ,
+	SND_KEY,
+	SND_REMOVEKEY,
+	SND_MOVE,
+	SND_NULL,
+	SND_COUNT
+};
+
 typedef struct
 {
 	CWindowStack menu;
@@ -131,6 +146,8 @@ typedef struct
 	bool renderPicbuttonText;
 
 	int lowmemory;
+
+	char sounds[SND_COUNT][40];
 } uiStatic_t;
 
 extern float	cursorDY;			// use for touch scroll
@@ -138,17 +155,6 @@ extern bool g_bCursorDown;
 extern uiStatic_t		uiStatic;
 
 #define DLG_X ((uiStatic.width - 640) / 2 - 192) // Dialogs are 640px in width
-
-extern const char		*uiSoundIn;
-extern const char		*uiSoundRollOver;
-extern const char		*uiSoundOut;
-extern const char		*uiSoundKey;
-extern const char		*uiSoundRemoveKey;
-extern const char		*uiSoundLaunch;
-extern const char		*uiSoundBuzz;
-extern const char		*uiSoundGlow;
-extern const char		*uiSoundMove;
-extern const char		*uiSoundNull;
 
 extern unsigned int	uiColorHelp;
 extern unsigned int	uiPromptBgColor;

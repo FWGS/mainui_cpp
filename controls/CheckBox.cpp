@@ -63,7 +63,7 @@ bool CMenuCheckBox::KeyUp( int key )
 	case K_MOUSE1:
 		if(!( iFlags & QMF_HASMOUSEFOCUS ))
 			break;
-		sound = uiSoundGlow;
+		sound = uiStatic.sounds[SND_GLOW];
 		break;
 	case K_ENTER:
 	case K_KP_ENTER:
@@ -71,7 +71,7 @@ bool CMenuCheckBox::KeyUp( int key )
 		//if( !down ) return sound;
 		if( iFlags & QMF_MOUSEONLY )
 			break;
-		sound = uiSoundGlow;
+		sound = uiStatic.sounds[SND_GLOW];
 		break;
 	}
 
@@ -99,7 +99,7 @@ bool CMenuCheckBox::KeyDown( int key )
 	case K_MOUSE1:
 		if(!( iFlags & QMF_HASMOUSEFOCUS ))
 			break;
-		sound = uiSoundGlow;
+		sound = uiStatic.sounds[SND_GLOW];
 		break;
 	case K_ENTER:
 	case K_KP_ENTER:
@@ -107,7 +107,7 @@ bool CMenuCheckBox::KeyDown( int key )
 		//if( !down ) return sound;
 		if( iFlags & QMF_MOUSEONLY )
 			break;
-		sound = uiSoundGlow;
+		sound = uiStatic.sounds[SND_GLOW];
 		break;
 	}
 

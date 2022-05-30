@@ -114,7 +114,7 @@ bool CMenuItemsHolder::Key( const int key, const bool down )
 				if( cursorPrev != m_iCursor )
 				{
 					CursorMoved();
-					m_pItems[m_iCursor]->PlayLocalSound( uiSoundMove );
+					m_pItems[m_iCursor]->PlayLocalSound( uiStatic.sounds[SND_MOVE] );
 					handled = true;
 
 					m_pItems[m_iCursorPrev]->iFlags &= ~QMF_HASKEYBOARDFOCUS;
@@ -140,7 +140,7 @@ bool CMenuItemsHolder::Key( const int key, const bool down )
 				if( cursorPrev != m_iCursor )
 				{
 					CursorMoved();
-					m_pItems[m_iCursor]->PlayLocalSound( uiSoundMove );
+					m_pItems[m_iCursor]->PlayLocalSound( uiStatic.sounds[SND_MOVE] );
 					handled = true;
 
 					m_pItems[m_iCursorPrev]->iFlags &= ~QMF_HASKEYBOARDFOCUS;
@@ -240,7 +240,7 @@ bool CMenuItemsHolder::MouseMove( int x, int y )
 			if( m_iCursorPrev != -1 )
 				m_pItems[m_iCursorPrev]->iFlags &= ~(QMF_HASMOUSEFOCUS|QMF_HASKEYBOARDFOCUS);
 
-			m_pItems[m_iCursor]->PlayLocalSound( uiSoundMove );
+			m_pItems[m_iCursor]->PlayLocalSound( uiStatic.sounds[SND_MOVE] );
 		}
 
 		m_pItems[m_iCursor]->iFlags |= QMF_HASMOUSEFOCUS;

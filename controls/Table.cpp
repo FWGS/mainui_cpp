@@ -193,14 +193,14 @@ bool CMenuTable::KeyUp( int key )
 		if( UI_CursorInRect( upArrow, arrow ) )
 		{
 			if( MoveView( -5 ) )
-				sound = uiSoundMove;
-			else sound = uiSoundBuzz;
+				sound = uiStatic.sounds[SND_MOVE];
+			else sound = uiStatic.sounds[SND_BUZZ];
 		}
 		else if( UI_CursorInRect( downArrow, arrow ))
 		{
 			if( MoveView( 5 ) )
-				sound = uiSoundMove;
-			else sound = uiSoundBuzz;
+				sound = uiStatic.sounds[SND_MOVE];
+			else sound = uiStatic.sounds[SND_BUZZ];
 		}
 		else if( UI_CursorInRect( boxPos, boxSize ))
 		{
@@ -224,7 +224,7 @@ bool CMenuTable::KeyUp( int key )
 					else
 					{
 						iCurItem = newCur;
-						sound = uiSoundNull;
+						sound = uiStatic.sounds[SND_NULL];
 					}
 
 					m_iLastItemMouseChange = uiStatic.realTime;
@@ -280,7 +280,7 @@ bool CMenuTable::KeyUp( int key )
 
 	if( sound )
 	{
-		if( sound != uiSoundBuzz )
+		if( sound != uiStatic.sounds[SND_BUZZ] )
 			_Event( QM_CHANGED );
 
 		PlayLocalSound( sound );
@@ -336,40 +336,40 @@ bool CMenuTable::KeyDown( int key )
 		if( iCurItem )
 		{
 			iCurItem = 0;
-			sound = uiSoundMove;
+			sound = uiStatic.sounds[SND_MOVE];
 		}
-		else sound = uiSoundBuzz;
+		else sound = uiStatic.sounds[SND_BUZZ];
 		break;
 	case K_END:
 	case K_KP_END:
 		if( iCurItem != m_pModel->GetRows() - 1 )
 		{
 			iCurItem = m_pModel->GetRows() - 1;
-			sound = uiSoundMove;
+			sound = uiStatic.sounds[SND_MOVE];
 		}
-		else sound = uiSoundBuzz;
+		else sound = uiStatic.sounds[SND_BUZZ];
 		break;
 	case K_PGDN:
 	case K_KP_PGDN:
 	case K_R1_BUTTON:
-		sound = MoveCursor( 2 ) ? uiSoundMove : uiSoundBuzz;
+		sound = MoveCursor( 2 ) ? uiStatic.sounds[SND_MOVE] : uiStatic.sounds[SND_BUZZ];
 		break;
 	case K_PGUP:
 	case K_KP_PGUP:
 	case K_L1_BUTTON:
-		sound = MoveCursor( -2 ) ? uiSoundMove : uiSoundBuzz;
+		sound = MoveCursor( -2 ) ? uiStatic.sounds[SND_MOVE] : uiStatic.sounds[SND_BUZZ];
 		break;
 	case K_UPARROW:
 	case K_KP_UPARROW:
 	case K_DPAD_UP:
 	case K_MWHEELUP:
-		sound = MoveCursor( -1 ) ? uiSoundMove : uiSoundBuzz;
+		sound = MoveCursor( -1 ) ? uiStatic.sounds[SND_MOVE] : uiStatic.sounds[SND_BUZZ];
 		break;
 	case K_DOWNARROW:
 	case K_KP_DOWNARROW:
 	case K_DPAD_DOWN:
 	case K_MWHEELDOWN:
-		sound = MoveCursor( 1 ) ? uiSoundMove : uiSoundBuzz;
+		sound = MoveCursor( 1 ) ? uiStatic.sounds[SND_MOVE] : uiStatic.sounds[SND_BUZZ];
 		break;
 	case K_BACKSPACE:
 	case K_DEL:
@@ -392,7 +392,7 @@ bool CMenuTable::KeyDown( int key )
 
 	if( sound )
 	{
-		if( sound != uiSoundBuzz )
+		if( sound != uiStatic.sounds[SND_BUZZ] )
 			_Event( QM_CHANGED );
 
 		PlayLocalSound( sound );
