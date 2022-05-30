@@ -1012,10 +1012,10 @@ static void UI_LoadSounds( void )
 			size_t len = strlen( uiSoundOldPrefix );
 
 			if ( !strncmp( uiSounds[i], uiSoundOldPrefix, len ) )
-				sprintf( uiStatic.sounds[i], "%s%s", uiSoundNewPrefix, uiSounds[i] + len );
+				snprintf( uiStatic.sounds[i], sizeof( uiStatic.sounds[i] ), "%s%s", uiSoundNewPrefix, uiSounds[i] + len );
 		}
 		else
-			strcpy( uiStatic.sounds[i], uiSounds[i] );
+			Q_strncpy( uiStatic.sounds[i], uiSounds[i], sizeof( uiStatic.sounds[i] ) );
 	}
 }
 

@@ -147,7 +147,7 @@ typedef struct
 
 	int lowmemory;
 
-	char sounds[SND_COUNT][32];
+	char sounds[SND_COUNT][40];
 } uiStatic_t;
 
 extern float	cursorDY;			// use for touch scroll
