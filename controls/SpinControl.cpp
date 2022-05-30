@@ -74,7 +74,7 @@ bool CMenuSpinControl::KeyDown(	int key )
 	if( sound )
 	{
 		_Event( QM_PRESSED );
-		if( sound != uiSoundBuzz )
+		if( sound != uiStatic.sounds[SND_BUZZ] )
 		{
 			Display();
 			_Event( QM_CHANGED );
@@ -126,7 +126,7 @@ bool CMenuSpinControl::KeyUp( int key )
 	if( sound )
 	{
 		_Event( QM_RELEASED );
-		if( sound != uiSoundBuzz )
+		if( sound != uiStatic.sounds[SND_BUZZ] )
 		{
 			Display();
 			_Event( QM_CHANGED );
@@ -251,9 +251,9 @@ const char *CMenuSpinControl::MoveLeft()
 		m_flCurValue -= m_flRange;
 		if( m_flCurValue < m_flMinValue )
 			m_flCurValue = m_flMinValue;
-		sound = uiSoundMove;
+		sound = uiStatic.sounds[SND_MOVE];
 	}
-	else sound = uiSoundBuzz;
+	else sound = uiStatic.sounds[SND_BUZZ];
 
 	return sound;
 }
@@ -267,9 +267,9 @@ const char *CMenuSpinControl::MoveRight()
 		m_flCurValue += m_flRange;
 		if( m_flCurValue > m_flMaxValue )
 			m_flCurValue = m_flMaxValue;
-		sound = uiSoundMove;
+		sound = uiStatic.sounds[SND_MOVE];
 	}
-	else sound = uiSoundBuzz;
+	else sound = uiStatic.sounds[SND_BUZZ];
 
 	return sound;
 }

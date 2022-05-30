@@ -136,7 +136,7 @@ bool CMenuPlayerModelView::KeyDown( int key )
 		return CMenuBaseItem::KeyDown( key );
 	}
 
-	PlayLocalSound( uiSoundLaunch );
+	PlayLocalSound( uiStatic.sounds[SND_LAUNCH] );
 	return false;
 }
 

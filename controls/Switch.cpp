@@ -131,7 +131,7 @@ bool CMenuSwitch::KeyUp( int key )
 		state = IsNewStateByMouseClick();
 		haveNewState = state != m_iState;
 		if( haveNewState )
-			sound = uiSoundGlow;
+			sound = uiStatic.sounds[SND_GLOW];
 		break;
 	case K_ENTER:
 	case K_KP_ENTER:
@@ -139,7 +139,7 @@ bool CMenuSwitch::KeyUp( int key )
 	case K_AUX1:
 		if( iFlags & QMF_MOUSEONLY )
 			break;
-		sound = uiSoundGlow;
+		sound = uiStatic.sounds[SND_GLOW];
 		break;
 	}
 
@@ -178,7 +178,7 @@ bool CMenuSwitch::KeyDown( int key )
 	case K_AUX1:
 		if( iFlags & QMF_MOUSEONLY )
 			break;
-		sound = uiSoundGlow;
+		sound = uiStatic.sounds[SND_GLOW];
 		break;
 	}
 

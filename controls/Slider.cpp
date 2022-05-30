@@ -110,7 +110,7 @@ bool CMenuSlider::KeyDown( int key )
 		if( m_flCurValue < m_flMinValue )
 		{
 			m_flCurValue = m_flMinValue;
-			PlayLocalSound( uiSoundBuzz );
+			PlayLocalSound( uiStatic.sounds[SND_BUZZ] );
 			return true;
 		}
 
@@ -118,7 +118,7 @@ bool CMenuSlider::KeyDown( int key )
 		SetCvarValue( m_flCurValue );
 		_Event( QM_CHANGED );
 
-		PlayLocalSound( uiSoundKey );
+		PlayLocalSound( uiStatic.sounds[SND_KEY] );
 		return true;
 	case K_RIGHTARROW:
 		m_flCurValue += m_flRange;
@@ -126,14 +126,14 @@ bool CMenuSlider::KeyDown( int key )
 		if( m_flCurValue > m_flMaxValue )
 		{
 			m_flCurValue = m_flMaxValue;
-			PlayLocalSound( uiSoundBuzz );
+			PlayLocalSound( uiStatic.sounds[SND_BUZZ] );
 			return true;
 		}
 
 		// tell menu about changes
 		SetCvarValue( m_flCurValue );
 		_Event( QM_CHANGED );
-		PlayLocalSound( uiSoundKey );
+		PlayLocalSound( uiStatic.sounds[SND_KEY] );
 		return true;
 	}
 

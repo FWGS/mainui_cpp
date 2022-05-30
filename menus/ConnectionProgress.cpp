@@ -148,11 +148,11 @@ bool CMenuConnectionProgress::KeyDown( int key )
 	{
 	case K_ESCAPE:
 		dialog.Show();
-		PlayLocalSound( uiSoundOut );
+		PlayLocalSound( uiStatic.sounds[SND_OUT] );
 		return true;
 	case '~':
 		consoleButton.onReleased( &consoleButton );
-		PlayLocalSound( uiSoundLaunch );
+		PlayLocalSound( uiStatic.sounds[SND_LAUNCH] );
 		return true;
 	case 'A':
 		HandleDisconnect();
