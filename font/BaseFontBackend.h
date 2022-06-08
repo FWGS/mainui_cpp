@@ -31,6 +31,20 @@ struct charRange_t
 	int chMax;
 	const int *sequence;
 	int size;
+
+	size_t Length() const
+	{
+		if( sequence )
+			return size;
+		return chMax - chMin;
+	}
+
+	int Character( size_t pos )
+	{
+		if( sequence )
+			return sequence[pos];
+		return chMin + pos;
+	}
 };
 
 class CBaseFont
@@ -47,10 +61,11 @@ public:
 		int scanlineOffset, float scanlineScale,
 		int flags ) = 0;
 	virtual void GetCharRGBA( int ch, Point pt, Size sz, byte *rgba, Size &drawSize ) = 0;
-	virtual void GetCharABCWidths( int ch, int &a, int &b, int &c ) = 0;
+	virtual void GetCharABCWidthsNoCache( int ch, int &a, int &b, int &c ) = 0;
 	virtual bool HasChar( int ch ) const = 0;
+	virtual void GetCharABCWidths( int ch, int &a, int &b, int &c );
 	virtual void UploadGlyphsForRanges( charRange_t *range, int rangeSize );
-	virtual int DrawCharacter(int ch, Point pt, int charH, const unsigned int color, bool forceAdditive = false);
+	virtual int  DrawCharacter(int ch, Point pt, int charH, const unsigned int color, bool forceAdditive = false);
 
 	inline int GetHeight() const       { return m_iHeight + GetEfxOffset(); }
 	inline int GetTall() const         { return m_iTall; }
@@ -64,9 +79,6 @@ public:
 	bool IsEqualTo( const char *name, int tall, int weight, int blur, int flags ) const;
 
 	void DebugDraw();
-
-
-
 
 	void GetTextureName(char *dst, size_t len) const;
 
@@ -96,6 +108,9 @@ protected:
 	int m_iEllipsisWide;
 
 private:
+	bool ReadFromCache( const char *filename, charRange_t *range, size_t rangeSize );
+	void SaveToCache( const char *filename, charRange_t *range, size_t rangeSize, CBMP *bmp );
+
 	void GetBlurValueForPixel(float *distribution, byte *src, Point srcPt, Size srcSz, byte *dest);
 
 	struct glyph_t
@@ -112,7 +127,19 @@ private:
 		}
 	};
 
+	struct abc_t
+	{
+		int ch;
+		int a, b, c;
+
+		bool operator< ( const abc_t &a ) const
+		{
+			return ch < a.ch;
+		}
+	};
+
 	CUtlRBTree<glyph_t, int> m_glyphs;
+	CUtlRBTree<abc_t, int>   m_ABCCache;
 	friend class CFontManager;
 };
 

@@ -51,7 +51,7 @@ public:
 		int scanlineOffset, float scanlineScale,
 		int flags ) override;
 	void GetCharRGBA( int ch, Point pt, Size sz, unsigned char *rgba, Size &drawSize ) override;
-	void GetCharABCWidths( int ch, int &a, int &b, int &c ) override;
+	void GetCharABCWidthsNoCache( int ch, int &a, int &b, int &c ) override;
 	bool HasChar( int ch ) const override;
 
 	bool m_bFound;

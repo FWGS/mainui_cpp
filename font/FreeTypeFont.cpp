@@ -27,9 +27,9 @@ FT_Library CFreeTypeFont::m_Library;
 
 
 CFreeTypeFont::CFreeTypeFont() : CBaseFont(),
-	m_ABCCache(0, 0), face(), m_szRealFontFile()
+	face(), m_szRealFontFile()
 {
-	SetDefLessFunc( m_ABCCache );
+
 }
 
 CFreeTypeFont::~CFreeTypeFont()
@@ -47,7 +47,7 @@ CFreeTypeFont::~CFreeTypeFont()
  *
  * Ripped from skia source code
  */
-FcPattern* FontMatch(const char* type, ...)
+static FcPattern* FontMatch(const char* type, ...)
 {
 	FcValue fcvalue;
 	va_list ap;
@@ -233,54 +233,22 @@ void CFreeTypeFont::GetCharRGBA(int ch, Point pt, Size sz, unsigned char *rgba, 
 	ApplyStrikeout( sz, rgba );
 }
 
-void CFreeTypeFont::GetCharABCWidths(int ch, int &a, int &b, int &c)
+void CFreeTypeFont::GetCharABCWidthsNoCache(int ch, int &a, int &b, int &c)
 {
-	abc_t find;
-	find.ch = ch;
-
-	unsigned short i = m_ABCCache.Find( find );
-	if( i != 65535 && m_ABCCache.IsValidIndex(i) )
-	{
-		a = m_ABCCache[i].a;
-		b = m_ABCCache[i].b;
-		c = m_ABCCache[i].c;
-		return;
-	}
-
-	// not found in cache
-
 	if( FT_Load_Char( face, ch, FT_LOAD_DEFAULT ) )
 	{
-		find.a = 0;
-		find.b = PIXEL(face->bbox.xMax);
-		find.c = 0;
+		a = 0;
+		b = PIXEL(face->bbox.xMax);
+		c = 0;
 	}
 	else
 	{
-		find.a = PIXEL(face->glyph->metrics.horiBearingX);
-		find.b = PIXEL(face->glyph->metrics.width);
-		find.c = PIXEL(face->glyph->metrics.horiAdvance -
+		a = PIXEL(face->glyph->metrics.horiBearingX);
+		b = PIXEL(face->glyph->metrics.width);
+		c = PIXEL(face->glyph->metrics.horiAdvance -
 			 face->glyph->metrics.horiBearingX -
 			 face->glyph->metrics.width);
 	}
-
-	find.a -= m_iBlur + m_iOutlineSize;
-	find.b += m_iBlur + m_iOutlineSize;
-
-	if( m_iOutlineSize )
-	{
-		if( find.a < 0 )
-			find.a += m_iOutlineSize;
-
-		if( find.c < 0 )
-			find.c += m_iOutlineSize;
-	}
-
-	a = find.a;
-	b = find.b;
-	c = find.c;
-
-	m_ABCCache.Insert(find);
 }
 
 bool CFreeTypeFont::HasChar(int ch) const

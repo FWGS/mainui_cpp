@@ -30,17 +30,6 @@ extern "C"
 #include "utlmemory.h"
 #include "utlrbtree.h"
 
-struct abc_t
-{
-	int ch;
-	int a, b, c;
-
-	bool operator< ( const abc_t &a ) const
-	{
-		return ch < a.ch;
-	}
-};
-
 class CFreeTypeFont : public CBaseFont
 {
 public:
@@ -54,11 +43,9 @@ public:
 		int scanlineOffset, float scanlineScale,
 		int flags) override;
 	void GetCharRGBA(int ch, Point pt, Size sz, unsigned char *rgba, Size &drawSize) override;
-	void GetCharABCWidths( int ch, int &a, int &b, int &c ) override;
+	void GetCharABCWidthsNoCache( int ch, int &a, int &b, int &c ) override;
 	bool HasChar( int ch ) const override;
 private:
-	CUtlRBTree<abc_t, int> m_ABCCache;
-
 	FT_Face face;
 	static FT_Library m_Library;
 	char m_szRealFontFile[4096];

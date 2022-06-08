@@ -31,6 +31,7 @@ public:
 						 int scanlineOffset, float scanlineScale,
 						 int flags ) override;
 	void GetCharRGBA( int ch, Point pt, Size sz, byte *rgba, Size &drawSize ) override;
+	void GetCharABCWidthsNoCache( int ch, int &a, int &b, int &c ) override;
 	void GetCharABCWidths( int ch, int &a, int &b, int &c ) override;
 	bool HasChar( int ch ) const override;
 	void UploadGlyphsForRanges( charRange_t *range, int rangeSize ) override;

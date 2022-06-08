@@ -66,6 +66,12 @@ void CBitmapFont::GetCharRGBA(int ch, Point pt, Size sz, byte *rgba, Size &drawS
 	Con_DPrintf( "CBitmapFont::GetCharRGBA\n" );
 }
 
+void CBitmapFont::GetCharABCWidthsNoCache( int ch, int &a, int &b, int &c )
+{
+	// static font not uses cache
+	return;
+}
+
 void CBitmapFont::GetCharABCWidths(int ch, int &a, int &b, int &c)
 {
 	a = c = 0;

@@ -16,16 +16,18 @@ GNU General Public License for more details.
 #include "FontManager.h"
 #include <math.h>
 #include "Utils.h"
+#include "miniutl/utlbuffer.h"
 
 CBaseFont::CBaseFont()
 	: m_iTall(), m_iWeight(), m_iFlags(),
 	m_iHeight(), m_iMaxCharWidth(), m_iAscent(),
 	m_iBlur(), m_fBrighten(),
 	m_iEllipsisWide( 0 ),
-	m_glyphs(0, 0)
+	m_glyphs(0, 0), m_ABCCache( 0, 0 )
 {
 	m_szName[0] = 0;
 	SetDefLessFunc( m_glyphs );
+	SetDefLessFunc( m_ABCCache );
 }
 
 
@@ -82,6 +84,17 @@ void CBaseFont::UploadGlyphsForRanges(charRange_t *range, int rangeSize)
 	const Point nullPt( 0, 0 );
 	char name[256];
 
+	GetTextureName( name, sizeof( name ));
+
+	if( ReadFromCache( name, range, rangeSize ))
+	{
+		int dotWideA, dotWideB, dotWideC;
+		GetCharABCWidths( '.', dotWideA, dotWideB, dotWideC );
+		m_iEllipsisWide = ( dotWideA + dotWideB + dotWideC ) * 3;
+
+		return;
+	}
+
 	CBMP bmp( MAX_PAGE_SIZE, MAX_PAGE_SIZE );
 	byte *rgbdata = bmp.GetTextureData();
 	bmp_t *hdr = bmp.GetBitmapHdr();
@@ -97,20 +110,11 @@ void CBaseFont::UploadGlyphsForRanges(charRange_t *range, int rangeSize)
 	int xstart = 0, ystart = hdr->height-1;
 	for( int iRange = 0; iRange < rangeSize; iRange++ )
 	{
-		int size;
+		size_t size = range[iRange].Length();
 
-		if( range[iRange].sequence )
-			size = range[iRange].size;
-		else
-			size = range[iRange].chMax - range[iRange].chMin;
-
-		for( int i = 0; i < size; i++ )
+		for( size_t i = 0; i < size; i++ )
 		{
-			int ch;
-
-			if( range[iRange].sequence )
-				ch = range[iRange].sequence[i];
-			else ch = range[iRange].chMin + i;
+			int ch = range[iRange].Character( i );
 
 			// clear temporary buffer
 			memset( temp, 0, tempSize );
@@ -202,18 +206,15 @@ void CBaseFont::UploadGlyphsForRanges(charRange_t *range, int rangeSize)
 		}
 	}
 
-	GetTextureName( name, sizeof( name ) );
-	// bmp.Increase( hdr->width * 2, hdr->height );
-	// bmp.Increase( hdr->width, hdr->height * 2 );
 	HIMAGE hImage = EngFuncs::PIC_Load( name, bmp.GetBitmap(), bmp.GetBitmapHdr()->fileSize, 0 );
-	Con_DPrintf( "Uploaded %s to %i\n", name, hImage );
-	//delete[] bmp;
+	SaveToCache( name, range, rangeSize, &bmp );
+	Con_DPrintf( "Uploaded %s to %i and saved to cache\n", name, hImage );
+
 	delete[] temp;
 
 	for( int i = m_glyphs.FirstInorder();; i = m_glyphs.NextInorder( i ) )
 	{
-		if( !m_glyphs[i].texture )
-			m_glyphs[i].texture = hImage;
+		m_glyphs[i].texture = hImage;
 		if( i == m_glyphs.LastInorder() )
 			break;
 	}
@@ -229,6 +230,42 @@ CBaseFont::~CBaseFont()
 	char name[256];
 	GetTextureName( name, sizeof( name ) );
 	EngFuncs::PIC_Free( name );
+}
+
+void CBaseFont::GetCharABCWidths( int ch, int &a, int &b, int &c )
+{
+	abc_t find;
+	find.ch = ch;
+
+	unsigned short i = m_ABCCache.Find( find );
+	if( i != 65535 && m_ABCCache.IsValidIndex(i) )
+	{
+		a = m_ABCCache[i].a;
+		b = m_ABCCache[i].b;
+		c = m_ABCCache[i].c;
+		return;
+	}
+
+	// not found in cache
+	GetCharABCWidthsNoCache( ch, find.a, find.b, find.c );
+
+	find.a -= m_iBlur + m_iOutlineSize;
+	find.b += m_iBlur + m_iOutlineSize;
+
+	if( m_iOutlineSize )
+	{
+		if( find.a < 0 )
+			find.a += m_iOutlineSize;
+
+		if( find.c < 0 )
+			find.c += m_iOutlineSize;
+	}
+
+	a = find.a;
+	b = find.b;
+	c = find.c;
+
+	m_ABCCache.Insert( find );
 }
 
 bool CBaseFont::IsEqualTo(const char *name, int tall, int weight, int blur, int flags)  const
@@ -511,4 +548,216 @@ int CBaseFont::DrawCharacter(int ch, Point pt, int charH, const unsigned int col
 	}
 #endif
 	return width;
+}
+
+#define CACHED_FONT_IDENT \
+	(('T'<<24)+('F'<<16)+('I'<<8)+'U') // little-endian "UIFT"
+
+#define CACHED_FONT_VERSION 1
+
+struct char_data_t
+{
+	uint32_t ch;
+	int32_t a, b, c;
+	uint32_t left, right, top, bottom;
+};
+
+struct cached_font_t
+{
+	uint32_t ident;
+	uint32_t version;
+	uint32_t charsCount;
+};
+
+bool CBaseFont::ReadFromCache( const char *filename, charRange_t *range, size_t rangeSize )
+{
+	char path[512];
+	int size, i, j, charsCount = 0;
+	byte *data;
+	cached_font_t *hdr;
+	char_data_t *ch;
+	bmp_t *bmp;
+
+	V_snprintf( path, sizeof( path ), ".fontcache/%s", filename );
+
+	if( !EngFuncs::FileExists( path ))
+		return false;
+
+	Con_Printf( "Trying to loading %s from font cache on disk...\n", filename );
+
+	data = EngFuncs::COM_LoadFile( path, &size );
+
+	if( !data )
+	{
+		Con_Printf( "Failed to load font cache file\n" );
+		return false;
+	}
+
+	for( i = 0; i < rangeSize; i++ )
+		charsCount += range[i].Length();
+
+	hdr = reinterpret_cast<cached_font_t *>( data );
+
+	if( size < sizeof( cached_font_t ) )
+	{
+		Con_Printf( "Font cache file is too short\n" );
+		EngFuncs::COM_FreeFile( data );
+		return false;
+	}
+
+	if( hdr->ident != CACHED_FONT_IDENT )
+	{
+		Con_Printf( "Wrong font cache file format\n" );
+		EngFuncs::COM_FreeFile( data );
+		return false;
+	}
+
+	if( hdr->version != CACHED_FONT_VERSION )
+	{
+		Con_Printf( "Wrong font cache file version. Expected %d, got %d\n", CACHED_FONT_VERSION, hdr->version );
+		EngFuncs::COM_FreeFile( data );
+		return false;
+	}
+
+	if( hdr->charsCount != charsCount )
+	{
+		Con_Printf( "Font cache file has different character set. Expected %d characters in set, got %d\n", charsCount, hdr->charsCount );
+		EngFuncs::COM_FreeFile( data );
+		return false;
+	}
+
+	if( size < sizeof( cached_font_t ) + hdr->charsCount * sizeof( char_data_t ))
+	{
+		Con_Printf( "Font cache file is too short (2nd check)\n" );
+		EngFuncs::COM_FreeFile( data );
+		return false;
+	}
+
+	bmp = reinterpret_cast<bmp_t *>(data + sizeof( cached_font_t ) + hdr->charsCount * sizeof( char_data_t ));
+
+	if( bmp->id[0] != 'B' && bmp->id[1] != 'M' )
+	{
+		Con_Printf( "Font cache BMP file id check failed\n" );
+		EngFuncs::COM_FreeFile( data );
+		return false;
+	}
+
+	if( size != sizeof( cached_font_t ) + hdr->charsCount * sizeof( char_data_t ) + bmp->fileSize )
+	{
+		Con_Printf( "Font cache file is too short or too long (3rd check)\n" );
+		EngFuncs::COM_FreeFile( data );
+		return false;
+	}
+
+	HIMAGE hImage = EngFuncs::PIC_Load( filename, (const byte*)bmp, bmp->fileSize, 0 );
+	Con_DPrintf( "Uploaded %s to %i\n", filename, hImage );
+
+	if( !hImage )
+	{
+		Con_Printf( "Failed to load font cache BMP\n" );
+		EngFuncs::COM_FreeFile( data );
+		return false;
+	}
+
+	ch = reinterpret_cast<char_data_t *>(data + sizeof( cached_font_t ));
+
+	for( i = 0; i < rangeSize; i++ )
+	{
+		charsCount = range[i].Length();
+
+		for( j = 0; j < charsCount; j++ )
+		{
+			if( ch->ch != range[i].Character( j ))
+			{
+				Con_Printf( "Font cache file has different character set. Expected %d, got %d", range[i].Character( j ), ch->ch );
+				EngFuncs::COM_FreeFile( data );
+				EngFuncs::PIC_Free( filename );
+				return false;
+			}
+
+			glyph_t glyph( ch->ch );
+			abc_t abc;
+
+			glyph.rect.left = ch->left;
+			glyph.rect.bottom = ch->bottom;
+			glyph.rect.right = ch->right;
+			glyph.rect.top = ch->top;
+			glyph.texture = hImage;
+
+			m_glyphs.Insert( glyph );
+
+			abc.ch = ch->ch;
+			abc.a = ch->a;
+			abc.b = ch->b;
+			abc.c = ch->c;
+
+			m_ABCCache.Insert( abc );
+
+			ch++;
+		}
+	}
+
+	EngFuncs::COM_FreeFile( data );
+	return true;
+}
+
+void CBaseFont::SaveToCache( const char *filename, charRange_t *range, size_t rangeSize, CBMP *bmp )
+{
+	char path[512];
+	int i, j;
+	uint32_t charsCount = 0;
+	byte *data, *buf_p;
+	size_t size = 0, bmpSize = bmp->GetBitmapHdr()->fileSize;
+
+	for( i = 0; i < rangeSize; i++ )
+		charsCount += range[i].Length();
+
+	size = sizeof( cached_font_t ) +
+			charsCount * sizeof( char_data_t ) +
+			bmpSize;
+
+	buf_p = data = new byte[size];
+
+	((cached_font_t *)buf_p)->ident = CACHED_FONT_IDENT;
+	((cached_font_t *)buf_p)->version = CACHED_FONT_VERSION;
+	((cached_font_t *)buf_p)->charsCount = charsCount;
+
+	buf_p += sizeof( cached_font_t );
+
+	for( i = 0; i < rangeSize; i++ )
+	{
+		charsCount = range[i].Length();
+
+		for( j = 0; j < charsCount; j++ )
+		{
+			char_data_t ch;
+
+
+			ch.ch = range[i].Character( j );
+			GetCharABCWidths( ch.ch, ch.a, ch.b, ch.c );
+
+			glyph_t glyph( ch.ch );
+			int idx = m_glyphs.Find( glyph );
+
+			glyph = m_glyphs[idx];
+
+			ch.left   = glyph.rect.left;
+			ch.right  = glyph.rect.right;
+			ch.bottom = glyph.rect.bottom;
+			ch.top    = glyph.rect.top;
+
+			memcpy( buf_p, &ch, sizeof( ch ));
+			buf_p += sizeof( ch );
+		}
+	}
+
+	memcpy( buf_p, bmp->GetBitmapHdr(), bmpSize );
+
+	if( buf_p + bmpSize - data != size )
+		Host_Error( "%s: %i: buf_p + bmpSize - data != size", __FILE__, __LINE__ );
+
+	V_snprintf( path, sizeof( path ), ".fontcache/%s", filename );
+	EngFuncs::COM_SaveFile( path, data, size );
+
+	delete[] data;
 }
