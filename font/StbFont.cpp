@@ -38,9 +38,8 @@ GNU General Public License for more details.
 #include "Utils.h"
 
 CStbFont::CStbFont() : CBaseFont(),
-	m_ABCCache(0, 0), m_szRealFontFile(), m_pFontData( NULL )
+	m_szRealFontFile(), m_pFontData( NULL )
 {
-	SetDefLessFunc( m_ABCCache );
 }
 
 CStbFont::~CStbFont()

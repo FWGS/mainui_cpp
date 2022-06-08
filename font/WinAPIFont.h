@@ -27,17 +27,6 @@ GNU General Public License for more details.
 #include "utlmemory.h"
 #include "utlrbtree.h"
 
-struct abc_t
-{
-	int ch;
-	int a, b, c;
-
-	bool operator<(const abc_t &a) const
-	{
-		return ch < a.ch;
-	}
-};
-
 class CWinAPIFont : public CBaseFont
 {
 public:
@@ -57,19 +46,14 @@ public:
 	bool m_bFound;
 
 private:
-	CUtlRBTree<abc_t, int> m_ABCCache;
-
 	HFONT m_hFont;
 	HDC m_hDC;
 	HBITMAP m_hDIB;
 
-
 	int m_rgiBitmapSize[2];
 
 	// pointer to buffer for use when generated bitmap versions of a texture
-
 	unsigned char	*m_pBuf;
-
 
 	friend class CFontManager;
 	friend int CALLBACK FontEnumProc( const LOGFONT *, const TEXTMETRIC *, DWORD, LPARAM lpParam );

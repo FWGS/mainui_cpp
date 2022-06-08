@@ -21,9 +21,8 @@ GNU General Public License for more details.
 #include "WinAPIFont.h"
 
 
-CWinAPIFont::CWinAPIFont( ) : CBaseFont( ), m_ABCCache( 0, 0 )
+CWinAPIFont::CWinAPIFont( ) : CBaseFont( )
 {
-	SetDefLessFunc( m_ABCCache );
 }
 
 CWinAPIFont::~CWinAPIFont( )
