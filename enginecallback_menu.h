@@ -227,8 +227,6 @@ public:
 	{ engfuncs.pfnShellExecute( name, args, closeEngine ); }
 	static inline void	WriteServerConfig( const char *name )
 	{ engfuncs.pfnWriteServerConfig( name ); }
-	static inline void	ChangeInstance( const char *newInstance, const char *szFinalMessage )
-	{ engfuncs.pfnChangeInstance( newInstance, szFinalMessage ); }
 	static inline void	PlayBackgroundTrack( const char *introName, const char *loopName )
 	{ engfuncs.pfnPlayBackgroundTrack( introName, loopName ); }
 	static inline void  StopBackgroundTrack( )
