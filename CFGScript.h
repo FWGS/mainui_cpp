@@ -30,34 +30,41 @@ typedef enum
 	T_COUNT
 } cvartype_t;
 
-typedef struct scrvarlistentry_s
+struct scrvarlistentry_t
 {
+	scrvarlistentry_t() : szName( NULL ), flValue( 0 ), next( NULL ) {}
+
 	char *szName;
 	float flValue;
-	struct scrvarlistentry_s *next;
-} scrvarlistentry_t;
 
-typedef struct scrvarlist_s
+	scrvarlistentry_t *next;
+};
+
+struct scrvarlist_t
 {
+	scrvarlist_t() : iCount( 0 ), pEntries( NULL ), pLast( NULL ), pArray( NULL ), pModel( NULL ) {}
+
 	int iCount;
 	scrvarlistentry_t *pEntries;
 	scrvarlistentry_t *pLast;
 	const char **pArray;
 	CStringArrayModel *pModel; // ready model for use in UI
-} scrvarlist_t;
+};
 
-typedef struct
+struct scrvarnumber_t
 {
+	scrvarnumber_t() : fMin( 0 ), fMax( 0 ) {}
+
 	float fMin;
 	float fMax;
-} scrvarnumber_t;
+};
 
 struct scrvardef_t
 {
-	scrvardef_t() :
-		flags(0),
-		type(T_NONE), next(0) {
-		name[0] = value[0] = desc[0] = 0;}
+	scrvardef_t() : flags( 0 ), list(), type( T_NONE ), next( NULL )
+	{
+		name[0] = value[0] = desc[0] = 0;
+	}
 
 	int flags;
 	char name[MAX_STRING];

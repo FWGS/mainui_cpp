@@ -207,7 +207,7 @@ error:
 
 		while( result->list.pEntries )
 		{
-			scrvarlistentry_s *next = result->list.pEntries->next;
+			scrvarlistentry_t *next = result->list.pEntries->next;
 			delete[] result->list.pEntries->szName;
 			delete result->list.pEntries;
 
@@ -358,7 +358,7 @@ void CSCR_FreeList( scrvardef_t *list )
 
 			while( i->list.pEntries )
 			{
-				scrvarlistentry_s *next = i->list.pEntries->next;
+				scrvarlistentry_t *next = i->list.pEntries->next;
 				delete[] i->list.pEntries->szName;
 				delete i->list.pEntries;
 
