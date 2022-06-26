@@ -366,7 +366,7 @@ void CMenuTouchButtons::_Init( void )
 	cancel.SetNameAndStatus( L( "GameUI_Cancel" ), L( "Discard changes and go back to the Touch Menu" ) );
 	cancel.SetPicture( PC_CANCEL );
 	cancel.onReleased = ExitMenuCb;
-	cancel.onReleased.pExtra = (void*)"touch_loadconfig\n";
+	cancel.onReleased.pExtra = (void*)"touch_reloadconfig\n";
 
 	red.eFocusAnimation = QM_PULSEIFFOCUS;
 	red.SetNameAndStatus( L( "Red:" ), L( "Texture red channel" ) );
