@@ -160,10 +160,10 @@ void CMenuSavesListModel::Update( void )
 	// sort the saves in reverse order (oldest past at the end)
 	qsort( filenames, numFiles, sizeof( char* ), (cmpfunc)COM_CompareSaves );
 
-	if ( parent->IsSaveMode() && CL_IsActive() )
+	if( parent->IsSaveMode() && CL_IsActive() )
 	{
 		// create new entry for current save game
-		Q_strncpy( saveName[i], L( "GameUI_SaveGame_New" ), CS_SIZE );
+		Q_strncpy( saveName[i], "new", CS_SIZE ); // special name, handled in SV_Save_f
 		Q_strncpy( delName[i], "", CS_SIZE );
 		strcpy( m_szCells[i][0], L( "GameUI_SaveGame_Current" ) );
 		strcpy( m_szCells[i][1], L( "GameUI_SaveGame_NewSavedGame" ) );
