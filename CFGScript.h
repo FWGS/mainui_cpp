@@ -61,7 +61,7 @@ struct scrvarnumber_t
 
 struct scrvardef_t
 {
-	scrvardef_t() : flags( 0 ), list(), type( T_NONE ), next( NULL )
+	scrvardef_t() : flags( 0 ), number(), list(), type( T_NONE ), next( NULL )
 	{
 		name[0] = value[0] = desc[0] = 0;
 	}
@@ -70,11 +70,8 @@ struct scrvardef_t
 	char name[MAX_STRING];
 	char value[MAX_STRING];
 	char desc[MAX_STRING];
-	union
-	{
-		scrvarnumber_t number;
-		scrvarlist_t list;
-	};
+	scrvarnumber_t number;
+	scrvarlist_t list;
 	cvartype_t type;
 	struct scrvardef_t *next;
 };
