@@ -36,11 +36,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 static struct
 {
 	const char *name;
-	unsigned char r;
-	unsigned char g;
-	unsigned char b;
+	int r, g, b;
 } g_LogoColors[] =
 {
+{ "FullColor",     -1,  -1,  -1  },
 { "#Valve_Orange", 255, 120, 24  }, // L( "#Valve_Orange" )
 { "#Valve_Yellow", 225, 180, 24  }, // L( "#Valve_Yellow" )
 { "#Valve_Blue",   0,   60,  255 }, // L( "#Valve_Blue" )
@@ -125,7 +124,10 @@ void CMenuPlayerSetup::CMenuLogoPreview::Draw()
 	}
 	else
 	{
-		EngFuncs::PIC_Set( hImage, r, g, b, 255 );
+		if( r != -1 && g != -1 && b != -1 )
+			EngFuncs::PIC_Set( hImage, r, g, b );
+		else
+			EngFuncs::PIC_Set( hImage, 255, 255, 255 );
 		EngFuncs::PIC_DrawTrans( m_scPos, m_scSize );
 	}
 
@@ -329,7 +331,8 @@ void CMenuPlayerSetup::WriteNewLogo( void )
 	logoColor.WriteCvar();
 
 	// remap logo if needed
-	bmpFile->RemapLogo( logoImage.r, logoImage.g, logoImage.b );
+	if( logoImage.r != -1 && logoImage.g != -1 && logoImage.b != -1 )
+		bmpFile->RemapLogo( logoImage.r, logoImage.g, logoImage.b );
 
 	EngFuncs::DeleteFile( "custom.hpk" );
 	EngFuncs::DeleteFile( "logos/remapped.bmp" );
