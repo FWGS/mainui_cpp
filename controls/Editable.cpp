@@ -34,7 +34,7 @@ void CMenuEditable::LinkCvar(const char *name, cvarType_e type)
 
 	m_bForceUpdate = true;
 
-		UpdateCvar();
+	UpdateCvar();
 
 	m_bForceUpdate = false;
 }
@@ -91,7 +91,7 @@ void CMenuEditable::UpdateCvar()
 		onCvarGet( this );
 		haveUpdate = false; // FIXME: add return values to events
 	}
-	else
+	else if( m_szCvarName )
 	{
 		switch( m_eType )
 		{
@@ -140,7 +140,7 @@ void CMenuEditable::DiscardChanges()
 void CMenuEditable::WriteCvar()
 {
 	if( onCvarWrite ) onCvarWrite( this );
-	else
+	else if( m_szCvarName )
 	{
 		switch( m_eType )
 		{
