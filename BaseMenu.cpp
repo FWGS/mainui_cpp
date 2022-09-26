@@ -773,11 +773,16 @@ void UI_MouseMove( int x, int y )
 	if( g_bCursorDown )
 	{
 		static bool prevDown = false;
-		if(!prevDown)
-			prevDown = true, cursorDY = 0;
-		else
-			if( y - uiStatic.cursorY )
-				cursorDY += y - uiStatic.cursorY;
+
+		if( !prevDown )
+		{
+			prevDown = true;
+			cursorDY = 0;
+		}
+		else if( y - uiStatic.cursorY )
+		{
+			cursorDY += y - uiStatic.cursorY;
+		}
 	}
 	else
 		cursorDY = 0;
