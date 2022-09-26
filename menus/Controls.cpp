@@ -187,7 +187,7 @@ void CMenuKeysModel::Update( void )
 		if( !stricmp( token, "blank" ))
 		{
 			// separator
-			pfile = EngFuncs::COM_ParseFile( pfile, token );
+			pfile = EngFuncs::COM_ParseFile( pfile, token, sizeof( token ));
 			if( !pfile ) break;	// technically an error
 
 			if( token[0] == '#' )
