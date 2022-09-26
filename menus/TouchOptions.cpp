@@ -198,7 +198,7 @@ void CMenuTouchOptions::Apply()
 		char command[256];
 		const char *curconfig = EngFuncs::GetCvarString( "touch_config_file" );
 		snprintf( command, 256, "exec \"touch_presets/%s\"\n", model.profileDesc[ i ] );
-		EngFuncs::ClientCmd( 1,  command );
+		EngFuncs::ClientCmd( 1, command );
 
 		while( EngFuncs::FileExists( curconfig, TRUE ) )
 		{
@@ -238,14 +238,16 @@ void CMenuTouchOptions::Apply()
 
 void CMenuTouchOptions::Save()
 {
-	char name[512];
-
 	if( profilename.GetBuffer()[0] )
 	{
-		snprintf(name, sizeof( name ), "touch_profiles/%s.cfg", profilename.GetBuffer() );
-		EngFuncs::CvarSetString("touch_config_file", name );
+		char name[512];
+
+		EngFuncs::CvarSetStringF( "touch_config_file", "touch_profiles/%s.cfg", profilename.GetBuffer() );
+
+		Com_EscapeCommand( name, profilename.GetBuffer(), sizeof( name ));
+		EngFuncs::ClientCmdF( 1, "touch_exportconfig \"touch_profiles/%s.cfg\"\n", name );
 	}
-	EngFuncs::ClientCmd( 1, "touch_writeconfig\n" );
+
 	model.Update();
 	profilename.Clear();
 }
