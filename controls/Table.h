@@ -54,6 +54,7 @@ public:
 	bool KeyDown( int key ) override;
 	void Draw() override;
 	void VidInit() override;
+	bool MouseMove( int x, int y ) override;
 	bool MoveView( int delta );
 	bool MoveCursor( int delta );
 	int GetCurrentIndex() { return iCurItem; }
@@ -137,6 +138,8 @@ public:
 	CColor iHeaderColor;
 
 private:
+	float Step( void );
+
 	void DrawLine(Point p, const char **psz, size_t size, uint textColor, bool forceCol, uint fillColor = 0);
 	void DrawLine(Point p, int line, uint textColor, bool forceCol, uint fillColor = 0);
 

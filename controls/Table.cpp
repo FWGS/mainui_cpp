@@ -115,6 +115,78 @@ void CMenuTable::VidInit()
 	boxSize.h = m_scSize.h - headerSize.h;
 }
 
+bool CMenuTable::MouseMove( int x, int y )
+{
+	if( !iScrollBarSliding && FBitSet( iFlags, QMF_HASMOUSEFOCUS ))
+	{
+		float step = Step();
+
+		if( UI_CursorInRect( boxPos, boxSize ))
+		{
+			static float ac_y = 0;
+
+			ac_y += cursorDY;
+			cursorDY = 0;
+			if( ac_y > m_scChSize / 2.0f )
+			{
+				iTopItem -= ac_y / m_scChSize - 0.5f;
+				ac_y = 0;
+			}
+			if( ac_y < -m_scChSize / 2.0f )
+			{
+				iTopItem -= ac_y / m_scChSize - 0.5f;
+				ac_y = 0;
+			}
+		}
+		else if( UI_CursorInRect( sbarPos, sbarSize ))
+		{
+			static float ac_y = 0;
+
+			ac_y += cursorDY;
+			cursorDY = 0;
+			if( ac_y < -step )
+			{
+				iTopItem += ac_y / step + 0.5f;
+				ac_y = 0;
+			}
+			if( ac_y > step )
+			{
+				iTopItem += ac_y / step + 0.5f;
+				ac_y = 0;
+			}
+		}
+
+		iTopItem = bound( 0, iTopItem, m_pModel->GetRows() - iNumRows );
+	}
+
+	if( iScrollBarSliding )
+	{
+		int dist = uiStatic.cursorY - sbarPos.y - (sbarSize.h / 2);
+
+		if((((dist / 2) > (m_scChSize / 2)) || ((dist / 2) < (m_scChSize / 2))) && iTopItem <= (m_pModel->GetRows() - iNumRows ) && iTopItem >= 0)
+		{
+			//_Event( QM_CHANGED );
+
+			if((dist / 2) > ( m_scChSize / 2 ) && iTopItem < ( m_pModel->GetRows() - iNumRows - 1 ))
+			{
+				iTopItem++;
+			}
+
+			if((dist / 2) < -(m_scChSize / 2) && iTopItem > 0 )
+			{
+				iTopItem--;
+			}
+		}
+
+		//iTopItem = iCurItem - iNumRows + 1;
+		if( iTopItem < 0 ) iTopItem = 0;
+		if( iTopItem > ( m_pModel->GetRows() - iNumRows - 1 ))
+			iTopItem = m_pModel->GetRows() - iNumRows - 1;
+	}
+
+	return true;
+}
+
 bool CMenuTable::MoveView(int delta )
 {
 	iTopItem += delta;
@@ -174,11 +246,19 @@ void CMenuTable::SetCurrentIndex( int idx )
 	}
 }
 
+float CMenuTable::Step()
+{
+	float step = (m_pModel->GetRows() <= 1 ) ? 1 : (downArrow.y - upArrow.y - arrow.h) / (float)(m_pModel->GetRows() - 1);
+
+	return step;
+}
+
 bool CMenuTable::KeyUp( int key )
 {
 	const char *sound = 0;
 	int i;
 	bool noscroll = false;
+
 	iScrollBarSliding = false;
 
 	switch( key )
@@ -292,7 +372,6 @@ bool CMenuTable::KeyUp( int key )
 bool CMenuTable::KeyDown( int key )
 {
 	const char *sound = 0;
-	int i;
 	bool noscroll = false;
 
 	switch( key )
@@ -304,31 +383,9 @@ bool CMenuTable::KeyDown( int key )
 		if( !( iFlags & QMF_HASMOUSEFOCUS ) )
 			break;
 
-		// test for arrows
-		if( UI_CursorInRect( upArrow, arrow ) )
-		{
-		}
-		else if( UI_CursorInRect( downArrow, arrow ))
-		{
-		}
-		else if( UI_CursorInRect( boxPos, boxSize ))
-		{
-		}
-		else if( bAllowSorting && UI_CursorInRect( m_scPos, headerSize ))
-		{
-		}
-		else
-		{
-			// ADAMIX
-			if( UI_CursorInRect( upArrow.x, upArrow.y + arrow.h,
-					arrow.w, sbarPos.y - upArrow.y - arrow.h ) ||
-				UI_CursorInRect( upArrow.x, sbarPos.y + sbarSize.h,
-					arrow.w, downArrow.y - sbarPos.y - sbarSize.h ))
-			{
-				iScrollBarSliding = true;
-			}
-			// ADAMIX END
-		}
+		// test for scrollbar
+		if( UI_CursorInRect( sbarPos, sbarSize ))
+			iScrollBarSliding = true;
 		break;
 	}
 	case K_HOME:
@@ -631,10 +688,11 @@ void CMenuTable::Draw()
 			UI_DrawRectangleExt( boxPos, boxSize, color, iStrokeWidth );
 	}
 
-	float step = (m_pModel->GetRows() <= 1 ) ? 1 : (downArrow.y - upArrow.y - arrow.h) / (float)(m_pModel->GetRows() - 1);
 
 	sbarPos.x = upArrow.x + arrow.w * 0.125f;
 	sbarSize.w = arrow.w * 0.75f;
+
+	float step = Step();
 
 	if(((downArrow.y - upArrow.y - arrow.h) - (((m_pModel->GetRows()-1)*m_scChSize)/2)) < 2)
 	{
@@ -647,85 +705,15 @@ void CMenuTable::Draw()
 		sbarPos.y = upArrow.y + arrow.h + (((iTopItem) * m_scChSize)/2);
 	}
 
-	if( g_bCursorDown && !iScrollBarSliding && ( iFlags & QMF_HASMOUSEFOCUS ) )
-	{
-		if( UI_CursorInRect( boxPos, boxSize ))
-		{
-			static float ac_y = 0;
-			ac_y += cursorDY;
-			cursorDY = 0;
-			if( ac_y > m_scChSize / 2.0f )
-			{
-				iTopItem -= ac_y/ m_scChSize - 0.5f;
-				if( iTopItem < 0 )
-					iTopItem = 0;
-				ac_y = 0;
-			}
-			if( ac_y < -m_scChSize / 2.0f )
-			{
-				iTopItem -= ac_y/ m_scChSize - 0.5f;
-				if( iTopItem > m_pModel->GetRows() - iNumRows )
-					iTopItem = m_pModel->GetRows() - iNumRows;
-				ac_y = 0;
-			}
-		}
-		else if( UI_CursorInRect( sbarPos, sbarSize ))
-		{
-			static float ac_y = 0;
-			ac_y += cursorDY;
-			cursorDY = 0;
-			if( ac_y < -step )
-			{
-				iTopItem += ac_y / step + 0.5f;
-				if( iTopItem < 0 )
-					iTopItem = 0;
-				ac_y = 0;
-			}
-			if( ac_y > step )
-			{
-				iTopItem += ac_y / step + 0.5f;
-				if( iTopItem > m_pModel->GetRows() - iNumRows )
-					iTopItem = m_pModel->GetRows() - iNumRows;
-				ac_y = 0;
-			}
-		}
-	}
-
 	// draw the arrows base
 	UI_FillRect( upArrow.x, upArrow.y + arrow.h,
 		arrow.w, downArrow.y - upArrow.y - arrow.h, uiInputFgColor );
 
 	// ADAMIX
-
-	if( iScrollBarSliding )
-	{
-		int dist = uiStatic.cursorY - sbarPos.y - (sbarSize.h>>1);
-
-		if((((dist / 2) > (m_scChSize / 2)) || ((dist / 2) < (m_scChSize / 2))) && iTopItem <= (m_pModel->GetRows() - iNumRows ) && iTopItem >= 0)
-		{
-			//_Event( QM_CHANGED );
-
-			if((dist / 2) > ( m_scChSize / 2 ) && iTopItem < ( m_pModel->GetRows() - iNumRows - 1 ))
-			{
-				iTopItem++;
-			}
-
-			if((dist / 2) < -(m_scChSize / 2) && iTopItem > 0 )
-			{
-				iTopItem--;
-			}
-		}
-
-		//iTopItem = iCurItem - iNumRows + 1;
-		if( iTopItem < 0 ) iTopItem = 0;
-		if( iTopItem > ( m_pModel->GetRows() - iNumRows - 1 ))
-			iTopItem = m_pModel->GetRows() - iNumRows - 1;
-	}
-
 	if( iScrollBarSliding )
 	{
 		// Draw scrollbar background
-		UI_FillRect ( sbarPos.x, upArrow.y + arrow.h, sbarSize.w, downArrow.y - upArrow.y - arrow.h, uiColorBlack);
+		UI_FillRect( sbarPos.x, upArrow.y + arrow.h, sbarSize.w, downArrow.y - upArrow.y - arrow.h, uiColorBlack);
 	}
 
 	// ADAMIX END
