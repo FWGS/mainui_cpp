@@ -312,10 +312,11 @@ public:
 		return engfuncs.COM_LoadFile( filename, pLength );
 	}
 
-	static inline char *COM_ParseFile( char *data, char *token )
-	{
-		return engfuncs.COM_ParseFile( data, token );
-	}
+	// deprecated, do not use
+	//static inline char *COM_ParseFile( char *data, char *token )
+	//{
+	//	return engfuncs.COM_ParseFile( data, token );
+	//}
 
 	static inline void COM_FreeFile( void *buffer )
 	{
