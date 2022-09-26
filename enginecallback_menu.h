@@ -526,6 +526,30 @@ public:
 	{
 		return textfuncs.pfnAdrToString( adr );
 	}
+
+	static inline void ClientCmdF( bool now, const char *fmt, ... ) _format( 2 )
+	{
+		va_list va;
+		char buf[4096];
+
+		va_start( va, fmt );
+		vsnprintf( buf, sizeof( buf ), fmt, va );
+		va_end( va );
+
+		ClientCmd( now, buf );
+	}
+
+	static inline void CvarSetStringF( const char *cvar, const char *fmt, ... ) _format( 2 )
+	{
+		va_list va;
+		char buf[4096];
+
+		va_start( va, fmt );
+		vsnprintf( buf, sizeof( buf ), fmt, va );
+		va_end( va );
+
+		CvarSetString( cvar, buf );
+	}
 };
 
 
