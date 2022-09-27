@@ -249,6 +249,39 @@ inline bool IsEnter( int key )
 	return false;
 }
 
+inline bool IsDelete( int key )
+{
+	switch( key )
+	{
+	case K_BACKSPACE:
+	case K_DEL:
+		return true;
+	}
+	return false;
+}
+
+inline bool IsHome( int key )
+{
+	switch( key )
+	{
+	case K_HOME:
+	case K_KP_HOME:
+		return true;
+	}
+	return false;
+}
+
+inline bool IsEnd( int key )
+{
+	switch( key )
+	{
+	case K_HOME:
+	case K_KP_HOME:
+		return true;
+	}
+	return false;
+}
+
 inline bool IsLeftMouse( int key )
 {
 	switch( key )
@@ -272,6 +305,84 @@ inline bool IsMouse( int key )
 	}
 	return false;
 }
+
+inline bool IsUpArrow( int key )
+{
+	switch( key )
+	{
+	case K_UPARROW:
+	case K_KP_UPARROW:
+	case K_DPAD_UP:
+		return true;
+	}
+	return false;
+}
+
+inline bool IsDownArrow( int key )
+{
+	switch( key )
+	{
+	case K_DOWNARROW:
+	case K_KP_DOWNARROW:
+	case K_DPAD_DOWN:
+		return true;
+	}
+	return false;
+}
+
+inline bool IsLeftArrow( int key )
+{
+	switch( key )
+	{
+	case K_LEFTARROW:
+	case K_KP_LEFTARROW:
+	case K_DPAD_LEFT:
+		return true;
+	}
+	return false;
+}
+
+inline bool IsRightArrow( int key )
+{
+	switch( key )
+	{
+	case K_RIGHTARROW:
+	case K_KP_RIGHTARROW:
+	case K_DPAD_RIGHT:
+		return true;
+	}
+	return false;
+}
+
+inline bool IsNavigationArrow( int key )
+{
+	return IsUpArrow( key ) || IsDownArrow( key ) || IsLeftArrow( key ) || IsRightArrow( key );
+}
+
+inline bool IsPageUp( int key )
+{
+	switch( key )
+	{
+	case K_PGUP:
+	case K_KP_PGUP:
+	case K_L1_BUTTON:
+		return true;
+	}
+	return false;
+}
+
+inline bool IsPageDown( int key )
+{
+	switch( key )
+	{
+	case K_PGDN:
+	case K_KP_PGDN:
+	case K_R1_BUTTON:
+		return true;
+	}
+	return false;
+}
+
 }
 
 namespace Names
