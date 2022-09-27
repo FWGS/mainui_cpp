@@ -123,25 +123,15 @@ bool CMenuSwitch::KeyUp( int key )
 	bool haveNewState = false;
 	int state = 0;
 
-	switch( key )
+	if( UI::Key::IsLeftMouse( key ) && FBitSet( iFlags, QMF_HASMOUSEFOCUS ))
 	{
-	case K_MOUSE1:
-		if(!( iFlags & QMF_HASMOUSEFOCUS ))
-			break;
 		state = IsNewStateByMouseClick();
 		haveNewState = state != m_iState;
 		if( haveNewState )
 			sound = uiStatic.sounds[SND_GLOW];
-		break;
-	case K_ENTER:
-	case K_KP_ENTER:
-	case K_SPACE:
-	case K_AUX1:
-		if( iFlags & QMF_MOUSEONLY )
-			break;
-		sound = uiStatic.sounds[SND_GLOW];
-		break;
 	}
+	else if( UI::Key::IsEnter( key ) && !FBitSet( iFlags, QMF_MOUSEONLY ))
+		sound = uiStatic.sounds[SND_GLOW];
 
 	if( sound )
 	{
@@ -164,23 +154,15 @@ bool CMenuSwitch::KeyDown( int key )
 	bool haveNewState = false;
 	int state = 0;
 
-	switch( key )
+	if( UI::Key::IsLeftMouse( key ) && FBitSet( iFlags, QMF_HASMOUSEFOCUS ))
 	{
-	case K_MOUSE1:
-		if(!( iFlags & QMF_HASMOUSEFOCUS ))
-			break;
 		state = IsNewStateByMouseClick();
 		haveNewState = state != m_iState;
-		break;
-	case K_ENTER:
-	case K_KP_ENTER:
-	case K_SPACE:
-	case K_AUX1:
-		if( iFlags & QMF_MOUSEONLY )
-			break;
-		sound = uiStatic.sounds[SND_GLOW];
-		break;
+		if( haveNewState )
+			sound = uiStatic.sounds[SND_GLOW];
 	}
+	else if( UI::Key::IsEnter( key ) && !FBitSet( iFlags, QMF_MOUSEONLY ))
+		sound = uiStatic.sounds[SND_GLOW];
 
 	if( sound )
 	{
