@@ -58,22 +58,10 @@ bool CMenuCheckBox::KeyUp( int key )
 {
 	const char	*sound = 0;
 
-	switch( key )
-	{
-	case K_MOUSE1:
-		if(!( iFlags & QMF_HASMOUSEFOCUS ))
-			break;
+	if( UI::Key::IsLeftMouse( key ) && FBitSet( iFlags, QMF_HASMOUSEFOCUS ))
 		sound = uiStatic.sounds[SND_GLOW];
-		break;
-	case K_ENTER:
-	case K_KP_ENTER:
-	case K_AUX1:
-		//if( !down ) return sound;
-		if( iFlags & QMF_MOUSEONLY )
-			break;
+	else if( UI::Key::IsEnter( key ) && !FBitSet( iFlags, QMF_MOUSEONLY ))
 		sound = uiStatic.sounds[SND_GLOW];
-		break;
-	}
 
 	if( sound )
 	{
@@ -94,22 +82,10 @@ bool CMenuCheckBox::KeyDown( int key )
 {
 	const char	*sound = 0;
 
-	switch( key )
-	{
-	case K_MOUSE1:
-		if(!( iFlags & QMF_HASMOUSEFOCUS ))
-			break;
+	if( UI::Key::IsLeftMouse( key ) && FBitSet( iFlags, QMF_HASMOUSEFOCUS ))
 		sound = uiStatic.sounds[SND_GLOW];
-		break;
-	case K_ENTER:
-	case K_KP_ENTER:
-	case K_AUX1:
-		//if( !down ) return sound;
-		if( iFlags & QMF_MOUSEONLY )
-			break;
+	else if( UI::Key::IsEnter( key ) && !FBitSet( iFlags, QMF_MOUSEONLY ))
 		sound = uiStatic.sounds[SND_GLOW];
-		break;
-	}
 
 	if( sound )
 	{
