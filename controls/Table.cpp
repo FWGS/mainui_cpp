@@ -439,7 +439,14 @@ bool CMenuTable::KeyDown( int key )
 	case K_BACKSPACE:
 	case K_DEL:
 	case K_AUX30:
-		m_pModel->OnDeleteEntry( iCurItem ); // allow removing entries on repeating
+		if( m_pModel->GetRows() )
+		{
+			m_pModel->OnDeleteEntry( iCurItem ); // allow removing entries on repeating
+		}
+		else
+		{
+			sound = uiStatic.sounds[SND_BUZZ];
+		}
 		break;
 	}
 
