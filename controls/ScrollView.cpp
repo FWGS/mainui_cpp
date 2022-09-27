@@ -33,34 +33,22 @@ bool CMenuScrollView::KeyDown( int key )
 	if( !m_bDisableScrolling )
 	{
 		int newPos = m_iPos;
-		switch( key )
-		{
-		case K_MWHEELUP:
-		case K_UPARROW:
-		case K_DPAD_UP:
+		if( UI::Key::IsUpArrow( key ))
 			newPos -= 20;
-			break;
-		case K_MWHEELDOWN:
-		case K_DOWNARROW:
-		case K_DPAD_DOWN:
+		else if( UI::Key::IsDownArrow( key ))
 			newPos += 20;
-			break;
-
-		case K_PGUP:
-		case K_L1_BUTTON:
+		else if( UI::Key::IsPageUp( key ))
 			newPos -= 100;
-			break;
-		case K_PGDN:
-		case K_R1_BUTTON:
+		else if( UI::Key::IsPageDown( key ))
 			newPos += 100;
-			break;
-		case K_MOUSE1:
+		else if( UI::Key::IsLeftMouse( key ))
+		{
 			// m_bHoldingMouse1 = down != 0;
 			// m_HoldingPoint = Point( uiStatic.cursorX, uiStatic.cursorY );
 			// drag & drop
 			// scrollbar
-			break;
 		}
+
 		// TODO: overscrolling
 		newPos = bound( 0, newPos, m_iMax - m_scSize.h );
 
