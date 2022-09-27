@@ -249,14 +249,23 @@ inline bool IsEnter( int key )
 	return false;
 }
 
-inline bool IsDelete( int key )
+inline bool IsBackspace( int key )
 {
 	switch( key )
 	{
 	case K_BACKSPACE:
-	case K_DEL:
+	case K_X_BUTTON:
 		return true;
 	}
+	return false;
+}
+
+inline bool IsDelete( int key, bool ignoreBackspace = false )
+{
+	if( key == K_DEL )
+		return true;
+	if( !ignoreBackspace )
+		return UI::Key::IsBackspace( key );
 	return false;
 }
 
@@ -284,12 +293,7 @@ inline bool IsEnd( int key )
 
 inline bool IsLeftMouse( int key )
 {
-	switch( key )
-	{
-	case K_MOUSE1:
-		return true;
-	}
-	return false;
+	return key == K_MOUSE1;
 }
 
 inline bool IsMouse( int key )
@@ -354,9 +358,13 @@ inline bool IsRightArrow( int key )
 	return false;
 }
 
-inline bool IsNavigationArrow( int key )
+inline bool IsNavigationKey( int key )
 {
-	return IsUpArrow( key ) || IsDownArrow( key ) || IsLeftArrow( key ) || IsRightArrow( key );
+	return IsUpArrow( key ) ||
+			IsDownArrow( key ) ||
+			IsLeftArrow( key ) ||
+			IsRightArrow( key ) ||
+			key == K_TAB;
 }
 
 inline bool IsPageUp( int key )
@@ -378,6 +386,28 @@ inline bool IsPageDown( int key )
 	case K_PGDN:
 	case K_KP_PGDN:
 	case K_R1_BUTTON:
+		return true;
+	}
+	return false;
+}
+
+inline bool IsConsole( int key )
+{
+	switch( key )
+	{
+	case '`':
+	case '~':
+		return true;
+	}
+	return false;
+}
+
+inline bool IsInsert( int key )
+{
+	switch( key )
+	{
+	case K_INS:
+	case K_KP_INS:
 		return true;
 	}
 	return false;
