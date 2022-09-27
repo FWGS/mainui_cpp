@@ -49,27 +49,14 @@ void CMenuSpinControl::VidInit( void )
 	BaseClass::VidInit();
 }
 
-bool CMenuSpinControl::KeyDown(	int key )
+bool CMenuSpinControl::KeyDown( int key )
 {
 	const char *sound = 0;
 
-	switch( key )
-	{
-	case K_LEFTARROW:
-	case K_KP_LEFTARROW:
-		if( iFlags & QMF_MOUSEONLY )
-			break;
-
+	if( UI::Key::IsLeftArrow( key ) && !FBitSet( iFlags, QMF_MOUSEONLY ))
 		sound = MoveLeft();
-		break;
-	case K_RIGHTARROW:
-	case K_KP_RIGHTARROW:
-		if( iFlags & QMF_MOUSEONLY )
-			break;
-
+	else if( UI::Key::IsRightArrow( key ) && !FBitSet( iFlags, QMF_MOUSEONLY ))
 		sound = MoveRight();
-		break;
-	}
 
 	if( sound )
 	{
@@ -95,13 +82,8 @@ bool CMenuSpinControl::KeyUp( int key )
 	Size arrow;
 	Point left, right;
 
-	switch( key )
+	if( UI::Key::IsLeftMouse( key ) && FBitSet( iFlags, QMF_HASMOUSEFOCUS ))
 	{
-	case K_MOUSE1:
-	case K_MOUSE2:
-		if( !( iFlags & QMF_HASMOUSEFOCUS ))
-			break;
-
 		// calculate size and position for the arrows
 		arrow.w = m_scSize.h + UI_OUTLINE_WIDTH * 2 * uiStatic.scaleX;
 		arrow.h = m_scSize.h + UI_OUTLINE_WIDTH * 2 * uiStatic.scaleY;
@@ -113,14 +95,9 @@ bool CMenuSpinControl::KeyUp( int key )
 
 		// now see if either left or right arrow has focus
 		if( UI_CursorInRect( left, arrow ))
-		{
 			sound = MoveLeft();
-		}
 		else if( UI_CursorInRect( right, arrow ))
-		{
 			sound = MoveRight();
-		}
-		break;
 	}
 
 	if( sound )
