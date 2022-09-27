@@ -261,97 +261,88 @@ bool CMenuTable::KeyUp( int key )
 
 	iScrollBarSliding = false;
 
-	switch( key )
+	if( UI::Key::IsLeftMouse( key ))
 	{
-	case K_MOUSE1:
 		noscroll = true; // don't scroll to current when mouse used
 
-		if( !( iFlags & QMF_HASMOUSEFOCUS ) )
-			break;
-
-		// test for arrows
-		if( UI_CursorInRect( upArrow, arrow ) )
+		if( FBitSet( iFlags, QMF_HASMOUSEFOCUS ))
 		{
-			if( MoveView( -5 ) )
-				sound = uiStatic.sounds[SND_MOVE];
-			else sound = uiStatic.sounds[SND_BUZZ];
-		}
-		else if( UI_CursorInRect( downArrow, arrow ))
-		{
-			if( MoveView( 5 ) )
-				sound = uiStatic.sounds[SND_MOVE];
-			else sound = uiStatic.sounds[SND_BUZZ];
-		}
-		else if( UI_CursorInRect( boxPos, boxSize ))
-		{
-			// test for item select
-			int starty = boxPos.y + iStrokeWidth;
-			int endy = starty + iNumRows * m_scChSize;
-			if( uiStatic.cursorY > starty && uiStatic.cursorY < endy )
+			// test for arrows
+			if( UI_CursorInRect( upArrow, arrow ) )
 			{
-				int offsety = uiStatic.cursorY - starty;
-				int newCur = iTopItem + offsety / m_scChSize;
-
-				if( newCur < m_pModel->GetRows() )
+				if( MoveView( -5 ) )
+					sound = uiStatic.sounds[SND_MOVE];
+				else sound = uiStatic.sounds[SND_BUZZ];
+			}
+			else if( UI_CursorInRect( downArrow, arrow ))
+			{
+				if( MoveView( 5 ) )
+					sound = uiStatic.sounds[SND_MOVE];
+				else sound = uiStatic.sounds[SND_BUZZ];
+			}
+			else if( UI_CursorInRect( boxPos, boxSize ))
+			{
+				// test for item select
+				int starty = boxPos.y + iStrokeWidth;
+				int endy = starty + iNumRows * m_scChSize;
+				if( uiStatic.cursorY > starty && uiStatic.cursorY < endy )
 				{
-					if( newCur == iCurItem )
+					int offsety = uiStatic.cursorY - starty;
+					int newCur = iTopItem + offsety / m_scChSize;
+
+					if( newCur < m_pModel->GetRows() )
 					{
-						if( uiStatic.realTime - m_iLastItemMouseChange < 200 ) // 200 msec to double click
+						if( newCur == iCurItem )
 						{
-							m_pModel->OnActivateEntry( iCurItem );
+							if( uiStatic.realTime - m_iLastItemMouseChange < 200 ) // 200 msec to double click
+							{
+								m_pModel->OnActivateEntry( iCurItem );
+							}
+						}
+						else
+						{
+							iCurItem = newCur;
+							sound = uiStatic.sounds[SND_NULL];
+						}
+
+						m_iLastItemMouseChange = uiStatic.realTime;
+					}
+				}
+			}
+			else if( bAllowSorting && UI_CursorInRect( m_scPos, headerSize ))
+			{
+				Point p = m_scPos;
+				Size sz;
+				sz.h = headerSize.h;
+
+				for( i = 0; i < m_pModel->GetColumns(); i++, p.x += sz.w )
+				{
+					if( columns[i].fStaticWidth )
+						sz.w = columns[i].flWidth * uiStatic.scaleX;
+					else
+						sz.w = ((float)headerSize.w - flFixedSumm) * columns[i].flWidth / flDynamicSumm;
+
+					if( UI_CursorInRect( p, sz ))
+					{
+						if( GetSortingColumn() != i )
+						{
+							SetSortingColumn( i );
+						}
+						else
+						{
+							SwapOrder();
 						}
 					}
-					else
-					{
-						iCurItem = newCur;
-						sound = uiStatic.sounds[SND_NULL];
-					}
-
-					m_iLastItemMouseChange = uiStatic.realTime;
 				}
 			}
 		}
-		else if( bAllowSorting && UI_CursorInRect( m_scPos, headerSize ))
-		{
-			Point p = m_scPos;
-			Size sz;
-			sz.h = headerSize.h;
-
-			for( i = 0; i < m_pModel->GetColumns(); i++, p.x += sz.w )
-			{
-				if( columns[i].fStaticWidth )
-					sz.w = columns[i].flWidth * uiStatic.scaleX;
-				else
-					sz.w = ((float)headerSize.w - flFixedSumm) * columns[i].flWidth / flDynamicSumm;
-
-				if( UI_CursorInRect( p, sz ))
-				{
-					if( GetSortingColumn() != i )
-					{
-						SetSortingColumn( i );
-					}
-					else
-					{
-						SwapOrder();
-					}
-				}
-			}
-		}
-		break;
-	case K_ENTER:
-	case K_AUX1:
-	case K_AUX31:
-	case K_AUX32:
+	}
+	else if( UI::Key::IsEnter( key ))
+	{
 		if( m_pModel->GetRows() )
-		{
 			m_pModel->OnActivateEntry( iCurItem ); // activate only on release
-		}
 		else
-		{
-			// list is empty, can't activate anything
-			sound = uiStatic.sounds[SND_BUZZ];
-		}
-		break;
+			sound = uiStatic.sounds[SND_BUZZ]; // list is empty, can't activate anything
 	}
 
 	if( !noscroll )
@@ -382,72 +373,46 @@ bool CMenuTable::KeyDown( int key )
 	const char *sound = 0;
 	bool noscroll = false;
 
-	switch( key )
+	if( UI::Key::IsUpArrow( key ))
+		sound = MoveCursor( -1 ) ? uiStatic.sounds[SND_MOVE] : 0;
+	else if( UI::Key::IsDownArrow( key ))
+		sound = MoveCursor( 1 ) ? uiStatic.sounds[SND_MOVE] : 0;
+	else if( key == K_MWHEELUP )
+		sound = MoveCursor( -1 ) ? uiStatic.sounds[SND_MOVE] : uiStatic.sounds[SND_BUZZ];
+	else if( key == K_MWHEELDOWN )
+		sound = MoveCursor( 1 ) ? uiStatic.sounds[SND_MOVE] : uiStatic.sounds[SND_BUZZ];
+	else if( UI::Key::IsPageUp( key ))
+		sound = MoveCursor( -2 ) ? uiStatic.sounds[SND_MOVE] : uiStatic.sounds[SND_BUZZ];
+	else if( UI::Key::IsPageDown( key ))
+		sound = MoveCursor( 2 ) ? uiStatic.sounds[SND_MOVE] : uiStatic.sounds[SND_BUZZ];
+	else if( UI::Key::IsHome( key ))
 	{
-	case K_MOUSE1:
+		sound = iCurItem > 0 ? uiStatic.sounds[SND_MOVE] : uiStatic.sounds[SND_BUZZ];
+		iCurItem = 0;
+	}
+	else if( UI::Key::IsEnd( key ))
+	{
+		int lastItem = Q_min( m_pModel->GetRows() - 1, 0 );
+		sound = iCurItem < lastItem ? uiStatic.sounds[SND_MOVE] : uiStatic.sounds[SND_BUZZ];
+		iCurItem = lastItem;
+	}
+	else if( UI::Key::IsDelete( key ))
+	{
+		if( m_pModel->GetRows() )
+			m_pModel->OnDeleteEntry( iCurItem ); // allow removing entries on repeating
+		else
+			sound = uiStatic.sounds[SND_BUZZ];
+	}
+	else if( UI::Key::IsLeftMouse( key ))
 	{
 		noscroll = true; // don't scroll to current when mouse used
 
-		if( !( iFlags & QMF_HASMOUSEFOCUS ) )
-			break;
-
-		// test for scrollbar
-		if( UI_CursorInRect( sbarPos, sbarSize ))
-			iScrollBarSliding = true;
-		break;
-	}
-	case K_HOME:
-	case K_KP_HOME:
-		if( iCurItem )
+		if( FBitSet( iFlags, QMF_HASMOUSEFOCUS ))
 		{
-			iCurItem = 0;
-			sound = uiStatic.sounds[SND_MOVE];
+			// test for scrollbar
+			if( UI_CursorInRect( sbarPos, sbarSize ))
+				iScrollBarSliding = true;
 		}
-		else sound = uiStatic.sounds[SND_BUZZ];
-		break;
-	case K_END:
-	case K_KP_END:
-		if( iCurItem != m_pModel->GetRows() - 1 )
-		{
-			iCurItem = m_pModel->GetRows() - 1;
-			sound = uiStatic.sounds[SND_MOVE];
-		}
-		else sound = uiStatic.sounds[SND_BUZZ];
-		break;
-	case K_PGDN:
-	case K_KP_PGDN:
-	case K_R1_BUTTON:
-		sound = MoveCursor( 2 ) ? uiStatic.sounds[SND_MOVE] : uiStatic.sounds[SND_BUZZ];
-		break;
-	case K_PGUP:
-	case K_KP_PGUP:
-	case K_L1_BUTTON:
-		sound = MoveCursor( -2 ) ? uiStatic.sounds[SND_MOVE] : uiStatic.sounds[SND_BUZZ];
-		break;
-	case K_UPARROW:
-	case K_KP_UPARROW:
-	case K_DPAD_UP:
-	case K_MWHEELUP:
-		sound = MoveCursor( -1 ) ? uiStatic.sounds[SND_MOVE] : uiStatic.sounds[SND_BUZZ];
-		break;
-	case K_DOWNARROW:
-	case K_KP_DOWNARROW:
-	case K_DPAD_DOWN:
-	case K_MWHEELDOWN:
-		sound = MoveCursor( 1 ) ? uiStatic.sounds[SND_MOVE] : uiStatic.sounds[SND_BUZZ];
-		break;
-	case K_BACKSPACE:
-	case K_DEL:
-	case K_AUX30:
-		if( m_pModel->GetRows() )
-		{
-			m_pModel->OnDeleteEntry( iCurItem ); // allow removing entries on repeating
-		}
-		else
-		{
-			sound = uiStatic.sounds[SND_BUZZ];
-		}
-		break;
 	}
 
 	if( !noscroll )
