@@ -304,7 +304,8 @@ bool CMenuControls::CGrabKeyMessageBox::KeyUp( int key )
 	CMenuControls *parent = ((CMenuControls*)m_pParent);
 
 	// defining a key
-	if( key == '`' || key == '~' || key == K_ESCAPE )
+	// escape is special, should allow rebind all keys on gamepad
+	if( UI::Key::IsConsole( key ) || key == K_ESCAPE )
 	{
 		Hide();
 		PlayLocalSound( uiStatic.sounds[SND_BUZZ] );
