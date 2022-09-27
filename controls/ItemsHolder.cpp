@@ -53,9 +53,9 @@ bool CMenuItemsHolder::Key( const int key, const bool down )
 
 	if( item && item->IsVisible() && !(item->iFlags & (QMF_GRAYED|QMF_INACTIVE) ) )
 	{
-		// mouse keys must be checked for item bounds
+		// mouse keys must be checked for item bounds on press
 		if( !UI::Key::IsMouse( key ) ||
-			 (UI::Key::IsMouse( key ) && UI_CursorInRect( item->m_scPos, item->m_scSize )))
+			 (UI::Key::IsMouse( key ) && ( !down || UI_CursorInRect( item->m_scPos, item->m_scSize ))))
 		{
 			handled = down ? item->KeyDown( key ) : item->KeyUp( key );
 			if( handled )
@@ -91,18 +91,18 @@ bool CMenuItemsHolder::Key( const int key, const bool down )
 		return false;
 
 	// default handling -- items navigation
-	switch( key )
+	if( UI::Key::IsNavigationKey( key ))
 	{
-	case K_UPARROW:
-	case K_KP_UPARROW:
-	case K_DPAD_UP:
-	case K_LEFTARROW:
-	case K_KP_LEFTARROW:
-	case K_DPAD_LEFT:
+		int direction;
 		cursorPrev = m_iCursorPrev = m_iCursor;
 
-		m_iCursor--;
-		if( AdjustCursor( -1 ) )
+		if( UI::Key::IsUpArrow( key ) || UI::Key::IsLeftArrow( key ))
+			direction = -1;
+		else if( UI::Key::IsDownArrow( key ) || UI::Key::IsRightArrow( key ) || key == K_TAB )
+			direction = 1;
+
+		m_iCursor += direction;
+		if( AdjustCursor( direction ) )
 		{
 			if( cursorPrev != m_iCursor )
 			{
@@ -110,42 +110,14 @@ bool CMenuItemsHolder::Key( const int key, const bool down )
 				m_pItems[m_iCursor]->PlayLocalSound( uiStatic.sounds[SND_MOVE] );
 				handled = true;
 
-				m_pItems[m_iCursorPrev]->iFlags &= ~QMF_HASKEYBOARDFOCUS;
-				m_pItems[m_iCursor]->iFlags |= QMF_HASKEYBOARDFOCUS;
+				ClearBits( m_pItems[m_iCursorPrev]->iFlags, QMF_HASKEYBOARDFOCUS );
+				SetBits( m_pItems[m_iCursor]->iFlags, QMF_HASKEYBOARDFOCUS );
 			}
 		}
 		else
 		{
 			handled = false;
 		}
-		break;
-	case K_DOWNARROW:
-	case K_KP_DOWNARROW:
-	case K_DPAD_DOWN:
-	case K_RIGHTARROW:
-	case K_KP_RIGHTARROW:
-	case K_DPAD_RIGHT:
-	case K_TAB:
-		cursorPrev = m_iCursorPrev = m_iCursor;
-
-		m_iCursor++;
-		if( AdjustCursor( 1 ) )
-		{
-			if( cursorPrev != m_iCursor )
-			{
-				CursorMoved();
-				m_pItems[m_iCursor]->PlayLocalSound( uiStatic.sounds[SND_MOVE] );
-				handled = true;
-
-				m_pItems[m_iCursorPrev]->iFlags &= ~QMF_HASKEYBOARDFOCUS;
-				m_pItems[m_iCursor]->iFlags |= QMF_HASKEYBOARDFOCUS;
-			}
-		}
-		else
-		{
-			handled = false;
-		}
-		break;
 	}
 
 	return handled;
