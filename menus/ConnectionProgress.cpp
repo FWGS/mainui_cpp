@@ -144,20 +144,19 @@ CMenuConnectionProgress::CMenuConnectionProgress() : CMenuBaseWindow( "Connectio
 
 bool CMenuConnectionProgress::KeyDown( int key )
 {
-	switch( key )
+	if( UI::Key::IsEscape( key ))
 	{
-	case K_ESCAPE:
 		dialog.Show();
 		PlayLocalSound( uiStatic.sounds[SND_OUT] );
-		return true;
-	case '~':
+	}
+	else if( UI::Key::IsConsole( key ))
+	{
 		consoleButton.onReleased( &consoleButton );
 		PlayLocalSound( uiStatic.sounds[SND_LAUNCH] );
-		return true;
-	case 'A':
+	}
+	else if( key == 'A' )
+	{
 		HandleDisconnect();
-		break;
-	default: break;
 	}
 
 	return CMenuItemsHolder::KeyDown( key );
