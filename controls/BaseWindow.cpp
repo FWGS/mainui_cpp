@@ -92,7 +92,7 @@ void CMenuBaseWindow::DragDrop( int down )
 
 bool CMenuBaseWindow::KeyDown( int key )
 {
-	if( key == K_MOUSE1 && bAllowDrag )
+	if( UI::Key::IsLeftMouse( key ) && bAllowDrag )
 		DragDrop( true );
 
 	if( UI::Key::IsEscape( key ) )
@@ -107,7 +107,7 @@ bool CMenuBaseWindow::KeyDown( int key )
 
 bool CMenuBaseWindow::KeyUp( int key )
 {
-	if( key == K_MOUSE1 && bAllowDrag )
+	if( UI::Key::IsLeftMouse( key ) && bAllowDrag )
 		DragDrop( false );
 
 	return BaseClass::KeyUp( key );
