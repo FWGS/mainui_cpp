@@ -142,25 +142,6 @@ void CMenuItemsHolder::Char( int ch )
 
 	if( item && item->IsVisible() && !(item->iFlags & (QMF_GRAYED|QMF_INACTIVE)) )
 		item->Char( ch );
-
-	FOR_EACH_VEC( m_pItems, i )
-	{
-		item = m_pItems[i];
-
-		if( !item )
-			continue;
-
-		if( item == ItemAtCursor() )
-			continue;
-
-		if( item->iFlags & (QMF_GRAYED|QMF_INACTIVE) )
-			continue;
-
-		if( !item->IsVisible() )
-			continue;
-
-		item->Char( ch );
-	}
 }
 
 bool CMenuItemsHolder::MouseMove( int x, int y )
