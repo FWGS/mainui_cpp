@@ -325,7 +325,7 @@ void CMenuGameListModel::OnActivateEntry( int line )
 	CMenuServerBrowser::Connect( servers[line] );
 }
 
-void CMenuGameListModel::AddServerToList(netadr_t adr, const char *info)
+void CMenuGameListModel::AddServerToList( netadr_t adr, const char *info )
 {
 	int i;
 

@@ -342,7 +342,15 @@ bool CMenuTable::KeyUp( int key )
 	case K_AUX1:
 	case K_AUX31:
 	case K_AUX32:
-		m_pModel->OnActivateEntry( iCurItem ); // activate only on release
+		if( m_pModel->GetRows() )
+		{
+			m_pModel->OnActivateEntry( iCurItem ); // activate only on release
+		}
+		else
+		{
+			// list is empty, can't activate anything
+			sound = uiStatic.sounds[SND_BUZZ];
+		}
 		break;
 	}
 
