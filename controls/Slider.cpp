@@ -81,9 +81,8 @@ CMenuSlider::Key
 */
 bool CMenuSlider::KeyDown( int key )
 {
-	switch( key )
+	if( UI::Key::IsLeftMouse( key ))
 	{
-	case K_MOUSE1:
 		if( !UI_CursorInRect( m_scPos, m_scSize ) )
 		{
 			m_iKeepSlider = false;
@@ -104,7 +103,9 @@ bool CMenuSlider::KeyDown( int key )
 		_Event( QM_CHANGED );
 
 		return true;
-	case K_LEFTARROW:
+	}
+	else if( UI::Key::IsLeftArrow( key ))
+	{
 		m_flCurValue -= m_flRange;
 
 		if( m_flCurValue < m_flMinValue )
@@ -120,7 +121,9 @@ bool CMenuSlider::KeyDown( int key )
 
 		PlayLocalSound( uiStatic.sounds[SND_KEY] );
 		return true;
-	case K_RIGHTARROW:
+	}
+	else if( UI::Key::IsRightArrow( key ))
+	{
 		m_flCurValue += m_flRange;
 
 		if( m_flCurValue > m_flMaxValue )
