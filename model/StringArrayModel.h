@@ -23,9 +23,9 @@ public:
 	}
 
 	// by default, there is no need to update
-	void Update() { }
+	void Update() override { }
 
-	const char *GetText( int line )
+	const char *GetText( int line ) final override
 	{
 		if( line < 0 || line > m_iCount )
 		{
@@ -37,7 +37,7 @@ public:
 		return m_u.m_pArrayOfPtrs[line];
 	}
 
-	int GetRows() const
+	int GetRows() const final override
 	{
 		return m_iCount;
 	}

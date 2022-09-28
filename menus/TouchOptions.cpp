@@ -57,7 +57,6 @@ public:
 	public:
 		CProfiliesListModel() : CStringArrayModel( (const char*)profileDesc, 95, 0 ) {}
 		void Update();
-		const char *GetText( int line ) { return profileDesc[line]; }
 		char profileDesc[UI_MAXGAMES][95];
 		int	 iHighlight;
 		int	 firstProfile;
