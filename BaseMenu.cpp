@@ -549,16 +549,6 @@ void UI_DrawMouseCursor( void )
 #endif
 }
 
-const char *COM_ExtractExtension( const char *s )
-{
-	int len = strlen( s );
-
-	for( int i = len; i >= 0; i-- )
-		if( s[i] == '.' )
-			return s + i + 1;
-	return s;
-}
-
 // =====================================================================
 
 /*
