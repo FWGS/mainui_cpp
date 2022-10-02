@@ -98,7 +98,7 @@ bool CMenuItemsHolder::Key( const int key, const bool down )
 
 		if( UI::Key::IsUpArrow( key ) || UI::Key::IsLeftArrow( key ))
 			direction = -1;
-		else if( UI::Key::IsDownArrow( key ) || UI::Key::IsRightArrow( key ) || key == K_TAB )
+		else // if( UI::Key::IsDownArrow( key ) || UI::Key::IsRightArrow( key ) || key == K_TAB )
 			direction = 1;
 
 		m_iCursor += direction;
@@ -146,7 +146,7 @@ void CMenuItemsHolder::Char( int ch )
 
 bool CMenuItemsHolder::MouseMove( int x, int y )
 {
-	int i;
+	int i = 0;
 	// region test the active menu items
 	// go in reverse direction, so last items will be first
 	FOR_EACH_VEC_BACK( m_pItems, i )
