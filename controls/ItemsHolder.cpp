@@ -193,7 +193,7 @@ bool CMenuItemsHolder::MouseMove( int x, int y )
 	}
 
 	// out of any region
-	if( !i )
+	if( !i && m_pItems.Count() > 0 )
 	{
 		ClearBits( m_pItems[m_iCursor]->iFlags, QMF_HASMOUSEFOCUS );
 
