@@ -464,7 +464,7 @@ void CMenuTable::DrawLine( Point p, const char **psz, size_t size, uint textColo
 		else
 			sz.w = ((float)headerSize.w - flFixedSumm) * columns[i].flWidth / flDynamicSumm;
 
-		if( !psz[i] ) // headers may be null, cells too
+		if( !psz[i] || !sz.w ) // headers may be null, cells too
 			continue;
 
 		if( bAllowSorting && i == GetSortingColumn() )
