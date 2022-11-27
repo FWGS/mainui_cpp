@@ -33,6 +33,16 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 class CMenuServerBrowser;
 
+enum
+{
+	COLUMN_PASSWORD = 0,
+	COLUMN_NAME,
+	COLUMN_MAP,
+	COLUMN_PLAYERS,
+	COLUMN_PING,
+	COLUMN_IP
+};
+
 struct server_t
 {
 	netadr_t adr;
@@ -54,61 +64,51 @@ struct server_t
 
 	int Rank( const server_t &other ) const
 	{
-		if( isLegacy )
-		{
-			if( !other.isLegacy )
-				return -2;
-		}
-		else
-		{
-			if( other.isLegacy )
-				return 2;
-		}
-
+		if( isLegacy > other.isLegacy ) return 2;
+		else if( isLegacy < other.isLegacy ) return -2;
 		return 0;
 	}
 
 	int NameCmp( const server_t &other ) const
 	{
-		return Rank( other ) + colorstricmp( name, other.name );
+		return colorstricmp( name, other.name );
 	}
 
 	int AdrCmp( const server_t &other ) const
 	{
 		// NET_CompareAdr is not in the engine API!
-		return Rank( other ) + strcmp( ipstr, other.ipstr );
+		return strcmp( ipstr, other.ipstr );
 	}
 
 	int MapCmp( const server_t &other ) const
 	{
-		return Rank( other ) + stricmp( mapname, other.mapname );
+		return stricmp( mapname, other.mapname );
 	}
 
 	int ClientCmp( const server_t &other ) const
 	{
-		int rank = Rank( other );
-		if( numcl > other.numcl ) return rank + 1;
-		else if( numcl < other.numcl ) return rank - 1;
-		return rank;
+		if( numcl > other.numcl ) return 1;
+		else if( numcl < other.numcl ) return -1;
+		return 0;
 	}
 
 	int PingCmp( const server_t &other ) const
 	{
-		int rank = Rank( other );
-		if( ping > other.ping ) return rank + 1;
-		else if( ping < other.ping ) return rank - 1;
-		return rank;
+		if( ping > other.ping ) return 1;
+		else if( ping < other.ping ) return -1;
+		return 0;
 	}
 
 	// make generic
+	// always rank new servers higher, even when sorting in reverse order
 #define GENERATE_COMPAR_FN( method ) \
 	static int method ## Ascend( const void *a, const void *b ) \
 	{\
-		return (( const server_t *)a)->method( *(( const server_t *)b) );\
+		return (( const server_t *)a)->Rank( *(( const server_t *)b) ) + (( const server_t *)a)->method( *(( const server_t *)b) );\
 	}\
 	static int method ## Descend( const void *a, const void *b ) \
 	{\
-		return (( const server_t *)b)->method( *(( const server_t *)a) );\
+		return (( const server_t *)a)->Rank( *(( const server_t *)b) ) + (( const server_t *)b)->method( *(( const server_t *)a) );\
 	}\
 
 	GENERATE_COMPAR_FN( NameCmp )
@@ -147,12 +147,12 @@ public:
 	{
 		switch( column )
 		{
-		case 0: return servers[line].havePassword ? ART_BANNER_LOCK : NULL;
-		case 1: return servers[line].name;
-		case 2: return servers[line].mapname;
-		case 3: return servers[line].clientsstr;
-		case 4: return servers[line].pingstr;
-		case 5: return servers[line].ipstr;
+		case COLUMN_PASSWORD: return servers[line].havePassword ? ART_BANNER_LOCK : NULL;
+		case COLUMN_NAME: return servers[line].name;
+		case COLUMN_MAP: return servers[line].mapname;
+		case COLUMN_PLAYERS: return servers[line].clientsstr;
+		case COLUMN_PING: return servers[line].pingstr;
+		case COLUMN_IP: return servers[line].ipstr;
 		default: return NULL;
 		}
 	}
@@ -323,25 +323,25 @@ bool CMenuGameListModel::Sort(int column, bool ascend)
 	m_bAscend = ascend;
 	switch( column )
 	{
-	case 0:
+	case COLUMN_PASSWORD:
 		return false;
-	case 1:
+	case COLUMN_NAME:
 		qsort( servers.Base(), servers.Count(), sizeof( server_t ),
 			ascend ? server_t::NameCmpAscend : server_t::NameCmpDescend );
 		return true;
-	case 2:
+	case COLUMN_MAP:
 		qsort( servers.Base(), servers.Count(), sizeof( server_t ),
 			ascend ? server_t::MapCmpAscend : server_t::MapCmpDescend );
 		return true;
-	case 3:
+	case COLUMN_PLAYERS:
 		qsort( servers.Base(), servers.Count(), sizeof( server_t ),
 			ascend ? server_t::ClientCmpAscend : server_t::ClientCmpDescend );
 		return true;
-	case 4:
+	case COLUMN_PING:
 		qsort( servers.Base(), servers.Count(), sizeof( server_t ),
 			ascend ? server_t::PingCmpAscend : server_t::PingCmpDescend );
 		return true;
-	case 5:
+	case COLUMN_IP:
 		qsort( servers.Base(), servers.Count(), sizeof( server_t ),
 			ascend ? server_t::AdrCmpAscend : server_t::AdrCmpDescend );
 		return true;
@@ -501,7 +501,7 @@ bool CMenuServerBrowser::KeyUp( int key )
 {
 	if( key == 'i' )
 	{
-		gameList.SetColumnWidth( 5, 300, true );
+		gameList.SetColumnWidth( COLUMN_IP, 300, true );
 
 		gameList.VidInit();
 		gameListModel.Update();
@@ -548,12 +548,12 @@ void CMenuServerBrowser::_Init( void )
 	msgBox.Link( this );
 
 	gameList.SetCharSize( QM_SMALLFONT );
-	gameList.SetupColumn( 0, NULL, 32.0f, true );
-	gameList.SetupColumn( 1, L( "Name" ), 0.40f );
-	gameList.SetupColumn( 2, L( "GameUI_Map" ), 0.25f );
-	gameList.SetupColumn( 3, L( "Players" ), 100.0f, true );
-	gameList.SetupColumn( 4, L( "Ping" ), 120.0f, true );
-	gameList.SetupColumn( 5, L( "IP" ), 0, true );
+	gameList.SetupColumn( COLUMN_PASSWORD, NULL, 32.0f, true );
+	gameList.SetupColumn( COLUMN_NAME, L( "Name" ), 0.40f );
+	gameList.SetupColumn( COLUMN_MAP, L( "GameUI_Map" ), 0.25f );
+	gameList.SetupColumn( COLUMN_PLAYERS, L( "Players" ), 100.0f, true );
+	gameList.SetupColumn( COLUMN_PING, L( "Ping" ), 120.0f, true );
+	gameList.SetupColumn( COLUMN_IP, L( "IP" ), 0, true );
 	gameList.SetModel( &gameListModel );
 	gameList.bFramedHintText = true;
 	gameList.bAllowSorting = true;
@@ -648,7 +648,7 @@ void CMenuServerBrowser::Show()
 	// clear out server table
 	staticWaitingPassword = false;
 	gameListModel.Flush();
-	gameList.DisableSorting();
+	gameList.SetSortingColumn( COLUMN_PING );
 	joinGame->SetGrayed( true );
 }
 
