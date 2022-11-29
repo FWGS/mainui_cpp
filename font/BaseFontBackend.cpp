@@ -208,7 +208,6 @@ void CBaseFont::UploadGlyphsForRanges(charRange_t *range, int rangeSize)
 
 	HIMAGE hImage = EngFuncs::PIC_Load( name, bmp.GetBitmap(), bmp.GetBitmapHdr()->fileSize, 0 );
 	SaveToCache( name, range, rangeSize, &bmp );
-	Con_DPrintf( "Uploaded %s to %i and saved to cache\n", name, hImage );
 
 	delete[] temp;
 
@@ -583,8 +582,6 @@ bool CBaseFont::ReadFromCache( const char *filename, charRange_t *range, size_t 
 	if( !EngFuncs::FileExists( path ))
 		return false;
 
-	Con_Printf( "Trying to loading %s from font cache on disk...\n", filename );
-
 	data = EngFuncs::COM_LoadFile( path, &size );
 
 	if( !data )
@@ -650,7 +647,6 @@ bool CBaseFont::ReadFromCache( const char *filename, charRange_t *range, size_t 
 	}
 
 	HIMAGE hImage = EngFuncs::PIC_Load( filename, (const byte*)bmp, bmp->fileSize, 0 );
-	Con_DPrintf( "Uploaded %s to %i\n", filename, hImage );
 
 	if( !hImage )
 	{

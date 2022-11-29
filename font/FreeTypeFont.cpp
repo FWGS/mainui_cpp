@@ -118,8 +118,6 @@ bool CFreeTypeFont::FindFontDataFile( const char *name, int tall, int weight, in
 	}
 	else bRet = false;
 
-	Con_DPrintf( "fontconfig: %s -> %s\n", name, dataFile );
-
 	FcPatternDestroy( pattern );
 	return bRet;
 }
@@ -139,10 +137,9 @@ bool CFreeTypeFont::Create(const char *name, int tall, int weight, int blur, flo
 	m_iScanlineOffset = scanlineOffset;
 	m_fScanlineScale = scanlineScale;
 
-
 	if( !FindFontDataFile( name, tall, weight, flags, m_szRealFontFile, sizeof( m_szRealFontFile ) ) )
 	{
-		Con_DPrintf( "Unable to find font named %s\n", name );
+		Con_Printf( "Unable to find font named %s\n", name );
 		m_szName[0] = 0;
 		return false;
 	}
@@ -172,10 +169,9 @@ void CFreeTypeFont::GetCharRGBA(int ch, Point pt, Size sz, unsigned char *rgba, 
 
 	if( ( error = FT_Load_Glyph( face, idx, FT_LOAD_RENDER | FT_LOAD_TARGET_NORMAL ) ) )
 	{
-		Con_DPrintf( "Error in FT_Load_Glyph: %x\n", error );
+		Con_Printf( "Error in FT_Load_Glyph: %x\n", error );
 		return;
 	}
-
 
 	slot = face->glyph;
 	buf = slot->bitmap.buffer;

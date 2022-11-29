@@ -62,8 +62,7 @@ bool CBitmapFont::Create(const char *name, int tall, int weight, int blur, float
 
 void CBitmapFont::GetCharRGBA(int ch, Point pt, Size sz, byte *rgba, Size &drawSize)
 {
-	// stub!
-	Con_DPrintf( "CBitmapFont::GetCharRGBA\n" );
+
 }
 
 void CBitmapFont::GetCharABCWidthsNoCache( int ch, int &a, int &b, int &c )
@@ -94,8 +93,7 @@ bool CBitmapFont::HasChar(int ch) const
 
 void CBitmapFont::UploadGlyphsForRanges(charRange_t *range, int rangeSize)
 {
-	// stub!
-	Con_DPrintf( "CBitmapFont::UploadGlyphsForRanges\n" );
+
 }
 
 int CBitmapFont::DrawCharacter(int ch, Point pt, int charH, const unsigned int color, bool forceAdditive)

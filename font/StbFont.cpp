@@ -134,7 +134,7 @@ bool CStbFont::FindFontDataFile(const char *name, int tall, int weight, int flag
 
 	if( (fp = popen( cmd, "r") ) == NULL )
 	{
-		Con_DPrintf( "fontconfig: Error opening pipe!\n" );
+		Con_Printf( "fontconfig: Error opening pipe!\n" );
 		return false;
 	}
 
@@ -142,11 +142,9 @@ bool CStbFont::FindFontDataFile(const char *name, int tall, int weight, int flag
 
 	if( pclose(fp) )
 	{
-		Con_DPrintf( "fontconfig: Command not found or exited with error status\n" );
+		Con_Printf( "fontconfig: Command not found or exited with error status\n" );
         return false;
     }
-
-	Con_DPrintf( "fontconfig: %s -> %s\n", name, dataFile );
 
 	// fallback with empty fontname if font not found
 	if( strlen( dataFile ) < 2 )
@@ -249,7 +247,7 @@ bool CStbFont::Create(const char *name, int tall, int weight, int blur, float br
 
 	if( !FindFontDataFile( name, tall, weight, flags, m_szRealFontFile, 4096 ) )
 	{
-		Con_DPrintf( "Unable to find font named %s\n", name );
+		Con_Printf( "Unable to find font named %s\n", name );
 		m_szName[0] = 0;
 		return false;
 	}
@@ -259,7 +257,7 @@ bool CStbFont::Create(const char *name, int tall, int weight, int blur, float br
 	FILE *fd = fopen( m_szRealFontFile, "r" );
 	if( !fd )
 	{
-		Con_DPrintf( "Unable to open font %s!\n", m_szRealFontFile );
+		Con_Printf( "Unable to open font %s!\n", m_szRealFontFile );
 		return false;
 	}
 
@@ -272,13 +270,13 @@ bool CStbFont::Create(const char *name, int tall, int weight, int blur, float br
 	fclose( fd );
 	if( red != len )
 	{
-		Con_DPrintf( "Unable to read font file %s!\n", m_szRealFontFile );
+		Con_Printf( "Unable to read font file %s!\n", m_szRealFontFile );
 		return false;
 	}
 
 	if( !stbtt_InitFont( &m_fontInfo, m_pFontData, 0 ) )
 	{
-		Con_DPrintf( "Unable to create font %s!\n", m_szRealFontFile );
+		Con_Printf( "Unable to create font %s!\n", m_szRealFontFile );
 		m_szName[0] = 0;
 		return false;
 	}

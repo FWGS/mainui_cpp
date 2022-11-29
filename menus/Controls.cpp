@@ -214,9 +214,6 @@ void CMenuKeysModel::Update( void )
 			else
 				snprintf( name[i], sizeof( name[i] ), "^6%s^7", token );
 
-			if( keys[0] == keys[1] )
-				Con_DPrintf( "%i %i\n", keys[0], keys[1]);
-
 			if( keys[0] != -1 )
 			{
 				const char *str = EngFuncs::KeynumToString( keys[0] );

@@ -386,8 +386,6 @@ static void Localize_AddToDictionary( const char *name, const char *lang )
 		}
 	}
 
-	Con_Printf( "Localize_AddToDict( %s ): loaded %i words(%s encoding)\n", filename, i, isUtf16 ? "UTF-16LE" : "UTF-8" );
-
 error:
 	if( isUtf16 && afile )
 		delete[] afile;

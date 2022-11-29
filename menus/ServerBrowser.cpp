@@ -688,7 +688,6 @@ UI_MenuResetPing_f
 */
 void UI_MenuResetPing_f( void )
 {
-	Con_Printf("UI_MenuResetPing_f\n");
 	if( menu_internetgames )
 		menu_internetgames->ResetPing();
 }
