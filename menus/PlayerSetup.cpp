@@ -28,6 +28,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "YesNoMessageBox.h"
 #include "PlayerModelView.h"
 #include "StringArrayModel.h"
+#include "StringVectorModel.h"
 
 #define ART_BANNER		"gfx/shell/head_customize"
 
@@ -77,14 +78,28 @@ public:
 		char models[MAX_PLAYERMODELS][CS_SIZE];
 	} modelsModel;
 
-	class CLogosListModel : public CStringArrayModel
+	class CLogosListModel : public CStringVectorModel
 	{
 	public:
-		CLogosListModel() : CStringArrayModel( (const char *)logos, CS_SIZE, 0 ) {}
-		void Update();
+		void Update() override;
+
+		int GetFullPath( char *buf, size_t size, int pos )
+		{
+			const char *file, *ext;
+
+			file = Element( pos ).String();
+			ext = IsPng( pos ) ? "png" : "bmp";
+
+			return snprintf( buf, size, "logos/%s.%s", file, ext );
+		}
+
+		bool IsPng( int pos )
+		{
+			return m_isPngs[pos];
+		}
 
 	private:
-		char logos[MAX_PLAYERMODELS][CS_SIZE];
+		CUtlVector<bool> m_isPngs;
 	} logosModel;
 
 	CMenuPlayerModelView	view;
@@ -184,35 +199,39 @@ CMenuPlayerSetup::FindLogos
 
 =================
 */
-void CMenuPlayerSetup::CLogosListModel::Update( void )
+void CMenuPlayerSetup::CLogosListModel::Update( )
 {
 	char	**filenames;
 	int numFiles, i;
 
-	m_iCount = 0;
-
 	// Get file list
-	filenames = EngFuncs::GetFilesList( "logos/*.bmp", &numFiles, FALSE );
+	filenames = EngFuncs::GetFilesList( "logos/*.*", &numFiles, FALSE );
 
 	if( !filenames || !numFiles )
 	{
-		m_iCount = 0;
+		m_isPngs.RemoveAll();
+		RemoveAll();
 		return;
 	}
 
 	// build the model list
 	for( i = 0; i < numFiles; i++ )
 	{
-		char logoFileName[CS_SIZE];
+		CUtlString logoFileName = filenames[i];
+		char temp[256];
+		bool png;
 
-		Q_strncpy( logoFileName, filenames[i], sizeof( logos[0] ) );
-		COM_FileBase( logoFileName, logos[m_iCount] );
+		if(( png = logoFileName.BEndsWithCaseless( ".png" )) ||
+			 logoFileName.BEndsWithCaseless( ".bmp" ))
+		{
+			COM_FileBase( logoFileName.String(), temp );
 
-		// ignore remapped.bmp
-		if( !stricmp( logos[m_iCount], "remapped" ) )
-			continue;
+			if( !stricmp( temp, "remapped" ))
+				continue;
 
-		m_iCount++;
+			AddToTail( temp );
+			m_isPngs.AddToTail( png );
+		}
 	}
 }
 
@@ -272,19 +291,36 @@ void CMenuPlayerSetup::UpdateModel()
 
 void CMenuPlayerSetup::UpdateLogo()
 {
-	char image[256];
-	const char *mdl = logo.GetCurrentString();
+	char filename[1024];
+	int pos = logo.GetCurrentValue();
 
-	if( !mdl || !mdl[0] )
-	{
+	if( pos < 0 )
 		return;
+
+	logosModel.GetFullPath( filename, sizeof( filename ), pos );
+	logoImage.hImage = EngFuncs::PIC_Load( filename, 0 );
+	if( logosModel.IsPng( pos ))
+	{
+		logoImage.r = logoImage.g = logoImage.b = -1;
+		logoColor.SetGrayed( true );
+	}
+	else
+	{
+		CBMP *bmpFile = CBMP::LoadFile( filename );
+		if( bmpFile->GetBitmapHdr()->bitsPerPixel == 8 )
+		{
+			ApplyColorToLogoPreview();
+			logoColor.SetGrayed( false );
+		}
+		else
+		{
+			logoImage.r = logoImage.g = logoImage.b = -1;
+			logoColor.SetGrayed( true );
+		}
+		delete bmpFile;
 	}
 
-	snprintf( image, 256, "logos/%s.bmp", mdl );
-	logoImage.hImage = EngFuncs::PIC_Load( image, 0 );
-	ApplyColorToLogoPreview();
-
-	EngFuncs::CvarSetString( "cl_logofile", mdl );
+	EngFuncs::CvarSetString( "cl_logofile", logo.GetCurrentString() );
 	logoColor.WriteCvar();
 }
 
@@ -318,26 +354,49 @@ void CMenuPlayerSetup::ApplyColorToLogoPreview()
 void CMenuPlayerSetup::WriteNewLogo( void )
 {
 	char filename[1024];
-	CBMP *bmpFile;
+	int pos = logo.GetCurrentValue();
 
-	snprintf( filename, sizeof( filename ), "logos/%s.bmp", logo.GetCurrentString() );
-	bmpFile = CBMP::LoadFile( filename );
-
-	// not valid logo BMP file
-	if( !bmpFile )
+	if( pos < 0 )
 		return;
+
+	EngFuncs::DeleteFile( "logos/remapped.png" );
+	EngFuncs::DeleteFile( "logos/remapped.bmp" );
+
+	logosModel.GetFullPath( filename, sizeof( filename ), pos );
+
+	// TODO: check file size and throw a messagebox if it's too big?
+	if( logosModel.IsPng( pos ))
+	{
+		int len;
+		void *afile = EngFuncs::COM_LoadFile( filename, &len );
+
+		// just copy file, nothing special
+		EngFuncs::COM_SaveFile( "logos/remapped.png", afile, len );
+
+		EngFuncs::COM_FreeFile( afile );
+
+		EngFuncs::CvarSetString( "cl_logoext", "png" );
+	}
+	else
+	{
+		CBMP *bmpFile = CBMP::LoadFile( filename );
+
+		// not valid logo BMP file
+		if( !bmpFile )
+			return;
+
+		// remap logo if needed
+		if( logoImage.r != -1 && logoImage.g != -1 && logoImage.b != -1 )
+			bmpFile->RemapLogo( logoImage.r, logoImage.g, logoImage.b );
+
+		EngFuncs::COM_SaveFile( "logos/remapped.bmp", bmpFile->GetBitmap(), bmpFile->GetBitmapHdr()->fileSize );
+		EngFuncs::CvarSetString( "cl_logoext", "bmp" );
+
+		delete bmpFile;
+	}
 
 	logo.WriteCvar();
 	logoColor.WriteCvar();
-
-	// remap logo if needed
-	if( logoImage.r != -1 && logoImage.g != -1 && logoImage.b != -1 )
-		bmpFile->RemapLogo( logoImage.r, logoImage.g, logoImage.b );
-
-	EngFuncs::DeleteFile( "logos/remapped.bmp" );
-	EngFuncs::COM_SaveFile( "logos/remapped.bmp", bmpFile->GetBitmap(), bmpFile->GetBitmapHdr()->fileSize );
-
-	delete bmpFile;
 }
 
 /*
