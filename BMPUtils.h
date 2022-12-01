@@ -55,7 +55,7 @@ class CBMP
 {
 public:
 	static CBMP* LoadFile( const char *filename ); // implemented in library!
-	
+
 	CBMP( uint w, uint h )
 	{
 		bmp_t bhdr;
@@ -81,12 +81,22 @@ public:
 		bhdr.colors = ( pixel_size == 1 ) ? 256 : 0;
 		bhdr.importantColors = 0;
 	
+		fileAllocated = false;
 		data = new byte[bhdr.fileSize];
 		memcpy( data, &bhdr, sizeof( bhdr ));
 		memset( data + bhdr.bitmapDataOffset, 0, bhdr.bitmapDataSize );
 	}
 	
-	~CBMP() { if( data ) delete []data; }
+	~CBMP()
+	{
+		if( data )
+		{
+			if( fileAllocated )
+				EngFuncs::COM_FreeFile( data );
+			else
+				delete []data;
+		}
+	}
 
 	void Increase(uint w, uint h)
 	{
@@ -172,7 +182,12 @@ public:
 		return (rgbquad_t*)(data + sizeof( bmp_t ));
 	}
 
-
 private:
-	byte    *data;
+	CBMP( bmp_t *data ) :
+		fileAllocated( true ), data( (byte*)data )
+	{
+	}
+
+	bool fileAllocated;
+	byte *data;
 };

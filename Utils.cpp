@@ -413,10 +413,17 @@ CBMP* CBMP::LoadFile( const char *filename )
 	if( !bmp->width || !bmp->height )
 		return NULL;
 
-	CBMP *ret = new CBMP( bmp->width, bmp->height );
-	memcpy( ret->GetBitmap(), bmp, length );
+	// validate all nasty data size fields
+	if( length < bmp->fileSize ||
+		 length < bmp->bitmapDataSize ||
+		 length < bmp->bitmapDataOffset ||
+		 length < bmp->bitmapHeaderSize ||
+		 length < bmp->bitmapDataOffset + bmp->bitmapDataSize ||
+		 length < bmp->bitmapHeaderSize + bmp->bitmapDataSize )
+		return NULL;
 
-	EngFuncs::COM_FreeFile( bmp );
+	// will be freed in destructor
+	CBMP *ret = new CBMP( bmp );
 
 	return ret;
 }
