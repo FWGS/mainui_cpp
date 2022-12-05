@@ -121,7 +121,7 @@ inline void UnpackRGBA( int &r, int &g, int &b, int &a, const unsigned int ulRGB
 
 inline unsigned int PackAlpha( const unsigned int ulRGB, const unsigned int ulAlpha )
 {
-	return (ulRGB)|(ulAlpha<<24);
+	return (ulRGB & 0x00FFFFFF)|(ulAlpha<<24);
 }
 
 inline unsigned int UnpackAlpha( const unsigned int ulRGBA )
