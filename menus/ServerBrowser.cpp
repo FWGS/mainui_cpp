@@ -162,9 +162,11 @@ public:
 		if( servers[line].isLegacy )
 		{
 			CColor color = uiPromptTextColor;
-			color.a = color.a * 0.7;
+			color.a = color.a * 0.5;
 			textColor = color;
-			// force = true;
+
+			// allow colorstrings only in server name
+			force = column != COLUMN_NAME;
 
 			return true;
 		}
