@@ -61,15 +61,16 @@ void CBaseFont::GetTextureName(char *dst, size_t len) const
 	}
 	attribs[i] = 0;
 
+	// faster loading: don't query filesystem, tell engine to skip everything and load only from buffer
 	if( i == 0 )
 	{
-		snprintf( dst, len - 1, "%s_%i_%i_font.bmp", GetName(), GetTall(), GetWeight() );
+		snprintf( dst, len - 1, "#%s_%i_%i_font.bmp", GetName(), GetTall(), GetWeight() );
 		dst[len - 1] = 0;
 	}
 	else
 	{
 		attribs[i] = 0;
-		snprintf( dst, len - 1, "%s_%i_%i_%s_font.bmp", GetName(), GetTall(), GetWeight(), attribs );
+		snprintf( dst, len - 1, "#%s_%i_%i_%s_font.bmp", GetName(), GetTall(), GetWeight(), attribs );
 		dst[len - 1] = 0;
 	}
 }
@@ -207,6 +208,7 @@ void CBaseFont::UploadGlyphsForRanges(charRange_t *range, int rangeSize)
 	}
 
 	HIMAGE hImage = EngFuncs::PIC_Load( name, bmp.GetBitmap(), bmp.GetBitmapHdr()->fileSize, 0 );
+
 	SaveToCache( name, range, rangeSize, &bmp );
 
 	delete[] temp;
@@ -577,7 +579,8 @@ bool CBaseFont::ReadFromCache( const char *filename, charRange_t *range, size_t 
 	char_data_t *ch;
 	bmp_t *bmp;
 
-	V_snprintf( path, sizeof( path ), ".fontcache/%s", filename );
+	// skip special symbol used for engine
+	V_snprintf( path, sizeof( path ), ".fontcache/%s", filename[0] == '#' ? filename + 1 : filename );
 
 	if( !EngFuncs::FileExists( path ))
 		return false;
@@ -704,6 +707,10 @@ void CBaseFont::SaveToCache( const char *filename, charRange_t *range, size_t ra
 	uint32_t charsCount = 0;
 	byte *data, *buf_p;
 	size_t size = 0, bmpSize = bmp->GetBitmapHdr()->fileSize;
+
+	// skip special symbol used for engine
+	if( filename[0] == '#' )
+		filename++;
 
 	for( i = 0; i < rangeSize; i++ )
 		charsCount += range[i].Length();
