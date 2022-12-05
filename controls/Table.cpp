@@ -504,7 +504,7 @@ void CMenuTable::DrawLine( Point p, int line, uint textColor, bool forceCol, uin
 	sz.h = m_scChSize;
 
 	unsigned int newFillColor;
-	bool forceFillColor;
+	bool forceFillColor = false;
 	if( m_pModel->GetLineColor( line, newFillColor, forceFillColor ))
 	{
 		if( !fillColor || forceFillColor )
