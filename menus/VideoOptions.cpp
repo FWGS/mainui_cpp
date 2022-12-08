@@ -201,7 +201,7 @@ void CMenuVidOptions::_Init( void )
 #endif
 	AddItem( gammaIntensity );
 	AddItem( glareReduction );
-	AddItem( vbo );
+	// AddItem( vbo );
 	AddItem( testImage );
 
 #if LEGACY_VIEWSIZE
