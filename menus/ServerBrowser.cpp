@@ -76,8 +76,7 @@ struct server_t
 
 	int AdrCmp( const server_t &other ) const
 	{
-		// NET_CompareAdr is not in the engine API!
-		return strcmp( ipstr, other.ipstr );
+		return EngFuncs::NET_CompareAdr( &adr, &other.adr );
 	}
 
 	int MapCmp( const server_t &other ) const
@@ -386,6 +385,9 @@ void CMenuGameListModel::AddServerToList( netadr_t adr, const char *info )
 	// ignore if duplicated
 	for( i = 0; i < servers.Count(); i++ )
 	{
+		if( !EngFuncs::NET_CompareAdr( &servers[i].adr, &adr ))
+			return;
+
 		if( !stricmp( servers[i].info, info ))
 			return;
 	}
@@ -654,7 +656,7 @@ void CMenuServerBrowser::Show()
 	joinGame->SetGrayed( true );
 }
 
-void CMenuServerBrowser::AddServerToList(netadr_t adr, const char *info)
+void CMenuServerBrowser::AddServerToList( netadr_t adr, const char *info )
 {
 	if( stricmp( gMenu.m_gameinfo.gamefolder, Info_ValueForKey( info, "gamedir" )) != 0 )
 		return;

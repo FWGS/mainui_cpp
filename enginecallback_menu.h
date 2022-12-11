@@ -527,6 +527,11 @@ public:
 		return textfuncs.pfnAdrToString( adr );
 	}
 
+	static inline int NET_CompareAdr( const void *a, const void *b )
+	{
+		return textfuncs.pfnCompareAdr( a, b );
+	}
+
 	static inline void ClientCmdF( bool now, const char *fmt, ... ) _format( 2 )
 	{
 		va_list va;
