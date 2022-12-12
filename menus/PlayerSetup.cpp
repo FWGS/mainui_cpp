@@ -356,7 +356,7 @@ void CMenuPlayerSetup::WriteNewLogo( void )
 	char filename[1024];
 	int pos = logo.GetCurrentValue();
 
-	if( pos < 0 )
+	if( pos < 0 || hideLogos )
 		return;
 
 	EngFuncs::DeleteFile( "logos/remapped.png" );
