@@ -64,8 +64,8 @@ struct server_t
 
 	int Rank( const server_t &other ) const
 	{
-		if( isLegacy > other.isLegacy ) return 2;
-		else if( isLegacy < other.isLegacy ) return -2;
+		if( isLegacy > other.isLegacy ) return 100;
+		else if( isLegacy < other.isLegacy ) return -100;
 		return 0;
 	}
 
