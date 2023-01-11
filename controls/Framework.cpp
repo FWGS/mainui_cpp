@@ -25,6 +25,7 @@ CMenuFramework::CMenuFramework( const char *name ) : BaseClass( name )
 {
 	memset( m_apBtns, 0, sizeof( m_apBtns ) );
 	m_iBtnsNum = 0;
+	bannerAnimDirection = ANIM_NO;
 }
 
 CMenuFramework::~CMenuFramework()
