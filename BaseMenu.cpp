@@ -1164,11 +1164,7 @@ void UI_Init( void )
 
 	g_FontMgr = new CFontManager();
 
-	// EngFuncs::Cmd_AddCommand( "menu_zoo", UI_Zoo_Menu );
-	EngFuncs::CreateMapsList( TRUE );
-
 	uiStatic.initialized = true;
-
 	uiStatic.lowmemory = (int)EngFuncs::GetCvarFloat( "host_lowmemorymode" );
 
 	// setup game info
