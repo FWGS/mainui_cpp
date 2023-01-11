@@ -27,130 +27,82 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define ART_BUTTONS_MAIN		"gfx/shell/btns_main.bmp"	// we support bmp only
 
-typedef unsigned char	BYTE;
-typedef short int	    WORD;
-typedef unsigned int    DWORD;
-typedef int				LONG;
+static int UI_GetBlockHeight( int button_height, int points[3], int &empty_height )
+{
+	empty_height = 1; // don't add pixels in-between
+	int height = ( button_height + empty_height ) * 2 + button_height;
 
-#pragma pack(push, 1)
-typedef struct tagBITMAPFILEHEADER {
-  WORD  bfType;
-  DWORD bfSize;
-  WORD  bfReserved1;
-  WORD  bfReserved2;
-  DWORD bfOffBits;
-} BITMAPFILEHEADER, *PBITMAPFILEHEADER;
+	points[0] = 0;
+	points[1] = button_height + empty_height;
+	points[2] = ( button_height + empty_height ) * 2; // 102:
 
-typedef struct tagBITMAPINFOHEADER {
-  DWORD biSize;
-  LONG  biWidth;
-  LONG  biHeight;
-  WORD  biPlanes;
-  WORD  biBitCount;
-  DWORD biCompression;
-  DWORD biSizeImage;
-  LONG  biXPelsPerMeter;
-  LONG  biYPelsPerMeter;
-  DWORD biClrUsed;
-  DWORD biClrImportant;
-} BITMAPINFOHEADER, *PBITMAPINFOHEADER;
+	return height;
+}
 
-typedef struct tagRGBQUAD {
-  BYTE rgbBlue;
-  BYTE rgbGreen;
-  BYTE rgbRed;
-  BYTE rgbReserved;
-} RGBQUAD;
-#pragma pack(pop)
 /*
 =================
 UI_LoadBmpButtons
 =================
 */
-void UI_LoadBmpButtons( void )
+void UI_LoadBmpButtons()
 {
 	memset( uiStatic.buttonsPics, 0, sizeof( uiStatic.buttonsPics ));
 
 	if( uiStatic.lowmemory )
 		return;
 
-	int bmp_filesize, palette_sz = 0;
-	byte *bmp_buffer = EngFuncs::COM_LoadFile( ART_BUTTONS_MAIN, &bmp_filesize );
+	CBMP *bmp = CBMP::LoadFile( ART_BUTTONS_MAIN );
 
-	if( !bmp_buffer || !bmp_filesize )
-	{
-		Con_Printf( "UI_LoadBmpButtons: btns_main.bmp not found\n" );
-		return;
-	}
+	// get default block size
+	uiStatic.buttons_width = bmp->GetBitmapHdr()->width; // pass to the other parts of ui
+	uiStatic.buttons_height = 26; // hardcoded!
 
-	BITMAPFILEHEADER *pFileHdr = (BITMAPFILEHEADER *)bmp_buffer;
-	BITMAPINFOHEADER *pInfoHdr = (BITMAPINFOHEADER *)&bmp_buffer[sizeof( BITMAPFILEHEADER )];
+	// calculate original bmp size
+	const int stride = (( bmp->GetBitmapHdr()->width * bmp->GetBitmapHdr()->bitsPerPixel / 8 ) + 3 ) & ~3;
+	const size_t btn_sz = stride * uiStatic.buttons_height; // one button size
 
-	BITMAPINFOHEADER NewInfoHdr;
-	BITMAPFILEHEADER NewFileHdr;
+	// get our cutted bmp sizes
+	int empty_height;
+	const int blockHeight = UI_GetBlockHeight( uiStatic.buttons_height, uiStatic.buttons_points, empty_height );
+	const int empty_sz = empty_height * stride;
 
-	if( pInfoHdr->biBitCount == 8 && pInfoHdr->biClrUsed == 0 )
-		pInfoHdr->biClrUsed = 256; // all colors used
+	// init CBMP and copy data
+	CBMP cutted_bmp( bmp->GetBitmapHdr(), stride * blockHeight );
+	cutted_bmp.GetBitmapHdr()->height = blockHeight;
 
-	memcpy( &NewFileHdr, pFileHdr, sizeof( BITMAPFILEHEADER ));
-	memcpy( &NewInfoHdr, pInfoHdr, sizeof( BITMAPINFOHEADER ));
+	byte *src = bmp->GetTextureData();
+	byte *dst = cutted_bmp.GetTextureData();
 
-	byte *palette = bmp_buffer + sizeof( BITMAPFILEHEADER ) + sizeof( BITMAPINFOHEADER );
-	if( pInfoHdr->biBitCount <= 8 )
-	{
-		// figure out how many entries are actually in the table
-		if( pInfoHdr->biClrUsed == 0 )
-		{
-			pInfoHdr->biClrUsed = 256;
-			palette_sz = (1 << pInfoHdr->biBitCount) * sizeof( RGBQUAD );
-		}
-		else palette_sz = pInfoHdr->biClrUsed * sizeof( RGBQUAD );
-	}
-
-	uiStatic.buttons_width = pInfoHdr->biWidth;
-	uiStatic.buttons_height = 78;	// fixed height (26 * 3)
-
-	// determine buttons count by image height...
-	int pic_count = ( pInfoHdr->biHeight / uiStatic.buttons_height );
-
-	int stride = (pInfoHdr->biWidth * pInfoHdr->biBitCount / 8);
-	int cutted_img_sz = ((stride + 3 ) & ~3) * uiStatic.buttons_height;
-	int CuttedBmpSize = sizeof( BITMAPFILEHEADER ) + sizeof( BITMAPINFOHEADER ) + palette_sz + cutted_img_sz;
-	byte *img_data = &bmp_buffer[pFileHdr->bfOffBits + cutted_img_sz * ( pic_count - 1 )];
-
-	NewFileHdr.bfSize = CuttedBmpSize;
-	NewFileHdr.bfOffBits = sizeof( BITMAPFILEHEADER ) + sizeof( BITMAPINFOHEADER ) + palette_sz;
-	NewInfoHdr.biHeight = uiStatic.buttons_height;
-	NewInfoHdr.biSizeImage = cutted_img_sz;
-
-	char fname[256];
-	byte *raw_img_buff = (byte *)MALLOC( CuttedBmpSize );
+	int pic_count = bmp->GetBitmapHdr()->height / uiStatic.buttons_height / 3;
+	int src_pos = bmp->GetBitmapHdr()->height * stride;
 
 	for( int i = 0; i < pic_count; i++ )
 	{
-		sprintf( fname, "#btns_%d.bmp", i );
+		int dst_pos = blockHeight * stride;
+		char fname[256];
 
-		int offset = 0;
-		memcpy( &raw_img_buff[offset], &NewFileHdr, sizeof( BITMAPFILEHEADER ));
-		offset += sizeof( BITMAPFILEHEADER );
+		V_snprintf( fname, sizeof( fname ), "#btns_%d.bmp", i );
 
-		memcpy( &raw_img_buff[offset], &NewInfoHdr, NewInfoHdr.biSize );
-		offset += NewInfoHdr.biSize;
-
-		if( NewInfoHdr.biBitCount <= 8 )
+		for( int btn = 0; btn < 3; btn++ )
 		{
-			memcpy( &raw_img_buff[offset], palette, palette_sz );
-			offset += palette_sz;
+			src_pos -= btn_sz;
+			dst_pos -= btn_sz;
+			memcpy( &dst[dst_pos], &src[src_pos], btn_sz );
+
+			// fix misaligned gearbox btns
+			memset( &dst[dst_pos], 0, stride );
+
+			// fill the empty space
+			if( btn < 2 && empty_sz != 0 )
+			{
+				dst_pos -= empty_sz;
+				memset( &dst[dst_pos], 0, empty_sz );
+			}
 		}
 
-		memcpy( &raw_img_buff[offset], img_data, cutted_img_sz );
-
 		// upload image into video memory
-		uiStatic.buttonsPics[i] = EngFuncs::PIC_Load( fname, raw_img_buff, CuttedBmpSize );
-
-		img_data -= cutted_img_sz;
+		uiStatic.buttonsPics[i] = EngFuncs::PIC_Load( fname, cutted_bmp.GetBitmap(), cutted_bmp.GetBitmapHdr()->fileSize );
 	}
 
-	FREE( raw_img_buff );
-	EngFuncs::COM_FreeFile( bmp_buffer );
+	delete bmp;
 }

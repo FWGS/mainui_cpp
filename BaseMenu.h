@@ -130,11 +130,11 @@ typedef struct
 	// btns_main.bmp stuff
 	HIMAGE	buttonsPics[PC_BUTTONCOUNT];
 
-	int		buttons_width;	// btns_main.bmp global width
-	int		buttons_height;	// per one button with all states (inactive, focus, pressed)
+	int		buttons_width; // btns_main.bmp global width
+	int		buttons_height; // one button height
+	int		buttons_points[3];
 
-	int		buttons_draw_width;	// scaled image what we drawing
-	int		buttons_draw_height;
+	Size		buttons_draw_size; // scaled image what we drawing
 	int		width;
 	bool	textInput;
 	bool	enableAlphaFactor;
@@ -233,7 +233,7 @@ inline void UI_DrawRectangleExt( Point pos, Size size, const unsigned int color,
 }
 
 void UI_StartSound( const char *sound );
-void UI_LoadBmpButtons( void );
+void UI_LoadBmpButtons();
 
 int UI_CreditsActive( void );
 void UI_DrawFinalCredits( void );

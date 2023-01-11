@@ -35,7 +35,7 @@ CMenuPicButton::CMenuPicButton() : BaseClass()
 	eTextAlignment = QM_TOPLEFT;
 
 	hPic = 0;
-	button_id = 0;
+	button_id = -1;
 	iOldState = BUTTON_NOFOCUS;
 	m_iLastFocusTime = -512;
 	bPulse = false;
@@ -141,7 +141,7 @@ void CMenuPicButton::DrawButton(int r, int g, int b, int a, wrect_t *rects, int 
 #ifdef ALT_PICBUTTON_FOCUS_ANIM
 	UI::PushScissor( m_scPos.x, m_scPos.y, uiStatic.buttons_draw_width * flFill, uiStatic.buttons_draw_height );
 #endif
-	EngFuncs::PIC_DrawAdditive( m_scPos.x, m_scPos.y, uiStatic.buttons_draw_width, uiStatic.buttons_draw_height, &rects[state] );
+	EngFuncs::PIC_DrawAdditive( m_scPos, uiStatic.buttons_draw_size, &rects[state] );
 
 #ifdef ALT_PICBUTTON_FOCUS_ANIM
 	UI::PopScissor();
@@ -210,12 +210,24 @@ void CMenuPicButton::Draw( )
 
 		UnpackRGB( r, g, b, iFlags & QMF_GRAYED ? uiColorDkGrey : uiColorWhite );
 
-		wrect_t rects[] =
+		wrect_t rects[3];
+		for( int i = 0; i < 3; i++ )
 		{
-		{ 0, uiStatic.buttons_width, 0,  26 },
-		{ 0, uiStatic.buttons_width, 26, 52 },
-		{ 0, uiStatic.buttons_width, 52, 78 },
-		};
+			if( button_id > 0 )
+			{
+				rects[i].top = uiStatic.buttons_points[i];
+				rects[i].bottom = uiStatic.buttons_points[i] + uiStatic.buttons_height;
+			}
+			else
+			{
+				rects[i].top = 26 * i;
+				rects[i].bottom = 26 * ( i + 1 );
+			}
+			rects[i].left = 0;
+			rects[i].right = uiStatic.buttons_width;
+		}
+
+		// decay
 		if( state == BUTTON_NOFOCUS && a > 0 )
 		{
 			DrawButton( r, g, b, a, rects, BUTTON_FOCUS );
@@ -225,28 +237,21 @@ void CMenuPicButton::Draw( )
 		if( ( state == BUTTON_NOFOCUS && bPulse ) ||
 			( state == BUTTON_FOCUS   && eFocusAnimation == QM_PULSEIFFOCUS ) )
 		{
-			EngFuncs::PIC_Set( hPic, r, g, b, 255 *(0.5f + 0.5f * sin( (float)uiStatic.realTime / ( UI_PULSE_DIVISOR * 2 ))));
-			EngFuncs::PIC_DrawAdditive( m_scPos.x, m_scPos.y, uiStatic.buttons_draw_width, uiStatic.buttons_draw_height, &rects[BUTTON_FOCUS] );
+			a = 255 * (0.5f + 0.5f * sin( (float)uiStatic.realTime / ( UI_PULSE_DIVISOR * 2 )));
 
-			EngFuncs::PIC_DrawAdditive( m_scPos.x, m_scPos.y, uiStatic.buttons_draw_width, uiStatic.buttons_draw_height, &rects[BUTTON_NOFOCUS] );
+			DrawButton( r, g, b, a, rects, BUTTON_FOCUS );
+			DrawButton( r, g, b, 255, rects, BUTTON_NOFOCUS );
+		}
+		// special handling for focused
+		else if( state == BUTTON_FOCUS )
+		{
+			DrawButton( r, g, b, 255, rects, BUTTON_FOCUS );
+			DrawButton( r, g, b, 255, rects, BUTTON_NOFOCUS );
 		}
 		else
 		{
-			// special handling for focused
-			if( state == BUTTON_FOCUS )
-			{
-				EngFuncs::PIC_Set( hPic, r, g, b, 255 );
-				EngFuncs::PIC_DrawAdditive( m_scPos.x, m_scPos.y, uiStatic.buttons_draw_width, uiStatic.buttons_draw_height, &rects[BUTTON_FOCUS] );
-
-				EngFuncs::PIC_Set( hPic, r, g, b, 255 ); // set colors again
-				EngFuncs::PIC_DrawAdditive( m_scPos.x, m_scPos.y, uiStatic.buttons_draw_width, uiStatic.buttons_draw_height, &rects[BUTTON_NOFOCUS] );
-			}
-			else
-			{
-				// just draw
-				EngFuncs::PIC_Set( hPic, r, g, b, 255 );
-				EngFuncs::PIC_DrawAdditive( m_scPos.x, m_scPos.y, uiStatic.buttons_draw_width, uiStatic.buttons_draw_height, &rects[state] );
-			}
+			// just draw
+			DrawButton( r, g, b, 255, rects, state );
 		}
 	}
 	else if( !uiStatic.lowmemory )
@@ -328,8 +333,8 @@ void CMenuPicButton::SetPicture( EDefaultBtns ID )
 		return; // bad id
 
 	hPic = uiStatic.buttonsPics[ID];
-
 	button_id = ID;
+
 }
 
 void CMenuPicButton::SetPicture( const char *filename )
