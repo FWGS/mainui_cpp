@@ -52,7 +52,6 @@ private:
 	CMenuCheckBox noDSP;
 	CMenuCheckBox muteFocusLost;
 	CMenuCheckBox vibrationEnable;
-	CMenuCheckBox reverseChannels;
 
 	float oldVibrate;
 };
@@ -73,7 +72,6 @@ void CMenuAudio::GetConfig( void )
 	noDSP.LinkCvar( "dsp_off" );
 	muteFocusLost.LinkCvar( "snd_mute_losefocus" );
 	vibrationEnable.LinkCvar( "vibration_enable" );
-	reverseChannels.LinkCvar( "s_reverse_channels" );
 
 	if( !vibrationEnable.bChecked )
 		vibration.SetGrayed( true );
@@ -108,7 +106,6 @@ void CMenuAudio::SaveAndPopMenu()
 	noDSP.WriteCvar();
 	muteFocusLost.WriteCvar();
 	vibrationEnable.WriteCvar();
-	reverseChannels.WriteCvar();
 
 	CMenuFramework::SaveAndPopMenu();
 }
@@ -169,10 +166,6 @@ void CMenuAudio::_Init( void )
 	vibration.onChanged = VoidCb( &CMenuAudio::VibrateChanged );
 	vibration.SetCoord( 700, 570 );
 
-	reverseChannels.SetNameAndStatus( L( "Reverse audio channels" ), L( "Use it when you can't swap your headphones' speakers" ) );
-	reverseChannels.onChanged = CMenuEditable::WriteCvarCb;
-	reverseChannels.SetCoord( 320, 620 );
-
 	AddItem( background );
 	AddItem( banner );
 	AddButton( L( "Done" ), L( "Go back to the Configuration Menu" ), PC_DONE,
@@ -183,7 +176,6 @@ void CMenuAudio::_Init( void )
 	AddItem( lerping );
 	AddItem( noDSP );
 	AddItem( muteFocusLost );
-	AddItem( reverseChannels );
 	AddItem( vibrationEnable );
 	AddItem( vibration );
 }
