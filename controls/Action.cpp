@@ -24,6 +24,7 @@ CMenuAction::CMenuAction() : BaseClass()
 	m_szBackground = 0;
 	m_bfillBackground = false;
 	forceCalcW = forceCalcY = false;
+	bIgnoreColorstring = false;
 }
 
 /*
@@ -112,12 +113,19 @@ CMenuAction::Draw
 */
 void CMenuAction::Draw( )
 {
-	uint textflags = ( iFlags & QMF_DROPSHADOW ? ETF_SHADOW : 0 ) | ( m_bLimitBySize ? 0 : ETF_NOSIZELIMIT ) | ( bIgnoreColorstring ? ETF_FORCECOL : 0 );
+	uint textflags = 0;
+
+	if( FBitSet( iFlags, QMF_DROPSHADOW ))
+		SetBits( textflags, ETF_SHADOW );
+
+	if( !m_bLimitBySize )
+		SetBits( textflags, ETF_NOSIZELIMIT );
+
+	if( bIgnoreColorstring )
+		SetBits( textflags, ETF_FORCECOL );
 
 	if( bDrawStroke )
-	{
 		UI_DrawRectangleExt( m_scPos, m_scSize, colorStroke, iStrokeWidth );
-	}
 
 	if( m_szBackground )
 	{
