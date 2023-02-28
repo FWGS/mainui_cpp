@@ -53,6 +53,9 @@ void UI_LoadBmpButtons()
 
 	CBMP *bmp = CBMP::LoadFile( ART_BUTTONS_MAIN );
 
+	if( bmp == nullptr )
+		return;
+
 	// get default block size
 	uiStatic.buttons_width = bmp->GetBitmapHdr()->width; // pass to the other parts of ui
 	uiStatic.buttons_height = 26; // hardcoded!
