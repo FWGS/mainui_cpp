@@ -254,7 +254,7 @@ bool CStbFont::Create(const char *name, int tall, int weight, int blur, float br
 
 
 	// EngFuncs::COM_LoadFile does not allow open files from /
-	FILE *fd = fopen( m_szRealFontFile, "r" );
+	FILE *fd = fopen( m_szRealFontFile, "rb" );
 	if( !fd )
 	{
 		Con_Printf( "Unable to open font %s!\n", m_szRealFontFile );
