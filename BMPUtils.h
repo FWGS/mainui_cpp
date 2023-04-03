@@ -19,6 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 #pragma once
 
+#define BI_FILE_HEADER_SIZE 14
 #define BI_SIZE	40 // size of bitmap info header.
 typedef unsigned short       word;
 
@@ -193,7 +194,7 @@ public:
 	inline rgbquad_t *GetPaletteData()
 	{
 		// palette is always right after header
-		return (rgbquad_t*)(data + GetBitmapHdr()->bitmapHeaderSize);
+		return (rgbquad_t*)(data + BI_FILE_HEADER_SIZE + GetBitmapHdr()->bitmapHeaderSize);
 	}
 
 	inline size_t GetPaletteSize()
