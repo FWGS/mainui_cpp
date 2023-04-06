@@ -101,5 +101,6 @@ def build(bld):
 		includes = includes,
 		use      = libs,
 		install_path = bld.env.LIBDIR,
-		subsystem = bld.env.MSVC_SUBSYSTEM
+		subsystem = bld.env.MSVC_SUBSYSTEM,
+		cmake_skip = True
 	)
