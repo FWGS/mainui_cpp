@@ -141,7 +141,7 @@ void CMenuCreateGame::Begin( CMenuBaseItem *pSelf, void *pExtra )
 	Com_EscapeCommand( cmd2, mapName, 256 );
 
 	// hack: wait three frames allowing server to completely shutdown, reapply maxplayers and start new map
-	sprintf( cmd, "endgame;menu_connectionprogress localserver;wait;wait;wait;maxplayers %i;latch;map %s\n", atoi( menu->maxClients.GetBuffer() ), cmd2 );
+	sprintf( cmd, "disconnect;menu_connectionprogress localserver;wait;wait;wait;maxplayers %i;latch;map %s\n", atoi( menu->maxClients.GetBuffer() ), cmd2 );
 	EngFuncs::ClientCmd( FALSE, cmd );
 }
 
