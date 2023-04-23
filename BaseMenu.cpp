@@ -668,7 +668,7 @@ void UI_UpdateMenu( float flTime )
 		{
 			// if game was launched with commandline e.g. +map or +load ignore the music
 			if( !CL_IsActive( ))
-				EngFuncs::PlayBackgroundTrack( "gamestartup", "gamestartup" );
+				EngFuncs::PlayBackgroundTrack( "media/gamestartup", "media/gamestartup" );
 			first = FALSE;
 		}
 	}
