@@ -820,6 +820,7 @@ void UI_SetActiveMenu( int fActive )
 	else
 	{
 		UI_CloseMenu();
+		uiStatic.nextFrameActive = false; // don't call main menu next frame
 	}
 }
 
