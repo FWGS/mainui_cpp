@@ -35,7 +35,7 @@ option(MAINUI_USE_STB "Use stb_truetype.h for rendering(*nix-only)" OFF)
 option(MAINUI_FONT_SCALE "Scale fonts by height" OFF)
 
 if(NOT XASH_SDK)
-	set(XASH_SDK "../")
+	set(XASH_SDK "sdk_includes/")
 endif()
 
 file(GLOB MAINUI_CONTROLS_SOURCES "controls/*.cpp")

@@ -62,9 +62,8 @@ def configure(conf):
 		conf.check_cxx(lib='rt', mandatory=False)
 
 def build(bld):
-	libs = [ 'sdk_includes' ]
+	libs = []
 
-	# basic build: dedicated only, no dependencies
 	if bld.env.DEST_OS != 'win32':
 		if not bld.env.USE_STBTT:
 			libs += ['FT2', 'FC']
@@ -92,6 +91,10 @@ def build(bld):
 		'controls/',
 		'menus/',
 		'model/',
+		'sdk_includes/common',
+		'sdk_includes/engine',
+		'sdk_includes/public',
+		'sdk_includes/pm_shared'
 	]
 
 	bld.shlib(
