@@ -32,14 +32,11 @@ Debug/
 Release/
 ipch/
 *.opensdf
-# Use CMake for generating projects
-*.vcxproj.filters
-*.vcxproj
-*.vcproj
-*.sln
 *.pdb
 
 __pycache__
 temp.txt
 nonfree_translations
-/.vs
+.vs
+x64/
+x86/
