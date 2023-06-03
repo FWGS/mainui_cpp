@@ -1,0 +1,7 @@
+DO NOT replace engine's menu.dll with your freshly built DLL!
+
+COPY IT ALONGSIDE YOUR MOD CLIENT.DLL, ENGINE WILL FIND IT AUTOMATICALLY!
+
+FOR 64 BIT BUILDS: LEAVE _amd64 POSTFIX! DO NOT RENAME THE DLL!
+
+Make Xash3D FWGS happy!
