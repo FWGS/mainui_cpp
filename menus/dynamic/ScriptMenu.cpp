@@ -161,7 +161,10 @@ void CMenuScriptConfig::ListItemCvarGetCb(CMenuBaseItem *pSelf, void *pExtra)
 	for( i = 0; entry; entry = entry->next, i++ )
 	{
 		if( entry->flValue == value )
+		{
+			self->SetCurrentValue( i );
 			break;
+		}
 	}
 
 	if( entry )
