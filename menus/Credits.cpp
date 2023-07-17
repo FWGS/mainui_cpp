@@ -58,6 +58,7 @@ public:
 
 private:
 	void _Init() override;
+	void Reload() override;
 
 	const char	**credits;
 	int		startTime;
@@ -207,12 +208,17 @@ void CMenuCredits::_Init( void )
 			numLines = ( sizeof( uiCreditsDefault ) / sizeof( uiCreditsDefault[0] )) - 1; // skip term
 		}
 	}
+}
 
+void CMenuCredits::Reload( void )
+{
 	// run credits
 	startTime = (gpGlobals->time * 1000) + 500; // make half-seconds delay
 	showTime = bound( 1000, strlen( credits[numLines - 1]) * 1000, 10000 );
 	fadeTime = 0; // will be determined later
 	active = true;
+
+	CMenuBaseWindow::Reload();
 }
 
 ADD_MENU3( menu_credits, CMenuCredits, UI_FinalCredits );
