@@ -366,12 +366,32 @@ void CMenuMain::VidInit( bool connected )
 
 	console.pos.x = 72;
 	console.CalcPosition();
-	saveRestore.SetCoord( 72, bTrainMap ? 380 : 330 );
-	configuration.SetCoord( 72, bTrainMap ? 430 : 380 );
-	multiPlayer.SetCoord( 72, bTrainMap ? 480 : 430 );
-	customGame.SetCoord( 72, bTrainMap ? 530 : 480 );
-	previews.SetCoord( 72, (bCustomGame) ? (bTrainMap ? 580 : 530) : (bTrainMap ? 530 : 480) );
-	quit.SetCoord( 72, (bCustomGame) ? (bTrainMap ? 630 : 580) : (bTrainMap ? 580 : 530));
+
+	int saveRestorePos = 330;
+	if (bTrainMap) saveRestorePos += 50; 
+	saveRestore.SetCoord( 72, saveRestorePos );
+
+	int configurationPos = 380;
+	if (bTrainMap) configurationPos += 50; 
+	configuration.SetCoord( 72, configurationPos );
+
+	int multiPlayerPos = 430;
+	if (bTrainMap) multiPlayerPos += 50; 
+	multiPlayer.SetCoord( 72, multiPlayerPos );
+	
+	int customGamePos = 480;
+	if (bTrainMap) customGamePos += 50; 
+	customGame.SetCoord( 72, customGamePos );
+
+	int previewsPos = 480;
+	if (bCustomGame) previewsPos += 50;
+	if (bTrainMap) previewsPos += 50;
+	previews.SetCoord( 72, previewsPos );
+
+	int quitPos = 530;
+	if (bCustomGame) quitPos += 50;
+	if (bTrainMap) quitPos += 50;
+	quit.SetCoord( 72, quitPos);
 }
 
 void CMenuMain::_VidInit()
