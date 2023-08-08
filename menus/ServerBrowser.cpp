@@ -658,8 +658,10 @@ void CMenuServerBrowser::Show()
 
 void CMenuServerBrowser::AddServerToList( netadr_t adr, const char *info )
 {
+#ifndef XASH_ALL_SERVERS
 	if( stricmp( gMenu.m_gameinfo.gamefolder, Info_ValueForKey( info, "gamedir" )) != 0 )
 		return;
+#endif
 
 	if( !WasInit() )
 		return;
