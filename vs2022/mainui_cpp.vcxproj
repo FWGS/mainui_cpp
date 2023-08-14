@@ -119,6 +119,7 @@
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;MAINUI_USE_CUSTOM_FONT_RENDER;STDINT_H=&lt;stdint.h&gt;;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>../;../controls;../font;../menus;../model;../miniutl;../sdk_includes/common;../sdk_includes/engine;../sdk_includes/pm_shared;../sdk_includes/public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
