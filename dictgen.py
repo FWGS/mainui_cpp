@@ -17,6 +17,7 @@ import sys
 import re
 
 EXTENSIONS = ('.cpp', '.h')
+EXCLUDE_FILES = ('./sdk_includes')
 TRANSLATABLE_PATTERN = re.compile('L\s*\(\s*\".*?\"\s*\)')
 STRING_LITERAL_PATTERN = re.compile('\".*?\"')
 
@@ -43,6 +44,7 @@ FOOTER = '''}
 '''
 
 def process_file(name):
+	print('Processing %s...' % name)
 	trans = []
 
 	# TODO: dumb! It can't find multilines
@@ -122,6 +124,9 @@ def main():
 
 	trans = []
 	for f in files:
+		if f.startswith(EXCLUDE_FILES):
+			continue
+
 		trans += process_file(f)
 
 	trans = process_trans(trans)
