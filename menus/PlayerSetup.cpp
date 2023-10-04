@@ -41,15 +41,15 @@ static struct
 } g_LogoColors[] =
 {
 { "FullColor",     -1,  -1,  -1  },
-{ "#Valve_Orange", 255, 120, 24  }, // L( "#Valve_Orange" )
-{ "#Valve_Yellow", 225, 180, 24  }, // L( "#Valve_Yellow" )
-{ "#Valve_Blue",   0,   60,  255 }, // L( "#Valve_Blue" )
-{ "#Valve_Ltblue", 0,   167, 255 }, // L( "#Valve_Ltblue" )
-{ "#Valve_Green",  0,   167, 0   }, // L( "#Valve_Green" )
-{ "#Valve_Red",    255, 43,  0   }, // L( "#Valve_Red" )
-{ "#Valve_Brown",  123, 73,  0   }, // L( "#Valve_Brown" )
-{ "#Valve_Ltgray", 100, 100, 100 }, // L( "#Valve_Ltgray" )
-{ "#Valve_Dkgray", 36,  36,  36  }, // L( "#Valve_Dkgray" )
+{ "#Valve_Orange", 255, 120, 24  }, // L( "Valve_Orange" )
+{ "#Valve_Yellow", 225, 180, 24  }, // L( "Valve_Yellow" )
+{ "#Valve_Blue",   0,   60,  255 }, // L( "Valve_Blue" )
+{ "#Valve_Ltblue", 0,   167, 255 }, // L( "Valve_Ltblue" )
+{ "#Valve_Green",  0,   167, 0   }, // L( "Valve_Green" )
+{ "#Valve_Red",    255, 43,  0   }, // L( "Valve_Red" )
+{ "#Valve_Brown",  123, 73,  0   }, // L( "Valve_Brown" )
+{ "#Valve_Ltgray", 100, 100, 100 }, // L( "Valve_Ltgray" )
+{ "#Valve_Dkgray", 36,  36,  36  }, // L( "Valve_Dkgray" )
 };
 
 class CMenuPlayerSetup : public CMenuFramework
