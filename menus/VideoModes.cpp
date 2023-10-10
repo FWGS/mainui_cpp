@@ -20,14 +20,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "Framework.h"
 #include "MenuStrings.h"
-#include "Bitmap.h"
 #include "PicButton.h"
 #include "Table.h"
 #include "CheckBox.h"
-#include "Action.h"
 #include "YesNoMessageBox.h"
 #include "SpinControl.h"
 #include "utlvector.h"
+#include "StringArrayModel.h"
 
 #define ART_BANNER		"gfx/shell/head_vidmodes"
 
@@ -135,7 +134,6 @@ public:
 		EngFuncs::CvarSetString( "r_refdll", renderersModel.GetShortName( i ));
 	}
 
-	CMenuCheckBox	windowed;
 	CMenuCheckBox	vsync;
 
 	CMenuTable	vidList;
@@ -145,11 +143,12 @@ public:
 
 	CMenuRenderersModel renderersModel;
 	CMenuSpinControl renderers;
+	CMenuSpinControl windowMode;
 
 	int prevMode;
 	int prevModeX;
 	int prevModeY;
-	bool prevFullscreen;
+	int prevFullscreen;
 	float testModeTimer;
 	char testModeMsg[256];
 };
@@ -204,9 +203,10 @@ UI_VidModes_SetConfig
 void CMenuVidModes::SetConfig( )
 {
 	bool testMode = false;
+	int  currentWindowModeIndex = windowMode.GetCurrentValue();
 	int  currentModeIndex = vidList.GetCurrentIndex() - VID_MODES_POS;
 	bool isVidModeChanged = prevMode != currentModeIndex;
-	bool isWindowedModeChanged = prevFullscreen != !windowed.bChecked;
+	bool isWindowedModeChanged = prevFullscreen != currentWindowModeIndex;
 
 	/*
 	checking windowed mode first because it'll be checked next in
@@ -216,9 +216,9 @@ void CMenuVidModes::SetConfig( )
 	*/
 	if( isWindowedModeChanged )
 	{
-		EngFuncs::CvarSetValue( "fullscreen", !windowed.bChecked );
+		EngFuncs::CvarSetValue( "fullscreen", currentWindowModeIndex );
 		// moved to fullscreen, enable test mode
-		testMode |= !windowed.bChecked;
+		testMode |= currentWindowModeIndex >= 0;
 	}
 
 	if( isVidModeChanged )
@@ -227,7 +227,7 @@ void CMenuVidModes::SetConfig( )
 		EngFuncs::CvarSetValue( "vid_mode", currentModeIndex );
 		vidList.SetCurrentIndex( currentModeIndex + VID_MODES_POS );
 		// have changed resolution, but enable test mode only in fullscreen
-		testMode |= !windowed.bChecked;
+		testMode |= currentWindowModeIndex >= 0;
 	}
 
 	vsync.WriteCvar();
@@ -297,25 +297,24 @@ UI_VidModes_Init
 */
 void CMenuVidModes::_Init( void )
 {
+	static const char *windowModeStr[] =
+	{
+		L( "Windowed" ),
+		L( "Fullscreen" ),
+		L( "Borderless" ),
+	};
+	static CStringArrayModel windowModeModel( windowModeStr, V_ARRAYSIZE( windowModeStr ));
+
 	banner.SetPicture(ART_BANNER);
 
 	vidList.SetRect( 360, 230, -20, 365 );
 	vidList.SetupColumn( 0, L( "GameUI_Resolution" ), 1.0f );
 	vidList.SetModel( &vidListModel );
 
-	windowed.SetNameAndStatus( L( "GameUI_Windowed" ), L( "GameUI_Windowed" ) );
-	windowed.SetCoord( 360, 620 );
-	SET_EVENT_MULTI( windowed.onChanged,
-	{
-		CMenuVidModes *parent = pSelf->GetParent(CMenuVidModes);
-		if( !parent->windowed.bChecked && parent->vidList.GetCurrentIndex() < VID_AUTOMODE_POS )
-			parent->vidList.SetCurrentIndex( VID_AUTOMODE_POS );
-	});
-
 	SET_EVENT_MULTI( vidList.onChanged,
 	{
 		CMenuVidModes *parent = pSelf->GetParent(CMenuVidModes);
-		if( !parent->windowed.bChecked && parent->vidList.GetCurrentIndex() < VID_AUTOMODE_POS )
+		if( parent->windowMode.GetCurrentValue() && parent->vidList.GetCurrentIndex() < VID_AUTOMODE_POS )
 			parent->vidList.SetCurrentIndex( VID_AUTOMODE_POS );
 	});
 
@@ -337,12 +336,24 @@ void CMenuVidModes::_Init( void )
 	renderers.onCvarWrite = VoidCb( &CMenuVidModes::WriteRendererConfig );
 	renderers.bUpdateImmediately = true;
 
+	windowMode.SetNameAndStatus( "Window mode", "Select desired window mode" );
+	windowMode.Setup( &windowModeModel );
+	windowMode.SetRect( 80, 550, 250, 32 );
+	windowMode.SetCharSize( QM_SMALLFONT );
+	SET_EVENT_MULTI( windowMode.onChanged,
+	{
+		// disable vid modes list when borderless is used
+		CMenuVidModes *parent = pSelf->GetParent( CMenuVidModes );
+		parent->vidList.SetGrayed( parent->windowMode.GetCurrentValue( ) == 2 );
+		parent->vidList.SetInactive( parent->windowMode.GetCurrentValue( ) == 2 );
+	});
+
 	AddItem( background );
 	AddItem( banner );
 	AddButton( L( "GameUI_Apply" ), L( "Apply changes" ), PC_OK, VoidCb( &CMenuVidModes::SetConfig ) );
 	AddButton( L( "GameUI_Cancel" ), L( "Return back to previous menu" ), PC_CANCEL, VoidCb( &CMenuVidModes::Hide ) );
 	AddItem( renderers );
-	AddItem( windowed );
+	AddItem( windowMode );
 	AddItem( vsync );
 	AddItem( vidList );
 
@@ -356,7 +367,7 @@ void CMenuVidModes::_VidInit()
 	{
 		ApplyChanges( );
 		vidList.SetCurrentIndex( prevMode + VID_MODES_POS );
-		windowed.bChecked = !prevFullscreen;
+		windowMode.SetCurrentValue( prevFullscreen );
 	}
 }
 
