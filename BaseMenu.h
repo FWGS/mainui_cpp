@@ -1,5 +1,5 @@
 /*
-basemenu.h - menu basic header 
+basemenu.h - menu basic header
 Copyright (C) 2010 Uncle Mike
 
 This program is free software: you can redistribute it and/or modify
@@ -188,7 +188,8 @@ enum ETextFlags
 	ETF_FORCECOL    = BIT( 0 ),
 	ETF_SHADOW      = BIT( 1 ),
 	ETF_NOSIZELIMIT = BIT( 2 ),
-	ETF_ADDITIVE    = BIT( 3 )
+	ETF_ADDITIVE    = BIT( 3 ),
+	ETF_NO_WRAP     = BIT( 4 )
 };
 
 int  UI_DrawString( HFont font, int x, int y, int w, int h, const char *str, const unsigned int col, int charH, uint justify, uint flags = 0 );
