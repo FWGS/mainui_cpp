@@ -10,7 +10,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -304,15 +304,21 @@ int UI_DrawString( HFont font, int x, int y, int w, int h,
 	if( justify & QM_TOP )
 	{
 		yy = y;
+		h -= h % charH;
 	}
 	else if( justify & QM_BOTTOM )
 	{
 		yy = y + h - charH;
+		h -= h % charH;
 	}
 	else
 	{
 		yy = y + (h - charH)/2;
+		h -= charH;
 	}
+
+	if( flags & ETF_NO_WRAP )
+		h = charH;
 
 	int i = 0;
 	int ellipsisWide = g_FontMgr->GetEllipsisWide( font );
@@ -358,7 +364,7 @@ int UI_DrawString( HFont font, int x, int y, int w, int h,
 				int charWide;
 
 				// does we have free space for new line?
-				if( yy < (yy + h ) - charH )
+				if( yy < (y + h) - charH )
 				{
 					if( uch == ' ' && pixelWide < w ) // remember last whitespace
 					{
@@ -381,7 +387,7 @@ int UI_DrawString( HFont font, int x, int y, int w, int h,
 				if( !(flags & ETF_NOSIZELIMIT) && pixelWide + charWide > w )
 				{
 					// do we have free space for new line?
-					if( yy < (yy + h) - charH )
+					if( yy < (y + h) - charH )
 					{
 						// try to word wrap
 						if( save_j != 0 && save_pixelWide != 0 )
@@ -663,7 +669,7 @@ void UI_UpdateMenu( float flTime )
 
 		uiStatic.firstDraw = false;
 		static int first = TRUE;
-                    
+
 		if( first )
 		{
 			// if game was launched with commandline e.g. +map or +load ignore the music
@@ -1026,7 +1032,7 @@ int UI_VidInit( void )
 	if( uiStatic.textInput )
 	{
 		uiStatic.menu.InputMethodResized();
-		
+
 		return 0;
 	}
 	if(!calledOnce) UI_Precache();
@@ -1044,7 +1050,7 @@ int UI_VidInit( void )
 		uiStatic.yOffset = 0;
 	}
 
-	
+
 	uiStatic.width = ScreenWidth / uiStatic.scaleX;
 	// move cursor to screen center
 	uiStatic.cursorX = ScreenWidth / 2;
