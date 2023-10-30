@@ -34,6 +34,7 @@ class CMenuVidOptions : public CMenuFramework
 private:
 	void _Init() override;
 	void _VidInit() override;
+	void Reload() override;
 
 public:
 	CMenuVidOptions() : CMenuFramework( "CMenuVidOptions" ) { }
@@ -56,6 +57,7 @@ public:
 	CMenuSlider	gammaIntensity;
 	CMenuSlider	glareReduction;
 	CMenuCheckBox   vbo;
+	CMenuCheckBox	swwater;
 
 	HIMAGE		hTestImage;
 };
@@ -148,13 +150,9 @@ CMenuVidOptions::Init
 */
 void CMenuVidOptions::_Init( void )
 {
-#ifdef PIC_KEEP_RGBDATA
-	hTestImage = EngFuncs::PIC_Load( ART_GAMMA, PIC_KEEP_RGBDATA );
-#else
 	hTestImage = EngFuncs::PIC_Load( ART_GAMMA, PIC_KEEP_SOURCE | PIC_EXPAND_SOURCE );
-#endif
 
-	banner.SetPicture(ART_BANNER);
+	banner.SetPicture( ART_BANNER );
 
 	testImage.iFlags = QMF_INACTIVE;
 	testImage.SetRect( 390, 225, 480, 450 );
@@ -193,6 +191,9 @@ void CMenuVidOptions::_Init( void )
 	vbo.SetNameAndStatus( L( "Use VBO" ), L( "Use new world renderer. Faster, but rarely glitchy" ) );
 	vbo.SetCoord( 72, 565 );
 
+	swwater.SetNameAndStatus( L( "Water ripples"), L( "Enable water ripple effect, like in software-mode GoldSrc" ));
+	swwater.SetCoord( 72, 615 );
+
 	AddItem( background );
 	AddItem( banner );
 	AddItem( done );
@@ -202,6 +203,7 @@ void CMenuVidOptions::_Init( void )
 	AddItem( gammaIntensity );
 	AddItem( glareReduction );
 	// AddItem( vbo );
+	AddItem( swwater );
 	AddItem( testImage );
 
 #if LEGACY_VIEWSIZE
@@ -210,6 +212,7 @@ void CMenuVidOptions::_Init( void )
 
 	gammaIntensity.LinkCvar( "gamma" );
 	glareReduction.LinkCvar( "brightness" );
+	swwater.LinkCvar( "r_ripple" );
 	vbo.LinkCvar( "gl_vbo" );
 }
 
@@ -217,6 +220,15 @@ void CMenuVidOptions::_VidInit()
 {
 	outlineWidth = 2;
 	UI_ScaleCoords( NULL, NULL, &outlineWidth, NULL );
+}
+
+void CMenuVidOptions::Reload()
+{
+	CMenuFramework::Reload();
+	bool gl_active = !strnicmp( EngFuncs::GetCvarString( "r_refdll_loaded" ), "gl", 2 );
+
+	swwater.SetGrayed( !gl_active );
+	swwater.SetInactive( !gl_active );
 }
 
 ADD_MENU( menu_vidoptions, CMenuVidOptions, UI_VidOptions_Menu );
