@@ -336,7 +336,7 @@ void CMenuVidModes::_Init( void )
 	renderers.onCvarWrite = VoidCb( &CMenuVidModes::WriteRendererConfig );
 	renderers.bUpdateImmediately = true;
 
-	windowMode.SetNameAndStatus( "Window mode", "Select desired window mode" );
+	windowMode.SetNameAndStatus( L( "Window mode" ), L( "Select desired window mode" ) );
 	windowMode.Setup( &windowModeModel );
 	windowMode.SetRect( 80, 550, 250, 32 );
 	windowMode.SetCharSize( QM_SMALLFONT );
