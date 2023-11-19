@@ -60,9 +60,6 @@ CMenuMultiplayer::Init
 */
 void CMenuMultiplayer::_Init( void )
 {
-	// memset( &uiMultiPlayer, 0, sizeof( CMenuMultiplayer ));
-	AddItem( background );
-
 	banner.SetPicture( ART_BANNER );
 	AddItem( banner );
 

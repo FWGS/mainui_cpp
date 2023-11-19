@@ -20,6 +20,7 @@ public:
 
 	CMenuPicButton done;
 private:
+	CMenuBackgroundBitmap background;
 	CMenuPicButton options;
 	CMenuCheckBox normal, dsl, slowest;
 	CMenuAction title, message;

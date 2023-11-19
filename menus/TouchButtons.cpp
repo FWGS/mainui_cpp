@@ -447,7 +447,6 @@ void CMenuTouchButtons::_Init( void )
 	UpdateFields();
 	msgBox.Link( this );
 
-	AddItem( background );
 	AddItem( remove );
 	AddItem( reset );
 	AddItem( done );

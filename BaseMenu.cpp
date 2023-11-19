@@ -154,7 +154,7 @@ bool UI_CursorInRect( int x, int y, int w, int h )
 UI_EnableAlphaFactor
 =================
 */
-void UI_EnableAlphaFactor(float a)
+void UI_EnableAlphaFactor( float a )
 {
 	uiStatic.enableAlphaFactor = true;
 	uiStatic.alphaFactor = bound( 0.0f, a, 1.0f );
@@ -621,11 +621,18 @@ void UI_UpdateMenu( float flTime )
 	// set from user configs
 	if( loadStuff )
 	{
+		// init global background, root windows don't have background anymore
+		uiStatic.background = new CMenuBackgroundBitmap();
+
 		// load localized strings
 		UI_LoadCustomStrings();
 
 		// load scr
 		UI_LoadScriptConfig();
+
+		// load background track
+		if( !CL_IsActive( ))
+			EngFuncs::PlayBackgroundTrack( "media/gamestartup", "media/gamestartup" );
 
 		loadStuff = false;
 	}
@@ -652,36 +659,26 @@ void UI_UpdateMenu( float flTime )
 	if( !uiStatic.menu.IsActive( ))
 		return;
 
-	if( !EngFuncs::ClientInGame() && EngFuncs::GetCvarFloat( "cl_background" ))
+	if( !EngFuncs::ClientInGame() && EngFuncs::GetCvarFloat( "cl_background" ) != 0.0f )
 		return;	// don't draw menu while level is loading
 
 	if( uiStatic.firstDraw )
 	{
 		// we loading background so skip SCR_Update
-		if( UI_StartBackGroundMap( )) return;
+		if( UI_StartBackGroundMap( ))
+			return;
 
 		uiStatic.firstDraw = false;
-		static int first = TRUE;
-
-		if( first )
-		{
-			// if game was launched with commandline e.g. +map or +load ignore the music
-			if( !CL_IsActive( ))
-				EngFuncs::PlayBackgroundTrack( "media/gamestartup", "media/gamestartup" );
-			first = FALSE;
-		}
 	}
 
 	// draw cursor
 	UI_DrawMouseCursor();
 
-	// delay playing the enter sound until after the menu has been
-	// drawn, to avoid delay while caching images
-	if( uiStatic.enterSound > 0.0f && uiStatic.enterSound <= gpGlobals->time )
-	{
-		EngFuncs::PlayLocalSound( uiStatic.sounds[SND_IN] );
-		uiStatic.enterSound = -1;
-	}
+	// background doesn't need to be drawn with transparency
+	bool enableAlphaFactor = uiStatic.enableAlphaFactor;
+	uiStatic.enableAlphaFactor = false;
+	uiStatic.background->Draw();
+	uiStatic.enableAlphaFactor = enableAlphaFactor;
 
 	uiStatic.menu.Update();
 }
@@ -1197,6 +1194,7 @@ void UI_Shutdown( void )
 
 	UI_FreeCustomStrings();
 
+	delete uiStatic.background;
 	delete g_FontMgr;
 
 	memset( &uiStatic, 0, sizeof( uiStatic_t ));

@@ -49,6 +49,7 @@ public:
 	CEventCallback onNegative;
 
 	bool bAutoHide;
+	CMenuBackgroundBitmap background;
 	CMenuAction		dlgMessage1;
 	CMenuPicButton	yes;
 	CMenuPicButton	no;

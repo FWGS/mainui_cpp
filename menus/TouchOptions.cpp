@@ -384,7 +384,6 @@ void CMenuTouchOptions::_Init( void )
 	msgBox.SetPositiveButton( L( "GameUI_OK" ), PC_OK );
 	msgBox.Link( this );
 	
-	AddItem( background );
 	AddItem( banner );
 	AddItem( done );
 	AddItem( lookX );

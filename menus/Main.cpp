@@ -287,7 +287,6 @@ void CMenuMain::_Init( void )
 
 	dialog.Link( this );
 
-	AddItem( background );
 	AddItem( banner );
 
 	if ( gpGlobals->developer )

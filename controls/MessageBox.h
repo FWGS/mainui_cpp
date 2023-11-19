@@ -29,6 +29,7 @@ public:
 private:
 	void _Init() override;
 
+	CMenuBackgroundBitmap background;
 	CMenuAction dlgMessage;
 };
 

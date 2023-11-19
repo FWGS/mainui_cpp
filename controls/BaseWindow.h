@@ -81,7 +81,6 @@ public:
 
 	bool bAllowDrag;
 	EAnimation eTransitionType; // valid only when in transition
-	CMenuBackgroundBitmap background;
 
 	const CWindowStack *WindowStack() const
 	{

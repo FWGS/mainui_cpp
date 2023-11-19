@@ -474,7 +474,6 @@ void CMenuPlayerSetup::_Init( void )
 	msgBox.SetMessage( L( "Please, choose another player name" ) );
 	msgBox.Link( this );
 
-	AddItem( background );
 	AddItem( banner );
 
 	AddButton( L( "Done" ), L( "Go back to the Multiplayer Menu" ), PC_DONE, VoidCb( &CMenuPlayerSetup::SaveAndPopMenu ) );

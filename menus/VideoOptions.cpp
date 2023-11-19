@@ -194,7 +194,6 @@ void CMenuVidOptions::_Init( void )
 	swwater.SetNameAndStatus( L( "Water ripples"), L( "Enable water ripple effect, like in software-mode GoldSrc" ));
 	swwater.SetCoord( 72, 615 );
 
-	AddItem( background );
 	AddItem( banner );
 	AddItem( done );
 #if LEGACY_VIEWSIZE

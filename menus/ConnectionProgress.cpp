@@ -120,6 +120,7 @@ public:
 	EState m_iState;
 	ESource m_iSource;
 private:
+	CMenuBackgroundBitmap background;
 	CMenuProgressBar commonProgress;
 	CMenuProgressBar downloadProgress;
 	CMenuPicButton consoleButton;

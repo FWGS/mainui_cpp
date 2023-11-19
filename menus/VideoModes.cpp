@@ -348,7 +348,6 @@ void CMenuVidModes::_Init( void )
 		parent->vidList.SetInactive( parent->windowMode.GetCurrentValue( ) == 2 );
 	});
 
-	AddItem( background );
 	AddItem( banner );
 	AddButton( L( "GameUI_Apply" ), L( "Apply changes" ), PC_OK, VoidCb( &CMenuVidModes::SetConfig ) );
 	AddButton( L( "GameUI_Cancel" ), L( "Return back to previous menu" ), PC_CANCEL, VoidCb( &CMenuVidModes::Hide ) );

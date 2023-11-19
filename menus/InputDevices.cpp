@@ -119,7 +119,6 @@ void CMenuInputDevices::_Init( void )
 	evdev.SetCoord( 72, 380 );
 	evdev.onReleased.SetCommand( FALSE, "evdev_autodetect\n" );
 
-	AddItem( background );
 	//AddItem( banner );
 	AddItem( done );
 	AddItem( mouse );

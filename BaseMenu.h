@@ -92,8 +92,11 @@ enum EUISounds
 	SND_COUNT
 };
 
+class CMenuBackgroundBitmap;
+
 typedef struct
 {
+	CMenuBackgroundBitmap *background;
 	CWindowStack menu;
 	CWindowStack client; // separate window stack for client windows
 	char	bgmaps[UI_MAX_BGMAPS][80];
@@ -121,7 +124,6 @@ typedef struct
 	int		cursorY;
 	int		realTime;
 	int		firstDraw;
-	float	enterSound;
 	int		mouseInRect;
 	int		hideCursor;
 	int		initialized;

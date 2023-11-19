@@ -198,7 +198,6 @@ void CAdvancedControls::_Init( void )
 	//inputDev.SetRect( 72, 230, UI_BUTTONS_WIDTH, UI_BUTTONS_HEIGHT );
 	inputDev.SetCoord( 72, 210 );
 
-	AddItem( background );
 	AddItem( banner );
 	AddItem( done );
 	AddItem( inputDev );

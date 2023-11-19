@@ -159,23 +159,9 @@ bool CMenuBaseWindow::DrawAnimation()
 bool CMenuBaseWindow::KeyValueData(const char *key, const char *data)
 {
 	if( !strcmp( key, "enabled" ) || !strcmp( key, "visible" ) )
-	{
+		return true;
 
-	}
-	else
-	{
-		if( !strcmp( key, "xpos" ) ||
-		!strcmp( key, "ypos" ) ||
-		!strcmp( key, "wide" ) ||
-		!strcmp( key, "tall" ) )
-		{
-			background.KeyValueData( key, data );
-		}
-
-		return CMenuBaseItem::KeyValueData(key, data);
-	}
-
-	return true;
+	return CMenuBaseItem::KeyValueData(key, data);
 }
 
 void CMenuBaseWindow::EnableTransition( EAnimation type )

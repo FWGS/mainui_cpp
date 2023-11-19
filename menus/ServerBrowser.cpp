@@ -521,7 +521,6 @@ CMenuServerBrowser::Init
 */
 void CMenuServerBrowser::_Init( void )
 {
-	AddItem( background );
 	AddItem( banner );
 
 	joinGame = AddButton( L( "Join game" ), L( "Join to selected game" ), PC_JOIN_GAME,

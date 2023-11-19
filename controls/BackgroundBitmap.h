@@ -33,7 +33,6 @@ public:
 	void SetInactive(bool) override { }
 	void ToggleInactive() override { }
 
-	bool bForceWON; // if true, szPic will be drawn, instead of Steam-background
 	bool bForceColor; // dialogs should set this
 
 	static void LoadBackground();
@@ -46,7 +45,6 @@ private:
 
 	static bool LoadBackgroundImage( const bool gamedirOnly ); // Steam background loader
 	static bool CheckBackgroundSplash( const bool gamedirOnly ); // WON background loader
-
 
 	//==========
 	// WON-style

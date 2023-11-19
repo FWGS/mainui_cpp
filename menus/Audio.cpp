@@ -166,7 +166,6 @@ void CMenuAudio::_Init( void )
 	vibration.onChanged = VoidCb( &CMenuAudio::VibrateChanged );
 	vibration.SetCoord( 700, 570 );
 
-	AddItem( background );
 	AddItem( banner );
 	AddButton( L( "Done" ), L( "Go back to the Configuration Menu" ), PC_DONE,
 		VoidCb( &CMenuAudio::SaveAndPopMenu ) );

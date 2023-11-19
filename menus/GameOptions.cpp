@@ -243,7 +243,6 @@ void CMenuGameOptions::_Init( void )
 	split.SetNameAndStatus( L( "Split" ), L( "Split network packets" ) );
 	split.LinkCvar("cl_enable_split" );
 
-	AddItem( background );
 	AddItem( banner );
 	AddButton( L( "Done" ), L( "Save changes and go back to the Customize Menu" ), PC_DONE, VoidCb( &CMenuGameOptions::SaveCb ) );
 	AddButton( L( "GameUI_Cancel" ), L( "Go back to the Customize Menu" ), PC_CANCEL, VoidCb( &CMenuGameOptions::RestoreCb ) );

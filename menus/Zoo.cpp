@@ -72,7 +72,6 @@ void CMenuZoo::_Init()
 
 	background.bForceColor = true;
 
-	AddItem( background );
 	SET_TAG_BY_MEMBER_NAME( OKButton );
 	SET_TAG_BY_MEMBER_NAME( CancelButton );
 	SET_TAG_BY_MEMBER_NAME( Label1 );
@@ -144,7 +143,6 @@ void CMenuZoo::_Init()
 
 	scrollView.SetRect( 0, 0, 1024, 768 );
 
-	AddItem( background );
 	AddItem( scrollView );
 }
 

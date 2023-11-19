@@ -393,7 +393,6 @@ void CMenuControls::_Init( void )
 	msgBox2.onPositive = VoidCb( &CMenuControls::ResetKeysList );
 	msgBox2.Link( this );
 
-	AddItem( background );
 	AddItem( banner );
 	AddButton( L( "GameUI_UseDefaults" ), L( "GameUI_KeyboardSettingsText" ), PC_USE_DEFAULTS, msgBox2.MakeOpenEvent() );
 	AddButton( L( "Adv. Controls" ), L( "Change mouse sensitivity, enable autoaim, mouselook and crosshair" ), PC_ADV_CONTROLS, UI_AdvControls_Menu );

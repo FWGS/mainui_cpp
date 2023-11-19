@@ -206,7 +206,6 @@ void CMenuCreateGame::_Init( void )
 	nat.bChecked = true;
 
 	// add them here, so "done" button can be used by mapsListModel::Update
-	AddItem( background );
 	AddItem( banner );
 	CMenuPicButton *advOpt = AddButton( L( "Adv. Options" ), L( "Open the game advanced options menu" ), PC_ADV_OPT, UI_AdvServerOptions_Menu );
 	advOpt->SetGrayed( !UI_AdvServerOptions_IsAvailable() );

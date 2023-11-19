@@ -42,7 +42,6 @@ void UI_Touch_Menu( void )
 	if( !menu_touch->WasInit() )
 	{
 		menu_touch->banner.SetPicture( ART_BANNER );
-		menu_touch->AddItem( menu_touch->background );
 		menu_touch->AddItem( menu_touch->banner );
 
 		menu_touch->AddButton( L( "Touch options" ), L( "Touch sensitivity and profile options" ), "gfx/shell/btn_touch_options",

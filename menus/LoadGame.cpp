@@ -304,7 +304,6 @@ void CMenuLoadGame::_Init( void )
 
 	levelShot.SetRect( LEVELSHOT_X, LEVELSHOT_Y, LEVELSHOT_W, LEVELSHOT_H );
 
-	AddItem( background );
 	AddItem( banner );
 	AddItem( load );
 	AddItem( save );

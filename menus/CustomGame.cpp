@@ -151,7 +151,6 @@ void CMenuCustomGame::_Init( void )
 	msgBox.onPositive = MenuCb( &CMenuCustomGame::ChangeGame );
 	msgBox.Link( this );
 
-	AddItem( background );
 	AddItem( banner );
 	load = AddButton( L( "Activate" ), L( "Activate selected custom game" ), PC_ACTIVATE,
 		VoidCb( &CMenuCustomGame::ShowDialog ) );

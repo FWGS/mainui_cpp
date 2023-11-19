@@ -57,7 +57,6 @@ void CMenuSaveLoad::_Init( void )
 	hintMessage.szName = hintText;
 	hintMessage.SetCoord( 360, 480 );
 
-	AddItem( background );
 	AddItem( banner );
 	AddButton( L( "GameUI_LoadGame" ), L( "GameUI_LoadGameHelp" ), PC_LOAD_GAME, UI_LoadGame_Menu, QMF_NOTIFY );
 	AddButton( L( "GameUI_SaveGame" ), L( "GameUI_SaveGameHelp" ), PC_SAVE_GAME, UI_SaveGame_Menu, QMF_NOTIFY );

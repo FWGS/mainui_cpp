@@ -28,7 +28,6 @@ CMenuBackgroundBitmap::CMenuBackgroundBitmap() : CMenuBitmap()
 {
 	szPic = 0;
 	iFlags = QMF_INACTIVE|QMF_DISABLESCAILING;
-	bForceWON = false;
 	bForceColor = false;
 }
 
@@ -85,35 +84,6 @@ void CMenuBackgroundBitmap::DrawBackgroundLayout( Point p, float xScale, float y
 	}
 }
 
-class OverrideAlphaFactor
-{
-public:
-	OverrideAlphaFactor()
-	{
-		bOverride = false;
-		flAlphaFactor = 1.0f;
-	}
-
-	~OverrideAlphaFactor()
-	{
-		if( bOverride )
-			UI_EnableAlphaFactor( flAlphaFactor );
-	}
-
-	void Override()
-	{
-		if( uiStatic.enableAlphaFactor )
-		{
-			bOverride = true;
-			flAlphaFactor = uiStatic.alphaFactor;
-			UI_DisableAlphaFactor();
-		}
-	}
-
-	bool bOverride;
-	float flAlphaFactor;
-};
-
 /*
 =================
 CMenuBackgroundBitmap::Draw
@@ -121,21 +91,6 @@ CMenuBackgroundBitmap::Draw
 */
 void CMenuBackgroundBitmap::Draw()
 {
-	// HACKHACK: Don't draw background for root windows, which goes out and in transition
-	// for window which is goes in and in transition, alpha factor should be ignored
-	OverrideAlphaFactor alphaFactor;
-	if( m_pParent && m_pParent->IsWindow() )
-	{
-		CMenuBaseWindow *window = (CMenuBaseWindow*)m_pParent;
-		if( window->IsRoot() && window->eTransitionType )
-		{
-			alphaFactor.Override();
-
-			if( window->eTransitionType == CMenuBaseWindow::ANIM_CLOSING )
-				return;
-		}
-	}
-
 	if( bForceColor )
 	{
 		DrawColor();

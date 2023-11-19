@@ -254,9 +254,8 @@ void CWindowStack::Add( CMenuBaseWindow *menu )
 	if( this == &uiStatic.menu ) // hack!
 	{
 		uiStatic.firstDraw = true;
-		uiStatic.enterSound = gpGlobals->time + 0.15f;	// make some delay
 
-		EngFuncs::KEY_SetDest ( KEY_MENU );
+		EngFuncs::KEY_SetDest( KEY_MENU );
 	}
 }
 
