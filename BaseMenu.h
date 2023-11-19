@@ -124,7 +124,6 @@ typedef struct
 	float	enterSound;
 	int		mouseInRect;
 	int		hideCursor;
-	int		framecount;	// how many frames menu visible
 	int		initialized;
 
 	// btns_main.bmp stuff

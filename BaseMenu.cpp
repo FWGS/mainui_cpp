@@ -617,6 +617,8 @@ void UI_UpdateMenu( float flTime )
 
 	static bool loadStuff = true;
 
+	// can't do this in Init, since these are dependent on cvar values
+	// set from user configs
 	if( loadStuff )
 	{
 		// load localized strings
@@ -630,6 +632,8 @@ void UI_UpdateMenu( float flTime )
 
 	UI_DrawFinalCredits ();
 
+	// also moved opening main menu here from SetActiveMenu, so
+	// translation strings could will be loaded at this moment
 	if( uiStatic.nextFrameActive )
 	{
 		if( !uiStatic.menu.IsActive() )
@@ -638,26 +642,15 @@ void UI_UpdateMenu( float flTime )
 		uiStatic.nextFrameActive = false;
 	}
 
-	// let's use engine credits "feature" for drawing client windows
-	if( uiStatic.client.IsActive() )
-	{
-		uiStatic.client.Update();
-		uiStatic.realTime = flTime * 1000;
-		uiStatic.framecount++;
-	}
-
-	if( !uiStatic.menu.IsActive() )
-	{
-		if( uiStatic.framecount )
-			uiStatic.framecount = 0;
-		return;
-	}
-
-	if( !uiStatic.menu.IsActive() )
-		return;
-
+	// advance global time
 	uiStatic.realTime = flTime * 1000;
-	uiStatic.framecount++;
+
+	// let's use engine credits "feature" for drawing client windows
+	if( uiStatic.client.IsActive( ))
+		uiStatic.client.Update();
+
+	if( !uiStatic.menu.IsActive( ))
+		return;
 
 	if( !EngFuncs::ClientInGame() && EngFuncs::GetCvarFloat( "cl_background" ))
 		return;	// don't draw menu while level is loading
@@ -815,8 +808,6 @@ void UI_SetActiveMenu( int fActive )
 
 	// don't continue firing if we leave game
 	EngFuncs::KEY_ClearStates();
-
-	uiStatic.framecount = 0;
 
 	if( fActive )
 	{
