@@ -217,9 +217,15 @@ bool CMenuBackgroundBitmap::LoadBackgroundImage( bool gamedirOnly )
 
 	s_bEnableLogoMovie = false; // no logos for Steam background
 
-	afile = (char*)EngFuncs::COM_LoadFile( "resource/BackgroundLayout.txt" );
+	// try 25'th anniversary update background first
+	afile = (char *)EngFuncs::COM_LoadFile( "resource/HD_BackgroundLayout.txt" );
 
-	if( !afile ) return false;
+	// if not found, load older Steam background
+	if( !afile )
+		afile = (char *)EngFuncs::COM_LoadFile( "resource/BackgroundLayout.txt" );
+
+	if( !afile )
+		return false;
 
 	pfile = afile;
 
