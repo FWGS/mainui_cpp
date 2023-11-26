@@ -261,6 +261,9 @@ void CMenuMain::CMenuMainBanner::VidInit()
 
 void CMenuMain::CMenuMainBanner::Draw()
 {
+	if( EngFuncs::ClientInGame() && EngFuncs::GetCvarFloat( "ui_renderworld" ) != 0.0f )
+		return;
+
 	if( useAnimatedTitle )
 		AnimatedTitleDraw();
 
