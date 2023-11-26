@@ -91,9 +91,9 @@ public:
 		return a.m_hPic == b.m_hPic;
 	}
 
-	bool IsValid()     { return m_hPic != 0; }
-	const char *Path() { return m_szPath; }
-	HIMAGE Handle()    { return m_hPic; }
+	bool IsValid() const     { return m_hPic != 0; }
+	const char *Path() const { return m_szPath; }
+	HIMAGE Handle() const    { return m_hPic; }
 private:
 	const char *m_szPath;
 	HIMAGE m_hPic;
