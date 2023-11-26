@@ -33,9 +33,10 @@ CMenuBackgroundBitmap::CMenuBackgroundBitmap() : CMenuBitmap()
 
 void CMenuBackgroundBitmap::VidInit()
 {
+	pos.x = pos.y = 0;
+
 	if( m_pParent )
 	{
-		pos.x = pos.y = 0;
 		// fill parent
 		if( m_pParent->iFlags & QMF_DISABLESCAILING )
 		{
@@ -45,6 +46,10 @@ void CMenuBackgroundBitmap::VidInit()
 		{
 			size = m_pParent->size.Scale();
 		}
+	}
+	else
+	{
+		size = Size( ScreenWidth, ScreenHeight );
 	}
 
 	colorBase.SetDefault( 0xFF505050 );
