@@ -277,7 +277,7 @@ void CMenuCreateGame::SaveCvars()
 	hostName.WriteCvar();
 	maxClients.WriteCvar();
 	password.WriteCvar();
-	EngFuncs::CvarSetString( "sv_nat", EngFuncs::GetCvarFloat( "public" ) ? menu->nat.bChecked : 0 );
+	EngFuncs::CvarSetValue( "sv_nat", EngFuncs::GetCvarFloat( "public" ) ? nat.bChecked : 0 );
 }
 
 void CMenuCreateGame::Reload( void )
