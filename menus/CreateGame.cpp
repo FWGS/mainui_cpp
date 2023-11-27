@@ -64,8 +64,7 @@ public:
 	static void Begin( CMenuBaseItem *pSelf, void *pExtra );
 
 	void Reload( void ) override;
-
-	char		*mapsDescriptionPtr[UI_MAXGAMES];
+	void SaveCvars( void );
 
 	CMenuField	maxClients;
 	CMenuField	hostName;
@@ -93,55 +92,45 @@ void CMenuCreateGame::Begin( CMenuBaseItem *pSelf, void *pExtra )
 {
 	CMenuCreateGame *menu = (CMenuCreateGame*)pSelf->Parent();
 	int item = menu->mapsList.GetCurrentIndex();
-	if( item < 0 || item > UI_MAXGAMES )
+	if( item < 0 || item > menu->mapsListModel.GetRows( ))
 		return;
 
-	const char *mapName;
-	if( menu->mapsList.GetCurrentIndex() == 0 )
-	{
-		int idx = EngFuncs::RandomLong( 1, menu->mapsListModel.GetRows() );
-		mapName = menu->mapsListModel.mapName[idx];
-	}
-	else
-	{
-		mapName = menu->mapsListModel.mapName[menu->mapsList.GetCurrentIndex()];
-	}
+	if( item == 0 )
+		item = EngFuncs::RandomLong( 1, menu->mapsListModel.GetRows() );
+
+	const char *mapName = menu->mapsListModel.mapName[item];
 
 	if( !EngFuncs::IsMapValid( mapName ))
 		return;	// bad map
 
-	if( EngFuncs::GetCvarFloat( "host_serverstate" ) )
+	if( EngFuncs::GetCvarFloat( "host_serverstate" ))
 	{
-		if(	EngFuncs::GetCvarFloat( "maxplayers" ) == 1.0f )
+		if( EngFuncs::GetCvarFloat( "maxplayers" ) == 1.0f )
 			EngFuncs::HostEndGame( "end of the game" );
 		else
 			EngFuncs::HostEndGame( "starting new server" );
 	}
 
 	EngFuncs::CvarSetValue( "deathmatch", 1.0f );	// start deathmatch as default
-	EngFuncs::CvarSetString( "defaultmap", mapName );
-	EngFuncs::CvarSetValue( "sv_nat", EngFuncs::GetCvarFloat( "public" ) ? menu->nat.bChecked : 0 );
-	menu->password.WriteCvar();
-	menu->hostName.WriteCvar();
-	menu->maxClients.WriteCvar();
+	menu->SaveCvars();
 
 	EngFuncs::PlayBackgroundTrack( NULL, NULL );
 
 	// all done, start server
-	EngFuncs::WriteServerConfig( EngFuncs::GetCvarString( "lservercfgfile" ));
+	const char *listenservercfg = EngFuncs::GetCvarString( "lservercfgfile" );
+	EngFuncs::WriteServerConfig( listenservercfg );
 
-	char cmd[1024], cmd2[256];
-	sprintf( cmd, "exec %s\n", EngFuncs::GetCvarString( "lservercfgfile" ) );
-
+	char cmd[1024];
+	snprintf( cmd, sizeof( cmd ), "exec %s\n", listenservercfg );
 	EngFuncs::ClientCmd( TRUE, cmd );
 
 	// dirty listenserver config form old xash may rewrite maxplayers
-	EngFuncs::CvarSetValue( "maxplayers", atoi( menu->maxClients.GetBuffer() ));
-
-	Com_EscapeCommand( cmd2, mapName, 256 );
+	menu->maxClients.WriteCvar();
 
 	// hack: wait three frames allowing server to completely shutdown, reapply maxplayers and start new map
-	sprintf( cmd, "disconnect;menu_connectionprogress localserver;wait;wait;wait;maxplayers %i;latch;map %s\n", atoi( menu->maxClients.GetBuffer() ), cmd2 );
+	char cmd2[256];
+	Com_EscapeCommand( cmd2, mapName, sizeof( cmd2 ));
+	snprintf( cmd, sizeof( cmd ), "disconnect;menu_connectionprogress localserver;wait;wait;wait;maxplayers %i;latch;map %s\n", atoi( menu->maxClients.GetBuffer() ), cmd2 );
 	EngFuncs::ClientCmd( FALSE, cmd );
 }
 
@@ -169,20 +158,20 @@ void CMenuMapListModel::Update( void )
 	char token[1024];
 	int numMaps = 1;
 
-	strcpy( mapName[0], L( "GameUI_RandomMap" ) );
+	Q_strncpy( mapName[0], L( "GameUI_RandomMap" ), sizeof( mapName[0] ));
 	mapsDescription[0][0] = 0;
-	
+
 	while(( pfile = EngFuncs::COM_ParseFile( pfile, token, sizeof( token ))) != NULL )
 	{
 		if( numMaps >= UI_MAXGAMES ) break;
 
-		Q_strncpy( mapName[numMaps], token, 64 );
+		Q_strncpy( mapName[numMaps], token, sizeof( mapName[numMaps] ));
 		if(( pfile = EngFuncs::COM_ParseFile( pfile, token, sizeof( token ))) == NULL )
 		{
-			Q_strncpy( mapsDescription[numMaps], mapName[numMaps], 64 );
+			Q_strncpy( mapsDescription[numMaps], mapName[numMaps], sizeof( mapsDescription[numMaps] ));
 			break; // unexpected end of file
 		}
-		Q_strncpy( mapsDescription[numMaps], token, 64 );
+		Q_strncpy( mapsDescription[numMaps], token, sizeof( mapsDescription[numMaps] ));
 		numMaps++;
 	}
 
@@ -204,6 +193,7 @@ void CMenuCreateGame::_Init( void )
 
 	nat.SetNameAndStatus( "NAT", L( "Use NAT Bypass instead of direct mode" ) );
 	nat.bChecked = true;
+	nat.LinkCvar( "sv_nat" );
 
 	// add them here, so "done" button can be used by mapsListModel::Update
 	AddItem( banner );
@@ -241,7 +231,7 @@ void CMenuCreateGame::_Init( void )
 	{
 		CMenuField *self = (CMenuField*)pSelf;
 		const char *buf = self->GetBuffer();
-		
+
 		int players = atoi( buf );
 		if( players <= 1 )
 			self->SetBuffer( "16" );
@@ -280,6 +270,14 @@ void CMenuCreateGame::_VidInit()
 	hostName.SetRect( 350, 260, 205, 32 );
 	maxClients.SetRect( 350, 360, 205, 32 );
 	password.SetRect( 350, 460, 205, 32 );
+}
+
+void CMenuCreateGame::SaveCvars()
+{
+	hostName.WriteCvar();
+	maxClients.WriteCvar();
+	password.WriteCvar();
+	EngFuncs::CvarSetString( "sv_nat", EngFuncs::GetCvarFloat( "public" ) ? menu->nat.bChecked : 0 );
 }
 
 void CMenuCreateGame::Reload( void )
