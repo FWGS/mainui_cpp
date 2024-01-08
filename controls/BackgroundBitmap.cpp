@@ -72,7 +72,7 @@ void CMenuBackgroundBitmap::DrawColor()
 	UI_FillRect( m_scPos, m_scSize, colorBase );
 }
 
-void CMenuBackgroundBitmap::DrawBackgroundLayout( Point p, int xOffset, float xScale, float yScale )
+void CMenuBackgroundBitmap::DrawBackgroundLayout( Point p, int xOffset, int yOffset, float xScale, float yScale )
 {
 	// iterate and draw all the background pieces
 	for (int i = 0; i < s_Backgrounds.Count(); i++)
@@ -85,7 +85,7 @@ void CMenuBackgroundBitmap::DrawBackgroundLayout( Point p, int xOffset, float xS
 		int dt = (int)ceil(bimage.size.h * yScale);
 
 		EngFuncs::PIC_Set( bimage.hImage, 255, 255, 255, 255 );
-		EngFuncs::PIC_Draw( p.x + dx + xOffset, p.y + dy, dw, dt );
+		EngFuncs::PIC_Draw( p.x + dx + xOffset, p.y + dy + yOffset, dw, dt );
 	}
 }
 
@@ -166,11 +166,14 @@ void CMenuBackgroundBitmap::Draw()
 #endif
 
 	// center wide background (for example if background is wider than our window)
-	int xOffset = 0;
+	int xOffset = 0, yOffset = 0;
 	if( s_BackgroundImageSize.w * xScale > ScreenWidth )
 		xOffset = ( ScreenWidth - s_BackgroundImageSize.w * xScale ) / 2;
+	else if( s_BackgroundImageSize.h * yScale > ScreenHeight )
+		yOffset = ( ScreenHeight - s_BackgroundImageSize.h * yScale ) / 2;
 
-	DrawBackgroundLayout( p, xOffset, xScale, yScale );
+
+	DrawBackgroundLayout( p, xOffset, yOffset, xScale, yScale );
 }
 
 bool CMenuBackgroundBitmap::LoadBackgroundImage( bool gamedirOnly )

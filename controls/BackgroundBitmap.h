@@ -38,7 +38,7 @@ public:
 	static void LoadBackground();
 	static bool ShouldDrawLogoMovie() { return s_bEnableLogoMovie; }
 private:
-	void DrawBackgroundLayout( Point p, int xOffset, float xScale, float yScale );
+	void DrawBackgroundLayout( Point p, int xOffset, int yOffset, float xScale, float yScale );
 	void DrawColor();
 	void DrawInGameBackground();
 
