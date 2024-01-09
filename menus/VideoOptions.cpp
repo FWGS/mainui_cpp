@@ -58,6 +58,9 @@ public:
 	CMenuSlider	glareReduction;
 	CMenuCheckBox   vbo;
 	CMenuCheckBox	swwater;
+	CMenuCheckBox	overbright;
+	CMenuCheckBox	filtering;
+	CMenuCheckBox	detailtex;
 
 	HIMAGE		hTestImage;
 };
@@ -94,7 +97,11 @@ void CMenuVidOptions::SaveAndPopMenu( void )
 #if LEGACY_VIEWSIZE
 	screenSize.WriteCvar();
 #endif
+	detailtex.WriteCvar();
 	vbo.WriteCvar();
+	swwater.WriteCvar();
+	overbright.WriteCvar();
+	filtering.WriteCvar();
 	// gamma and brightness is already written
 
 	CMenuFramework::SaveAndPopMenu();
@@ -158,11 +165,6 @@ void CMenuVidOptions::_Init( void )
 	testImage.SetRect( 390, 225, 480, 450 );
 	testImage.SetPicture( ART_GAMMA );
 
-	done.SetNameAndStatus( L( "GameUI_OK" ), L( "Go back to the Video Menu" ) );
-	done.SetCoord( 72, 435 );
-	done.SetPicture( PC_DONE );
-	done.onReleased = VoidCb( &CMenuVidOptions::SaveAndPopMenu );
-
 	int height = 280;
 
 #if LEGACY_VIEWSIZE
@@ -188,11 +190,31 @@ void CMenuVidOptions::_Init( void )
 	glareReduction.onCvarGet = VoidCb( &CMenuVidOptions::GetConfig );
 	height += 60;
 
+	done.SetNameAndStatus( L( "GameUI_OK" ), L( "Go back to the Video Menu" ) );
+	done.SetCoord( 72, height );
+	done.SetPicture( PC_DONE );
+	done.onReleased = VoidCb( &CMenuVidOptions::SaveAndPopMenu );
+	height += 60;
+
+	detailtex.SetNameAndStatus( L( "Detail textures" ), L( "Use detail textures if possible" ));
+	detailtex.SetCoord( 72, height );
+	height += 50;
+
 	vbo.SetNameAndStatus( L( "Use VBO" ), L( "Use new world renderer. Faster, but rarely glitchy" ) );
-	vbo.SetCoord( 72, 565 );
+	vbo.SetCoord( 72, height );
+	height += 50;
 
 	swwater.SetNameAndStatus( L( "Water ripples"), L( "Enable water ripple effect, like in software-mode GoldSrc" ));
-	swwater.SetCoord( 72, 615 );
+	swwater.SetCoord( 72, height );
+	height += 50;
+
+	overbright.SetNameAndStatus( L( "Overbrights" ), L( "Enable overbrights, makes lighting less flat in bright areas" ));
+	overbright.SetCoord( 72, height );
+	height += 50;
+
+	filtering.SetNameAndStatus( L( "Texture filtering" ), L( "Enable texture filtering, makes textures smoother" ));
+	filtering.SetCoord( 72, height );
+	height += 50;
 
 	AddItem( banner );
 	AddItem( done );
@@ -201,8 +223,11 @@ void CMenuVidOptions::_Init( void )
 #endif
 	AddItem( gammaIntensity );
 	AddItem( glareReduction );
-	// AddItem( vbo );
+	AddItem( detailtex );
+	AddItem( vbo );
 	AddItem( swwater );
+	AddItem( overbright );
+	AddItem( filtering );
 	AddItem( testImage );
 
 #if LEGACY_VIEWSIZE
@@ -211,8 +236,12 @@ void CMenuVidOptions::_Init( void )
 
 	gammaIntensity.LinkCvar( "gamma" );
 	glareReduction.LinkCvar( "brightness" );
+
+	detailtex.LinkCvar( "r_detailtextures" );
 	swwater.LinkCvar( "r_ripple" );
 	vbo.LinkCvar( "gl_vbo" );
+	overbright.LinkCvar( "gl_overbright" );
+	// skip filtering.LinkCvar, different names in ref_gl and ref_soft
 }
 
 void CMenuVidOptions::_VidInit()
@@ -225,9 +254,56 @@ void CMenuVidOptions::Reload()
 {
 	CMenuFramework::Reload();
 	bool gl_active = !strnicmp( EngFuncs::GetCvarString( "r_refdll_loaded" ), "gl", 2 );
+	bool soft_active = !stricmp( EngFuncs::GetCvarString( "r_refdll_loaded" ), "soft" );
+
+	detailtex.SetGrayed( !gl_active );
+	detailtex.SetInactive( !gl_active );
+
+	vbo.SetGrayed( !gl_active );
+	vbo.SetInactive( !gl_active );
 
 	swwater.SetGrayed( !gl_active );
 	swwater.SetInactive( !gl_active );
+
+	overbright.SetGrayed( !gl_active );
+	overbright.SetInactive( !gl_active );
+
+	if( soft_active || gl_active )
+	{
+		filtering.SetGrayed( false );
+		filtering.SetInactive( false );
+
+		if( soft_active )
+		{
+			// no need to invert, 0 disables filtering
+			filtering.LinkCvar( "sw_texfilt" );
+		}
+		else
+		{
+			SET_EVENT_MULTI( filtering.onCvarGet,
+			{
+				CMenuCheckBox *cb = (CMenuCheckBox *)pSelf;
+
+				if( EngFuncs::GetCvarFloat( cb->CvarName( )))
+					cb->bChecked = false;
+				else cb->bChecked = true;
+			});
+			SET_EVENT_MULTI( filtering.onCvarWrite,
+			{
+				CMenuCheckBox *cb = (CMenuCheckBox *)pSelf;
+				if( cb->bChecked )
+					EngFuncs::CvarSetValue( cb->CvarName(), 0.0f );
+				else EngFuncs::CvarSetValue( cb->CvarName(), 1.0f );
+			});
+
+			filtering.LinkCvar( "gl_texture_nearest" );
+		}
+	}
+	else
+	{
+		filtering.SetGrayed( true );
+		filtering.SetInactive( true );
+	}
 }
 
 ADD_MENU( menu_vidoptions, CMenuVidOptions, UI_VidOptions_Menu );
