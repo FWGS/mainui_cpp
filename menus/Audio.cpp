@@ -50,6 +50,7 @@ private:
 	CMenuSlider	vibration;
 	CMenuSpinControl lerping;
 	CMenuCheckBox noDSP;
+	CMenuCheckBox useAlphaDSP;
 	CMenuCheckBox muteFocusLost;
 	CMenuCheckBox vibrationEnable;
 
@@ -70,6 +71,7 @@ void CMenuAudio::GetConfig( void )
 
 	lerping.LinkCvar( "s_lerping", CMenuEditable::CVAR_VALUE );
 	noDSP.LinkCvar( "dsp_off" );
+	useAlphaDSP.LinkCvar( "dsp_coeff_table" );
 	muteFocusLost.LinkCvar( "snd_mute_losefocus" );
 	vibrationEnable.LinkCvar( "vibration_enable" );
 
@@ -104,6 +106,7 @@ void CMenuAudio::SaveAndPopMenu()
 	vibration.WriteCvar();
 	lerping.WriteCvar();
 	noDSP.WriteCvar();
+	useAlphaDSP.WriteCvar();
 	muteFocusLost.WriteCvar();
 	vibrationEnable.WriteCvar();
 
@@ -150,9 +153,13 @@ void CMenuAudio::_Init( void )
 	noDSP.onChanged = CMenuEditable::WriteCvarCb;
 	noDSP.SetCoord( 320, 520 );
 
+	useAlphaDSP.SetNameAndStatus( L( "Use Alpha DSP effects" ), L( "Enables alternative coefficients table" ));
+	useAlphaDSP.onChanged = CMenuEditable::WriteCvarCb;
+	useAlphaDSP.SetCoord( 320, 570 );
+
 	muteFocusLost.SetNameAndStatus( L( "Mute when inactive" ), L( "Disable sound when game goes into background" ) );
 	muteFocusLost.onChanged = CMenuEditable::WriteCvarCb;
-	muteFocusLost.SetCoord( 320, 570 );
+	muteFocusLost.SetCoord( 320, 620 );
 
 	vibrationEnable.SetNameAndStatus( L( "Enable vibration" ), L( "In-game vibration(when player injured, etc)" ) );
 	vibrationEnable.iMask = (QMF_GRAYED|QMF_INACTIVE);
@@ -174,6 +181,7 @@ void CMenuAudio::_Init( void )
 	AddItem( suitVolume );
 	AddItem( lerping );
 	AddItem( noDSP );
+	AddItem( useAlphaDSP );
 	AddItem( muteFocusLost );
 	AddItem( vibrationEnable );
 	AddItem( vibration );
