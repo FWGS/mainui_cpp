@@ -62,7 +62,7 @@ def configure(conf):
 		conf.check_cxx(lib='rt', mandatory=False)
 
 def build(bld):
-	libs = []
+	libs = ['werror']
 
 	if bld.env.DEST_OS != 'win32':
 		if not bld.env.USE_STBTT:
