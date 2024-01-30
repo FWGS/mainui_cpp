@@ -58,9 +58,6 @@ typedef uint64_t longtime_t;
 
 #define BIT( n )		( 1U << ( n ))
 #define BIT64( n )		( 1ULL << ( n ))
-#define GAMMA		( 2.2f )		// Valve Software gamma
-#define INVGAMMA		( 1.0f / 2.2f )	// back to 1.0
-#define TEXGAMMA		( 0.9f )		// compensate dim textures
 #define SetBits( iBitVector, bits )	((iBitVector) = (iBitVector) | (bits))
 #define ClearBits( iBitVector, bits )	((iBitVector) = (iBitVector) & ~(bits))
 #define FBitSet( iBitVector, bit )	((iBitVector) & (bit))
@@ -89,6 +86,8 @@ typedef uint64_t longtime_t;
 	#define NORETURN __attribute__((noreturn))
 	#define NONNULL __attribute__((nonnull))
 	#define ALLOC_CHECK(x) __attribute__((alloc_size(x)))
+	#define FORCEINLINE inline __attribute__((always_inline))
+	#define NOINLINE __attribute__((noinline))
 #elif defined(_MSC_VER)
 	#define EXPORT          __declspec( dllexport )
 	#define GAME_EXPORT
@@ -96,6 +95,8 @@ typedef uint64_t longtime_t;
 	#define NORETURN
 	#define NONNULL
 	#define ALLOC_CHECK(x)
+	#define FORCEINLINE __forceinline
+	#define NOINLINE __declspec( noinline )
 #else
 	#define EXPORT
 	#define GAME_EXPORT
@@ -103,6 +104,8 @@ typedef uint64_t longtime_t;
 	#define NORETURN
 	#define NONNULL
 	#define ALLOC_CHECK(x)
+	#define FORCEINLINE
+	#define NOINLINE
 #endif
 
 #if ( __GNUC__ >= 3 )
@@ -121,10 +124,18 @@ typedef uint64_t longtime_t;
 	#define likely(x)   (x)
 #endif
 
-#if defined( static_assert ) // C11 static_assert
-#define STATIC_ASSERT static_assert
+#if __STDC_VERSION__ >= 202311L || __cplusplus >= 201103L // C23 or C++ static_assert is a keyword
+	#define STATIC_ASSERT_( ignore, x, y ) static_assert( x, y )
+	#define STATIC_ASSERT  static_assert
+#elif __STDC_VERSION__ >= 201112L // in C11 it's _Static_assert
+	#define STATIC_ASSERT_( ignore, x, y ) _Static_assert( x, y )
+	#define STATIC_ASSERT  _Static_assert
 #else
-#define STATIC_ASSERT( x, y ) extern int _static_assert_##__LINE__[( x ) ? 1 : -1]
+	#define STATIC_ASSERT_( id, x, y ) extern int id[( x ) ? 1 : -1]
+	// need these to correctly expand the line macro
+	#define STATIC_ASSERT_3( line, x, y ) STATIC_ASSERT_( static_assert_ ## line, x, y )
+	#define STATIC_ASSERT_2( line, x, y ) STATIC_ASSERT_3( line, x, y )
+	#define STATIC_ASSERT( x, y ) STATIC_ASSERT_2( __LINE__, x, y )
 #endif
 
 #ifdef XASH_BIG_ENDIAN

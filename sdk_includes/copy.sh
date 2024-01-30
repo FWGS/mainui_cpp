@@ -25,6 +25,7 @@ FILES_LIST=" \
 	engine/mobility_int.h \
 	public/build.h \
 	public/buildenums.h \
+	public/pstdint.h \
 	pm_shared/pm_info.h \
 "
 

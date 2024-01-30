@@ -69,7 +69,7 @@ void CAdvancedControls::GetConfig( )
 	if( EngFuncs::GetCvarFloat( "m_pitch" ) < 0 )
 		invertMouse.bChecked = true;
 
-	mlook = (kbutton_s *)EngFuncs::KEY_GetState( "in_mlook" );
+	mlook = (kbutton_t *)EngFuncs::KEY_GetState( "in_mlook" );
 	if( mlook )
 	{
 		if( mlook && mlook->state & 1 )
