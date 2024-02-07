@@ -302,16 +302,9 @@ static void Localize_AddToDictionary( const char *name, const char *lang )
 	if( isUtf16 )
 	{
 		int ansiLength = len + 1;
-		uchar16 *autf16 = new uchar16[len/2 + 1];
-
-		memcpy( autf16, pFileBuf + 2, len - 1 );
-		autf16[len/2-1] = 0; //null terminator
-
 		afile = new char[ansiLength]; // save original pointer, so we can free it later
 
-		Q_UTF16ToUTF8( autf16, afile, ansiLength, STRINGCONVERT_ASSERT_REPLACE );
-
-		delete[] autf16;
+		Q_UTF16ToUTF8((uint16_t *)&pFileBuf[2], afile, ansiLength, STRINGCONVERT_REPLACE );
 	}
 	else
 	{
@@ -367,7 +360,7 @@ static void Localize_AddToDictionary( const char *name, const char *lang )
 		goto error;
 	}
 
-	while( (pfile = EngFuncs::COM_ParseFile( pfile, token, sizeof( token ))))
+	while(( pfile = EngFuncs::COM_ParseFile( pfile, token, sizeof( token ))))
 	{
 		if( !strcmp( token, "}" ))
 			break;
