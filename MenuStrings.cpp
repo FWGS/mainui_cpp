@@ -20,7 +20,7 @@ GNU General Public License for more details.
 #include "MenuStrings.h"
 #include "utlhashmap.h"
 #include "generichash.h"
-#include "unicode_strtools.h"
+#include "utflib.h"
 
 #define EMPTY_STRINGS_1 ""
 #define EMPTY_STRINGS_2 EMPTY_STRINGS_1, EMPTY_STRINGS_1
@@ -301,10 +301,10 @@ static void Localize_AddToDictionary( const char *name, const char *lang )
 
 	if( isUtf16 )
 	{
-		int ansiLength = len + 1;
+		size_t ansiLength = len + 1;
 		afile = new char[ansiLength]; // save original pointer, so we can free it later
 
-		Q_UTF16ToUTF8((uint16_t *)&pFileBuf[2], afile, ansiLength, STRINGCONVERT_REPLACE );
+		Q_UTF16ToUTF8( afile, ansiLength, (const uint16_t *)&pFileBuf[2], ( len / 2 ) - 1 );
 	}
 	else
 	{
