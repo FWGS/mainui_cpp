@@ -28,9 +28,9 @@ typedef struct utfstate_s
 // feed utf8 characters one by one
 // if it returns 0, feed more
 // utfstate_t must be zero initialized
-uint32_t Q_DecodeUTF8( utfstate_t *s, int ch );
-uint32_t Q_DecodeUTF16( utfstate_t *s, int ch );
-size_t Q_EncodeUTF8( char dst[4], int ch );
+uint32_t Q_DecodeUTF8( utfstate_t *s, uint32_t ch );
+uint32_t Q_DecodeUTF16( utfstate_t *s, uint32_t ch );
+size_t Q_EncodeUTF8( char dst[4], uint32_t ch );
 
 size_t Q_UTF8Length( const char *s );
 

@@ -15,7 +15,7 @@ GNU General Public License for more details.
 #include "utflib.h"
 #include "xash3d_types.h"
 
-uint32_t Q_DecodeUTF8( utfstate_t *s, int in )
+uint32_t Q_DecodeUTF8( utfstate_t *s, uint32_t in )
 {
 	// get character length
 	if( s->len == 0 )
@@ -24,28 +24,28 @@ uint32_t Q_DecodeUTF8( utfstate_t *s, int in )
 		s->uc = 0;
 
 		// expect ASCII symbols by default
-		if( likely( in <= 0x7f ))
+		if( likely( in <= 0x7fu ))
 			return in;
 
 		// invalid sequence
-		if( unlikely( in >= 0xf8 ))
+		if( unlikely( in >= 0xf8u ))
 			return 0;
 
 		s->k = 0;
 
-		if( in >= 0xf0 )
+		if( in >= 0xf0u )
 		{
-			s->uc = in & 0x07;
+			s->uc = in & 0x07u;
 			s->len = 3;
 		}
-		else if( in >= 0xe0 )
+		else if( in >= 0xe0u )
 		{
-			s->uc = in & 0x0f;
+			s->uc = in & 0x0fu;
 			s->len = 2;
 		}
-		else if( in >= 0xc0 )
+		else if( in >= 0xc0u )
 		{
-			s->uc = in & 0x1f;
+			s->uc = in & 0x1fu;
 			s->len = 1;
 		}
 
@@ -53,14 +53,14 @@ uint32_t Q_DecodeUTF8( utfstate_t *s, int in )
 	}
 
 	// invalid sequence, reset
-	if( unlikely( in > 0xbf ))
+	if( unlikely( in > 0xbfu ))
 	{
 		s->len = 0;
 		return 0;
 	}
 
 	s->uc <<= 6;
-	s->uc += in & 0x3f;
+	s->uc += in & 0x3fu;
 	s->k++;
 
 	// sequence complete, reset and return code point
@@ -74,7 +74,7 @@ uint32_t Q_DecodeUTF8( utfstate_t *s, int in )
 	return 0;
 }
 
-uint32_t Q_DecodeUTF16( utfstate_t *s, int in )
+uint32_t Q_DecodeUTF16( utfstate_t *s, uint32_t in )
 {
 	// get character length
 	if( s->len == 0 )
@@ -83,10 +83,10 @@ uint32_t Q_DecodeUTF16( utfstate_t *s, int in )
 		s->uc = 0;
 
 		// expect simple case, after all decoding UTF-16 must be easy
-		if( likely( in < 0xd800 || in > 0xdfff ))
+		if( likely( in < 0xd800u || in > 0xdfffu ))
 			return in;
 
-		s->uc = (( in - 0xd800 ) << 10 ) + 0x10000;
+		s->uc = (( in - 0xd800u ) << 10 ) + 0x10000u;
 		s->len = 1;
 		s->k = 0;
 
@@ -94,13 +94,13 @@ uint32_t Q_DecodeUTF16( utfstate_t *s, int in )
 	}
 
 	// invalid sequence, reset
-	if( unlikely( in < 0xdc00 || in > 0xdfff ))
+	if( unlikely( in < 0xdc00u || in > 0xdfffu ))
 	{
 		s->len = 0;
 		return 0;
 	}
 
-	s->uc |= in - 0xdc00;
+	s->uc |= in - 0xdc00u;
 	s->k++;
 
 	// sequence complete, reset and return code point
@@ -114,31 +114,31 @@ uint32_t Q_DecodeUTF16( utfstate_t *s, int in )
 	return 0;
 }
 
-size_t Q_EncodeUTF8( char dst[4], int ch )
+size_t Q_EncodeUTF8( char dst[4], uint32_t ch )
 {
-	if( ch <= 0x7f )
+	if( ch <= 0x7fu )
 	{
 		dst[0] = ch;
 		return 1;
 	}
-	else if( ch <= 0x7ff )
+	else if( ch <= 0x7ffu )
 	{
-		dst[0] = 0xc0 | (( ch >> 6 ) & 0x1f );
-		dst[1] = 0x80 | (( ch ) & 0x3f );
+		dst[0] = 0xc0u | (( ch >> 6 ) & 0x1fu );
+		dst[1] = 0x80u | (( ch ) & 0x3fu );
 		return 2;
 	}
-	else if( ch <= 0xffff )
+	else if( ch <= 0xffffu )
 	{
-		dst[0] = 0xe0 | (( ch >> 12 ) & 0x0f );
-		dst[1] = 0x80 | (( ch >> 6 ) & 0x3f );
-		dst[2] = 0x80 | (( ch ) & 0x3f );
+		dst[0] = 0xe0u | (( ch >> 12 ) & 0x0fu );
+		dst[1] = 0x80u | (( ch >> 6 ) & 0x3fu );
+		dst[2] = 0x80u | (( ch ) & 0x3fu );
 		return 3;
 	}
 
-	dst[0] = 0xf0 | (( ch >> 18 ) & 0x07 );
-	dst[1] = 0x80 | (( ch >> 12 ) & 0x3f );
-	dst[2] = 0x80 | (( ch >> 6 ) & 0x3f );
-	dst[3] = 0x80 | (( ch ) & 0x3f );
+	dst[0] = 0xf0u | (( ch >> 18 ) & 0x07u );
+	dst[1] = 0x80u | (( ch >> 12 ) & 0x3fu );
+	dst[2] = 0x80u | (( ch >> 6 ) & 0x3fu );
+	dst[3] = 0x80u | (( ch ) & 0x3fu );
 	return 4;
 }
 
@@ -152,7 +152,7 @@ size_t Q_UTF8Length( const char *s )
 
 	for( ; *s; s++ )
 	{
-		uint32_t ch = Q_DecodeUTF8( &state, (int)*s );
+		uint32_t ch = Q_DecodeUTF8( &state, (uint32_t)*s );
 
 		if( ch == 0 )
 			continue;
@@ -165,11 +165,11 @@ size_t Q_UTF8Length( const char *s )
 
 static size_t Q_CodepointLength( uint32_t ch )
 {
-	if( ch <= 0x7f )
+	if( ch <= 0x7fu )
 		return 1;
-	else if( ch <= 0x7ff )
+	else if( ch <= 0x7ffu )
 		return 2;
-	else if( ch <= 0xffff )
+	else if( ch <= 0xffffu )
 		return 3;
 
 	return 4;
