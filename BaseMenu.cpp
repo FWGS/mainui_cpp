@@ -286,7 +286,7 @@ int UI_DrawString( HFont font, int x, int y, int w, int h,
 		int charH, uint justify, uint flags )
 {
 	uint	modulate, shadowModulate = 0;
-	int	xx = 0, yy, ofsX = 0, ofsY = 0, ch;
+	int	xx = 0, yy, shadowOffset = 0, ch;
 	int maxX = x;
 
 	if( !string || !string[0] )
@@ -295,8 +295,7 @@ int UI_DrawString( HFont font, int x, int y, int w, int h,
 	if( flags & ETF_SHADOW )
 	{
 		shadowModulate = PackAlpha( uiColorBlack, UnpackAlpha( color ));
-
-		ofsX = ofsY = charH / 8;
+		shadowOffset = Q_max( 1, uiStatic.scaleX * 3 );
 	}
 
 	modulate = color;
@@ -479,7 +478,7 @@ int UI_DrawString( HFont font, int x, int y, int w, int h,
 				continue;
 
 			if( flags & ETF_SHADOW )
-				g_FontMgr->DrawCharacter( font, ch, Point( xx + ofsX, yy + ofsY ), charH, shadowModulate, flags & ETF_ADDITIVE );
+				g_FontMgr->DrawCharacter( font, ch, Point( xx + shadowOffset, yy + shadowOffset ), charH, shadowModulate, flags & ETF_ADDITIVE );
 
 #ifdef DEBUG_WHITESPACE
 			if( ch == ' ' )
