@@ -125,7 +125,7 @@ CMenuPicButton * CMenuFramework::AddButton(const char *szName, const char *szSta
 	return btn;
 }
 
-CMenuPicButton * CMenuFramework::AddButton(const char *szName, const char *szStatus, const char *szButtonPath, CEventCallback onReleased, int iFlags)
+CMenuPicButton * CMenuFramework::AddButton( const char *szName, const char *szStatus, const char *szButtonPath, CEventCallback onReleased, int iFlags, int hotkey )
 {
 	if( m_iBtnsNum >= MAX_FRAMEWORK_PICBUTTONS )
 	{
@@ -136,7 +136,7 @@ CMenuPicButton * CMenuFramework::AddButton(const char *szName, const char *szSta
 	CMenuPicButton *btn = new CMenuPicButton();
 
 	btn->SetNameAndStatus( szName, szStatus );
-	btn->SetPicture( szButtonPath );
+	btn->SetPicture( szButtonPath, hotkey );
 	btn->iFlags |= iFlags;
 	btn->onReleased = onReleased;
 	btn->SetCoord( 72, 230 + m_iBtnsNum * 50 );

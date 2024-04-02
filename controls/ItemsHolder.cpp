@@ -23,7 +23,8 @@ GNU General Public License for more details.
 CMenuItemsHolder::CMenuItemsHolder() :
 	BaseClass(), m_iCursor( 0 ), m_iCursorPrev( 0 ), m_pItems( ),
 	m_events(), m_bInit( false ),
-	m_bWrapCursor( true ), m_szResFile( 0 ), m_pItemAtCursorOnDown( 0 )
+	m_bWrapCursor( true ), m_szResFile( 0 ), m_pItemAtCursorOnDown( 0 ),
+	m_iHotKeyDown( 0 )
 {
 	;
 }
@@ -64,7 +65,7 @@ bool CMenuItemsHolder::Key( const int key, const bool down )
 	}
 
 	// only mouse keys can call key events for items that's not in focus
-	if( UI::Key::IsMouse( key ))
+	if( UI::Key::IsMouse( key ) || UI::Key::IsAlphaNum( key ))
 	{
 		FOR_EACH_VEC( m_pItems, i )
 		{
@@ -86,9 +87,61 @@ bool CMenuItemsHolder::Key( const int key, const bool down )
 		}
 	}
 
+	// original menu handles these on key down event
+	// but this makes navigating confusing, since buttons can repeat
+	// we will do it differently
+	if( UI::Key::IsAlphaNum( key ))
+	{
+		FOR_EACH_VEC( m_pItems, i )
+		{
+			item = m_pItems[i];
+
+			if( !item || FBitSet( item->iFlags, QMF_GRAYED|QMF_INACTIVE ))
+				continue;
+
+			if( !item->IsVisible( ))
+				continue;
+
+			// only respond to last pressed key, even if it's not handled
+			if( down )
+				m_iHotKeyDown = key;
+
+			if( !item->HotKey( key ))
+			{
+				// something was probably pressed down
+				// remove pressed button glowing effect
+				if( m_iHotKeyDown != 0 )
+					item->m_bPressed = false;
+				continue;
+			}
+
+			// pressing acts as "go to"
+			if( down )
+			{
+				// set focus to not let random key interfere
+				if( item != ItemAtCursor( ))
+				{
+					m_pItemAtCursorOnDown = item;
+					SetCursor( i, true );
+				}
+
+				item->_Event( QM_PRESSED );
+			}
+			else if( m_iHotKeyDown == key ) // only release from same key
+			{
+				// do not send released events to keys not in focus
+				if( item == ItemAtCursor( ))
+					item->_Event( QM_RELEASED );
+
+				m_iHotKeyDown = 0;
+			}
+			break;
+		}
+	}
+
 	// system keys are always wait for keys down and never keys up
 	if( !down )
-		return false;
+		return handled;
 
 	// default handling -- items navigation
 	if( UI::Key::IsNavigationKey( key ))

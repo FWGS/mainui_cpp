@@ -81,11 +81,14 @@ public:
 	// Window will be removed from current window stack
 	virtual void Hide() { iFlags |= QMF_HIDDEN;  }
 
-	// Determine, is this item is visible
+	// Determine if this item is visible
 	virtual bool IsVisible() const { return !(iFlags & QMF_HIDDEN); }
 
 	// Key value data reading, both parameters are zero-terminated string
 	virtual bool KeyValueData( const char *key, const char *data );
+
+	// Determine if this item can be activated using a hotkey
+	virtual bool HotKey( int key ) { return false; }
 
 	// Toggle visibiltiy.
 	inline void ToggleVisibility()

@@ -45,7 +45,7 @@ public:
 		EDefaultBtns iButton, CEventCallback onReleased = CEventCallback(), int iFlags = 0 );
 
 	CMenuPicButton *AddButton( const char *szName, const char *szStatus,
-		const char *szButtonPath, CEventCallback onReleased = CEventCallback(), int iFlags = 0 );
+		const char *szButtonPath, CEventCallback onReleased = CEventCallback(), int iFlags = 0, int hotkey = 0 );
 
 	bool DrawAnimation() override;
 

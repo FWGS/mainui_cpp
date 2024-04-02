@@ -413,6 +413,11 @@ inline bool IsInsert( int key )
 	return false;
 }
 
+inline bool IsAlphaNum( int key )
+{
+	return ( key >= '0' && key <= '9' ) || ( key >= 'a' && key <= 'z' );
+}
+
 }
 
 namespace Names

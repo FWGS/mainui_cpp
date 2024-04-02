@@ -45,10 +45,10 @@ void UI_Touch_Menu( void )
 		menu_touch->AddItem( menu_touch->banner );
 
 		menu_touch->AddButton( L( "Touch options" ), L( "Touch sensitivity and profile options" ), "gfx/shell/btn_touch_options",
-			UI_TouchOptions_Menu, QMF_NOTIFY );
+			UI_TouchOptions_Menu, QMF_NOTIFY, 'o' );
 
 		menu_touch->AddButton( L( "Touch buttons" ), L( "Add, remove, edit touch buttons" ), "gfx/shell/btn_touch_buttons",
-			UI_TouchButtons_Menu, QMF_NOTIFY );
+			UI_TouchButtons_Menu, QMF_NOTIFY, 'b' );
 
 		menu_touch->AddButton( L( "Done" ),  L( "Go back to the previous menu" ), PC_DONE, VoidCb( &CMenuFramework::Hide ), QMF_NOTIFY );
 	}

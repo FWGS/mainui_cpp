@@ -37,9 +37,10 @@ public:
 	bool KeyUp( int key ) override;
 	bool KeyDown( int key ) override;
 	void Draw( void ) override;
+	bool HotKey( int key ) override;
 
 	void SetPicture( EDefaultBtns ID );
-	void SetPicture( const char *filename );
+	void SetPicture( const char *filename, int hotkey = 0 );
 
 	bool bEnableTransitions;
 	bool bPulse;
@@ -47,10 +48,12 @@ private:
 	bool bRollOver;
 
 	void CheckWindowChanged( void );
+	void _Event( int ev ) override;
 
 	void DrawButton( int r, int g, int b, int a, wrect_t *rects, int state );
 
 	HIMAGE hPic;
+	int hotkey;
 	int button_id;
 	int iFocusStartTime;
 	int iOldState;

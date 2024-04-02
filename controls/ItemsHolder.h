@@ -99,6 +99,8 @@ protected:
 private:
 	bool Key( const int key, const bool down );
 	CMenuBaseItem *m_pItemAtCursorOnDown;
+
+	int m_iHotKeyDown;
 };
 
 #endif // EMBEDITEM_H
