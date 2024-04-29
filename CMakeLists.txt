@@ -74,7 +74,7 @@ if(MAINUI_FONT_SCALE)
 	add_definitions(-DMAINUI_FONT_SCALE)
 endif()
 
-add_definitions(-DSTDINT_H="stdint.h")
+add_definitions(-DSTDINT_H=<cstdint>)
 
 # Force stb_truetype for Apple devices, as there is no Apple native font renderer
 # And freetype&fontconfig isn't used on this platform by default
