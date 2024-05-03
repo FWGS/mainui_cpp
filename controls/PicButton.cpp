@@ -216,7 +216,7 @@ bool CMenuPicButton::KeyDown( int key )
 CMenuPicButton::DrawButton
 =================
 */
-void CMenuPicButton::DrawButton(int r, int g, int b, int a, wrect_t *rects, int state)
+void CMenuPicButton::DrawButton( int r, int g, int b, int a, wrect_t *rects, int state )
 {
 	EngFuncs::PIC_Set( hPic, r, g, b, a );
 #ifdef ALT_PICBUTTON_FOCUS_ANIM

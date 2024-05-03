@@ -92,6 +92,13 @@ void UI_LoadBmpButtons()
 			dst_pos -= btn_sz;
 			memcpy( &dst[dst_pos], &src[src_pos], btn_sz );
 
+			// fixup alpha for half-life infected mod
+			if( bmp->GetBitmapHdr()->bitsPerPixel == 32 )
+			{
+				for( int j = dst_pos; j < dst_pos + btn_sz; j += 4 )
+					dst[j+3] = 255;
+			}
+
 			// fix misaligned gearbox btns
 			memset( &dst[dst_pos], 0, stride );
 
