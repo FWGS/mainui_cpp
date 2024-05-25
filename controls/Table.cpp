@@ -332,6 +332,8 @@ bool CMenuTable::KeyUp( int key )
 						{
 							SwapOrder();
 						}
+
+						_Event( QM_CHANGED );
 					}
 				}
 			}
