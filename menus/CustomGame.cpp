@@ -30,22 +30,75 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define MAX_MODS		512	// engine limit
 
+enum
+{
+	COLUMN_TYPE = 0,
+	COLUMN_NAME,
+	COLUMN_VER,
+	COLUMN_SIZE,
+};
+
+struct mod_t
+{
+	char dir[64];
+	char webSite[256];
+	char type[32];
+	char name[32];
+	char ver[32];
+	char size[32];
+
+	int TypeCmp( const mod_t &other ) const
+	{
+		return stricmp( type, other.type );
+	}
+
+	int NameCmp( const mod_t &other ) const
+	{
+		return stricmp( name, other.name );
+	}
+
+#define GENERATE_COMPAR_FN( method ) \
+	static int method ## Ascend( const void *a, const void *b ) \
+	{\
+		return (( const mod_t *)a)->method( *(( const mod_t *)b) );\
+	}\
+	static int method ## Descend( const void *a, const void *b ) \
+	{\
+		return (( const mod_t *)b)->method( *(( const mod_t *)a) );;\
+	}\
+
+	GENERATE_COMPAR_FN( TypeCmp )
+	GENERATE_COMPAR_FN( NameCmp )
+#undef GENERATE_COMPAR_FN
+};
+
 class CMenuModListModel : public CMenuBaseModel
 {
 public:
+	CMenuModListModel() :  m_iSortingColumn(COLUMN_NAME) {}
+
 	void Update() override;
 	int GetColumns() const override { return 4; }
 	int GetRows() const override { return m_iNumItems; }
 	const char *GetCellText( int line, int column ) override
 	{
-		return modsDescription[line][column];
+		switch (column)
+		{
+		case COLUMN_TYPE: return mods[line].type;
+		case COLUMN_NAME: return mods[line].name;
+		case COLUMN_VER: return mods[line].ver;
+		case COLUMN_SIZE: return mods[line].size;
+		default: return NULL;
+		}
 	}
+	bool Sort( int column, bool ascend ) override;
 
-	char		modsDir[MAX_MODS][64];
-	char		modsWebSites[MAX_MODS][256];
-	char		modsDescription[MAX_MODS][5][32];
+	mod_t  mods[MAX_MODS];
 
 	int m_iNumItems;
+private:
+	int m_iSortingColumn;
+	bool m_bAscend;
 };
 
 class CMenuCustomGame: public CMenuFramework
@@ -91,13 +144,13 @@ void CMenuCustomGame::UpdateExtras( )
 {
 	int i = modList.GetCurrentIndex();
 
-	load->onReleased.pExtra = modListModel.modsDir[i];
-	load->SetGrayed( !stricmp( modListModel.modsDir[i], gMenu.m_gameinfo.gamefolder ) );
+	load->onReleased.pExtra = modListModel.mods[i].dir;
+	load->SetGrayed( !stricmp( modListModel.mods[i].dir, gMenu.m_gameinfo.gamefolder ) );
 
-	go2url->onReleased.pExtra = modListModel.modsWebSites[i];
-	go2url->SetGrayed( modListModel.modsWebSites[i][0] == 0 );
+	go2url->onReleased.pExtra = modListModel.mods[i].webSite;
+	go2url->SetGrayed( modListModel.mods[i].webSite[0] == 0 );
 
-	msgBox.onPositive.pExtra = modListModel.modsDir[i];
+	msgBox.onPositive.pExtra = modListModel.mods[i].dir;
 }
 
 /*
@@ -114,28 +167,61 @@ void CMenuModListModel::Update( void )
 
 	for( i = 0; i < numGames; i++ )
 	{
-		Q_strncpy( modsDir[i], games[i]->gamefolder, sizeof( modsDir[i] ));
-		Q_strncpy( modsWebSites[i], games[i]->game_url, sizeof( modsWebSites[i] ));
+		Q_strncpy( mods[i].dir, games[i]->gamefolder, sizeof( mods[i].dir ));
+		Q_strncpy( mods[i].webSite, games[i]->game_url, sizeof( mods[i].webSite ));
 
-		Q_strncpy( modsDescription[i][0], games[i]->type, 32 );
+		Q_strncpy( mods[i].type, games[i]->type, 32 );
 
 		if( ColorStrlen( games[i]->title ) > 31 ) // NAME_LENGTH
 		{
-			Q_strncpy( modsDescription[i][1], games[i]->title, 32 - 4 );
+			Q_strncpy( mods[i].name, games[i]->title, 32 - 4 );
 			// I am lazy to put strncat here :(
-			modsDescription[i][1][28] = modsDescription[i][1][29] = modsDescription[i][1][30] = '.';
-			modsDescription[i][1][31] = 0;
+			mods[i].name[28] = mods[i].name[29] = mods[i].name[30] = '.';
+			mods[i].name[31] = 0;
 		}
-		else Q_strncpy( modsDescription[i][1], games[i]->title, 32 );
+		else Q_strncpy( mods[i].name, games[i]->title, 32 );
 
-		Q_strncpy( modsDescription[i][2], games[i]->version, 32 );
+		Q_strncpy( mods[i].ver, games[i]->version, 32 );
 
 		if( games[i]->size[0] && atoi( games[i]->size ) != 0 )
-			Q_strncpy( modsDescription[i][3], games[i]->size, 32 );
-		else Q_strncpy( modsDescription[i][3], "0.0 Mb", 32 );
+			Q_strncpy( mods[i].size, games[i]->size, 32 );
+		else Q_strncpy( mods[i].size, "0.0 Mb", 32 );
 	}
 
 	m_iNumItems = numGames;
+
+	if(numGames)
+	{
+		if( m_iSortingColumn != -1 )
+			Sort( m_iSortingColumn, m_bAscend );
+	}
+}
+
+bool CMenuModListModel::Sort(int column, bool ascend)
+{
+	m_iSortingColumn = column;
+	if( column == -1 )
+		return false; // disabled
+
+	m_bAscend = ascend;
+
+	switch( column )
+	{
+		case COLUMN_TYPE:
+			qsort( mods, m_iNumItems, sizeof(mod_t),
+				ascend ? mod_t::TypeCmpAscend : mod_t::TypeCmpDescend );
+		return true;
+		case COLUMN_NAME:
+			qsort( mods, m_iNumItems, sizeof(mod_t),
+				ascend ? mod_t::NameCmpAscend : mod_t::NameCmpDescend );
+		return true;
+		case COLUMN_VER:
+		return false;
+		case COLUMN_SIZE:
+		return false;
+	}
+
+    return false;
 }
 
 /*
@@ -166,13 +252,14 @@ void CMenuCustomGame::_Init( void )
 	modList.SetupColumn( 2, L( "Ver" ),  0.15f );
 	modList.SetupColumn( 3, L( "Size" ), 0.15f );
 	modList.SetModel( &modListModel );
+	modList.bAllowSorting = true;
 	modList.SetRect( 360, 230, -20, 465 );
 
 	AddItem( modList );
 
 	for( int i = 0; i < modListModel.GetRows(); i++ )
 	{
-		if( !stricmp( modListModel.modsDir[i], gMenu.m_gameinfo.gamefolder ) )
+		if( !stricmp( modListModel.mods[i].dir, gMenu.m_gameinfo.gamefolder ) )
 		{
 			modList.SetCurrentIndex( i );
 			if( modList.onChanged ) 
