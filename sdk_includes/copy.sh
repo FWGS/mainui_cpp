@@ -23,6 +23,7 @@ FILES_LIST=" \
 	engine/keydefs.h \
 	engine/menu_int.h \
 	engine/mobility_int.h \
+	engine/cursor_type.h \
 	public/build.h \
 	public/buildenums.h \
 	pm_shared/pm_info.h \
