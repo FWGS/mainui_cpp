@@ -63,16 +63,6 @@ public:
 	void EnableTransition( EAnimation type );
 	void DisableTransition() { eTransitionType = ANIM_NO; }
 
-	bool IsMaximized() const
-	{
-		if( !FBitSet( iFlags, QMF_HIDDEN ) && // minimized
-		    m_scPos == Point( 0, 0 ) &&
-		    isrange( gpGlobals->scrWidth - 1, m_scSize.w, gpGlobals->scrWidth + 1 ) &&
-		    isrange( gpGlobals->scrHeight - 1, m_scSize.h, gpGlobals->scrHeight + 1 ))
-			return true;
-		return false;
-	}
-
 	// set parent of window
 	void Link( CMenuItemsHolder *h )
 	{

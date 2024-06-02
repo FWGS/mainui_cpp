@@ -81,7 +81,7 @@ void CWindowStack::Update( )
 	CUtlVector<CMenuBaseWindow *> drawList( 16 );
 	CUtlVector<int> removeList( 16 );
 
-	bool stop = Current()->IsMaximized();
+	bool stop = Current()->IsRoot();
 
 	// always add current window
 	drawList.AddToTail( Current() );
@@ -116,7 +116,7 @@ void CWindowStack::Update( )
 
 		// maximized, no need to go further anymore,
 		// but we need to check for closing windows, so don't break
-		if( stack[i]->IsMaximized() )
+		if( stack[i]->IsRoot() )
 		{
 			stop = true;
 		}
