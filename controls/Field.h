@@ -40,6 +40,11 @@ public:
 		CMenuEditable::LinkCvar( name, CVAR_STRING );
 	}
 
+	VGUI_DefaultCursor CursorAction() override
+	{
+		return dc_ibeam;
+	}
+
 	void Paste();
 	void Clear();
 

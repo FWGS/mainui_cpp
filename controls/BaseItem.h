@@ -17,6 +17,7 @@ GNU General Public License for more details.
 
 #include "BaseMenu.h"
 #include "Color.h"
+#include "cursor_type.h"
 
 class CMenuItemsHolder;
 class CMenuBaseItem
@@ -89,6 +90,9 @@ public:
 
 	// Determine if this item can be activated using a hotkey
 	virtual bool HotKey( int key ) { return false; }
+
+	// Get item default cursor (flags may override this)
+	virtual VGUI_DefaultCursor CursorAction() { return dc_arrow; }
 
 	// Toggle visibiltiy.
 	inline void ToggleVisibility()
