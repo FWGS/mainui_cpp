@@ -218,7 +218,7 @@
     <ClCompile Include="..\miniutl\utlstring.cpp" />
     <ClCompile Include="..\Scissor.cpp" />
     <ClCompile Include="..\udll_int.cpp" />
-    <ClCompile Include="..\unicode_strtools.cpp" />
+    <ClCompile Include="..\utflib.cpp" />
     <ClCompile Include="..\Utils.cpp" />
     <ClCompile Include="..\WindowSystem.cpp" />
   </ItemGroup>
@@ -269,7 +269,7 @@
     <ClInclude Include="..\model\StringVectorModel.h" />
     <ClInclude Include="..\Primitive.h" />
     <ClInclude Include="..\Scissor.h" />
-    <ClInclude Include="..\unicode_strtools.h" />
+    <ClInclude Include="..\utflib.h" />
     <ClInclude Include="..\Utils.h" />
     <ClInclude Include="..\WindowSystem.h" />
   </ItemGroup>
