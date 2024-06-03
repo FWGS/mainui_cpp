@@ -155,8 +155,6 @@ bool CMenuTable::MouseMove( int x, int y )
 				ac_y = 0;
 			}
 		}
-
-		iTopItem = bound( 0, iTopItem, m_pModel->GetRows() - iNumRows );
 	}
 
 	if( iScrollBarSliding )
@@ -177,12 +175,9 @@ bool CMenuTable::MouseMove( int x, int y )
 				iTopItem--;
 			}
 		}
-
-		//iTopItem = iCurItem - iNumRows + 1;
-		if( iTopItem < 0 ) iTopItem = 0;
-		if( iTopItem > ( m_pModel->GetRows() - iNumRows - 1 ))
-			iTopItem = m_pModel->GetRows() - iNumRows - 1;
 	}
+
+	iTopItem = bound( 0, iTopItem, m_pModel->GetRows() - iNumRows );
 
 	return true;
 }
