@@ -9,7 +9,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -72,7 +72,7 @@ public:
 		bhdr.bitmapDataOffset = sizeof( bmp_t ) + cbPalBytes;
 		bhdr.bitmapDataSize = bhdr.width * bhdr.height * pixel_size;
 		bhdr.fileSize = bhdr.bitmapDataOffset + bhdr.bitmapDataSize;
-	
+
 		// constant
 		bhdr.reserved0 = 0;
 		bhdr.planes = 1;
@@ -81,7 +81,7 @@ public:
 		bhdr.hRes = bhdr.vRes = 0;
 		bhdr.colors = ( pixel_size == 1 ) ? 256 : 0;
 		bhdr.importantColors = 0;
-	
+
 		fileAllocated = false;
 		data = new byte[bhdr.fileSize];
 		memcpy( data, &bhdr, sizeof( bhdr ));
@@ -101,7 +101,7 @@ public:
 		hdr->bitmapDataSize = img_sz;
 		hdr->fileSize = hdr->bitmapDataOffset + hdr->bitmapDataSize;
 	}
-	
+
 	~CBMP()
 	{
 		if( data )
@@ -134,7 +134,7 @@ public:
 		byte *newData = new byte[bhdr.fileSize];
 		memcpy( newData, &bhdr, sizeof( bhdr ));
 		memset( newData + bhdr.bitmapDataOffset, 0, bhdr.bitmapDataSize );
-	
+
 		// now copy texture
 		byte *src = GetTextureData();
 		byte *dst = newData + bhdr.bitmapDataOffset;
@@ -152,7 +152,7 @@ public:
 		data = newData;
 	}
 
-	void RemapLogo( int r, int g, int b )
+	void RemapLogo( int stripes, const byte *rgb )
 	{
 		// palette is always right after header
 		rgbquad_t *palette = GetPaletteData();
@@ -161,13 +161,47 @@ public:
 		if( GetBitmapHdr()->bitsPerPixel > 8 )
 			return;
 
-		for( int i = 0; i < 256; i++ )
+		int max_palette_slots = (int)(256 / (float)stripes) * stripes;
+
+		for( int i = 0; i < max_palette_slots; i += stripes )
 		{
-			float t = (float)i/256.0f;
-	
-			palette[i].r = (byte)(r * t);
-			palette[i].g = (byte)(g * t);
-			palette[i].b = (byte)(b * t);
+			double t = (double)i / max_palette_slots;
+
+			t = Q_min( t, 1.0 );
+
+			for( int j = 0; j < stripes; j++ )
+			{
+				int x = i + j;
+
+				palette[x].r = (byte)(rgb[j * 3 + 0] * t);
+				palette[x].g = (byte)(rgb[j * 3 + 1] * t);
+				palette[x].b = (byte)(rgb[j * 3 + 2] * t);
+			}
+		}
+
+		if( stripes == 1 )
+			return;
+
+		const bmp_t *hdr = GetBitmapHdr();
+		double lines_per_stripe = hdr->height / (double)stripes;
+		byte *data = GetTextureData();
+
+		for( int i = 0; i < hdr->height; i++ )
+		{
+			int stripe = (int)(( hdr->height - i - 1 ) / lines_per_stripe );
+
+			for( int j = 0; j < hdr->width; j++ )
+			{
+				byte c = data[i * hdr->width + j];
+				if( c == 0 )
+					continue;
+
+				// remap to the palette
+				int idx = ( c / 256.0f ) * max_palette_slots; // remap to limited palette
+				idx = (int)((double)( idx ) / stripes) * stripes; // now remap per palette
+				idx += stripe; // add stripe index
+				data[i * hdr->width + j] = Q_min( idx, max_palette_slots ); //
+			}
 		}
 	}
 

@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -34,22 +34,97 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define MAX_PLAYERMODELS	100
 
-static struct
+static const byte Orange[] = { 255, 120,  24 };
+static const byte Yellow[] = { 225, 180,  24 };
+static const byte Blue[]   = {   0,  60, 255 };
+static const byte Ltblue[] = {   0, 167, 255 };
+static const byte Green[]  = {   0, 167,   0 };
+static const byte Red[]    = { 255,  43,   0 };
+static const byte Brown[]  = { 123,  73,   0 };
+static const byte Ltgray[] = { 100, 100, 100 };
+static const byte Dkgray[] = {  36,  36,  36 };
+static const byte Rainbow[] = {
+	0xE4, 0x03, 0x03,
+	0xFF, 0x8C, 0x00,
+	0xFF, 0xED, 0x00,
+	0x00, 0x80, 0x26,
+	0x24, 0x40, 0x8E,
+	0x73, 0x29, 0x82,
+};
+static const byte Lesbian[] = {
+	0xD5, 0x2D, 0x00,
+	0xEF, 0x76, 0x27,
+	0xFF, 0x9A, 0x56,
+	0xFF, 0xFF, 0xFF,
+	0xD1, 0x62, 0xA4,
+	0xB5, 0x56, 0x90,
+	0xA3, 0x02, 0x62,
+};
+static const byte Gay[] = {
+	0x07, 0x8D, 0x70,
+	0x26, 0xCE, 0xAA,
+	0x98, 0xE8, 0xC1,
+	0xFF, 0xFF, 0xFF,
+	0x7B, 0xAD, 0xE2,
+	0x50, 0x49, 0xCC,
+	0x3D, 0x1A, 0x78,
+};
+static const byte Bi[] = {
+	0xD6, 0x02, 0x70,
+	0xD6, 0x02, 0x70,
+	0x9B, 0x4F, 0x96,
+	0x00, 0x38, 0xA8,
+	0x00, 0x38, 0xA8,
+};
+static const byte Trans[] = {
+	0x5B, 0xCE, 0xFA,
+	0xF5, 0xA9, 0xB8,
+	0xFF, 0xFF, 0xFF,
+	0xF5, 0xA9, 0xB8,
+	0x5B, 0xCE, 0xFA,
+};
+static const byte Pan[] = {
+	0xFF, 0x21, 0x8C,
+	0xFF, 0xD8, 0x00,
+	0x21, 0xB1, 0xFF,
+};
+static const byte Enby[] = {
+	0xFC, 0xF4, 0x34,
+	0xFF, 0xFF, 0xFF,
+	0x9C, 0x59, 0xD1,
+	0x2C, 0x2C, 0x2C,
+};
+
+#define FLAG_L( str, x ) str, x, sizeof( x ) / 3
+#define FLAG( x ) FLAG_L( #x, x )
+
+// TODO: Get rid of this hardcoded mess
+// allow user to set whatever they want
+// through UI or some config lst file
+static const struct logo_color_t
 {
 	const char *name;
-	int r, g, b;
+	const byte *rgb;
+	int stripes;
 } g_LogoColors[] =
 {
-{ "FullColor",     -1,  -1,  -1  },
-{ "#Valve_Orange", 255, 120, 24  }, // L( "Valve_Orange" )
-{ "#Valve_Yellow", 225, 180, 24  }, // L( "Valve_Yellow" )
-{ "#Valve_Blue",   0,   60,  255 }, // L( "Valve_Blue" )
-{ "#Valve_Ltblue", 0,   167, 255 }, // L( "Valve_Ltblue" )
-{ "#Valve_Green",  0,   167, 0   }, // L( "Valve_Green" )
-{ "#Valve_Red",    255, 43,  0   }, // L( "Valve_Red" )
-{ "#Valve_Brown",  123, 73,  0   }, // L( "Valve_Brown" )
-{ "#Valve_Ltgray", 100, 100, 100 }, // L( "Valve_Ltgray" )
-{ "#Valve_Dkgray", 36,  36,  36  }, // L( "Valve_Dkgray" )
+{ "FullColor", 0, 0 },
+{ FLAG_L( "#Valve_Orange", Orange ) }, // L( "Valve_Orange" )
+{ FLAG_L( "#Valve_Yellow", Yellow ) }, // L( "Valve_Yellow" )
+{ FLAG_L( "#Valve_Blue",   Blue )   }, // L( "Valve_Blue" )
+{ FLAG_L( "#Valve_Ltblue", Ltblue ) }, // L( "Valve_Ltblue" )
+{ FLAG_L( "#Valve_Green",  Green )  }, // L( "Valve_Green" )
+{ FLAG_L( "#Valve_Red",    Red )    }, // L( "Valve_Red" )
+{ FLAG_L( "#Valve_Brown",  Brown )  }, // L( "Valve_Brown" )
+{ FLAG_L( "#Valve_Ltgray", Ltgray ) }, // L( "Valve_Ltgray" )
+{ FLAG_L( "#Valve_Dkgray", Dkgray ) }, // L( "Valve_Dkgray" )
+{ FLAG( Rainbow ) },
+{ FLAG( Lesbian ) },
+{ FLAG( Gay )     },
+{ FLAG( Bi )      },
+{ FLAG( Trans )   },
+{ FLAG( Pan )     },
+{ FLAG( Enby )    },
 };
 
 class CMenuPlayerSetup : public CMenuFramework
@@ -116,7 +191,7 @@ public:
 	{
 	public:
 		virtual void Draw();
-		int r, g, b;
+		const logo_color_t *color;
 		HIMAGE hImage;
 	} logoImage;
 
@@ -137,13 +212,39 @@ void CMenuPlayerSetup::CMenuLogoPreview::Draw()
 
 		UI_DrawString( font, m_scPos, m_scSize, L( "No logo" ), colorBase, m_scChSize, QM_CENTER, ETF_SHADOW );
 	}
+	else if( color->stripes == 0 )
+	{
+		EngFuncs::PIC_Set( hImage, 255, 255, 255 );
+		EngFuncs::PIC_DrawTrans( m_scPos, m_scSize );
+	}
 	else
 	{
-		if( r != -1 && g != -1 && b != -1 )
-			EngFuncs::PIC_Set( hImage, r, g, b );
-		else
-			EngFuncs::PIC_Set( hImage, 255, 255, 255 );
-		EngFuncs::PIC_DrawTrans( m_scPos, m_scSize );
+		const Size img_sz = EngFuncs::PIC_Size( hImage );
+		Size  ui_sz = m_scSize;
+		wrect_t rc = { 0 };
+
+		rc.right = img_sz.w;
+		rc.bottom = img_sz.h;
+
+		double texture_pixels_per_stripe = img_sz.h / (double)color->stripes;
+		double screen_pixels_per_stripe  = ui_sz.h  / (double)color->stripes;
+
+		ui_sz.h = round( screen_pixels_per_stripe );
+
+		for( int i = 0; i < color->stripes; i++ )
+		{
+			wrect_t rc2 = rc;
+			Point ui_pt;
+
+			rc2.top    = round( i * texture_pixels_per_stripe );
+			rc2.bottom = round(( i + 1 ) * texture_pixels_per_stripe );
+
+			ui_pt.x = m_scPos.x;
+			ui_pt.y = m_scPos.y + round( i * screen_pixels_per_stripe );
+
+			EngFuncs::PIC_Set( hImage, color->rgb[i * 3 + 0], color->rgb[i * 3 + 1], color->rgb[i * 3 + 2] );
+			EngFuncs::PIC_DrawTrans( ui_pt, ui_sz, &rc2 );
+		}
 	}
 
 	// draw the rectangle
@@ -164,7 +265,7 @@ void CMenuPlayerSetup::CModelListModel::Update( void )
 	char	name[256];
 	char	**filenames;
 	int numFiles, i;
-	
+
 	m_iCount = 0;
 
 	// Get file list
@@ -183,12 +284,12 @@ void CMenuPlayerSetup::CModelListModel::Update( void )
 	{
 		COM_FileBase( filenames[i], name );
 		Q_strncpy( models[m_iCount], name, sizeof( models[0] ) );
-		
+
 		// check if the path is a valid model
 		snprintf( name, sizeof( name ), "models/player/%s/%s.mdl", models[m_iCount], models[m_iCount] );
 		if( !EngFuncs::FileExists( name ) )
 			continue;
-		
+
 		m_iCount++;
 	}
 }
@@ -219,10 +320,9 @@ void CMenuPlayerSetup::CLogosListModel::Update( )
 	{
 		CUtlString logoFileName = filenames[i];
 		char temp[256];
-		bool png;
+		bool png = logoFileName.BEndsWithCaseless( ".png" );
 
-		if(( png = logoFileName.BEndsWithCaseless( ".png" )) ||
-			 logoFileName.BEndsWithCaseless( ".bmp" ))
+		if( png || logoFileName.BEndsWithCaseless( ".bmp" ))
 		{
 			COM_FileBase( logoFileName.String(), temp );
 
@@ -301,7 +401,7 @@ void CMenuPlayerSetup::UpdateLogo()
 	logoImage.hImage = EngFuncs::PIC_Load( filename, 0 );
 	if( logosModel.IsPng( pos ))
 	{
-		logoImage.r = logoImage.g = logoImage.b = -1;
+		logoImage.color = &g_LogoColors[0];
 		logoColor.SetGrayed( true );
 	}
 	else
@@ -314,7 +414,7 @@ void CMenuPlayerSetup::UpdateLogo()
 		}
 		else
 		{
-			logoImage.r = logoImage.g = logoImage.b = -1;
+			logoImage.color = &g_LogoColors[0];
 			logoColor.SetGrayed( true );
 		}
 		delete bmpFile;
@@ -338,17 +438,13 @@ void CMenuPlayerSetup::ApplyColorToLogoPreview()
 	{
 		if( !stricmp( logoColorStr, L( g_LogoColors[i].name )))
 		{
-			logoImage.r = g_LogoColors[i].r;
-			logoImage.g = g_LogoColors[i].g;
-			logoImage.b = g_LogoColors[i].b;
+			logoImage.color = &g_LogoColors[i];
 			return;
 		}
 	}
 
 	logoColor.SetCurrentValue( L( g_LogoColors[0].name ) );
-	logoImage.r = g_LogoColors[0].r;
-	logoImage.g = g_LogoColors[0].g;
-	logoImage.b = g_LogoColors[0].b;
+	logoImage.color = &g_LogoColors[0];
 }
 
 void CMenuPlayerSetup::WriteNewLogo( void )
@@ -386,8 +482,8 @@ void CMenuPlayerSetup::WriteNewLogo( void )
 			return;
 
 		// remap logo if needed
-		if( logoImage.r != -1 && logoImage.g != -1 && logoImage.b != -1 )
-			bmpFile->RemapLogo( logoImage.r, logoImage.g, logoImage.b );
+		if( logoImage.color->stripes >= 1 )
+			bmpFile->RemapLogo( logoImage.color->stripes, logoImage.color->rgb );
 
 		EngFuncs::COM_SaveFile( "logos/remapped.bmp", bmpFile->GetBitmap(), bmpFile->GetBitmapHdr()->fileSize );
 		EngFuncs::CvarSetString( "cl_logoext", "bmp" );
