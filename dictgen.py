@@ -18,7 +18,7 @@ import re
 
 EXTENSIONS = ('.cpp', '.h')
 EXCLUDE_FILES = ('./sdk_includes')
-TRANSLATABLE_PATTERN = re.compile('L\s*\(\s*\".*?\"\s*\)')
+TRANSLATABLE_PATTERN = re.compile('[^a-zA-Z0-9_]L\s*\(\s*\".*?\"\s*\)')
 STRING_LITERAL_PATTERN = re.compile('\".*?\"')
 
 HEADER = '''// How to work with this file:
