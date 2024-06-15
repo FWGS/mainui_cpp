@@ -48,10 +48,9 @@ private:
 	CMenuCheckBox	cl_predict;
 	CMenuCheckBox	cl_lw;
 
-	CMenuSpinControl	maxpacket, maxpayload, cmdrate, updaterate, rate;
+	CMenuSpinControl	cmdrate, updaterate, rate;
 	CMenuAction networkMode;
 	CMenuCheckBox normal, dsl, slowest;
-	CMenuCheckBox split, compress;
 };
 
 /*
@@ -68,13 +67,7 @@ bool CMenuGameOptions::KeyDown( int key )
 
 void CMenuGameOptions::SetNetworkMode( int maxpacket1, int maxpayload1, int cmdrate1, int updaterate1, int rate1 )
 {
-	split.bChecked = true;
-	compress.bChecked = false;
 	normal.bChecked = dsl.bChecked = slowest.bChecked = false;
-	maxpacket.SetCurrentValue( maxpacket1 );
-	maxpayload.SetCurrentValue( maxpayload1 );
-	if( !maxpayload1 )
-	maxpayload.ForceDisplayString( "auto" );
 	cmdrate.SetCurrentValue( cmdrate1 );
 	updaterate.SetCurrentValue( updaterate1 );
 	rate.SetCurrentValue( rate1 );
@@ -85,13 +78,9 @@ void CMenuGameOptions::SaveCb()
 	maxFPS.WriteCvar();
 	//hand.WriteCvar();
 	allowDownload.WriteCvar();
-	maxpacket.WriteCvar();
-	maxpayload.WriteCvar();
 	cmdrate.WriteCvar();
 	updaterate.WriteCvar();
 	rate.WriteCvar();
-	split.WriteCvar();
-	compress.WriteCvar();
 	cl_predict.WriteCvar();
 	cl_lw.WriteCvar();
 
@@ -103,13 +92,9 @@ void CMenuGameOptions::Restore()
 	maxFPS.DiscardChanges();
 	//hand.DiscardChanges();
 	allowDownload.DiscardChanges();
-	maxpacket.DiscardChanges();
-	maxpayload.DiscardChanges();
 	cmdrate.DiscardChanges();
 	updaterate.DiscardChanges();
 	rate.DiscardChanges();
-	split.DiscardChanges();
-	compress.DiscardChanges();
 	cl_lw.DiscardChanges();
 	cl_predict.DiscardChanges();
 }
@@ -149,46 +134,6 @@ void CMenuGameOptions::_Init( void )
 	cl_lw.SetNameAndStatus( L( "Local weapons" ), L( "Enable local weapons" ) );
 	cl_lw.LinkCvar( "cl_lw" );
 	cl_lw.SetCoord( 240, 415 );
-
-	maxpacket.SetRect( 650, 270, 200, 32 );
-	maxpacket.Setup( 150, 1550, 50 );
-	maxpacket.LinkCvar( "cl_maxpacket", CMenuEditable::CVAR_VALUE );
-	maxpacket.SetNameAndStatus( L( "Network packet size limit (cl_maxpacket)" ), L( "Split packet size and minimum size to compress" ) );
-	SET_EVENT_MULTI( maxpacket.onChanged,
-	{
-		CMenuSpinControl *self = (CMenuSpinControl *)pSelf;
-		if( self->GetCurrentValue() == 1550 || self->GetCurrentValue() == 150 )
-		{
-			self->SetCurrentValue( 40000 );
-			self->ForceDisplayString( "auto" );
-		}
-		else if( self->GetCurrentValue() > 1550 )
-		{
-			self->SetCurrentValue( 1500 );
-		}
-	});
-	if( maxpacket.GetCurrentValue() == 40000 )
-		maxpacket.ForceDisplayString( "auto" );
-
-	maxpayload.SetRect( 650, 370, 200, 32 );
-	maxpayload.Setup( 150, 1550, 50 );
-	maxpayload.LinkCvar( "cl_maxpayload", CMenuEditable::CVAR_VALUE );
-	maxpayload.SetNameAndStatus( L( "Signon size (cl_maxpayload)" ), L( "Signon chain split decrease if cl_maxpacket does not help" ) );
-	SET_EVENT_MULTI( maxpayload.onChanged,
-	{
-		CMenuSpinControl *self = (CMenuSpinControl *)pSelf;
-		if( self->GetCurrentValue() == 250 || self->GetCurrentValue() == 40050 )
-		{
-			self->SetCurrentValue( 0.0f );
-			self->ForceDisplayString( "auto" );
-		}
-		else if( self->GetCurrentValue() > 0 && self->GetCurrentValue() < 250 )
-		{
-			self->SetCurrentValue( 300 );
-		}
-	});
-	if( maxpayload.GetCurrentValue() == 0 )
-		maxpayload.ForceDisplayString( "auto" );
 
 	cmdrate.SetRect( 650, 470, 200, 32 );
 	cmdrate.Setup( 20, 60, 5 );
@@ -235,13 +180,6 @@ void CMenuGameOptions::_Init( void )
 		pSelf->GetParent(CMenuGameOptions)->SetNetworkMode( 900, 700, 25, 30, 7500 );
 		((CMenuCheckBox*)pSelf)->bChecked = true;
 	});
-	compress.SetNameAndStatus( L( "Compress" ), L( "Compress splitted packets (need split to work)" ) );
-	compress.LinkCvar("cl_enable_splitcompress" );
-	compress.SetCoord( 390, 680 );
-
-	split.SetCoord( 240, 680 );
-	split.SetNameAndStatus( L( "Split" ), L( "Split network packets" ) );
-	split.LinkCvar("cl_enable_split" );
 
 	AddItem( banner );
 	AddButton( L( "Done" ), L( "Save changes and go back to the Customize Menu" ), PC_DONE, VoidCb( &CMenuGameOptions::SaveCb ) );
@@ -253,8 +191,6 @@ void CMenuGameOptions::_Init( void )
 	AddItem( allowDownload );
 	AddItem( cl_predict );
 	AddItem( cl_lw );
-	AddItem( maxpacket );
-	AddItem( maxpayload );
 	AddItem( cmdrate );
 	AddItem( updaterate );
 	AddItem( rate );
@@ -262,19 +198,15 @@ void CMenuGameOptions::_Init( void )
 	AddItem( normal );
 	AddItem( dsl );
 	AddItem( slowest );
-	AddItem( split );
-	AddItem( compress );
 
 	// only for game/engine developers
 	if( EngFuncs::GetCvarFloat( "developer" ) < 1 )
 	{
-		maxpacket.Hide();
 		rate.Hide();
 	}
 
 	if( EngFuncs::GetCvarFloat( "developer" ) < 2 )
 	{
-		maxpayload.Hide();
 		cmdrate.Hide();
 		updaterate.Hide();
 		rate.SetCoord( 650, 370 );

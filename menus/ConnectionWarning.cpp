@@ -106,23 +106,19 @@ void CMenuConnectionWarning::WriteSettings( const EPresets preset)
 {
 	const struct
 	{
-		float cl_maxpacket;
-		float cl_maxpayload;
 		float cl_cmdrate;
 		float cl_updaterate;
 		float rate;
 	} presets[EPRESET_LAST] =
 	{
-	{ 1400, 0,    30, 60, 25000 },
-	{ 1200, 1000, 30, 60, 25000 },
-	{ 900,  700,  25, 30, 7500 }
+	{ 30, 60, 25000 },
+	{ 30, 60, 25000 },
+	{ 25, 30, 7500 }
 	};
 
-	EngFuncs::CvarSetValue("cl_maxpacket",  presets[preset].cl_maxpacket );
-	EngFuncs::CvarSetValue("cl_maxpayload", presets[preset].cl_maxpayload );
-	EngFuncs::CvarSetValue("cl_cmdrate",    presets[preset].cl_cmdrate );
-	EngFuncs::CvarSetValue("cl_updaterate", presets[preset].cl_updaterate );
-	EngFuncs::CvarSetValue("rate",          presets[preset].rate );
+	EngFuncs::CvarSetValue( "cl_cmdrate",    presets[preset].cl_cmdrate );
+	EngFuncs::CvarSetValue( "cl_updaterate", presets[preset].cl_updaterate );
+	EngFuncs::CvarSetValue( "rate",          presets[preset].rate );
 
 	normal.bChecked  = preset == EPRESET_NORMAL;
 	dsl.bChecked     = preset == EPRESET_DSL;
@@ -132,7 +128,7 @@ void CMenuConnectionWarning::WriteSettings( const EPresets preset)
 }
 
 ADD_MENU3( menu_connectionwarning, CMenuConnectionWarning, UI_ConnectionWarning_f );
-void UI_ConnectionWarning_f( void )
+void UI_ConnectionWarning_f()
 {
 	if( !UI_IsVisible() )
 		UI_Main_Menu();
