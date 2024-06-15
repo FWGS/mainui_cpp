@@ -139,7 +139,7 @@ void CMenuGameOptions::_Init( void )
 	// hand.SetCoord( 240, 330 );
 
 	allowDownload.SetNameAndStatus( L( "Allow download" ), L( "Allow download of files from servers" ) );
-	allowDownload.LinkCvar( "sv_allow_download" );
+	allowDownload.LinkCvar( "cl_allowdownload" );
 	allowDownload.SetCoord( 240, 315 );
 
 	cl_predict.SetNameAndStatus( L( "Disable predicting" ), L( "Disable player movement prediction" ) );
