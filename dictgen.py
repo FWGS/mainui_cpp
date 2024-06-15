@@ -101,13 +101,13 @@ def vgui_translation_parse(name):
 	return trans
 
 def create_translations_file(name, trans):
-	maxlength = len(max(trans, key=len)) + 1
+	maxlength = min(72, len(max(trans, key=len)) + 1)
 
 	# we are working in UTF-8, it's easier to handle than UTF-16
 	with open(name, "w", encoding = 'utf-8',newline = '\r\n') as f:
 		f.write(HEADER)
 		for t in trans:
-			length = maxlength - len(t)
+			length = max(1, maxlength - len(t))
 
 			f.write('"%s"%*s""\n' % (t, length, ' '))
 		f.write(FOOTER)
