@@ -68,7 +68,14 @@ public:
 	}
 	const char *GetCellText( int line, int column ) override
 	{
-		return m_szCells[line][column];
+		switch( column )
+		{
+		case 0: return date[line];
+		case 1: return save_comment[line];
+		case 2: return elapsed_time[line];
+		}
+		ASSERT( 0 );
+		return NULL;
 	}
 	unsigned int GetAlignmentForColumn(int column) const override
 	{
@@ -83,8 +90,10 @@ public:
 
 private:
 	CMenuLoadGame *parent;
-	char		m_szCells[UI_MAXGAMES][3][MAX_CELLSTRING];
-	int			m_iNumItems;
+	char           date[UI_MAXGAMES][CS_SIZE];
+	char           save_comment[UI_MAXGAMES][256];
+	char           elapsed_time[UI_MAXGAMES][CS_SIZE];
+	int            m_iNumItems;
 };
 
 class CMenuLoadGame : public CMenuFramework
@@ -163,11 +172,11 @@ void CMenuSavesListModel::Update( void )
 	if( parent->IsSaveMode() && CL_IsActive() )
 	{
 		// create new entry for current save game
-		Q_strncpy( saveName[i], "new", CS_SIZE ); // special name, handled in SV_Save_f
-		Q_strncpy( delName[i], "", CS_SIZE );
-		strcpy( m_szCells[i][0], L( "GameUI_SaveGame_Current" ) );
-		strcpy( m_szCells[i][1], L( "GameUI_SaveGame_NewSavedGame" ) );
-		strcpy( m_szCells[i][2], L( "GameUI_SaveGame_New" ) );
+		Q_strncpy( saveName[i], "new", sizeof( saveName[i] )); // special name, handled in SV_Save_f
+		Q_strncpy( delName[i], "", sizeof( delName[i] ));
+		Q_strncpy( date[i], L( "GameUI_SaveGame_Current" ), sizeof( date[i] ));
+		Q_strncpy( save_comment[i], L( "GameUI_SaveGame_NewSavedGame" ), sizeof( save_comment[i] ));
+		Q_strncpy( elapsed_time[i], L( "GameUI_SaveGame_New" ), sizeof( elapsed_time[i] ));
 		i++;
 	}
 
@@ -181,9 +190,9 @@ void CMenuSavesListModel::Update( void )
 			{
 				// get name string even if not found - SV_GetComment can be mark saves
 				// as <CORRUPTED> <OLD VERSION> etc
-				Q_strncpy( m_szCells[i][0], comment, MAX_CELLSTRING );
-				m_szCells[i][1][0] = 0;
-				m_szCells[i][2][0] = 0;
+				Q_strncpy( date[i], comment, sizeof( date[i] ));
+				save_comment[i][0] = 0;
+				elapsed_time[i][0] = 0;
 				COM_FileBase( filenames[j], saveName[i] );
 				COM_FileBase( filenames[j], delName[i] );
 			}
@@ -195,43 +204,56 @@ void CMenuSavesListModel::Update( void )
 		COM_FileBase( filenames[j], delName[i] );
 
 		// they are defined by comment string format
-		const char *time = comment + CS_SIZE;
-		const char *date = comment + CS_SIZE + CS_TIME;
-		const char *elapsedTime = comment + CS_SIZE + CS_TIME * 2;
+		// time and date
+		snprintf( date[i], sizeof( date ), "%s %s", comment + CS_SIZE, comment + CS_SIZE + CS_TIME );
 
-		char *title = comment;
-		char type[CS_SIZE] = {}, *p = nullptr;
-		const char *translated_title = nullptr;
+		// ingame time
+		Q_strncpy( elapsed_time[i], comment + CS_SIZE + CS_TIME * 2, sizeof( elapsed_time[i] ));
 
-		// if comments begin with [ and there is second ]
+		char *title, *type, *p;
+		type = p = nullptr;
+
+		// we need real title
+		// so search for square brackets
 		if( comment[0] == '[' && ( p = strchr( comment, ']' )))
 		{
-			title = p + 1;
-			Q_strncpy( type, comment, title - comment + 1 );
+			type = comment + 1; // this might be "autosave", "quick", etc...
+			title = p + 1; // this is a title
 		}
+		else title = comment;
 
-		if( *title == '#' )
+		if( title[0] == '#' )
 		{
-			// strip everything after first space
 			char s[CS_SIZE];
 
+			// remove the second ], we don't need it to concatenate
+			if( p )
+				*p = 0;
+
+			// strip everything after first space, assume translatable save titles have no space
 			p = strchr( title, ' ' );
+			if( p )
+				*p = 0;
 
-			size_t len = p ? (p - title + 1) : ( CS_SIZE - ( title - comment ));
+			Q_strncpy( s, title, sizeof( s ));
 
-			Q_strncpy( s, title, len );
-			translated_title = L( s );
+			if( type )
+				snprintf( save_comment[i], sizeof( save_comment[i] ), "[%s]%s", type, L( s ));
+			else Q_strncpy( save_comment[i], L( s ), sizeof( save_comment[i] ));
 		}
 		else
 		{
-			translated_title = title;
+			// strip whitespace from the end of string
+			for( size_t len = strlen( title ) - 1; len >= 0; len-- )
+			{
+				if( !isspace( title[len] ))
+					break;
+
+				title[len] = '\0';
+			}
+
+			Q_strncpy( save_comment[i], comment, sizeof( save_comment[i] ));
 		}
-
-		// fill save desc
-		snprintf( m_szCells[i][0], MAX_CELLSTRING, "%s %s", time, date );
-		snprintf( m_szCells[i][1], MAX_CELLSTRING, "%s%s", type, translated_title );
-		Q_strncpy( m_szCells[i][2], elapsedTime, MAX_CELLSTRING );
-
 	}
 
 	m_iNumItems = i;

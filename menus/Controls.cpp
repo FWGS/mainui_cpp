@@ -70,7 +70,7 @@ public:
 		return keysBind[line][0] != 0;
 	}
 
-	char name[MAX_KEYS][64];
+	char name[MAX_KEYS][64+4]; // token + two colorcodes two characters each
 	char keysBind[MAX_KEYS][64];
 	char firstKey[MAX_KEYS][20];
 	char secondKey[MAX_KEYS][20];
@@ -167,7 +167,7 @@ void CMenuKeysModel::Update( void )
 {
 	char *afile = (char *)EngFuncs::COM_LoadFile( "gfx/shell/kb_act.lst", NULL );
 	char *pfile = afile;
-	char token[1024];
+	char token[64];
 	int i = 0;
 
 	if( !afile )
@@ -218,26 +218,25 @@ void CMenuKeysModel::Update( void )
 			{
 				const char *str = EngFuncs::KeynumToString( keys[0] );
 
-				if( str )
-					if( !strnicmp( str, "MOUSE", 5 ) )
-						snprintf( firstKey[i], 20, "^5%s^7", str );
-					else snprintf( firstKey[i], 20, "^3%s^7", str );
-				else firstKey[i][0] = 0;
+				if( !str )
+					firstKey[i][0] = 0;
+				else if( !strnicmp( str, "MOUSE", 5 ))
+					snprintf( firstKey[i], sizeof( firstKey[i] ), "^5%s^7", str );
+				else
+					snprintf( firstKey[i], sizeof( firstKey[i] ), "^3%s^7", str );
 			}
 
 			if( keys[1] != -1 )
 			{
 				const char *str = EngFuncs::KeynumToString( keys[1] );
 
-				if( str )
-					if( !strnicmp( str, "MOUSE", 5 ) )
-						snprintf( secondKey[i], 20, "^5%s^7", str );
-					else snprintf( secondKey[i], 20, "^3%s^7", str );
-				else secondKey[i][0] = 0;
+				if( !str )
+					secondKey[i][0] = 0;
+				else if( !strnicmp( str, "MOUSE", 5 ))
+					snprintf( secondKey[i], sizeof( secondKey[i] ), "^5%s^7", str );
+				else
+					snprintf( secondKey[i], sizeof( secondKey[i] ), "^3%s^7", str );
 			}
-
-
-
 			i++;
 		}
 	}
