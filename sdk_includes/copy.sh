@@ -15,6 +15,7 @@ FILES_LIST=" \
 	common/kbutton.h \
 	common/mathlib.h \
 	common/netadr.h \
+	common/net_api.h \
 	common/ref_params.h \
 	common/weaponinfo.h \
 	common/wrect.h \

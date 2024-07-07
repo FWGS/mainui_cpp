@@ -83,12 +83,15 @@ typedef uint64_t longtime_t;
 	#define NONNULL            __attribute__(( nonnull ))
 	#define _format( x )       __attribute__(( format( printf, x, x + 1 )))
 	#define ALLOC_CHECK( x )   __attribute__(( alloc_size( x )))
+	#define NO_ASAN            __attribute__(( no_sanitize( "address" )))
 	#define RENAME_SYMBOL( x ) asm( x )
 #else
 	#if defined( _MSC_VER )
 		#define EXPORT         __declspec( dllexport )
+		#define NO_ASAN        __declspec( no_sanitize_address )
 	#else
 		#define EXPORT
+		#define NO_ASAN
 	#endif
 	#define GAME_EXPORT
 	#define NORETURN
@@ -98,18 +101,17 @@ typedef uint64_t longtime_t;
 	#define RENAME_SYMBOL( x )
 #endif
 
-#if ( __GNUC__ >= 3 )
+#if __GNUC__ >= 3
 	#define unlikely( x )     __builtin_expect( x, 0 )
 	#define likely( x )       __builtin_expect( x, 1 )
 #elif defined( __has_builtin )
-	#if __has_builtin( __builtin_expect )
-		#define unlikely( x ) __builtin_expect( x, 0 )
-		#define likely( x )   __builtin_expect( x, 1 )
-	#else
-		#define unlikely( x ) ( x )
-		#define likely( x )   ( x )
+	#if __has_builtin( __builtin_expect ) // this must be after defined() check
+		#define unlikely( x )     __builtin_expect( x, 0 )
+		#define likely( x )       __builtin_expect( x, 1 )
 	#endif
-#else
+#endif
+
+#if !defined( unlikely ) || !defined( likely )
 	#define unlikely( x ) ( x )
 	#define likely( x )   ( x )
 #endif
@@ -166,8 +168,9 @@ _inline float LittleFloat( float f )
 #endif
 
 
-typedef unsigned int	dword;
-typedef unsigned int	uint;
+typedef unsigned int  dword;
+typedef unsigned int  uint;
+typedef unsigned long ulong;
 typedef char		string[MAX_STRING];
 typedef struct file_s	file_t;		// normal file
 typedef struct stream_s	stream_t;		// sound stream for background music playing
