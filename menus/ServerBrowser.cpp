@@ -218,6 +218,7 @@ public:
 	{
 		gameListModel.serversRefreshTime = EngFuncs::DoubleTime();
 	}
+	void ViewGameInfo( void );
 
 	void AddServerToList( netadr_t adr, const char *info );
 
@@ -226,6 +227,7 @@ public:
 	CMenuPicButton *joinGame;
 	CMenuPicButton *createGame;
 	CMenuPicButton *refresh;
+	CMenuPicButton *viewGameInfo;
 	CMenuSwitch natOrDirect;
 
 	CMenuYesNoMessageBox msgBox;
@@ -457,6 +459,7 @@ void CMenuServerBrowser::ClearList()
 {
 	gameListModel.Flush();
 	joinGame->SetGrayed( true );
+	viewGameInfo->SetGrayed( true );
 }
 
 void CMenuServerBrowser::RefreshList()
@@ -478,6 +481,16 @@ void CMenuServerBrowser::RefreshList()
 				refreshTime = uiStatic.realTime + 20000;
 		}
 	}
+}
+
+void CMenuServerBrowser::ViewGameInfo()
+{
+	int idx = gameList.GetCurrentIndex();
+
+	if( idx < 0 || idx >= gameListModel.GetRows( ))
+		return;
+
+	UI_ServerInfo_Menu( gameListModel.servers[idx].adr, gameListModel.servers[idx].name, gameListModel.servers[idx].isLegacy );
 }
 
 /*
@@ -523,8 +536,7 @@ void CMenuServerBrowser::_Init( void )
 {
 	AddItem( banner );
 
-	joinGame = AddButton( L( "Join game" ), L( "Join to selected game" ), PC_JOIN_GAME,
-		VoidCb( &CMenuServerBrowser::JoinGame ), QMF_GRAYED );
+	joinGame = AddButton( L( "Join game" ), L( "Join to selected game" ), PC_JOIN_GAME, VoidCb( &CMenuServerBrowser::JoinGame ), QMF_GRAYED );
 	joinGame->onReleasedClActive = msgBox.MakeOpenEvent();
 
 	createGame = AddButton( L( "GameUI_GameMenu_CreateServer" ), NULL, PC_CREATE_GAME );
@@ -537,9 +549,7 @@ void CMenuServerBrowser::_Init( void )
 		UI_CreateGame_Menu();
 	});
 
-	// TODO: implement!
-	AddButton( L( "View game info" ), L( "Get detail game info" ), PC_VIEW_GAME_INFO, CEventCallback::NoopCb, QMF_GRAYED );
-
+	viewGameInfo = AddButton( L( "View game info" ), L( "Get detail game info" ), PC_VIEW_GAME_INFO, VoidCb( &CMenuServerBrowser::ViewGameInfo ), QMF_GRAYED );
 	refresh = AddButton( L( "Refresh" ), L( "Refresh servers list" ), PC_REFRESH, VoidCb( &CMenuServerBrowser::RefreshList ) );
 
 	AddButton( L( "Done" ), L( "Return to main menu" ), PC_DONE, VoidCb( &CMenuServerBrowser::Hide ) );
@@ -653,6 +663,7 @@ void CMenuServerBrowser::Show()
 	gameListModel.Flush();
 	gameList.SetSortingColumn( COLUMN_PING );
 	joinGame->SetGrayed( true );
+	viewGameInfo->SetGrayed( true );
 }
 
 void CMenuServerBrowser::AddServerToList( netadr_t adr, const char *info )
@@ -671,6 +682,7 @@ void CMenuServerBrowser::AddServerToList( netadr_t adr, const char *info )
 	gameListModel.AddServerToList( adr, info );
 
 	joinGame->SetGrayed( false );
+	viewGameInfo->SetGrayed( false );
 }
 
 /*

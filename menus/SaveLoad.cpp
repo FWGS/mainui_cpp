@@ -44,8 +44,7 @@ UI_SaveLoad_Init
 void CMenuSaveLoad::_Init( void )
 {
 	snprintf( hintText, sizeof( hintText ),
-		L( "During play, you can quickly save your game by pressing %s.\n"
-		"Load this game again by pressing %s." ),
+		L( "During play, you can quickly save your game by pressing %s.\nLoad this game again by pressing %s." ),
 		EngFuncs::KeynumToString( KEY_GetKey( "save quick" ) ),
 		EngFuncs::KeynumToString( KEY_GetKey( "load quick" ) ) );
 
