@@ -64,7 +64,7 @@ struct mod_t
 	}\
 	static int method ## Descend( const void *a, const void *b ) \
 	{\
-		return (( const mod_t *)b)->method( *(( const mod_t *)a) );;\
+		return (( const mod_t *)b)->method( *(( const mod_t *)a) );\
 	}\
 
 	GENERATE_COMPAR_FN( TypeCmp )
@@ -129,7 +129,7 @@ private:
 void CMenuCustomGame::ChangeGame( void *pExtra )
 {
 	char cmd[128];
-	sprintf( cmd, "game %s\n", (const char*)pExtra );
+	snprintf( cmd, sizeof( cmd ), "game %s\n", (const char*)pExtra );
 	EngFuncs::ClientCmd( FALSE, cmd );
 }
 
@@ -169,28 +169,26 @@ void CMenuModListModel::Update( void )
 	{
 		Q_strncpy( mods[i].dir, games[i]->gamefolder, sizeof( mods[i].dir ));
 		Q_strncpy( mods[i].webSite, games[i]->game_url, sizeof( mods[i].webSite ));
+		Q_strncpy( mods[i].type, games[i]->type, sizeof( mods[i].type ));
+		Q_strncpy( mods[i].ver, games[i]->version, sizeof( mods[i].ver ));
 
-		Q_strncpy( mods[i].type, games[i]->type, 32 );
-
-		if( ColorStrlen( games[i]->title ) > 31 ) // NAME_LENGTH
+		if( ColorStrlen( games[i]->title ) > sizeof( mods[i].name ) - 1 ) // NAME_LENGTH
 		{
-			Q_strncpy( mods[i].name, games[i]->title, 32 - 4 );
+			Q_strncpy( mods[i].name, games[i]->title, sizeof( mods[i].name ) - 4 );
 			// I am lazy to put strncat here :(
 			mods[i].name[28] = mods[i].name[29] = mods[i].name[30] = '.';
 			mods[i].name[31] = 0;
 		}
-		else Q_strncpy( mods[i].name, games[i]->title, 32 );
-
-		Q_strncpy( mods[i].ver, games[i]->version, 32 );
+		else Q_strncpy( mods[i].name, games[i]->title, sizeof( mods[i].name ));
 
 		if( games[i]->size[0] && atoi( games[i]->size ) != 0 )
-			Q_strncpy( mods[i].size, games[i]->size, 32 );
-		else Q_strncpy( mods[i].size, "0.0 Mb", 32 );
+			Q_strncpy( mods[i].size, games[i]->size, sizeof( mods[i].size ));
+		else Q_strncpy( mods[i].size, "0.0 Mb", sizeof( mods[i].size ));
 	}
 
 	m_iNumItems = numGames;
 
-	if(numGames)
+	if( numGames )
 	{
 		if( m_iSortingColumn != -1 )
 			Sort( m_iSortingColumn, m_bAscend );
@@ -269,4 +267,4 @@ void CMenuCustomGame::_Init( void )
 	}
 }
 
-ADD_MENU( menu_customgame, CMenuCustomGame, UI_CustomGame_Menu );
+ADD_MENU( menu_customgame, CMenuCustomGame, UI_CustomGame_Menu )

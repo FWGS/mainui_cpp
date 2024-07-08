@@ -287,10 +287,7 @@ bool CMenuBaseItem::KeyValueData(const char *key, const char *data)
 
 		if( m_bAllocName )
 		{
-			char *name = new char[strlen( data ) + 1];
-			strcpy( name, data );
-
-			szName = name;
+			szName = StringCopy( data );
 		}
 	}
 	else if( !strcmp( key, "textAlignment" ) )

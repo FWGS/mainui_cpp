@@ -94,7 +94,7 @@ void CMenuTouchOptions::CProfiliesListModel::Update( void )
 	int	i = 0, numFiles, j = 0;
 	const char *curprofile;
 
-	Q_strncpy( profileDesc[i], L( "Presets:" ), CS_SIZE );
+	Q_strncpy( profileDesc[i], L( "Presets:" ), sizeof( profileDesc[i] ));
 	i++;
 
 	filenames = EngFuncs::GetFilesList( "touch_presets/*.cfg", &numFiles, TRUE );
@@ -103,7 +103,7 @@ void CMenuTouchOptions::CProfiliesListModel::Update( void )
 		if( i >= UI_MAXGAMES ) break;
 
 		// strip path, leave only filename (empty slots doesn't have savename)
-		COM_FileBase( filenames[j], profileDesc[i] );
+		COM_FileBase( filenames[j], profileDesc[i], sizeof( profileDesc[i] ));
 	}
 
 	// Overwrite "Presets:" line if there is no presets
@@ -114,10 +114,10 @@ void CMenuTouchOptions::CProfiliesListModel::Update( void )
 	j = 0;
 	curprofile = EngFuncs::GetCvarString("touch_config_file");
 
-	Q_strncpy( profileDesc[i], L( "Profiles:" ), CS_SIZE );
+	Q_strncpy( profileDesc[i], L( "Profiles:" ), sizeof( profileDesc[i] ));
 	i++;
 
-	Q_strncpy( profileDesc[i], "default", CS_SIZE );
+	Q_strncpy( profileDesc[i], "default", sizeof( profileDesc[i] ));
 
 	iHighlight = firstProfile = i;
 	i++;
@@ -126,7 +126,7 @@ void CMenuTouchOptions::CProfiliesListModel::Update( void )
 	{
 		if( i >= UI_MAXGAMES ) break;
 
-		COM_FileBase( filenames[j], profileDesc[i] );
+		COM_FileBase( filenames[j], profileDesc[i], sizeof( profileDesc[i] ));
 		if( !strcmp( filenames[j], curprofile ) )
 			iHighlight = i;
 	}
@@ -196,7 +196,7 @@ void CMenuTouchOptions::Apply()
 	{
 		char command[256];
 		const char *curconfig = EngFuncs::GetCvarString( "touch_config_file" );
-		snprintf( command, 256, "exec \"touch_presets/%s\"\n", model.profileDesc[ i ] );
+		snprintf( command, sizeof( command ), "exec \"touch_presets/%s\"\n", model.profileDesc[ i ] );
 		EngFuncs::ClientCmd( 1, command );
 
 		while( EngFuncs::FileExists( curconfig, TRUE ) )
@@ -204,9 +204,9 @@ void CMenuTouchOptions::Apply()
 			char copystring[256];
 			char filebase[256];
 
-			COM_FileBase( curconfig, filebase );
+			COM_FileBase( curconfig, filebase, sizeof( filebase ));
 
-			if( snprintf( copystring, 256, "touch_profiles/%s (new).cfg", filebase ) > 255 )
+			if( snprintf( copystring, sizeof( copystring ), "touch_profiles/%s (new).cfg", filebase ) > sizeof( copystring ) - 1 )
 				break;
 
 			EngFuncs::CvarSetString( "touch_config_file", copystring );
@@ -218,12 +218,12 @@ void CMenuTouchOptions::Apply()
 	else if( i > model.firstProfile )
 	{
 		char command[256];
-		snprintf( command, 256, "exec \"touch_profiles/%s\"\n", model.profileDesc[ i ] );
+		snprintf( command, sizeof( command ), "exec \"touch_profiles/%s\"\n", model.profileDesc[ i ] );
 		EngFuncs::ClientCmd( 1,  command );
 	}
 
 	// try save config
-	EngFuncs::ClientCmd( 1,  "touch_writeconfig\n" );
+	EngFuncs::ClientCmd( 1, "touch_writeconfig\n" );
 
 	// check if it failed ant reset profile to default if it is
 	if( !EngFuncs::FileExists( EngFuncs::GetCvarString( "touch_config_file" ), TRUE ) )
@@ -257,7 +257,7 @@ void CMenuTouchOptions::UpdateProfilies()
 	int isCurrent;
 	int idx = profiles.GetCurrentIndex();
 
-	COM_FileBase( EngFuncs::GetCvarString( "touch_config_file" ), curprofile );
+	COM_FileBase( EngFuncs::GetCvarString( "touch_config_file" ), curprofile, sizeof( curprofile ));
 	isCurrent = !strcmp( curprofile, model.profileDesc[ idx ]);
 
 	// Scrolllist changed, update available options

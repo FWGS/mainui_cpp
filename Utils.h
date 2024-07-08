@@ -148,19 +148,19 @@ inline float RemapVal( const float val, const float A, const float B, const floa
 	return C + (D - C) * (val - A) / (B - A);
 }
 
+extern const unsigned int g_iColorTable[8];
+
 int colorstricmp( const char *a, const char *b );
 int colorstrcmp( const char *a, const char *b );
-extern int ColorStrlen( const char *str );	// returns string length without color symbols
-extern int ColorPrexfixCount( const char *str );
-extern const unsigned int g_iColorTable[8];
-extern void COM_FileBase( const char *in, char *out );		// ripped out from hlsdk 2.3
-extern int UI_FadeAlpha( int starttime, int endtime );
-extern const char *Info_ValueForKey( const char *s, const char *key );
-extern int KEY_GetKey( const char *binding );			// ripped out from engine
-extern char *StringCopy( const char *input );			// copy string into new memory
-extern int COM_CompareSaves( const void **a, const void **b );
-extern void Com_EscapeCommand( char *newCommand, const char *oldCommand, int len );
-extern void UI_EnableTextInput( bool enable );
+int ColorStrlen( const char *str );	// returns string length without color symbols
+void COM_FileBase( const char *in, char *out, size_t size );
+int UI_FadeAlpha( int starttime, int endtime );
+const char *Info_ValueForKey( const char *s, const char *key );
+int KEY_GetKey( const char *binding );			// ripped out from engine
+char *StringCopy( const char *input );			// copy string into new memory
+int COM_CompareSaves( const void **a, const void **b );
+void Com_EscapeCommand( char *newCommand, const char *oldCommand, int len );
+void UI_EnableTextInput( bool enable );
 
 void UI_LoadCustomStrings( void );
 const char *L( const char *szStr ); // L means Localize!

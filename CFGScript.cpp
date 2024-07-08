@@ -151,8 +151,7 @@ bool CSCR_ParseSingleCvar( parserstate_t *ps, scrvardef_t *result )
 
 			entry = new scrvarlistentry_t;
 			entry->next = NULL;
-			entry->szName = new char[strlen( szName ) + 1];
-			strcpy( entry->szName, szName );
+			entry->szName = StringCopy( szName );
 			entry->flValue = atof( szValue );
 
 			if( !result->list.pEntries )

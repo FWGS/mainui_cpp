@@ -309,7 +309,7 @@ void CMenuSpinControl::SetCurrentValue( const char *stringValue )
 	m_flCurValue = -1;
 	SetCvarString( stringValue );
 
-	Q_strncpy( m_szDisplay, stringValue, CS_SIZE );
+	Q_strncpy( m_szDisplay, stringValue, sizeof( m_szDisplay ));
 }
 
 void CMenuSpinControl::SetDisplayPrecision( short precision )
@@ -323,7 +323,7 @@ void CMenuSpinControl::Display()
 	{
 		SetCvarValue( m_flCurValue );
 
-		snprintf( m_szDisplay, CS_SIZE, "%.*f", m_iFloatPrecision, m_flCurValue );
+		snprintf( m_szDisplay, sizeof( m_szDisplay ), "%.*f", m_iFloatPrecision, m_flCurValue );
 	}
 	else
 	{
@@ -336,11 +336,11 @@ void CMenuSpinControl::Display()
 		case CVAR_VALUE: SetCvarValue( m_flCurValue ); break;
 		}
 
-		Q_strncpy( m_szDisplay, stringValue, CS_SIZE );
+		Q_strncpy( m_szDisplay, stringValue, sizeof( m_szDisplay ));
 	}
 }
 
-void CMenuSpinControl::ForceDisplayString(const char *display)
+void CMenuSpinControl::ForceDisplayString( const char *display )
 {
-	Q_strncpy( m_szDisplay, display, CS_SIZE );
+	Q_strncpy( m_szDisplay, display, sizeof( m_szDisplay ));
 }

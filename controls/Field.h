@@ -50,7 +50,7 @@ public:
 
 	void SetBuffer( const char *buffer )
 	{
-		Q_strncpy( szBuffer, buffer, UI_MAX_FIELD_LINE );
+		Q_strncpy( szBuffer, buffer, sizeof( szBuffer ));
 		iCursor = strlen( szBuffer );
 		iScroll = g_FontMgr->CutText( font, szBuffer, m_scChSize, iRealWidth, true );
 		SetCvarString( szBuffer );

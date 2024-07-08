@@ -228,7 +228,7 @@ void UI_ShowMessageBox( const char *text )
 	static char msg[1024];
 	static CMenuYesNoMessageBox msgBox( true );
 
-	Q_strncpy( msg, text, sizeof( msg ) );
+	Q_strncpy( msg, text, sizeof( msg ));
 
 	if( !UI_IsVisible() )
 	{

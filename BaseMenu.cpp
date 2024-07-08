@@ -578,10 +578,10 @@ bool UI_StartBackGroundMap( void )
 	int bgmapid = EngFuncs::RandomLong( 0, uiStatic.bgmapcount - 1 );
 
 	char cmd[128];
-	sprintf( cmd, "maps/%s.bsp", uiStatic.bgmaps[bgmapid] );
+	snprintf( cmd, sizeof( cmd ), "maps/%s.bsp", uiStatic.bgmaps[bgmapid] );
 	if( !EngFuncs::FileExists( cmd, TRUE )) return FALSE;
 
-	sprintf( cmd, "map_background %s\n", uiStatic.bgmaps[bgmapid] );
+	snprintf( cmd, sizeof( cmd ), "map_background %s\n", uiStatic.bgmaps[bgmapid] );
 	EngFuncs::ClientCmd( FALSE, cmd );
 
 	return TRUE;

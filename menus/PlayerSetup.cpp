@@ -272,17 +272,10 @@ void CMenuPlayerSetup::CModelListModel::Update( void )
 	// search in basedir too, because that's how GoldSrc does this
 	filenames = EngFuncs::GetFilesList(  "models/player/*", &numFiles, FALSE );
 
-#if 0
-	// add default singleplayer model
-	strcpy( models[num_models], "player" );
-	modelsPtr[num_models] = models[num_models];
-	num_models++;
-#endif
-
 	// build the model list
 	for( i = 0; i < numFiles; i++ )
 	{
-		COM_FileBase( filenames[i], name );
+		COM_FileBase( filenames[i], name, sizeof( name ));
 		Q_strncpy( models[m_iCount], name, sizeof( models[0] ) );
 
 		// check if the path is a valid model
@@ -324,7 +317,7 @@ void CMenuPlayerSetup::CLogosListModel::Update( )
 
 		if( png || logoFileName.BEndsWithCaseless( ".bmp" ))
 		{
-			COM_FileBase( logoFileName.String(), temp );
+			COM_FileBase( logoFileName.String(), temp, sizeof( temp ));
 
 			if( !stricmp( temp, "remapped" ))
 				continue;
@@ -376,7 +369,7 @@ void CMenuPlayerSetup::UpdateModel()
 		return;
 	}
 
-	snprintf( image, 256, "models/player/%s/%s.bmp", mdl, mdl );
+	snprintf( image, sizeof( image ), "models/player/%s/%s.bmp", mdl, mdl );
 	view.hPlayerImage = EngFuncs::PIC_Load( image, PIC_KEEP_SOURCE );
 
 	ApplyColorToImagePreview();

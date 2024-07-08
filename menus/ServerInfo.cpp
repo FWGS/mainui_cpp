@@ -133,7 +133,7 @@ public:
 	int GetColumns() const override { return 4;	}
 	int GetRows() const override { return players.Count(); }
 
-	bool Sort( int column, bool ascend )
+	bool Sort( int column, bool ascend ) override
 	{
 		switch( column )
 		{

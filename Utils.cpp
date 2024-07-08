@@ -218,42 +218,40 @@ int COM_CompareSaves( const void **a, const void **b )
 /*
 ============
 COM_FileBase
+
+Extracts the base name of a file (no path, no extension, assumes '/' as path separator)
+a1ba: adapted and simplified version from QuakeSpasm
 ============
 */
-// Extracts the base name of a file (no path, no extension, assumes '/' as path separator)
-void COM_FileBase ( const char *in, char *out )
+#define COM_CheckString( string ) ( ( !string || !*string ) ? 0 : 1 )
+void COM_FileBase( const char *in, char *out, size_t size )
 {
-	int len, start, end;
+	const char *dot, *slash, *s;
+	size_t len;
 
-	len = strlen( in );
-	
-	// scan backward for '.'
-	end = len - 1;
-	while ( end && in[end] != '.' && in[end] != '/' && in[end] != '\\' )
-		end--;
-	
-	if ( in[end] != '.' )		// no '.', copy to end
-		end = len-1;
-	else 
-		end--;			// Found ',', copy to left of '.'
+	if( unlikely( !COM_CheckString( in ) || size <= 1 ))
+	{
+		out[0] = 0;
+		return;
+	}
 
+	slash = in;
+	dot = NULL;
+	for( s = in; *s; s++ )
+	{
+		if( *s == '/' || *s == '\\' )
+			slash = s + 1;
 
-	// Scan backward for '/'
-	start = len-1;
-	while ( start >= 0 && in[start] != '/' && in[start] != '\\' )
-		start--;
+		if( *s == '.' )
+			dot = s;
+	}
 
-	if ( in[start] != '/' && in[start] != '\\' )
-		start = 0;
-	else 
-		start++;
+	if( dot == NULL || dot < slash )
+		dot = s;
 
-	// Length of new sting
-	len = end - start + 1;
+	len = Q_min( size - 1, dot - slash );
 
-	// Copy partial string
-	strncpy( out, &in[start], len );
-	// Terminate it
+	memcpy( out, slash, len );
 	out[len] = 0;
 }
 
