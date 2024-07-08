@@ -166,42 +166,22 @@ void UI_LoadCustomStrings( void );
 const char *L( const char *szStr ); // L means Localize!
 void UI_FreeCustomStrings( void );
 
-#ifdef __APPLE__
-#define register
-#endif // __APPLE__
-
 inline size_t Q_strncpy( char *dst, const char *src, size_t size )
 {
-	char	*d = dst;
-	const char	*s = src;
-	size_t	n = size;
-
-	if( !dst || !src || !size )
+	size_t len;
+	if( unlikely( !dst || !src || !size ))
 		return 0;
 
-	// copy as many bytes as will fit
-	if( n != 0 && --n != 0 )
+	len = strlen( src );
+	if( len + 1 > size ) // check if truncate
 	{
-		do
-		{
-			if(( *d++ = *s++ ) == 0 )
-				break;
-		} while( --n != 0 );
+		memcpy( dst, src, size - 1 );
+		dst[size - 1] = 0;
 	}
+	else memcpy( dst, src, len + 1 );
 
-	// not enough room in dst, add NULL and traverse rest of src
-	if( n == 0 )
-	{
-		if( size != 0 )
-			*d = '\0'; // NULL-terminate dst
-		while( *s++ );
-	}
-	return ( s - src - 1 ); // count does not include NULL
+	return len; // count does not include NULL
 }
-
-#ifdef register
-#undef register
-#endif // register
 
 #define CS_SIZE			64	// size of one config string
 #define CS_TIME			16	// size of time string

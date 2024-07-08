@@ -156,36 +156,6 @@ int ColorStrlen( const char *str )
 	return len;
 }
 
-int ColorPrexfixCount( const char *str )
-{
-	const char *p;
-
-	if( !str )
-		return 0;
-
-	int len = 0;
-	p = str;
-
-	//EngFuncs::UtfProcessChar(0);
-
-	while( *p )
-	{
-		if( IsColorString( p ))
-		{
-			len += 2;
-			p += 2;
-			continue;
-		}
-		//if(!EngFuncs::UtfProcessChar((unsigned char)*p))
-			//len++;
-		p++;
-	}
-
-	//EngFuncs::UtfProcessChar(0);
-
-	return len;
-}
-
 char *StringCopy( const char *input )
 {
 	if( !input ) return NULL;
@@ -263,34 +233,41 @@ Searches the string for the given
 key and returns the associated value, or an empty string.
 ===============
 */
+#define MAX_KV_SIZE		128
 const char *Info_ValueForKey( const char *s, const char *key )
 {
-	char	pkey[MAX_INFO_STRING];
-	static	char value[2][MAX_INFO_STRING]; // use two buffers so compares work without stomping on each other
+	char	pkey[MAX_KV_SIZE];
+	static	char value[4][MAX_KV_SIZE]; // use two buffers so compares work without stomping on each other
 	static	int valueindex;
+	int	count;
 	char	*o;
-	
-	valueindex ^= 1;
+
+	valueindex = (valueindex + 1) % 4;
 	if( *s == '\\' ) s++;
 
 	while( 1 )
 	{
+		count = 0;
 		o = pkey;
-		while( *s != '\\' && *s != '\n' )
+
+		while( count < (MAX_KV_SIZE - 1) && *s != '\\' )
 		{
 			if( !*s ) return "";
 			*o++ = *s++;
+			count++;
 		}
 
 		*o = 0;
 		s++;
 
 		o = value[valueindex];
+		count = 0;
 
-		while( *s != '\\' && *s != '\n' && *s )
+		while( count < (MAX_KV_SIZE - 1) && *s && *s != '\\' )
 		{
 			if( !*s ) return "";
 			*o++ = *s++;
+			count++;
 		}
 		*o = 0;
 
@@ -365,30 +342,6 @@ void UI_EnableTextInput( bool enable )
 	uiStatic.textInput = enable;
 	EngFuncs::EnableTextInput( enable );
 }
-
-// Doesn't need anymore
-
-/*
-void *operator new( size_t a )
-{
-	return MALLOC( a );
-}
-
-void *operator new[]( size_t a )
-{
-	return MALLOC( a );
-}
-
-void operator delete( void *ptr )
-{
-	if( ptr ) FREE( ptr );
-}
-
-void operator delete[]( void *ptr )
-{
-	if( ptr ) FREE( ptr );
-}
-*/
 
 CBMP* CBMP::LoadFile( const char *filename )
 {
