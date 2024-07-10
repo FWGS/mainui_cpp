@@ -210,6 +210,7 @@ public:
 	}
 
 	void Show() override;
+	void Hide() override;
 
 	void DoNetworkRequests();
 
@@ -244,6 +245,10 @@ private:
 	char server_hostname_str[64];
 	char server_address_str[64]; // enough for both IPv4 and IPv6
 	char ping_str[16];
+
+	int32_t ping_context;
+	int32_t players_context;
+	int32_t rules_context;
 };
 
 ADD_MENU( menu_serverinfo, CMenuServerInfo, UI_ServerInfo_Menu )
@@ -257,12 +262,24 @@ void UI_ServerInfo_Menu( netadr_t adr, const char *hostname, bool legacy )
 
 void CMenuServerInfo::PingResponse( net_response_t *resp )
 {
+	if( resp->context != ping_context )
+		return;
+
+	if( resp->response == nullptr )
+		return;
+
 	snprintf( ping_str, sizeof( ping_str ), "%.f ms.", resp->ping * 1000.0f );
 	server_pingtime.szName = ping_str;
 }
 
 void CMenuServerInfo::PlayersResponse( net_response_t *resp )
 {
+	if( resp->context != players_context )
+		return;
+
+	if( resp->response == nullptr )
+		return;
+
 	char *s = (char *)resp->response;
 
 	if( s[0] != '\\' ) // legacy answer, which isn't an infostring
@@ -331,6 +348,12 @@ void CMenuServerInfo::PlayersResponse( net_response_t *resp )
 
 void CMenuServerInfo::RulesResponse( net_response_t *resp )
 {
+	if( resp->context != rules_context )
+		return;
+
+	if( resp->response == nullptr )
+		return;
+
 	if( m_legacy )
 	{
 		// this call is useless in old engine, it prints serverinfo
@@ -384,18 +407,17 @@ void CMenuServerInfo::RulesResponseFunc( net_response_t *resp )
 void CMenuServerInfo::DoNetworkRequests()
 {
 	// always generate random context, the engine will verify it for us
-	int32_t context;
 	int flags = m_legacy ? FNETAPI_LEGACY_PROTOCOL : 0;
 	const double timeout = 10.0;
 
-	context = EngFuncs::RandomLong( 0, 0x7fffffff );
-	EngFuncs::textfuncs.pNetAPI->SendRequest( context, NETAPI_REQUEST_PING, flags, timeout, &m_adr, CMenuServerInfo::PingResponseFunc );
+	ping_context = EngFuncs::RandomLong( 0, 0x7fffffff );
+	EngFuncs::textfuncs.pNetAPI->SendRequest( ping_context, NETAPI_REQUEST_PING, flags, timeout, &m_adr, CMenuServerInfo::PingResponseFunc );
 
-	context = EngFuncs::RandomLong( 0, 0x7fffffff );
-	EngFuncs::textfuncs.pNetAPI->SendRequest( context, NETAPI_REQUEST_PLAYERS, flags, timeout, &m_adr, CMenuServerInfo::PlayersResponseFunc );
+	players_context = EngFuncs::RandomLong( 0, 0x7fffffff );
+	EngFuncs::textfuncs.pNetAPI->SendRequest( players_context, NETAPI_REQUEST_PLAYERS, flags, timeout, &m_adr, CMenuServerInfo::PlayersResponseFunc );
 
-	context = EngFuncs::RandomLong( 0, 0x7fffffff );
-	EngFuncs::textfuncs.pNetAPI->SendRequest( context, NETAPI_REQUEST_RULES, flags, timeout, &m_adr, CMenuServerInfo::RulesResponseFunc );
+	rules_context = EngFuncs::RandomLong( 0, 0x7fffffff );
+	EngFuncs::textfuncs.pNetAPI->SendRequest( rules_context, NETAPI_REQUEST_RULES, flags, timeout, &m_adr, CMenuServerInfo::RulesResponseFunc );
 }
 
 void CMenuServerInfo::Show()
@@ -406,6 +428,17 @@ void CMenuServerInfo::Show()
 	rules_model.rules.RemoveAll();
 
 	players_list.SetSortingColumn( COLUMN_POSITION, true );
+}
+
+void CMenuServerInfo::Hide()
+{
+	EngFuncs::textfuncs.pNetAPI->CancelRequest( rules_context );
+	EngFuncs::textfuncs.pNetAPI->CancelRequest( players_context );
+	EngFuncs::textfuncs.pNetAPI->CancelRequest( ping_context );
+
+	ping_context = players_context = rules_context = -1;
+
+	CMenuFramework::Hide();
 }
 
 void CMenuServerInfo::_Init()
@@ -447,7 +480,7 @@ void CMenuServerInfo::_Init()
 
 	done.SetNameAndStatus( L( "Done" ), L( "Go back to the Multiplayer Menu" ));
 	done.SetPicture( PC_DONE );
-	done.onReleased = VoidCb( &CMenuServerInfo::SaveAndPopMenu );
+	done.onReleased = VoidCb( &CMenuServerInfo::Hide );
 	done.SetCoord( 72, 650 );
 
 	players_list.bAllowSorting = true;
