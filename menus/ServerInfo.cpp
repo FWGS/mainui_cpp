@@ -40,17 +40,11 @@ enum
 
 struct player_entry_t
 {
-	player_entry_t( int index, const char *name, int frags, float time )
+	player_entry_t( int index, const char *name, int frags, float time ) :
+		index( index ), name( name ), frags( frags ), time( time )
 	{
-		this->index = index;
 		index_str.Format( "%i", index );
-
-		this->name = name;
-
-		this->frags = frags;
 		frags_str.Format( "%i", frags );
-
-		this->time = time;
 
 		int hours = time / 3600;
 		int minutes = ( time - hours * 3600 ) / 60;
@@ -167,8 +161,6 @@ public:
 	}
 
 	CUtlVector<player_entry_t> players;
-	int m_sorting_column;
-	bool m_ascend;
 };
 
 class CMenuServerRuleModel : public CMenuBaseModel
