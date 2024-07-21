@@ -266,6 +266,49 @@ int UTFToCP1251( char *out, const char *instr, int len, int maxoutlen )
 	return out - outbegin;
 }
 
+static uint Localize_ProcessString( char *dst, const char *src )
+{
+	const char *p;
+	uint i = 0;
+
+	p = src;
+
+	while( *p )
+	{
+		if( *p == '\\' )
+		{
+			char replace = 0;
+
+			switch( p[1] )
+			{
+			case '\\': replace = '\\'; break;
+			case 'n': replace = '\n'; break;
+			}
+
+			if( replace )
+			{
+				if( dst )
+					dst[i] = replace;
+				i++;
+				p += 2;
+				continue;
+			}
+		}
+
+		if( dst )
+			dst[i] = *p;
+		i++;
+		p++;
+	}
+
+	// null terminator
+	if( dst )
+		dst[i] = '\0';
+	i++;
+
+	return i;
+}
+
 static void Localize_AddToDictionary( const char *name, const char *lang )
 {
 	char filename[64], token[4096];
@@ -374,6 +417,7 @@ static void Localize_AddToDictionary( const char *name, const char *lang )
 		if( pfile )
 		{
 			// Con_DPrintf("New token: %s %s\n", token, szLocString );
+			Localize_ProcessString( token, token );
 			Dictionary_Insert( token, szLocString );
 			i++;
 		}
