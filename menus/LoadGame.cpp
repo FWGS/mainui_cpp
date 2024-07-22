@@ -205,7 +205,7 @@ void CMenuSavesListModel::Update( void )
 
 		// they are defined by comment string format
 		// time and date
-		snprintf( date[i], sizeof( date ), "%s %s", comment + CS_SIZE, comment + CS_SIZE + CS_TIME );
+		snprintf( date[i], sizeof( date[i] ), "%s %s", comment + CS_SIZE, comment + CS_SIZE + CS_TIME );
 
 		// ingame time
 		Q_strncpy( elapsed_time[i], comment + CS_SIZE + CS_TIME * 2, sizeof( elapsed_time[i] ));
