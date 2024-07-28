@@ -15,7 +15,7 @@ GNU General Public License for more details.
 
 #include "Editable.h"
 
-CMenuEditable::CMenuEditable() : BaseClass(),
+CMenuEditable::CMenuEditable() : BaseClass(), bUpdateImmediately( false ),
 	m_szCvarName(), m_eType(), m_bForceUpdate( false ),
 	m_flValue(), m_flOriginalValue()
 {
