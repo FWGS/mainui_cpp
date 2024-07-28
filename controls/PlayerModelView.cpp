@@ -151,6 +151,9 @@ void CMenuPlayerModelView::Draw()
 	{
 		EngFuncs::ClearScene();
 
+		if( bDrawAsPlayer )
+			ent->curstate.body = 0; // reset body, so it will be changed by cl_himodels setting
+
 		if( uiStatic.enableAlphaFactor )
 		{
 			ent->curstate.rendermode = kRenderTransTexture;

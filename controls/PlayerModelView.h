@@ -54,8 +54,6 @@ public:
 	CColor backgroundColor;
 	CColor outlineFocusColor;
 private:
-	cl_entity_t ent2;
-
 	bool mouseYawControl;
 
 	int prevCursorX, prevCursorY;
