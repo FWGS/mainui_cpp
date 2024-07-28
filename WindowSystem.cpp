@@ -287,6 +287,9 @@ void CWindowStack::Remove( CMenuBaseWindow *menu )
 				if( stack[active]->IsRoot() && menu->IsRoot() )
 					stack[active]->EnableTransition( CMenuBaseWindow::ANIM_OPENING );
 
+				// notify new active window about changed mouse position
+				stack[active]->MouseMove( uiStatic.cursorX, uiStatic.cursorY );
+
 				break;
 			}
 		}
