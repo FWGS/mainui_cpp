@@ -56,6 +56,7 @@ public:
 private:
 	void _Init() override;
 	void _VidInit( ) override;
+	void Think() override;
 
 	void VidInit(bool connected);
 
@@ -507,6 +508,7 @@ void CMenuMain::_Init( void )
 	console.SetNameAndStatus( L( "GameUI_Console" ), L( "Show console" ) );
 	console.iFlags |= QMF_NOTIFY;
 	console.SetPicture( PC_CONSOLE );
+	console.SetVisibility( gpGlobals->developer );
 	SET_EVENT_MULTI( console.onReleased,
 	{
 		UI_SetActiveMenu( FALSE );
@@ -600,10 +602,7 @@ void CMenuMain::_Init( void )
 	dialog.Link( this );
 
 	AddItem( banner );
-
-	if ( gpGlobals->developer )
-		AddItem( console );
-
+	AddItem( console );
 	AddItem( disconnect );
 	AddItem( resumeGame );
 	AddItem( newGame );
@@ -708,6 +707,22 @@ void CMenuMain::VidInit( bool connected )
 void CMenuMain::_VidInit()
 {
 	VidInit( CL_IsActive() );
+}
+
+void CMenuMain::Think()
+{
+	if( gpGlobals->developer )
+	{
+		if( !console.IsVisible( ))
+			console.Show();
+	}
+	else
+	{
+		if( console.IsVisible( ))
+			console.Hide();
+	}
+
+	CMenuFramework::Think();
 }
 
 ADD_MENU( menu_main, CMenuMain, UI_Main_Menu );
