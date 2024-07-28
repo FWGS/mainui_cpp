@@ -45,8 +45,6 @@ private:
 	CMenuSpinControl	maxFPS;
 	//CMenuCheckBox	hand;
 	CMenuCheckBox	allowDownload;
-	CMenuCheckBox	cl_predict;
-	CMenuCheckBox	cl_lw;
 
 	CMenuSpinControl	cmdrate, updaterate, rate;
 	CMenuAction networkMode;
@@ -81,8 +79,6 @@ void CMenuGameOptions::SaveCb()
 	cmdrate.WriteCvar();
 	updaterate.WriteCvar();
 	rate.WriteCvar();
-	cl_predict.WriteCvar();
-	cl_lw.WriteCvar();
 
 	SaveAndPopMenu();
 }
@@ -95,8 +91,6 @@ void CMenuGameOptions::Restore()
 	cmdrate.DiscardChanges();
 	updaterate.DiscardChanges();
 	rate.DiscardChanges();
-	cl_lw.DiscardChanges();
-	cl_predict.DiscardChanges();
 }
 
 void CMenuGameOptions::RestoreCb()
@@ -126,14 +120,6 @@ void CMenuGameOptions::_Init( void )
 	allowDownload.SetNameAndStatus( L( "Allow download" ), L( "Allow download of files from servers" ) );
 	allowDownload.LinkCvar( "cl_allowdownload" );
 	allowDownload.SetCoord( 240, 315 );
-
-	cl_predict.SetNameAndStatus( L( "Disable predicting" ), L( "Disable player movement prediction" ) );
-	cl_predict.LinkCvar( "cl_nopred" );
-	cl_predict.SetCoord( 240, 365 );
-
-	cl_lw.SetNameAndStatus( L( "Local weapons" ), L( "Enable local weapons" ) );
-	cl_lw.LinkCvar( "cl_lw" );
-	cl_lw.SetCoord( 240, 415 );
 
 	cmdrate.SetRect( 650, 470, 200, 32 );
 	cmdrate.Setup( 20, 60, 5 );
@@ -189,8 +175,6 @@ void CMenuGameOptions::_Init( void )
 	//AddItem( hand );
 
 	AddItem( allowDownload );
-	AddItem( cl_predict );
-	AddItem( cl_lw );
 	AddItem( cmdrate );
 	AddItem( updaterate );
 	AddItem( rate );
