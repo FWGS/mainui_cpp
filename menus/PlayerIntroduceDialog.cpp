@@ -88,6 +88,7 @@ void CMenuPlayerIntroduceDialog::_Init()
 	name.SetRect( 188, 140, 270, 32 );
 	name.LinkCvar( "name" );
 	name.iMaxLength = MAX_SCOREBOARDNAME;
+	name.SetBuffer( EngFuncs::GetCvarString( "ui_username" ));
 
 	msgBox.SetMessage( L( "Please, choose another player name" ) );
 	msgBox.Link( this );
