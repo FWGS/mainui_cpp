@@ -527,7 +527,7 @@ void UI_DrawMouseCursor( void )
 	int cursor = uiStatic.menu.Current()->GetCursor();
 	item = uiStatic.menu.Current()->GetItemByIndex( cursor );
 
-	if( FBitSet( item->iFlags, QMF_HASMOUSEFOCUS )) 	// fast approach
+	if( item && FBitSet( item->iFlags, QMF_HASMOUSEFOCUS )) 	// fast approach
 	{
 		if( FBitSet( item->iFlags, QMF_GRAYED ))
 			hCursor = (void *)dc_no;
