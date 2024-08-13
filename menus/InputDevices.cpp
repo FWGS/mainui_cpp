@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -82,8 +82,7 @@ void CMenuInputDevices::_Init( void )
 	done.onReleased = VoidCb( &CMenuInputDevices::SaveAndPopMenu );
 	done.SetCoord( 72, 680 );
 
-	mouse.szName = L( "Ignore mouse" );
-	mouse.szStatusText = L( "Need for some servers. Will disable mouse in menu too" );
+	mouse.SetNameAndStatus( L( "Ignore mouse" ), L( "Need for some servers. Will disable mouse in menu too" ));
 	mouse.iFlags |= QMF_NOTIFY;
 #ifndef __ANDROID__
 	SET_EVENT_MULTI( mouse.onChanged,
@@ -91,8 +90,7 @@ void CMenuInputDevices::_Init( void )
 		if( ((CMenuCheckBox*)pSelf)->bChecked )
 		{
 			static CMenuYesNoMessageBox msgbox(false);
-			msgbox.SetMessage(L( "If you do not have touchscreen, or joystick, you will not be able to play without mouse."
-				"Are you sure to disable mouse?" ) );
+			msgbox.SetMessage( L( "If you do not have touchscreen, or joystick, you will not be able to play without mouse.\nAre you sure to disable mouse?" ));
 			SET_EVENT_MULTI( msgbox.onNegative,
 			{
 				pSelf->GetParent(CMenuInputDevices)->mouse.bChecked = false;
@@ -105,16 +103,15 @@ void CMenuInputDevices::_Init( void )
 
 	mouse.SetCoord( 72, 230 );
 
-	touch.szName = L( "Enable touch" );
-	touch.szStatusText = L( "On-screen controls for touchscreen" );
+	touch.SetNameAndStatus( L( "Enable touch" ), L( "On-screen controls for touchscreen" ));
 	touch.iFlags |= QMF_NOTIFY;
 	touch.SetCoord( 72, 280 );
 
-	joystick.szName = L( "GameUI_JoystickLabel" );
+	joystick.SetNameAndStatus( L( "GameUI_JoystickLabel" ), L( "Enable using game controller in game" ));
 	joystick.SetCoord( 72, 330 );
+	joystick.iFlags |= QMF_NOTIFY;
 
-	evdev.szName = L( "Evdev input (root)" );
-	evdev.szStatusText = L( "Press this to enable full mouse and keyboard control on Android" );
+	evdev.SetNameAndStatus( L( "Evdev input (root)" ), L( "Press this to enable full mouse and keyboard control on Android" ));
 	evdev.iFlags |= QMF_NOTIFY;
 	evdev.SetCoord( 72, 380 );
 	evdev.onReleased.SetCommand( FALSE, "evdev_autodetect\n" );
