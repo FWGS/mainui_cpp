@@ -126,7 +126,7 @@ inline unsigned int PackAlpha( const unsigned int ulRGB, const unsigned int ulAl
 
 inline unsigned int UnpackAlpha( const unsigned int ulRGBA )
 {
-	return ((ulRGBA & 0xFF000000) >> 24);	
+	return ((ulRGBA & 0xFF000000) >> 24);
 }
 
 inline float InterpVal( const float from, const float to, const float frac )
@@ -409,5 +409,8 @@ extern const int table_cp1251[64];
 int Con_UtfProcessChar(int in );
 int Con_UtfMoveLeft( const char *str, int pos );
 int Con_UtfMoveRight( const char *str, int pos, int length );
+
+char *Q_pretifymem( float value, int digitsafterdecimal );
+#define Q_memprint( val ) Q_pretifymem( val, 2 )
 
 #endif//UTILS_H

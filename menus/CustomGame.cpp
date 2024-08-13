@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -46,6 +46,7 @@ struct mod_t
 	char name[32];
 	char ver[32];
 	char size[32];
+	uint64_t bytes;
 
 	int TypeCmp( const mod_t &other ) const
 	{
@@ -55,6 +56,13 @@ struct mod_t
 	int NameCmp( const mod_t &other ) const
 	{
 		return stricmp( name, other.name );
+	}
+
+	int SizeCmp( const mod_t &other ) const
+	{
+		if( bytes > other.bytes ) return 1;
+		else if( bytes < other.bytes ) return -1;
+		return 0;
 	}
 
 #define GENERATE_COMPAR_FN( method ) \
@@ -69,6 +77,7 @@ struct mod_t
 
 	GENERATE_COMPAR_FN( TypeCmp )
 	GENERATE_COMPAR_FN( NameCmp )
+	GENERATE_COMPAR_FN( SizeCmp )
 #undef GENERATE_COMPAR_FN
 };
 
@@ -160,35 +169,40 @@ CMenuModListModel::Update
 */
 void CMenuModListModel::Update( void )
 {
-	int	numGames, i;
-	GAMEINFO	**games;
+	int i;
 
-	games = EngFuncs::GetGamesList( &numGames );
-
-	for( i = 0; i < numGames; i++ )
+	for( i = 0; ; i++ )
 	{
-		Q_strncpy( mods[i].dir, games[i]->gamefolder, sizeof( mods[i].dir ));
-		Q_strncpy( mods[i].webSite, games[i]->game_url, sizeof( mods[i].webSite ));
-		Q_strncpy( mods[i].type, games[i]->type, sizeof( mods[i].type ));
-		Q_strncpy( mods[i].ver, games[i]->version, sizeof( mods[i].ver ));
+		gameinfo2_t *gi = EngFuncs::GetModInfo( i );
 
-		if( ColorStrlen( games[i]->title ) > sizeof( mods[i].name ) - 1 ) // NAME_LENGTH
+		if( !gi )
+			break;
+
+		Q_strncpy( mods[i].dir, gi->gamefolder, sizeof( mods[i].dir ));
+		Q_strncpy( mods[i].webSite, gi->game_url, sizeof( mods[i].webSite ));
+		Q_strncpy( mods[i].type, gi->type, sizeof( mods[i].type ));
+		Q_strncpy( mods[i].ver, gi->version, sizeof( mods[i].ver ));
+
+		if( ColorStrlen( gi->title ) > sizeof( mods[i].name ) - 1 ) // NAME_LENGTH
 		{
-			Q_strncpy( mods[i].name, games[i]->title, sizeof( mods[i].name ) - 4 );
-			// I am lazy to put strncat here :(
-			mods[i].name[28] = mods[i].name[29] = mods[i].name[30] = '.';
-			mods[i].name[31] = 0;
-		}
-		else Q_strncpy( mods[i].name, games[i]->title, sizeof( mods[i].name ));
+			size_t s = sizeof( mods[i].name ) - 4;
 
-		if( games[i]->size[0] && atoi( games[i]->size ) != 0 )
-			Q_strncpy( mods[i].size, games[i]->size, sizeof( mods[i].size ));
+			Q_strncpy( mods[i].name, gi->title, s );
+
+			mods[i].name[s] = mods[i].name[s+1] = mods[i].name[s+2] = '.';
+			mods[i].name[s+3] = 0;
+		}
+		else Q_strncpy( mods[i].name, gi->title, sizeof( mods[i].name ));
+
+		mods[i].bytes = gi->size;
+		if( gi->size > 0 )
+			Q_strncpy( mods[i].size, Q_memprint( gi->size ), sizeof( mods[i].size ));
 		else Q_strncpy( mods[i].size, "0.0 Mb", sizeof( mods[i].size ));
 	}
 
-	m_iNumItems = numGames;
+	m_iNumItems = i;
 
-	if( numGames )
+	if( i != 0 )
 	{
 		if( m_iSortingColumn != -1 )
 			Sort( m_iSortingColumn, m_bAscend );
@@ -206,20 +220,20 @@ bool CMenuModListModel::Sort(int column, bool ascend)
 	switch( column )
 	{
 		case COLUMN_TYPE:
-			qsort( mods, m_iNumItems, sizeof(mod_t),
+			qsort( mods, m_iNumItems, sizeof( mod_t ),
 				ascend ? mod_t::TypeCmpAscend : mod_t::TypeCmpDescend );
-		return true;
+			return true;
 		case COLUMN_NAME:
-			qsort( mods, m_iNumItems, sizeof(mod_t),
+			qsort( mods, m_iNumItems, sizeof( mod_t ),
 				ascend ? mod_t::NameCmpAscend : mod_t::NameCmpDescend );
-		return true;
-		case COLUMN_VER:
-		return false;
+			return true;
 		case COLUMN_SIZE:
-		return false;
+			qsort( mods, m_iNumItems, sizeof( mod_t ),
+				ascend ? mod_t::SizeCmpAscend : mod_t::SizeCmpDescend );
+			return true;
 	}
 
-    return false;
+	return false;
 }
 
 /*
@@ -260,7 +274,7 @@ void CMenuCustomGame::_Init( void )
 		if( !stricmp( modListModel.mods[i].dir, gMenu.m_gameinfo.gamefolder ) )
 		{
 			modList.SetCurrentIndex( i );
-			if( modList.onChanged ) 
+			if( modList.onChanged )
 				modList.onChanged( &modList );
 			break;
 		}

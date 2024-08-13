@@ -35,12 +35,6 @@ inline bool isrange( T min, T value, T max )
 #define FBitSet( iBitVector, bit )	((iBitVector) & (bit))
 
 // engine constants
-enum
-{
-	GAME_NORMAL = 0,
-	GAME_SINGLEPLAYER_ONLY,
-	GAME_MULTIPLAYER_ONLY
-};
 
 enum
 {

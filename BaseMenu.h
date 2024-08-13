@@ -330,7 +330,7 @@ class CMenu
 {
 public:
 	// Game information
-	GAMEINFO		m_gameinfo;
+	gameinfo2_t m_gameinfo;
 };
 
 typedef struct

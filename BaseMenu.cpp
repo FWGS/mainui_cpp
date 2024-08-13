@@ -1164,7 +1164,11 @@ void UI_Init( void )
 	uiStatic.lowmemory = (int)EngFuncs::GetCvarFloat( "host_lowmemorymode" );
 
 	// setup game info
-	EngFuncs::GetGameInfo( &gMenu.m_gameinfo );
+	gameinfo2_t *gi = EngFuncs::GetGameInfo();
+	if( !gi )
+		Host_Error( "pfnGetGameInfo returned NULL!\n" );
+
+	gMenu.m_gameinfo = *gi;
 
 	uiStatic.renderPicbuttonText = gMenu.m_gameinfo.flags & GFL_RENDER_PICBUTTON_TEXT;
 
