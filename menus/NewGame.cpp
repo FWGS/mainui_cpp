@@ -33,7 +33,7 @@ class CMenuNewGame : public CMenuFramework
 {
 public:
 	CMenuNewGame() : CMenuFramework( "CMenuNewGame" ) { }
-	void StartGame( int skill );
+	void StartGame( uintptr_t skill );
 	void Show() override
 	{
 		if( gMenu.m_gameinfo.flags & GFL_NOSKILLS )
@@ -65,7 +65,7 @@ private:
 CMenuNewGame::StartGame
 =================
 */
-void CMenuNewGame::StartGame( int skill )
+void CMenuNewGame::StartGame( uintptr_t skill )
 {
 	if( EngFuncs::GetCvarFloat( "host_serverstate" ) && EngFuncs::GetCvarFloat( "maxplayers" ) > 1 )
 		EngFuncs::HostEndGame( "end of the game" );
@@ -88,7 +88,7 @@ void CMenuNewGame::StartGameCb( CMenuBaseItem *pSelf, void *pExtra )
 {
 	CMenuNewGame *ui = (CMenuNewGame*)pSelf->Parent();
 
-	ui->StartGame( (int)pExtra );
+	ui->StartGame( (uintptr_t)pExtra );
 }
 
 void CMenuNewGame::ShowDialogCb( CMenuBaseItem *pSelf, void *pExtra )
