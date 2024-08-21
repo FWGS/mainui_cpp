@@ -616,6 +616,10 @@ void CMenuTable::Draw()
 	if( iNumRows > m_pModel->GetRows() )
 		iNumRows = m_pModel->GetRows();
 
+	// HACKHACK: normalize iTopItem
+	// remove when there will be per-pixel scrolling
+	iTopItem = bound( 0, iTopItem, m_pModel->GetRows() - 1 );
+
 	if( UI_CursorInRect( boxPos, boxSize ) )
 	{
 		int newCur = iTopItem + ( uiStatic.cursorY - boxPos.y ) / m_scChSize;
