@@ -281,22 +281,23 @@ void CMenuSpinControl::Setup( CMenuBaseArrayModel *model )
 
 void CMenuSpinControl::SetCurrentValue( float curValue )
 {
+	bool notify = m_flCurValue != curValue;
 	m_flCurValue = curValue;
 	Display();
+
+	if( notify ) _Event( QM_CHANGED );
 }
 
 void CMenuSpinControl::SetCurrentValue( const char *stringValue )
 {
 	ASSERT( m_pModel );
 
-	if ( !m_pModel )
-	{
+	if( !m_pModel )
 		return;
-	}
 
-	int i = 0;
+	float oldValue = m_flCurValue;
 
-	for( ; i <= (int)m_flMaxValue; i++ )
+	for( int i = 0; i <= (int)m_flMaxValue; i++ )
 	{
 		if( !strcmp( m_pModel->GetText( i ), stringValue ) )
 		{
@@ -308,8 +309,10 @@ void CMenuSpinControl::SetCurrentValue( const char *stringValue )
 
 	m_flCurValue = -1;
 	SetCvarString( stringValue );
+	ForceDisplayString( stringValue );
 
-	Q_strncpy( m_szDisplay, stringValue, sizeof( m_szDisplay ));
+	if( oldValue != m_flCurValue )
+		_Event( QM_CHANGED );
 }
 
 void CMenuSpinControl::SetDisplayPrecision( short precision )
