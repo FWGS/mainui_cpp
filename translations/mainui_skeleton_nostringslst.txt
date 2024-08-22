@@ -14,8 +14,6 @@
 "Language" "<YOUR_LANGUAGE_HERE>"
 "Tokens"
 {
-"<Current window size>"                                                   ""
-"<Desktop size>"                                                          ""
 "Activate"                                                                ""
 "Activate selected custom game"                                           ""
 "Add, remove, edit touch buttons"                                         ""
