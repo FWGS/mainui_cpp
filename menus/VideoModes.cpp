@@ -367,7 +367,7 @@ void CMenuVidModes::_Init( void )
 	SET_EVENT_MULTI( windowMode.onChanged,
 	{
 		// disable vid modes list when borderless is used
-		Con_Printf( "hi from %s\n", __PRETTY_FUNCTION__ );
+		Con_Printf( "hi from %s\n", __FUNCTION__ );
 		CMenuVidModes *parent = pSelf->GetParent( CMenuVidModes );
 		parent->vidList.SetGrayed( parent->windowMode.GetCurrentValue( ) == 2 );
 		parent->vidList.SetInactive( parent->windowMode.GetCurrentValue( ) == 2 );
