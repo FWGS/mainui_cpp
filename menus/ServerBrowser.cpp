@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -26,10 +26,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Field.h"
 #include "utlvector.h"
 #include "CheckBox.h"
+#include "DropDown.h"
 
 #define ART_BANNER_INET		"gfx/shell/head_inetgames"
 #define ART_BANNER_LAN		"gfx/shell/head_lan"
 #define ART_BANNER_LOCK		"gfx/shell/lock"
+
+#define MAX_PING 9.999f
+#define FILTER_MAX_MAPS 16
+#define FILTER_ANY_MAP "any map"
 
 class CMenuServerBrowser;
 
@@ -98,6 +103,16 @@ struct server_t
 		return 0;
 	}
 
+	bool IsEmpty( ) const
+	{
+		return numcl == 0;
+	}
+
+	bool IsFull( ) const
+	{
+		return numcl >= maxcl;
+	}
+
 	// make generic
 	// always rank new servers higher, even when sorting in reverse order
 #define GENERATE_COMPAR_FN( method ) \
@@ -118,10 +133,81 @@ struct server_t
 #undef GENERATE_COMPAR_FN
 };
 
+struct filterMap_t
+{
+	char name[64];
+
+	filterMap_t( ): filterMap_t( "" ) {}
+
+	filterMap_t( const filterMap_t &obj )
+	{
+		count = obj.count;
+		Q_strncpy( name, obj.name, sizeof( name ) );
+		Q_strncpy( display, obj.display, sizeof( display ) );
+	}
+
+	filterMap_t( const char *s, unsigned short c = 0 )
+	{
+		count = c;
+		Q_strncpy( name, s, sizeof( name ) );
+		UpdateDisplay( );
+	}
+
+	inline bool operator==( const char *s ) const
+	{
+		return colorstricmp( name, s ) == 0;
+	}
+
+	void AddCount( unsigned short c )
+	{
+		count += c;
+		UpdateDisplay();
+	}
+
+	const char *GetDisplay( ) const
+	{
+		return display;
+	}
+
+	static int CmpName( const filterMap_t *a, const filterMap_t *b )
+	{
+		return colorstricmp( a->name, b->name );
+	}
+
+	static int CmpCount( const filterMap_t *a, const filterMap_t *b )
+	{
+		unsigned short ca = a->count;
+		unsigned short cb = b->count;
+		return ca < cb ? -1 : (ca > cb ? 1 : 0);
+	}
+
+	static int CmpCountInvert( const filterMap_t *a, const filterMap_t *b )
+	{
+		unsigned short ca = a->count;
+		unsigned short cb = b->count;
+		return ca < cb ? 1 : (ca > cb ? -1 : 0);
+	}
+
+private:
+	char display[64];
+	unsigned short count;
+
+	void UpdateDisplay()
+	{
+		snprintf( display, sizeof( display ), "(%d) %s", count, name );
+	}
+};
+
 class CMenuGameListModel : public CMenuBaseModel
 {
 public:
-	CMenuGameListModel( CMenuServerBrowser *parent ) : CMenuBaseModel(), parent( parent ), m_iSortingColumn(-1) {}
+	CMenuGameListModel( CMenuServerBrowser *parent ) :
+		CMenuBaseModel(), parent( parent ), m_iSortingColumn(-1)
+	{
+		filterPing = MAX_PING * 1000.0f;
+		filterEmpty = 0;
+		filterFull = 0;
+	}
 
 	void Update() override;
 
@@ -176,6 +262,7 @@ public:
 
 	void Flush()
 	{
+		filterMaps.RemoveAll();
 		servers.RemoveAll();
 		serversRefreshTime = gpGlobals->time;
 	}
@@ -189,8 +276,19 @@ public:
 
 	bool Sort( int column, bool ascend ) override;
 
+	void SetFilterMap( const char *mapname )
+	{
+		filterMap = filterMap_t( mapname );
+	}
+
 	float serversRefreshTime;
+	float filterPing;
+	char filterEmpty;
+	char filterFull;
 	CUtlVector<server_t> servers;
+
+	filterMap_t filterMap;
+	CUtlVector<filterMap_t> filterMaps;
 private:
 	CMenuServerBrowser *parent;
 
@@ -229,6 +327,11 @@ public:
 	CMenuPicButton *refresh;
 	CMenuPicButton *viewGameInfo;
 	CMenuSwitch natOrDirect;
+
+	CMenuDropDownFloat filterPing;
+	CMenuDropDownInt filterEmpty;
+	CMenuDropDownInt filterFull;
+	CMenuDropDownStr filterMap;
 
 	CMenuYesNoMessageBox msgBox;
 	CMenuTable	gameList;
@@ -308,7 +411,7 @@ void server_t::UpdateData( void )
 
 void server_t::SetPing( float ping )
 {
-	ping = bound( 0.0f, ping, 9.999f );
+	ping = bound( 0.0f, ping, MAX_PING );
 
 	if( isLegacy )
 		ping /= 2;
@@ -399,6 +502,53 @@ void CMenuGameListModel::AddServerToList( netadr_t adr, const char *info )
 	server.UpdateData();
 	server.SetPing( EngFuncs::DoubleTime() - serversRefreshTime );
 
+	if( server.ping > filterPing ) {
+		return;
+	}
+
+	if( filterEmpty == '1' && !server.IsEmpty( ) )
+		return;
+	if( filterEmpty == '0' && server.IsEmpty( ) )
+		return;
+
+	if( filterFull == '1' && !server.IsFull( ) )
+		return;
+	if( filterFull == '0' && server.IsFull( ) )
+		return;
+
+	if( filterMap.name[0] && colorstricmp( filterMap.name, server.mapname ) != 0 )
+		return;
+
+	if( server.mapname[0] != 0 )
+	{
+		bool foundMap = false;
+
+		for( int i = 0; i < filterMaps.Count(); ++i )
+		{
+			if( (foundMap = filterMaps[i] == server.mapname) )
+			{
+				filterMaps[i].AddCount( server.numcl );
+				break;
+			}
+		}
+
+		if( !foundMap )
+		{
+			filterMaps.AddToTail( filterMap_t( server.mapname, server.numcl ) );
+
+			// sort by players count
+			filterMaps.Sort( filterMap_t::CmpCountInvert );
+
+			parent->filterMap.Clear();
+			for( int i = Q_min( FILTER_MAX_MAPS, filterMaps.Count() ); i--; )
+				parent->filterMap.AddItem( filterMaps[i].GetDisplay(), filterMaps[i].name );
+			parent->filterMap.AddItem( FILTER_ANY_MAP, "" );
+
+			if( !filterMap.name[0] )
+				parent->filterMap.SelectLast( false );
+		}
+	}
+
 	servers.AddToTail( server );
 
 	if( m_iSortingColumn != -1 )
@@ -457,6 +607,11 @@ void CMenuServerBrowser::JoinGame()
 
 void CMenuServerBrowser::ClearList()
 {
+	filterMap.Clear();
+	if( gameListModel.filterMap.name[0] )
+		filterMap.AddItem( gameListModel.filterMap.GetDisplay(), gameListModel.filterMap.name );
+	filterMap.AddItem( FILTER_ANY_MAP, "" );
+
 	gameListModel.Flush();
 	joinGame->SetGrayed( true );
 	viewGameInfo->SetGrayed( true );
@@ -474,7 +629,32 @@ void CMenuServerBrowser::RefreshList()
 	{
 		if( uiStatic.realTime > refreshTime2 )
 		{
-			EngFuncs::ClientCmd( FALSE, "internetservers\n" );
+			char filter[128] = "";
+			char *buf = filter;
+			int remaining = sizeof(filter);
+
+			if( filterEmpty.GetItem( ) )
+			{
+				int n = snprintf(buf, remaining, "\\empty\\%c", (char) filterEmpty.GetItem( ) );
+				remaining -= n;
+				buf += n;
+			}
+
+			if( filterFull.GetItem( ) )
+			{
+				int n = snprintf(buf, remaining, "\\full\\%c", (char) filterFull.GetItem( ) );
+				remaining -= n;
+				buf += n;
+			}
+
+			if( filterMap.GetItem( )[0] )
+			{
+				int n = snprintf(buf, remaining, "\\map\\%s", filterMap.GetItem( ) );
+				remaining -= n;
+				buf += n;
+			}
+
+			EngFuncs::ClientCmdF( FALSE, "internetservers %s\n", filter );
 			refreshTime2 = uiStatic.realTime + (EngFuncs::GetCvarFloat("cl_nat") ? 4000:1000);
 			refresh->SetGrayed( true );
 			if( uiStatic.realTime + 20000 < refreshTime )
@@ -623,8 +803,89 @@ void CMenuServerBrowser::_Init( void )
 	askPassword.Init();
 	askPassword.AddItem( password );
 
+	filterPing.AddItem( "500ms", 500.0f );
+	filterPing.AddItem( "200ms", 200.0f );
+	filterPing.AddItem( "100ms", 100.0f );
+	filterPing.AddItem( "50ms", 50.0f );
+	filterPing.AddItem( "20ms", 20.0f );
+	filterPing.AddItem( "ping", MAX_PING * 1000.0f );
+	filterPing.SelectLast( );
+	filterPing.bDropUp = true;
+	filterPing.eTextAlignment = QM_LEFT;
+	filterPing.iSelectColor = uiInputFgColor;
+	filterPing.iFgTextColor = uiInputFgColor - 0x00151515;
+	filterPing.SetCharSize( QM_SMALLFONT );
+	filterPing.SetSize( 70, 30 );
+	SET_EVENT_MULTI( filterPing.onChanged,
+	{
+		CMenuDropDownFloat *self = (CMenuDropDownFloat*)pSelf;
+		CMenuServerBrowser *parent = (CMenuServerBrowser*)self->Parent();
+
+		parent->gameListModel.filterPing = self->GetItem( ) / 1000.0f;
+		parent->RefreshList();
+	});
+
+	filterEmpty.AddItem( "empty", '1' );
+	filterEmpty.AddItem( "not empty", '0' );
+	filterEmpty.AddItem( "any", 0 );
+	filterEmpty.SelectLast( false );
+	filterEmpty.bDropUp = true;
+	filterEmpty.eTextAlignment = QM_LEFT;
+	filterEmpty.iSelectColor = uiInputFgColor;
+	filterEmpty.iFgTextColor = uiInputFgColor - 0x00151515;
+	filterEmpty.SetCharSize( QM_SMALLFONT );
+	filterEmpty.SetSize( 120, 30 );
+	SET_EVENT_MULTI( filterEmpty.onChanged,
+	{
+		CMenuDropDownInt *self = (CMenuDropDownInt*)pSelf;
+		CMenuServerBrowser *parent = (CMenuServerBrowser*)self->Parent();
+
+		parent->gameListModel.filterEmpty = self->GetItem( );
+		parent->RefreshList();
+	});
+
+	filterFull.AddItem( "full", '1' );
+	filterFull.AddItem( "not full", '0' );
+	filterFull.AddItem( "any", 0 );
+	filterFull.SelectLast( false );
+	filterFull.bDropUp = true;
+	filterFull.eTextAlignment = QM_LEFT;
+	filterFull.iSelectColor = uiInputFgColor;
+	filterFull.iFgTextColor = uiInputFgColor - 0x00151515;
+	filterFull.SetCharSize( QM_SMALLFONT );
+	filterFull.SetSize( 120, 30 );
+	SET_EVENT_MULTI( filterFull.onChanged,
+	{
+		CMenuDropDownInt *self = (CMenuDropDownInt*)pSelf;
+		CMenuServerBrowser *parent = (CMenuServerBrowser*)self->Parent();
+
+		parent->gameListModel.filterFull = self->GetItem( );
+		parent->RefreshList();
+	});
+
+	filterMap.AddItem( FILTER_ANY_MAP, "" );
+	filterMap.bDropUp = true;
+	filterMap.eTextAlignment = QM_LEFT;
+	filterMap.iSelectColor = uiInputFgColor;
+	filterMap.iFgTextColor = uiInputFgColor - 0x00151515;
+	filterMap.SetCharSize( QM_SMALLFONT );
+	filterMap.SetSize( 200, 30 );
+	SET_EVENT_MULTI( filterMap.onChanged,
+	{
+		CMenuDropDownStr *self = (CMenuDropDownStr*)pSelf;
+		CMenuServerBrowser *parent = (CMenuServerBrowser*)self->Parent();
+
+		parent->gameListModel.SetFilterMap( self->GetItem( ) );
+		parent->RefreshList();
+	});
+
 	AddItem( gameList );
 	AddItem( natOrDirect );
+
+	AddItem( filterPing );
+	AddItem( filterEmpty );
+	AddItem( filterFull );
+	AddItem( filterMap );
 }
 
 /*
@@ -649,6 +910,22 @@ void CMenuServerBrowser::_VidInit()
 
 	gameList.SetRect( 360, 230, -20, 465 );
 	natOrDirect.SetCoord( -20 - natOrDirect.size.w, gameList.pos.y - UI_OUTLINE_WIDTH - natOrDirect.size.h );
+
+	int x = gameList.pos.x;
+	int y = gameList.pos.y + gameList.size.h + UI_OUTLINE_WIDTH;
+	filterPing.SetCoord( x, y );
+	x += filterPing.size.w + 10;
+	filterEmpty.SetCoord( x, y );
+	x += filterEmpty.size.w + 10;
+	filterFull.SetCoord( x, y );
+	x += filterFull.size.w + 10;
+	filterMap.SetCoord( x, y );
+
+	// force close all menus
+	filterPing.MenuClose( );
+	filterEmpty.MenuClose( );
+	filterFull.MenuClose( );
+	filterMap.MenuClose( );
 
 	refreshTime = uiStatic.realTime + 500; // delay before update 0.5 sec
 	refreshTime2 = uiStatic.realTime + 500;
