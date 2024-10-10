@@ -202,6 +202,7 @@
     <ClCompile Include="..\menus\PlayerSetup.cpp" />
     <ClCompile Include="..\menus\SaveLoad.cpp" />
     <ClCompile Include="..\menus\ServerBrowser.cpp" />
+    <ClCompile Include="..\menus\ServerInfo.cpp" />
     <ClCompile Include="..\menus\Touch.cpp" />
     <ClCompile Include="..\menus\TouchButtons.cpp" />
     <ClCompile Include="..\menus\TouchEdit.cpp" />
