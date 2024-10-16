@@ -111,7 +111,7 @@ private:
 	bool ReadFromCache( const char *filename, charRange_t *range, size_t rangeSize );
 	void SaveToCache( const char *filename, charRange_t *range, size_t rangeSize, CBMP *bmp );
 
-	void GetBlurValueForPixel(float *distribution, byte *src, Point srcPt, Size srcSz, byte *dest);
+	void GetBlurValueForPixel( double *distribution, const byte *src, Point srcPt, Size srcSz, byte *dest );
 
 	struct glyph_t
 	{

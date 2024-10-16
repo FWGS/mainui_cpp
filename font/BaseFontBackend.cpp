@@ -352,11 +352,12 @@ void CBaseFont::ApplyBlur(Size rgbaSz, byte *rgba)
 
 	sigma2 = 0.5 * m_iBlur;
 	sigma2 *= sigma2;
-	float * distribution = new float[m_iBlur * 2 + 1];
+	double *distribution = new double[m_iBlur * 2 + 1];
 	for( int x = 0; x <= m_iBlur * 2; x++ )
 	{
 		int val = x - m_iBlur;
-		distribution[x] = (float)(1.0f / sqrt(2 * 3.14f * sigma2)) * pow(2.7f, -1 * (val * val) / (2 * sigma2));
+
+		distribution[x] = (1.0 / sqrt(2 * 3.14 * sigma2)) * pow(2.7, -1 * (val * val) / (2 * sigma2));
 
 		// brightening factor
 		distribution[x] *= m_fBrighten;
@@ -377,9 +378,9 @@ void CBaseFont::ApplyBlur(Size rgbaSz, byte *rgba)
 	delete[] src;
 }
 
-void CBaseFont::GetBlurValueForPixel(float *distribution, byte *src, Point srcPt, Size srcSz, byte *dest)
+void CBaseFont::GetBlurValueForPixel( double *distribution, const byte *src, Point srcPt, Size srcSz, byte *dest )
 {
-	float accum = 0.0f;
+	double accum = 0.0f;
 
 	// scan the positive x direction
 	int maxX = Q_min( srcPt.x + m_iBlur, srcSz.w );
@@ -390,18 +391,18 @@ void CBaseFont::GetBlurValueForPixel(float *distribution, byte *src, Point srcPt
 		int minY = Q_max( srcPt.y - m_iBlur, 0);
 		for (int y = minY; y < maxY; y++)
 		{
-			byte *srcPos = src + ((x + (y * srcSz.w)) * 4);
+			const byte *srcPos = src + ((x + (y * srcSz.w)) * 4);
 
 			// muliply by the value matrix
-			float weight = distribution[(x - srcPt.x) + m_iBlur];
-			float weight2 = distribution[(y - srcPt.y) + m_iBlur];
+			double weight = distribution[(x - srcPt.x) + m_iBlur];
+			double weight2 = distribution[(y - srcPt.y) + m_iBlur];
 			accum += ( srcPos[3] ) * (weight * weight2);
 		}
 	}
 
 	// all the values are the same for fonts, just use the calculated alpha
 	dest[0] = dest[1] = dest[2] = 255;
-	dest[3] = Q_min( (int)(accum + 0.5f), 255);
+	dest[3] = Q_min( (int)(accum + 0.5), 255);
 }
 
 void CBaseFont::ApplyOutline(Point pt, Size rgbaSz, byte *rgba)
@@ -554,7 +555,8 @@ int CBaseFont::DrawCharacter(int ch, Point pt, int charH, const unsigned int col
 #define CACHED_FONT_IDENT \
 	(('T'<<24)+('F'<<16)+('I'<<8)+'U') // little-endian "UIFT"
 
-#define CACHED_FONT_VERSION 1
+// Version 2. Font blur has been changed, force font regeneration
+#define CACHED_FONT_VERSION 2
 
 struct char_data_t
 {

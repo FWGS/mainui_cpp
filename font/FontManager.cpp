@@ -86,12 +86,12 @@ void CFontManager::VidInit( void )
 
 		if( !uiStatic.lowmemory )
 		{
-			uiStatic.hLightBlur = CFontBuilder( DEFAULT_MENUFONT, UI_MED_CHAR_HEIGHT * scale, 1000 )
-				.SetBlurParams( 2, 1.0f )
+			uiStatic.hLightBlur = CFontBuilder( DEFAULT_MENUFONT, UI_MED_CHAR_HEIGHT * scale, DEFAULT_WEIGHT )
+				.SetBlurParams( 2 * scale, 1.25f )
 				.Create();
 
-			uiStatic.hHeavyBlur = CFontBuilder( DEFAULT_MENUFONT, UI_MED_CHAR_HEIGHT * scale, 1000 )
-				.SetBlurParams( 8, 1.75f )
+			uiStatic.hHeavyBlur = CFontBuilder( DEFAULT_MENUFONT, UI_MED_CHAR_HEIGHT * scale, DEFAULT_WEIGHT )
+				.SetBlurParams( 8 * scale, 2.0f )
 				.Create();
 		}
 

@@ -107,7 +107,7 @@ CMenuPicButton::CMenuPicButton() : BaseClass()
 
 	iFocusStartTime = 0;
 
-	eTextAlignment = QM_TOPLEFT;
+	eTextAlignment = QM_LEFT;
 
 	hPic = 0;
 	hotkey = 0;
@@ -337,45 +337,46 @@ void CMenuPicButton::Draw( )
 	}
 	else if( !uiStatic.lowmemory )
 	{
-		uint textflags = ETF_NOSIZELIMIT | ETF_FORCECOL;
+		const uint heavy_blur_flags = ETF_NOSIZELIMIT | ETF_FORCECOL;
+		const uint light_blur_flags = ETF_NOSIZELIMIT | ETF_FORCECOL | ETF_ADDITIVE;
+		Point pos = m_scPos;
 
-		SetBits( textflags, ETF_ADDITIVE );
+		pos.x += 7 * uiStatic.scaleX;
 
 		if( iFlags & QMF_GRAYED )
 		{
 			if( a > 0 )
 			{
-				UI_DrawString( uiStatic.hHeavyBlur, m_scPos, m_scSize, szName,
-					InterpColor( uiColorBlack, uiColorDkGrey, a / 255.0f ), m_scChSize, eTextAlignment, textflags );
+				UI_DrawString( uiStatic.hHeavyBlur, pos, m_scSize, szName,
+					InterpColor( uiColorBlack, uiColorDkGrey, a / 255.0f ), m_scChSize, eTextAlignment, heavy_blur_flags );
 			}
-			UI_DrawString( uiStatic.hLightBlur, m_scPos, m_scSize, szName, uiColorDkGrey, m_scChSize, eTextAlignment, textflags );
+			UI_DrawString( uiStatic.hLightBlur, pos, m_scSize, szName, uiColorDkGrey, m_scChSize, eTextAlignment, light_blur_flags );
 		} else if( this != m_pParent->ItemAtCursor() )
 		{
 			if( a > 0 )
 			{
-				UI_DrawString( uiStatic.hHeavyBlur, m_scPos, m_scSize, szName,
-					InterpColor( uiColorBlack, colorBase, a / 255.0f ), m_scChSize, eTextAlignment, textflags );
+				UI_DrawString( uiStatic.hHeavyBlur, pos, m_scSize, szName,
+					InterpColor( uiColorBlack, colorBase, a / 255.0f ), m_scChSize, eTextAlignment, heavy_blur_flags );
 			}
-			UI_DrawString( uiStatic.hLightBlur, m_scPos, m_scSize, szName, colorBase, m_scChSize, eTextAlignment, textflags );
+			UI_DrawString( uiStatic.hLightBlur, pos, m_scSize, szName, colorBase, m_scChSize, eTextAlignment, light_blur_flags );
 		}
 		else if( m_bPressed )
 		{
-			UI_DrawString( uiStatic.hHeavyBlur, m_scPos, m_scSize, szName, colorBase, m_scChSize, eTextAlignment, textflags );
-			ClearBits( textflags, ETF_ADDITIVE );
-			UI_DrawString( uiStatic.hLightBlur, m_scPos, m_scSize, szName, 0xFF000000, m_scChSize, eTextAlignment, textflags );
+			UI_DrawString( uiStatic.hHeavyBlur, pos, m_scSize, szName, colorBase, m_scChSize, eTextAlignment, heavy_blur_flags );
+			UI_DrawString( uiStatic.hLightBlur, pos, m_scSize, szName, 0xFF000000, m_scChSize, eTextAlignment, light_blur_flags & ( ~ETF_ADDITIVE ));
 		}
 		else if( eFocusAnimation == QM_HIGHLIGHTIFFOCUS )
 		{
-			UI_DrawString( uiStatic.hHeavyBlur, m_scPos, m_scSize, szName, colorBase, m_scChSize, eTextAlignment, textflags );
-			UI_DrawString( uiStatic.hLightBlur, m_scPos, m_scSize, szName, colorBase, m_scChSize, eTextAlignment, textflags );
+			UI_DrawString( uiStatic.hHeavyBlur, pos, m_scSize, szName, colorBase, m_scChSize, eTextAlignment, heavy_blur_flags );
+			UI_DrawString( uiStatic.hLightBlur, pos, m_scSize, szName, colorBase, m_scChSize, eTextAlignment, light_blur_flags );
 		}
 		else if( eFocusAnimation == QM_PULSEIFFOCUS )
 		{
 			float pulsar = 0.5f + 0.5f * sin( (float)uiStatic.realTime / UI_PULSE_DIVISOR );
 
-			UI_DrawString( uiStatic.hHeavyBlur, m_scPos, m_scSize, szName,
-				InterpColor( uiColorBlack, colorBase, pulsar ), m_scChSize, eTextAlignment, textflags );
-			UI_DrawString( uiStatic.hLightBlur, m_scPos, m_scSize, szName, colorBase, m_scChSize, eTextAlignment, textflags );
+			UI_DrawString( uiStatic.hHeavyBlur, pos, m_scSize, szName,
+				InterpColor( uiColorBlack, colorBase, pulsar ), m_scChSize, eTextAlignment, heavy_blur_flags );
+			UI_DrawString( uiStatic.hLightBlur, pos, m_scSize, szName, colorBase, m_scChSize, eTextAlignment, light_blur_flags );
 		}
 	}
 	else
