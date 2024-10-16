@@ -560,9 +560,9 @@ public:
 
 // built-in memory manager
 // NOTE: not recommeded to use, because object destruction may be after engine halts
-#define MALLOC( x )		EngFuncs::MemAlloc( x, __FILE__, __LINE__ )
-#define CALLOC( x, y )	EngFuncs::MemAlloc((x) * (y), __FILE__, __LINE__ )
-#define FREE( x )		EngFuncs::MemFree( x, __FILE__, __LINE__ )
+#define Mem_Malloc( x )		EngFuncs::MemAlloc( x, __FILE__, __LINE__ )
+#define Mem_Calloc( x, y )	EngFuncs::MemAlloc((x) * (y), __FILE__, __LINE__ ) // guaranteed to be zeroed by engine
+#define Mem_Free( x )		EngFuncs::MemFree( x, __FILE__, __LINE__ )
 
 #define CL_IsActive()	(EngFuncs::ClientInGame() && !EngFuncs::GetCvarFloat( "cl_background" ))
 #define Host_Error (*EngFuncs::engfuncs.pfnHostError)

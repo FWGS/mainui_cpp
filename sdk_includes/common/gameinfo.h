@@ -61,7 +61,6 @@ presense for extra fields.
 ========================================================================
 */
 
-// update gameinfo version on each struct gameinfo2_t
 #define GAMEINFO_VERSION 2
 
 typedef enum gametype_e
