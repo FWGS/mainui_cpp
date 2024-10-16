@@ -32,8 +32,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define ART_BANNER		"gfx/shell/head_customize"
 
-#define MAX_PLAYERMODELS	100
-
 static const byte Orange[] = { 255, 120,  24 };
 static const byte Yellow[] = { 225, 180,  24 };
 static const byte Blue[]   = {   0,  60, 255 };
@@ -143,14 +141,10 @@ public:
 	void WriteNewLogo();
 	void SaveAndPopMenu() override;
 
-	class CModelListModel : public CStringArrayModel
+	class CModelListModel : public CStringVectorModel
 	{
 	public:
-		CModelListModel() : CStringArrayModel( (const char *)models, CS_SIZE, 0 ) {}
 		void Update();
-
-	private:
-		char models[MAX_PLAYERMODELS][CS_SIZE];
 	} modelsModel;
 
 	class CLogosListModel : public CStringVectorModel
@@ -262,11 +256,10 @@ UI_PlayerSetup_FindModels
 */
 void CMenuPlayerSetup::CModelListModel::Update( void )
 {
-	char	name[256];
 	char	**filenames;
 	int numFiles, i;
 
-	m_iCount = 0;
+	RemoveAll();
 
 	// Get file list
 	// search in basedir too, because that's how GoldSrc does this
@@ -275,15 +268,15 @@ void CMenuPlayerSetup::CModelListModel::Update( void )
 	// build the model list
 	for( i = 0; i < numFiles; i++ )
 	{
+		char name[128], path[512];
 		COM_FileBase( filenames[i], name, sizeof( name ));
-		Q_strncpy( models[m_iCount], name, sizeof( models[0] ) );
 
 		// check if the path is a valid model
-		snprintf( name, sizeof( name ), "models/player/%s/%s.mdl", models[m_iCount], models[m_iCount] );
-		if( !EngFuncs::FileExists( name ) )
+		snprintf( path, sizeof( path ), "models/player/%s/%s.mdl", name, name );
+		if( !EngFuncs::FileExists( path ))
 			continue;
 
-		m_iCount++;
+		AddToTail( name );
 	}
 }
 
@@ -298,15 +291,11 @@ void CMenuPlayerSetup::CLogosListModel::Update( )
 	char	**filenames;
 	int numFiles, i;
 
+	m_isPngs.RemoveAll();
+	RemoveAll();
+
 	// Get file list
 	filenames = EngFuncs::GetFilesList( "logos/*.*", &numFiles, FALSE );
-
-	if( !filenames || !numFiles )
-	{
-		m_isPngs.RemoveAll();
-		RemoveAll();
-		return;
-	}
 
 	// build the model list
 	for( i = 0; i < numFiles; i++ )
@@ -547,14 +536,14 @@ void CMenuPlayerSetup::_Init( void )
 
 	showModels.iFlags |= addFlags;
 	showModels.SetNameAndStatus( L( "Show 3D preview" ), L( "Show 3D player models instead of preview thumbnails" ) );
-	showModels.LinkCvar( "ui_showmodels" );
 	showModels.onCvarChange = CMenuEditable::WriteCvarCb;
+	showModels.LinkCvar( "ui_showmodels" );
 	showModels.SetCoord( 340, 380 );
 
 	hiModels.iFlags |= addFlags;
 	hiModels.SetNameAndStatus( L( "GameUI_HighModels" ), L( "Show HD models in multiplayer" ) );
-	hiModels.LinkCvar( "cl_himodels" );
 	hiModels.onCvarChange = CMenuEditable::WriteCvarCb;
+	hiModels.LinkCvar( "cl_himodels" );
 	hiModels.SetCoord( 340, 430 );
 
 	view.iFlags |= addFlags;
