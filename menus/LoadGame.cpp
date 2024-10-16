@@ -31,12 +31,23 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define LEVELSHOT_X		72
 #define LEVELSHOT_Y		400
-#define LEVELSHOT_W		192
+#define LEVELSHOT_W		260
 #define LEVELSHOT_H		160
 
 #define MAX_CELLSTRING CS_SIZE
 
 class CMenuLoadGame;
+
+struct save_t
+{
+	char name[CS_SIZE];
+
+private:
+	friend class CMenuSavesListModel;
+	char date[CS_SIZE];
+	char comment[256];
+	char elapsed_time[CS_SIZE];
+};
 
 class CMenuSavePreview : public CMenuBaseItem
 {
@@ -48,10 +59,32 @@ public:
 
 	void Draw() override;
 
+	void SetSaveName( const char *name )
+	{
+		if( name == nullptr )
+			saveshot.ForceUnload();
+		else
+		{
+			char path[128];
+			snprintf( path, sizeof( path ), "save/%s.bmp", name );
+			saveshot.Load( path );
+
+			if( saveshot.IsValid( ))
+			{
+				double w = EngFuncs::PIC_Width( saveshot.Handle( ));
+				double h = EngFuncs::PIC_Height( saveshot.Handle( ));
+
+				size.h = round( size.w / ( w / h ));
+				CalcSizes();
+			}
+		}
+	}
+
 	CImage fallback;
+	CImage saveshot;
 };
 
-class CMenuSavesListModel : public CMenuBaseModel
+class CMenuSavesListModel : public CMenuBaseModel, public CUtlVector<save_t>
 {
 public:
 	CMenuSavesListModel( CMenuLoadGame *parent ) : parent( parent ) { }
@@ -64,36 +97,27 @@ public:
 	}
 	int GetRows() const override
 	{
-		return m_iNumItems;
+		return Count();
 	}
 	const char *GetCellText( int line, int column ) override
 	{
 		switch( column )
 		{
-		case 0: return date[line];
-		case 1: return save_comment[line];
-		case 2: return elapsed_time[line];
+		case 0: return Element( line ).date;
+		case 1: return Element( line ).comment;
+		case 2: return Element( line ).elapsed_time;
 		}
 		ASSERT( 0 );
 		return NULL;
 	}
 	unsigned int GetAlignmentForColumn(int column) const override
 	{
-		if( column == 2 )
-			return QM_RIGHT;
-		return QM_LEFT;
+		return column == 2 ? QM_RIGHT : QM_LEFT;
 	}
+
 	void OnDeleteEntry( int line ) override;
-
-	char		saveName[UI_MAXGAMES][CS_SIZE];
-	char		delName[UI_MAXGAMES][CS_SIZE];
-
 private:
 	CMenuLoadGame *parent;
-	char           date[UI_MAXGAMES][CS_SIZE];
-	char           save_comment[UI_MAXGAMES][256];
-	char           elapsed_time[UI_MAXGAMES][CS_SIZE];
-	int            m_iNumItems;
 };
 
 class CMenuLoadGame : public CMenuFramework
@@ -134,18 +158,8 @@ private:
 
 void CMenuSavePreview::Draw()
 {
-	if( szName && *szName )
-	{
-		char saveshot[128];
-
-		snprintf( saveshot, sizeof( saveshot ),
-				  "save/%s.bmp", szName );
-
-		if( EngFuncs::FileExists( saveshot ))
-			UI_DrawPic( m_scPos, m_scSize, uiColorWhite, saveshot );
-		else
-			UI_DrawPic( m_scPos, m_scSize, uiColorWhite, fallback, QM_DRAWADDITIVE );
-	}
+	if( saveshot.IsValid( ))
+		UI_DrawPic( m_scPos, m_scSize, uiColorWhite, saveshot );
 	else
 		UI_DrawPic( m_scPos, m_scSize, uiColorWhite, fallback, QM_DRAWADDITIVE );
 
@@ -160,55 +174,56 @@ CMenuSavesListModel::Update
 */
 void CMenuSavesListModel::Update( void )
 {
-	char	comment[256];
-	char	**filenames;
-	int	i = 0, j, numFiles;
+	char **filenames;
+	int numFiles;
 
+	RemoveAll();
 	filenames = EngFuncs::GetFilesList( "save/*.sav", &numFiles, TRUE );
 
 	// sort the saves in reverse order (oldest past at the end)
-	qsort( filenames, numFiles, sizeof( char* ), (cmpfunc)COM_CompareSaves );
+	qsort( filenames, numFiles, sizeof( *filenames ), (cmpfunc)COM_CompareSaves );
 
-	if( parent->IsSaveMode() && CL_IsActive() )
+	if( parent->IsSaveMode( ) && CL_IsActive( ))
 	{
 		// create new entry for current save game
-		Q_strncpy( saveName[i], "new", sizeof( saveName[i] )); // special name, handled in SV_Save_f
-		Q_strncpy( delName[i], "", sizeof( delName[i] ));
-		Q_strncpy( date[i], L( "GameUI_SaveGame_Current" ), sizeof( date[i] ));
-		Q_strncpy( save_comment[i], L( "GameUI_SaveGame_NewSavedGame" ), sizeof( save_comment[i] ));
-		Q_strncpy( elapsed_time[i], L( "GameUI_SaveGame_New" ), sizeof( elapsed_time[i] ));
-		i++;
+		save_t save;
+		Q_strncpy( save.name, "new", sizeof( save.name )); // special name, handled in SV_Save_f
+		Q_strncpy( save.date, L( "GameUI_SaveGame_Current" ), sizeof( save.date ));
+		Q_strncpy( save.comment, L( "GameUI_SaveGame_NewSavedGame" ), sizeof( save.comment ));
+		Q_strncpy( save.elapsed_time, L( "GameUI_SaveGame_New" ), sizeof( save.elapsed_time ));
+
+		AddToTail( save );
 	}
 
-	for ( j = 0; j < numFiles; i++, j++ )
+	for( int i = 0; i < numFiles; i++ )
 	{
-		if( i >= UI_MAXGAMES ) break;
+		save_t save;
+		char comment[256];
 
-		if( !EngFuncs::GetSaveComment( filenames[j], comment ))
+		// strip path, leave only filename (empty slots doesn't have savename)
+		COM_FileBase( filenames[i], save.name, sizeof( save.name ));
+
+		if( !EngFuncs::GetSaveComment( filenames[i], comment ))
 		{
 			if( comment[0] )
 			{
 				// get name string even if not found - SV_GetComment can be mark saves
 				// as <CORRUPTED> <OLD VERSION> etc
-				Q_strncpy( date[i], comment, sizeof( date[i] ));
-				save_comment[i][0] = 0;
-				elapsed_time[i][0] = 0;
-				COM_FileBase( filenames[j], saveName[i], sizeof( saveName[i] ));
-				COM_FileBase( filenames[j], delName[i], sizeof( delName[i] ));
+				Q_strncpy( save.date, comment, sizeof( save.date ));
+				save.elapsed_time[0] = 0;
+				save.comment[0] = 0;
+
+				AddToTail( save );
 			}
 			continue;
 		}
 
-		// strip path, leave only filename (empty slots doesn't have savename)
-		COM_FileBase( filenames[j], saveName[i], sizeof( saveName[i] ));
-		COM_FileBase( filenames[j], delName[i], sizeof( delName[i] ));
-
 		// they are defined by comment string format
 		// time and date
-		snprintf( date[i], sizeof( date[i] ), "%s %s", comment + CS_SIZE, comment + CS_SIZE + CS_TIME );
+		snprintf( save.date, sizeof( save.date ), "%s %s", comment + CS_SIZE, comment + CS_SIZE + CS_TIME );
 
 		// ingame time
-		Q_strncpy( elapsed_time[i], comment + CS_SIZE + CS_TIME * 2, sizeof( elapsed_time[i] ));
+		Q_strncpy( save.elapsed_time, comment + CS_SIZE + CS_TIME * 2, sizeof( save.elapsed_time ));
 
 		char *title, *type, *p;
 		type = p = nullptr;
@@ -238,8 +253,8 @@ void CMenuSavesListModel::Update( void )
 			Q_strncpy( s, title, sizeof( s ));
 
 			if( type )
-				snprintf( save_comment[i], sizeof( save_comment[i] ), "[%s]%s", type, L( s ));
-			else Q_strncpy( save_comment[i], L( s ), sizeof( save_comment[i] ));
+				snprintf( save.comment, sizeof( save.comment ), "[%s]%s", type, L( s ));
+			else Q_strncpy( save.comment, L( s ), sizeof( save.comment ));
 		}
 		else
 		{
@@ -252,32 +267,27 @@ void CMenuSavesListModel::Update( void )
 				title[len] = '\0';
 			}
 
-			Q_strncpy( save_comment[i], comment, sizeof( save_comment[i] ));
+			Q_strncpy( save.comment, comment, sizeof( save.comment ));
 		}
+
+		AddToTail( save );
 	}
 
-	m_iNumItems = i;
-
-	if ( saveName[0][0] == 0 )
+	if( !parent->IsSaveMode( ))
 	{
-		parent->load.SetGrayed( true );
+		parent->levelShot.SetSaveName( IsValidIndex( 0 ) ? Element( 0 ).name : nullptr );
+		parent->load.SetGrayed( !IsValidIndex( 0 ) );
 	}
 	else
 	{
-		parent->levelShot.szName = saveName[0];
-		parent->load.SetGrayed( false );
+		parent->levelShot.SetSaveName( nullptr );
+		parent->save.SetGrayed( !IsValidIndex( 0 ) || !CL_IsActive( ));
 	}
 
-	if ( saveName[0][0] == 0 || !CL_IsActive() )
-		parent->save.SetGrayed( true );
-	else parent->save.SetGrayed( false );
-
-	if ( delName[0][0] == 0 )
-		parent->remove.SetGrayed( true );
-	else parent->remove.SetGrayed( false );
+	parent->remove.SetGrayed( !IsValidIndex( 0 ));
 }
 
-void CMenuSavesListModel::OnDeleteEntry(int line)
+void CMenuSavesListModel::OnDeleteEntry( int line )
 {
 	parent->msgBox.Show();
 }
@@ -311,7 +321,6 @@ void CMenuLoadGame::_Init( void )
 
 	savesList.szName = hintText;
 	savesList.onChanged = VoidCb( &CMenuLoadGame::UpdateGame );
-	// savesList.onDeleteEntry = msgBox.MakeOpenEvent();
 	savesList.SetupColumn( 0, L( "GameUI_Time" ), 0.30f );
 	savesList.SetupColumn( 1, L( "GameUI_Game" ), 0.55f );
 	savesList.SetupColumn( 2, L( "GameUI_ElapsedTime" ), 0.15f );
@@ -337,71 +346,67 @@ void CMenuLoadGame::_Init( void )
 
 void CMenuLoadGame::LoadGame()
 {
-	const char *saveName = savesListModel.saveName[savesList.GetCurrentIndex()];
-	if( saveName[0] )
-	{
-		char	cmd[128];
-		snprintf( cmd, sizeof( cmd ), "load \"%s\"\n", saveName );
+	if( !savesListModel.IsValidIndex( savesList.GetCurrentIndex( )))
+		return;
 
-		EngFuncs::StopBackgroundTrack( );
+	char cmd[128];
+	const char *name = savesListModel[savesList.GetCurrentIndex( )].name;
 
-		EngFuncs::ClientCmd( FALSE, cmd );
-
-		UI_CloseMenu();
-	}
+	snprintf( cmd, sizeof( cmd ), "load \"%s\"\n", name );
+	EngFuncs::StopBackgroundTrack( );
+	EngFuncs::ClientCmd( FALSE, cmd );
+	UI_CloseMenu();
 }
 
 void CMenuLoadGame::SaveGame()
 {
-	const char *saveName = savesListModel.saveName[savesList.GetCurrentIndex()];
-	if( saveName[0] )
-	{
-		char	cmd[128];
+	if( !savesListModel.IsValidIndex( savesList.GetCurrentIndex( )))
+		return;
 
-		snprintf( cmd, sizeof( cmd ), "save/%s.bmp", saveName );
-		EngFuncs::PIC_Free( cmd );
+	char cmd[128];
+	const char *name = savesListModel[savesList.GetCurrentIndex( )].name;
 
-		snprintf( cmd, sizeof( cmd ), "save \"%s\"\n", saveName );
-		EngFuncs::ClientCmd( FALSE, cmd );
+	snprintf( cmd, sizeof( cmd ), "save/%s.bmp", name );
+	EngFuncs::PIC_Free( cmd );
 
-		UI_CloseMenu();
-	}
+	snprintf( cmd, sizeof( cmd ), "save \"%s\"\n", name );
+	EngFuncs::ClientCmd( FALSE, cmd );
+	UI_CloseMenu();
 }
 
 void CMenuLoadGame::UpdateGame()
 {
 	// first item is for creating new saves
-	if( IsSaveMode() && savesList.GetCurrentIndex() == 0 )
+	if(( IsSaveMode() && savesList.GetCurrentIndex() == 0 ) || !savesListModel.IsValidIndex( savesList.GetCurrentIndex( )))
 	{
 		remove.SetGrayed( true );
-		levelShot.szName = NULL;
+		levelShot.SetSaveName( nullptr );
 	}
 	else
 	{
 		remove.SetGrayed( false );
-		levelShot.szName = savesListModel.saveName[savesList.GetCurrentIndex()];
+		levelShot.SetSaveName( savesListModel[savesList.GetCurrentIndex( )].name );
 	}
 }
 
 void CMenuLoadGame::DeleteGame()
 {
-	const char *delName = savesListModel.delName[savesList.GetCurrentIndex()];
+	if( !savesListModel.IsValidIndex( savesList.GetCurrentIndex( )))
+		return;
 
-	if( delName[0] )
-	{
-		char	cmd[128];
-		snprintf( cmd, sizeof( cmd ), "killsave \"%s\"\n", delName );
+	char cmd[128];
+	const char *name = savesListModel[savesList.GetCurrentIndex( )].name;
 
-		EngFuncs::ClientCmd( TRUE, cmd );
+	snprintf( cmd, sizeof( cmd ), "killsave \"%s\"\n", name );
+	EngFuncs::ClientCmd( TRUE, cmd );
 
-		snprintf( cmd, sizeof( cmd ), "save/%s.bmp", delName );
-		EngFuncs::PIC_Free( cmd );
+	snprintf( cmd, sizeof( cmd ), "save/%s.bmp", name );
+	EngFuncs::PIC_Free( cmd );
 
-		savesListModel.Update();
-	}
+	savesListModel.Update();
 }
 
-void CMenuLoadGame::SetSaveMode(bool saveMode)
+void CMenuLoadGame::SetSaveMode( bool saveMode )
 {
 	m_fSaveMode = saveMode;
 	if( saveMode )
