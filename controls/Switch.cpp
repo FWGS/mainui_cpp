@@ -37,17 +37,16 @@ CMenuSwitch::CMenuSwitch( ) : BaseClass( )
 	iFlags |= QMF_DROPSHADOW;
 
 	m_iState = 0;
-	m_iSwitches = 0;
-	memset( m_szNames, 0, sizeof( m_szNames ));
-	memset( m_Sizes, 0, sizeof( m_Sizes ));
-	memset( m_Points, 0, sizeof( m_Points ));
+	m_switches.RemoveAll();
 
 	bChangeOnPressed = false;
 }
 
 void CMenuSwitch::AddSwitch(const char *text)
 {
-	m_szNames[m_iSwitches++] = text;
+	switch_t sw;
+	sw.name = text;
+	m_switches.AddToTail( sw );
 }
 
 int CMenuSwitch::IsNewStateByMouseClick()
@@ -58,14 +57,14 @@ int CMenuSwitch::IsNewStateByMouseClick()
 	{
 		state++;
 
-		if( state >= m_iSwitches )
+		if( state >= m_switches.Count() )
 			state = 0;
 	}
 	else
 	{
-		for( int i = 0; i < m_iSwitches; i++ )
+		for( int i = 0; i < m_switches.Count(); i++ )
 		{
-			if( ( UI_CursorInRect( m_Points[i], m_Sizes[i] ) && m_iState != i))
+			if( UI_CursorInRect( m_switches[i].pt, m_switches[i].sz ) && m_iState != i )
 			{
 				state = i;
 			}
@@ -84,33 +83,35 @@ void CMenuSwitch::VidInit()
 
 	BaseClass::VidInit();
 
-	int sizes[UI_MAX_MENUITEMS];
+	CUtlVector<int> sizes;
 	int sum = 0;
 	int i;
 
-	for( i = 0; i < m_iSwitches; i++ )
+	sizes.EnsureCount( m_switches.Count( ));
+
+	for( i = 0; i < m_switches.Count( ); i++ )
 	{
-		if( m_szNames[i] != NULL && !bKeepToggleWidth )
-			sizes[i] = g_FontMgr->GetTextWideScaled( font, m_szNames[i], m_scChSize );
-		else sizes[i] = (float)m_scSize.w / (float)m_iSwitches;
+		if( m_switches[i].name != NULL && !bKeepToggleWidth )
+			sizes[i] = g_FontMgr->GetTextWideScaled( font, m_switches[i].name, m_scChSize );
+		else sizes[i] = (float)m_scSize.w / (float)m_switches.Count( );
 
 		sum += sizes[i];
 	}
 
-	for( i = 0; i < m_iSwitches; i++ )
+	for( i = 0; i < m_switches.Count( ); i++ )
 	{
 		float frac = (float)sizes[i] / (float)sum;
 
-		m_Sizes[i].w = m_scSize.w * frac;
-		m_Sizes[i].h = m_scSize.h;
+		m_switches[i].sz.w = m_scSize.w * frac;
+		m_switches[i].sz.h = m_scSize.h;
 
-		m_Points[i] = m_scPos;
+		m_switches[i].pt = m_scPos;
 
 		if( i != 0 )
-			m_Points[i].x = m_Points[i-1].x + m_Sizes[i-1].w;
+			m_switches[i].pt.x = m_switches[i-1].pt.x + m_switches[i-1].sz.w;
 	}
 
-	m_scTextPos.x = m_scPos.x + (m_scSize.w * 1.5f );
+	m_scTextPos.x = m_scPos.x + ( m_scSize.w * 1.5f );
 	m_scTextPos.y = m_scPos.y;
 
 	m_scTextSize.w = g_FontMgr->GetTextWideScaled( font, szName, m_scChSize );
@@ -205,9 +206,9 @@ void CMenuSwitch::Draw( void )
 		selectColor = uiColorDkGrey;
 	}
 
-	for( int i = 0; i < m_iSwitches; i++ )
+	for( int i = 0; i < m_switches.Count(); i++ )
 	{
-		Point pt = m_Points[i];
+		Point pt = m_switches[i].pt;
 
 		pt.x += fTextOffsetX * uiStatic.scaleX;
 		pt.y += fTextOffsetY * uiStatic.scaleY;
@@ -218,8 +219,8 @@ void CMenuSwitch::Draw( void )
 			uint tempflags = textflags;
 			tempflags |= ETF_FORCECOL;
 
-			UI_FillRect( m_Points[i], m_Sizes[i], selectColor );
-			UI_DrawString( font, pt, m_Sizes[i], m_szNames[i], iFgTextColor, m_scChSize, eTextAlignment, tempflags);
+			UI_FillRect( m_switches[i].pt, m_switches[i].sz, selectColor );
+			UI_DrawString( font, pt, m_switches[i].sz, m_switches[i].name, iFgTextColor, m_scChSize, eTextAlignment, tempflags );
 		}
 		else
 		{
@@ -227,14 +228,14 @@ void CMenuSwitch::Draw( void )
 			uint textColor = iBgTextColor;
 			uint tempflags = textflags;
 
-			if( UI_CursorInRect( m_Points[i], m_Sizes[i] ) && !(iFlags & (QMF_GRAYED|QMF_INACTIVE)))
+			if( UI_CursorInRect( m_switches[i].pt, m_switches[i].sz ) && !(iFlags & (QMF_GRAYED|QMF_INACTIVE)))
 			{
 				bgColor = colorFocus;
 				tempflags |= ETF_FORCECOL;
 			}
 
-			UI_FillRect( m_Points[i], m_Sizes[i], bgColor );
-			UI_DrawString( font, pt, m_Sizes[i], m_szNames[i],
+			UI_FillRect( m_switches[i].pt, m_switches[i].sz, bgColor );
+			UI_DrawString( font, pt, m_switches[i].sz, m_switches[i].name,
 				textColor, m_scChSize, eTextAlignment, tempflags );
 		}
 	}
