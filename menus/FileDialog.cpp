@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Bitmap.h"
 #include "Action.h"
 #include "Table.h"
-#include "StringArrayModel.h"
+#include "StringVectorModel.h"
 #include "PicButton.h"
 
 #define ART_BANNER	  	"gfx/shell/head_touchoptions"
@@ -43,14 +43,11 @@ private:
 	void ApplyChanges( const char *fileName );
 	void UpdateExtra();
 
-	class CFileListModel : public CStringArrayModel
+	class CFileListModel : public CStringVectorModel
 	{
 	public:
-		CFileListModel() : CStringArrayModel( (const char*)filePath, 95, UI_MAXGAMES ) {}
+		CFileListModel() : CStringVectorModel() {}
 		void Update() override;
-
-	private:
-		char		filePath[UI_MAXGAMES][95];
 	} model;
 
 	CMenuTable fileList;
@@ -81,13 +78,9 @@ void CMenuFileDialog::CFileListModel::Update( void )
 	{
 		filenames = EngFuncs::GetFilesList( uiFileDialogGlobal.patterns[k], &numFiles, TRUE );
 		for ( j = 0; j < numFiles; i++, j++ )
-		{
-			if( i >= UI_MAXGAMES ) break;
-			Q_strncpy( filePath[i],filenames[j], sizeof( filePath[0] ) );
-		}
+			AddToTail( filenames[j] );
 	}
 
-	m_iCount = i;
 }
 
 void CMenuFileDialog::ApplyChanges(const char *fileName)
