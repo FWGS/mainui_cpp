@@ -572,16 +572,16 @@ bool UI_StartBackGroundMap( void )
 	first = FALSE;
 
 	// some map is already running
-	if( !uiStatic.bgmapcount || CL_IsActive() || gpGlobals->demoplayback )
+	if( uiStatic.bgmaps.IsEmpty() || CL_IsActive() || gpGlobals->demoplayback )
 		return FALSE;
 
-	int bgmapid = EngFuncs::RandomLong( 0, uiStatic.bgmapcount - 1 );
+	int bgmapid = EngFuncs::RandomLong( 0, uiStatic.bgmaps.Count() - 1 );
 
 	char cmd[128];
-	snprintf( cmd, sizeof( cmd ), "maps/%s.bsp", uiStatic.bgmaps[bgmapid] );
+	snprintf( cmd, sizeof( cmd ), "maps/%s.bsp", uiStatic.bgmaps[bgmapid].Get( ));
 	if( !EngFuncs::FileExists( cmd, TRUE )) return FALSE;
 
-	snprintf( cmd, sizeof( cmd ), "map_background %s\n", uiStatic.bgmaps[bgmapid] );
+	snprintf( cmd, sizeof( cmd ), "map_background %s\n", uiStatic.bgmaps[bgmapid].Get( ));
 	EngFuncs::ClientCmd( FALSE, cmd );
 
 	return TRUE;
@@ -962,8 +962,6 @@ static void UI_LoadBackgroundMapList( void )
 	char *pfile = afile;
 	char token[1024];
 
-	uiStatic.bgmapcount = 0;
-
 	if( !afile )
 	{
 		Con_Printf( "UI_LoadBackgroundMapList: chapterbackgrounds.txt not found\n" );
@@ -975,9 +973,7 @@ static void UI_LoadBackgroundMapList( void )
 		// skip the numbers (old format list)
 		if( isdigit( token[0] )) continue;
 
-		Q_strncpy( uiStatic.bgmaps[uiStatic.bgmapcount], token, sizeof( uiStatic.bgmaps[0] ));
-		if( ++uiStatic.bgmapcount > UI_MAX_BGMAPS )
-			break; // list is full
+		uiStatic.bgmaps.AddToTail( token );
 	}
 
 	EngFuncs::COM_FreeFile( afile );

@@ -89,8 +89,7 @@ typedef struct
 	CMenuBackgroundBitmap *background;
 	CWindowStack menu;
 	CWindowStack client; // separate window stack for client windows
-	char	bgmaps[UI_MAX_BGMAPS][80];
-	int		bgmapcount;
+	CUtlVector<CUtlString> bgmaps;
 
 	HIMAGE	hFont;		// legacy qfont
 
