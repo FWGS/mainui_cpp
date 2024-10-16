@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "SpinControl.h"
 #include "Field.h"
 #include "YesNoMessageBox.h"
-#include "StringArrayModel.h"
+#include "StringVectorModel.h"
 
 #define ART_BANNER	  	"gfx/shell/head_touch_options"
 
@@ -52,12 +52,11 @@ public:
 	void Apply();
 	void Save();
 
-	class CProfiliesListModel : public CStringArrayModel
+	class CProfiliesListModel : public CStringVectorModel
 	{
 	public:
-		CProfiliesListModel() : CStringArrayModel( (const char*)profileDesc, 95, 0 ) {}
+		CProfiliesListModel() : CStringVectorModel() {}
 		void Update();
-		char profileDesc[UI_MAXGAMES][95];
 		int	 iHighlight;
 		int	 firstProfile;
 	} model;
@@ -90,48 +89,40 @@ public:
 
 void CMenuTouchOptions::CProfiliesListModel::Update( void )
 {
-	char	**filenames;
-	int	i = 0, numFiles, j = 0;
+	char **filenames;
+	int numFiles;
 	const char *curprofile;
 
-	Q_strncpy( profileDesc[i], L( "Presets:" ), sizeof( profileDesc[i] ));
-	i++;
-
 	filenames = EngFuncs::GetFilesList( "touch_presets/*.cfg", &numFiles, TRUE );
-	for ( ; j < numFiles; i++, j++ )
+
+	if( filenames && numFiles > 0 )
 	{
-		if( i >= UI_MAXGAMES ) break;
+		AddToTail( L( "Presets:" ));
 
-		// strip path, leave only filename (empty slots doesn't have savename)
-		COM_FileBase( filenames[j], profileDesc[i], sizeof( profileDesc[i] ));
+		for( int j = 0; j < numFiles; j++ )
+		{
+			char profileDesc[128];
+			COM_FileBase( filenames[j], profileDesc, sizeof( profileDesc ));
+			AddToTail( profileDesc );
+		}
 	}
-
-	// Overwrite "Presets:" line if there is no presets
-	if( i == 1 )
-		i = 0;
 
 	filenames = EngFuncs::GetFilesList( "touch_profiles/*.cfg", &numFiles, TRUE );
-	j = 0;
 	curprofile = EngFuncs::GetCvarString("touch_config_file");
 
-	Q_strncpy( profileDesc[i], L( "Profiles:" ), sizeof( profileDesc[i] ));
-	i++;
+	AddToTail( L( "Profiles:" ));
 
-	Q_strncpy( profileDesc[i], "default", sizeof( profileDesc[i] ));
+	firstProfile = Count();
+	AddToTail( "default" );
 
-	iHighlight = firstProfile = i;
-	i++;
-
-	for ( ; j < numFiles; i++, j++ )
+	for( int j = 0; j < numFiles; j++ )
 	{
-		if( i >= UI_MAXGAMES ) break;
-
-		COM_FileBase( filenames[j], profileDesc[i], sizeof( profileDesc[i] ));
-		if( !strcmp( filenames[j], curprofile ) )
-			iHighlight = i;
+		char profileDesc[128];
+		COM_FileBase( filenames[j], profileDesc, sizeof( profileDesc ));
+		AddToTail( profileDesc );
+		if( !strcmp( filenames[j], curprofile ))
+			iHighlight = Count() - 1;
 	}
-
-	m_iCount = i;
 }
 
 /*
@@ -196,7 +187,7 @@ void CMenuTouchOptions::Apply()
 	{
 		char command[256];
 		const char *curconfig = EngFuncs::GetCvarString( "touch_config_file" );
-		snprintf( command, sizeof( command ), "exec \"touch_presets/%s\"\n", model.profileDesc[ i ] );
+		snprintf( command, sizeof( command ), "exec \"touch_presets/%s\"\n", model[i].Get());
 		EngFuncs::ClientCmd( 1, command );
 
 		while( EngFuncs::FileExists( curconfig, TRUE ) )
@@ -218,7 +209,7 @@ void CMenuTouchOptions::Apply()
 	else if( i > model.firstProfile )
 	{
 		char command[256];
-		snprintf( command, sizeof( command ), "exec \"touch_profiles/%s\"\n", model.profileDesc[ i ] );
+		snprintf( command, sizeof( command ), "exec \"touch_profiles/%s\"\n", model[i].Get());
 		EngFuncs::ClientCmd( 1,  command );
 	}
 
@@ -254,11 +245,13 @@ void CMenuTouchOptions::Save()
 void CMenuTouchOptions::UpdateProfilies()
 {
 	char curprofile[256];
-	int isCurrent;
+	bool isCurrent = false;
 	int idx = profiles.GetCurrentIndex();
 
 	COM_FileBase( EngFuncs::GetCvarString( "touch_config_file" ), curprofile, sizeof( curprofile ));
-	isCurrent = !strcmp( curprofile, model.profileDesc[ idx ]);
+
+	if( model.IsValidIndex( idx ))
+		isCurrent = !strcmp( curprofile, model[idx] );
 
 	// Scrolllist changed, update available options
 	remove.SetGrayed( true );
@@ -279,7 +272,7 @@ void CMenuTouchOptions::DeleteProfileCb()
 	if( profiles.GetCurrentIndex() <= model.firstProfile )
 		return;
 
-	snprintf(command, 256, "touch_deleteprofile \"%s\"\n", model.profileDesc[ profiles.GetCurrentIndex() ] );
+	snprintf(command, 256, "touch_deleteprofile \"%s\"\n", model[profiles.GetCurrentIndex()].Get() );
 	EngFuncs::ClientCmd( TRUE, command );
 
 	model.Update();
