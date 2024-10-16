@@ -27,21 +27,11 @@ GNU General Public License for more details.
 #include "BtnsBMPTable.h"
 #include "WindowSystem.h"
 #include "Image.h"
-
-#define UI_MAX_MENUDEPTH		64
-#define UI_MAX_MENUITEMS		64
+#include "utlstring.h"
 
 #define UI_PULSE_DIVISOR		75.0f
 
 #define UI_OUTLINE_WIDTH		uiStatic.outlineWidth	// outline thickness
-
-
-#if XASH_LOW_MEMORY
-#define UI_MAXGAMES			32
-#else
-#define UI_MAXGAMES			1024	// slots for savegame/demos
-#endif
-#define UI_MAX_BGMAPS		32
 
 #define MAX_HINT_TEXT		512
 
