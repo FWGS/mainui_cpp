@@ -94,22 +94,34 @@ public:
 		HIMAGE textureId;
 	} preview;
 
-	class CButtonListModel : public CStringArrayModel
+	class CButtonListModel : public CMenuBaseArrayModel
 	{
 	public:
-		CButtonListModel( CMenuTouchButtons *parent ) : CStringArrayModel( (const char*)&buttons, sizeof( buttons[0] ), 0 ), parent( parent ) {}
+		CButtonListModel( CMenuTouchButtons *parent ) : parent( parent ) { }
 
 		void Update() override;
 		void AddButtonToList( const char *name, const char *texture, const char *command, unsigned char *color, int flags );
 
-		struct
+		const char *GetText( int line ) final override
+		{
+			return buttons[line].szName;
+		}
+
+		int GetRows() const final override
+		{
+			return buttons.Count();
+		}
+
+		struct button_t
 		{
 			char szName[128];
 			char szTexture[128];
 			char szCommand[128];
 			byte bColors[4];
 			int  iFlags;
-		} buttons[UI_MAXGAMES];
+		};
+
+		CUtlVector<button_t> buttons;
 
 		bool gettingList;
 		bool initialized;
@@ -126,13 +138,15 @@ void CMenuTouchButtons::CButtonListModel::AddButtonToList( const char *name, con
 	if( !gettingList )
 		return;
 
-	int i = m_iCount++;
+	button_t button;
 
-	Q_strncpy( buttons[i].szName, name, sizeof( buttons[i].szName ) );
-	Q_strncpy( buttons[i].szTexture, texture, sizeof( buttons[i].szTexture ) );
-	Q_strncpy( buttons[i].szCommand, command, sizeof( buttons[i].szCommand ) );
-	memcpy( buttons[i].bColors, color, sizeof( buttons[i].bColors ) );
-	buttons[i].iFlags = flags;
+	Q_strncpy( button.szName, name, sizeof( button.szName ) );
+	Q_strncpy( button.szTexture, texture, sizeof( button.szTexture ) );
+	Q_strncpy( button.szCommand, command, sizeof( button.szCommand ) );
+	memcpy( button.bColors, color, sizeof( button.bColors ) );
+	button.iFlags = flags;
+
+	buttons.AddToTail( button );
 }
 
 void CMenuTouchButtons::CButtonListModel::Update()
@@ -140,7 +154,7 @@ void CMenuTouchButtons::CButtonListModel::Update()
 	if( !initialized )
 		return;
 
-	m_iCount = 0;
+	buttons.RemoveAll();
 
 	EngFuncs::ClientCmd( TRUE, "" ); // perform Cbuf_Execute()
 
@@ -205,6 +219,9 @@ void CMenuTouchButtons::ResetButtons()
 void CMenuTouchButtons::UpdateFields( )
 {
 	int i = buttonList.GetCurrentIndex();
+
+	if( !model.buttons.IsValidIndex( i ))
+		return;
 
 	Q_strncpy( selectedName, model.buttons[i].szName, sizeof( selectedName ));
 	red.SetCurrentValue( model.buttons[i].bColors[0] );
