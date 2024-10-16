@@ -28,8 +28,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define ART_BANNER		"gfx/shell/head_custom"
 
-#define MAX_MODS		512	// engine limit
-
 enum
 {
 	COLUMN_TYPE = 0,
@@ -66,13 +64,13 @@ struct mod_t
 	}
 
 #define GENERATE_COMPAR_FN( method ) \
-	static int method ## Ascend( const void *a, const void *b ) \
+	static int method ## Ascend( const mod_t *a, const mod_t *b ) \
 	{\
-		return (( const mod_t *)a)->method( *(( const mod_t *)b) );\
+		return a->method( *b );\
 	}\
-	static int method ## Descend( const void *a, const void *b ) \
+	static int method ## Descend( const mod_t *a, const mod_t *b ) \
 	{\
-		return (( const mod_t *)b)->method( *(( const mod_t *)a) );\
+		return b->method( *a );\
 	}\
 
 	GENERATE_COMPAR_FN( TypeCmp )
@@ -88,7 +86,7 @@ public:
 
 	void Update() override;
 	int GetColumns() const override { return 4; }
-	int GetRows() const override { return m_iNumItems; }
+	int GetRows() const override { return mods.Count(); }
 	const char *GetCellText( int line, int column ) override
 	{
 		switch (column)
@@ -102,9 +100,7 @@ public:
 	}
 	bool Sort( int column, bool ascend ) override;
 
-	mod_t  mods[MAX_MODS];
-
-	int m_iNumItems;
+	CUtlVector<mod_t> mods;
 private:
 	int m_iSortingColumn;
 	bool m_bAscend;
@@ -153,6 +149,9 @@ void CMenuCustomGame::UpdateExtras( )
 {
 	int i = modList.GetCurrentIndex();
 
+	if( !modListModel.mods.IsValidIndex( i ))
+		return;
+
 	load->onReleased.pExtra = modListModel.mods[i].dir;
 	load->SetGrayed( !stricmp( modListModel.mods[i].dir, gMenu.m_gameinfo.gamefolder ) );
 
@@ -171,36 +170,39 @@ void CMenuModListModel::Update( void )
 {
 	int i;
 
+	mods.RemoveAll();
+
 	for( i = 0; ; i++ )
 	{
 		gameinfo2_t *gi = EngFuncs::GetModInfo( i );
+		mod_t mod;
 
 		if( !gi )
 			break;
 
-		Q_strncpy( mods[i].dir, gi->gamefolder, sizeof( mods[i].dir ));
-		Q_strncpy( mods[i].webSite, gi->game_url, sizeof( mods[i].webSite ));
-		Q_strncpy( mods[i].type, gi->type, sizeof( mods[i].type ));
-		Q_strncpy( mods[i].ver, gi->version, sizeof( mods[i].ver ));
+		Q_strncpy( mod.dir, gi->gamefolder, sizeof( mod.dir ));
+		Q_strncpy( mod.webSite, gi->game_url, sizeof( mod.webSite ));
+		Q_strncpy( mod.type, gi->type, sizeof( mod.type ));
+		Q_strncpy( mod.ver, gi->version, sizeof( mod.ver ));
 
-		if( ColorStrlen( gi->title ) > sizeof( mods[i].name ) - 1 ) // NAME_LENGTH
+		if( ColorStrlen( gi->title ) > sizeof( mod.name ) - 1 ) // NAME_LENGTH
 		{
-			size_t s = sizeof( mods[i].name ) - 4;
+			size_t s = sizeof( mod.name ) - 4;
 
-			Q_strncpy( mods[i].name, gi->title, s );
+			Q_strncpy( mod.name, gi->title, s );
 
-			mods[i].name[s] = mods[i].name[s+1] = mods[i].name[s+2] = '.';
-			mods[i].name[s+3] = 0;
+			mod.name[s] = mod.name[s+1] = mod.name[s+2] = '.';
+			mod.name[s+3] = 0;
 		}
-		else Q_strncpy( mods[i].name, gi->title, sizeof( mods[i].name ));
+		else Q_strncpy( mod.name, gi->title, sizeof( mod.name ));
 
-		mods[i].bytes = gi->size;
+		mod.bytes = gi->size;
 		if( gi->size > 0 )
-			Q_strncpy( mods[i].size, Q_memprint( gi->size ), sizeof( mods[i].size ));
-		else Q_strncpy( mods[i].size, "0.0 Mb", sizeof( mods[i].size ));
-	}
+			Q_strncpy( mod.size, Q_memprint( gi->size ), sizeof( mod.size ));
+		else Q_strncpy( mod.size, "0.0 Mb", sizeof( mod.size ));
 
-	m_iNumItems = i;
+		mods.AddToTail( mod );
+	}
 
 	if( i != 0 )
 	{
@@ -220,16 +222,13 @@ bool CMenuModListModel::Sort(int column, bool ascend)
 	switch( column )
 	{
 		case COLUMN_TYPE:
-			qsort( mods, m_iNumItems, sizeof( mod_t ),
-				ascend ? mod_t::TypeCmpAscend : mod_t::TypeCmpDescend );
+			mods.Sort( ascend ? mod_t::TypeCmpAscend : mod_t::TypeCmpDescend );
 			return true;
 		case COLUMN_NAME:
-			qsort( mods, m_iNumItems, sizeof( mod_t ),
-				ascend ? mod_t::NameCmpAscend : mod_t::NameCmpDescend );
+			mods.Sort( ascend ? mod_t::NameCmpAscend : mod_t::NameCmpDescend );
 			return true;
 		case COLUMN_SIZE:
-			qsort( mods, m_iNumItems, sizeof( mod_t ),
-				ascend ? mod_t::SizeCmpAscend : mod_t::SizeCmpDescend );
+			mods.Sort( ascend ? mod_t::SizeCmpAscend : mod_t::SizeCmpDescend );
 			return true;
 	}
 
