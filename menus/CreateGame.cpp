@@ -31,29 +31,32 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define ART_BANNER		"gfx/shell/head_creategame"
 
+struct map_t
+{
+	char name[CS_SIZE];
+	char desc[CS_SIZE];
+};
+
 class CMenuCreateGame;
-class CMenuMapListModel : public CMenuBaseModel
+class CMenuMapListModel : public CMenuBaseModel, public CUtlVector<map_t>
 {
 public:
 	CMenuMapListModel( CMenuCreateGame *parent ) : parent( parent ) { }
 
 	void Update() override;
 	int GetColumns() const override { return 2; }
-	int GetRows() const override { return m_iNumItems; }
+	int GetRows() const override { return Count(); }
 	const char *GetCellText( int line, int column ) override
 	{
 		switch( column )
 		{
-		case 0: return mapName[line];
-		case 1: return mapsDescription[line];
+		case 0: return Element( line ).name;
+		case 1: return Element( line ).desc;
 		}
 
 		return NULL;
 	}
 
-	char		mapName[UI_MAXGAMES][64];
-	char		mapsDescription[UI_MAXGAMES][64];
-	int	m_iNumItems;
 	CMenuCreateGame *parent;
 };
 
@@ -92,13 +95,13 @@ void CMenuCreateGame::Begin( CMenuBaseItem *pSelf, void *pExtra )
 {
 	CMenuCreateGame *menu = (CMenuCreateGame*)pSelf->Parent();
 	int item = menu->mapsList.GetCurrentIndex();
-	if( item < 0 || item > menu->mapsListModel.GetRows( ))
+	if( !menu->mapsListModel.IsValidIndex( item ))
 		return;
 
 	if( item == 0 )
 		item = EngFuncs::RandomLong( 1, menu->mapsListModel.GetRows() );
 
-	const char *mapName = menu->mapsListModel.mapName[item];
+	const char *mapName = menu->mapsListModel[item].name;
 
 	if( !EngFuncs::IsMapValid( mapName ))
 		return;	// bad map
@@ -146,37 +149,43 @@ void CMenuMapListModel::Update( void )
 	if( !uiStatic.needMapListUpdate )
 		return;
 
+	RemoveAll();
+
 	if( !EngFuncs::CreateMapsList( TRUE ) || (afile = (char *)EngFuncs::COM_LoadFile( "maps.lst", NULL )) == NULL )
 	{
 		parent->done->SetGrayed( true );
-		m_iNumItems = 0;
 		Con_Printf( "Cmd_GetMapsList: can't open maps.lst\n" );
 		return;
 	}
 
+	{
+		map_t map;
+		Q_strncpy( map.name, L( "GameUI_RandomMap" ), sizeof( map.name ));
+		Q_strncpy( map.desc, "", sizeof( map.desc ));
+		AddToTail( map );
+	}
+
 	char *pfile = afile;
 	char token[1024];
-	int numMaps = 1;
-
-	Q_strncpy( mapName[0], L( "GameUI_RandomMap" ), sizeof( mapName[0] ));
-	mapsDescription[0][0] = 0;
 
 	while(( pfile = EngFuncs::COM_ParseFile( pfile, token, sizeof( token ))) != NULL )
 	{
-		if( numMaps >= UI_MAXGAMES ) break;
+		map_t map;
 
-		Q_strncpy( mapName[numMaps], token, sizeof( mapName[numMaps] ));
+		Q_strncpy( map.name, token, sizeof( map.name ));
 		if(( pfile = EngFuncs::COM_ParseFile( pfile, token, sizeof( token ))) == NULL )
 		{
-			Q_strncpy( mapsDescription[numMaps], mapName[numMaps], sizeof( mapsDescription[numMaps] ));
+			Q_strncpy( map.desc, map.name, sizeof( map.desc ));
+			AddToTail( map );
 			break; // unexpected end of file
 		}
-		Q_strncpy( mapsDescription[numMaps], token, sizeof( mapsDescription[numMaps] ));
-		numMaps++;
+		Q_strncpy( map.desc, token, sizeof( map.desc ));
+		AddToTail( map );
 	}
 
-	if( !( numMaps - 1) ) parent->done->SetGrayed( true );
-	m_iNumItems = numMaps;
+	if( Count( ) <= 1 )
+		parent->done->SetGrayed( true );
+
 	EngFuncs::COM_FreeFile( afile );
 	uiStatic.needMapListUpdate = false;
 }
