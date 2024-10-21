@@ -26,27 +26,32 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Field.h"
 #include "utlvector.h"
 #include "CheckBox.h"
+#include "SpinControl.h"
+#include "StringArrayModel.h"
 
-#define ART_BANNER_INET		"gfx/shell/head_inetgames"
-#define ART_BANNER_LAN		"gfx/shell/head_lan"
-#define ART_BANNER_LOCK		"gfx/shell/lock"
+#define ART_BANNER_INET     "gfx/shell/head_inetgames"
+#define ART_BANNER_LAN      "gfx/shell/head_lan"
+#define ART_BANNER_LOCK     "gfx/shell/lock"
+#define ART_BANNER_FAVORITE "gfx/shell/favorite"
 
 class CMenuServerBrowser;
 
 enum
 {
 	COLUMN_PASSWORD = 0,
+	COLUMN_FAVORITE,
 	COLUMN_NAME,
 	COLUMN_MAP,
 	COLUMN_PLAYERS,
 	COLUMN_PING,
-	COLUMN_IP
+	COLUMN_IP,
+	COLUMN_LAST
 };
 
 struct server_t
 {
 	netadr_t adr;
-	char  info[256];
+	char  info[512];
 	float ping;
 	int  numcl;
 	int  maxcl;
@@ -55,12 +60,21 @@ struct server_t
 	char clientsstr[64];
 	char pingstr[64];
 	char ipstr[64];
+	bool favorite;
 	bool havePassword;
 	bool isLegacy;
+	bool isGoldSrc;
 
-	server_t( netadr_t adr, const char *info );
+	server_t( netadr_t adr, const char *info, bool is_favorite );
 	void UpdateData();
 	void SetPing( float ping );
+
+	const char *ToProtocol( void )
+	{
+		if( isLegacy ) return "48";
+		if( isGoldSrc ) return "gs";
+		return "49";
+	}
 
 	int Rank( const server_t &other ) const
 	{
@@ -118,6 +132,20 @@ struct server_t
 #undef GENERATE_COMPAR_FN
 };
 
+struct favlist_entry_t
+{
+	favlist_entry_t( const char *sadr, const char *prot, bool favorited = true )
+	{
+		Q_strncpy( this->sadr, sadr, sizeof( this->sadr ));
+		Q_strncpy( this->prot, prot, sizeof( this->prot ));
+		this->favorited = favorited;
+	}
+
+	char sadr[128];
+	char prot[16];
+	bool favorited;
+};
+
 class CMenuGameListModel : public CMenuBaseModel
 {
 public:
@@ -127,7 +155,7 @@ public:
 
 	int GetColumns() const override
 	{
-		return 6; // havePassword, game, mapname, maxcl, ping, (hidden)ip
+		return COLUMN_LAST; // havePassword, game, mapname, maxcl, ping, (hidden)ip
 	}
 
 	int GetRows() const override
@@ -137,7 +165,7 @@ public:
 
 	ECellType GetCellType( int line, int column ) override
 	{
-		if( column == 0 )
+		if( column == COLUMN_PASSWORD || column == COLUMN_FAVORITE )
 			return CELL_IMAGE_ADDITIVE;
 		return CELL_TEXT;
 	}
@@ -147,6 +175,7 @@ public:
 		switch( column )
 		{
 		case COLUMN_PASSWORD: return servers[line].havePassword ? ART_BANNER_LOCK : NULL;
+		case COLUMN_FAVORITE: return servers[line].favorite ? ART_BANNER_FAVORITE : NULL;
 		case COLUMN_NAME: return servers[line].name;
 		case COLUMN_MAP: return servers[line].mapname;
 		case COLUMN_PLAYERS: return servers[line].clientsstr;
@@ -185,7 +214,7 @@ public:
 		return servers[line].havePassword;
 	}
 
-	void AddServerToList( netadr_t adr, const char *info );
+	void AddServerToList( netadr_t adr, const char *info, bool is_favorite );
 
 	bool Sort( int column, bool ascend ) override;
 
@@ -204,6 +233,7 @@ public:
 	CMenuServerBrowser() : CMenuFramework( "CMenuServerBrowser" ), gameListModel( this ) { }
 	void Draw() override;
 	void Show() override;
+	void Hide() override;
 	bool KeyUp( int key ) override;
 
 	void SetLANOnly( bool lanOnly )
@@ -219,6 +249,19 @@ public:
 		gameListModel.serversRefreshTime = EngFuncs::DoubleTime();
 	}
 	void ViewGameInfo( void );
+	void OnTabSwitch( void );
+
+	void ParseServerListFromFile( const char *filename, CUtlVector<favlist_entry_t> &list );
+	void SaveServerListToFile( const char *filename, const CUtlVector<favlist_entry_t> &list );
+	void QueryServerList( const CUtlVector<favlist_entry_t> &list );
+	void FavoriteServer( void );
+	void MaybeEnableFavoriteButton( void );
+	void ToggleFavoriteButton( bool en );
+	void OnChangeSelectedServer( void );
+	void SaveLists( void );
+
+	void ShowAddServerBox( void );
+	void AddServer( void );
 
 	void AddServerToList( netadr_t adr, const char *info );
 
@@ -228,7 +271,9 @@ public:
 	CMenuPicButton *createGame;
 	CMenuPicButton *refresh;
 	CMenuPicButton *viewGameInfo;
-	CMenuSwitch natOrDirect;
+	CMenuPicButton *favorite;
+	CMenuPicButton *addServer;
+	CMenuSwitch tabSwitch; // not actually tabs
 
 	CMenuYesNoMessageBox msgBox;
 	CMenuTable	gameList;
@@ -238,16 +283,23 @@ public:
 	CMenuYesNoMessageBox askPassword;
 	CMenuField password;
 
+	CMenuYesNoMessageBox addServerBox;
+	CMenuField addressField;
+	CMenuSpinControl serverProtocol;
+
 	int	  refreshTime;
 	int   refreshTime2;
 
 	bool m_bLanOnly;
+
+	CUtlVector<favlist_entry_t> favoritesList;
+	CUtlVector<favlist_entry_t> historyList;
 private:
 	void _Init() override;
 	void _VidInit() override;
 };
 
-static server_t staticServerSelect( netadr_t(), "" );
+static server_t staticServerSelect( netadr_t(), "", false );
 static bool staticWaitingPassword = false;
 
 ADD_MENU3( menu_internetgames, CMenuServerBrowser, UI_InternetGames_Menu );
@@ -288,8 +340,8 @@ void UI_LanGame_Menu( void )
 	UI_ServerBrowser_Menu();
 }
 
-server_t::server_t( netadr_t adr, const char *info ) :
-	adr( adr )
+server_t::server_t( netadr_t adr, const char *info, bool is_favorite ) :
+	adr( adr ), favorite( is_favorite )
 {
 	Q_strncpy( this->info, info, sizeof( this->info ));
 }
@@ -303,6 +355,7 @@ void server_t::UpdateData( void )
 	maxcl = atoi( Info_ValueForKey( info, "maxcl" ));
 	snprintf( clientsstr, sizeof( clientsstr ), "%d\\%d", numcl, maxcl );
 	havePassword = !strcmp( Info_ValueForKey( info, "password" ), "1" );
+	isGoldSrc = !strcmp( Info_ValueForKey( info, "gs" ), "1" );
 	isLegacy = !strcmp( Info_ValueForKey( info, "legacy" ), "1" );
 }
 
@@ -361,7 +414,6 @@ CMenuServerBrowser::GetGamesList
 void CMenuGameListModel::Update( void )
 {
 	int		i;
-	const char	*info;
 
 	// regenerate table data
 	for( i = 0; i < servers.Count(); i++ )
@@ -370,6 +422,8 @@ void CMenuGameListModel::Update( void )
 	if( servers.Count() )
 	{
 		parent->joinGame->SetGrayed( false );
+		parent->MaybeEnableFavoriteButton();
+		parent->OnChangeSelectedServer();
 		if( m_iSortingColumn != -1 )
 			Sort( m_iSortingColumn, m_bAscend );
 	}
@@ -380,7 +434,7 @@ void CMenuGameListModel::OnActivateEntry( int line )
 	CMenuServerBrowser::Connect( servers[line] );
 }
 
-void CMenuGameListModel::AddServerToList( netadr_t adr, const char *info )
+void CMenuGameListModel::AddServerToList( netadr_t adr, const char *info, bool is_favorite )
 {
 	int i;
 
@@ -394,7 +448,7 @@ void CMenuGameListModel::AddServerToList( netadr_t adr, const char *info )
 			return;
 	}
 
-	server_t server( adr, info );
+	server_t server( adr, info, is_favorite );
 
 	server.UpdateData();
 	server.SetPing( EngFuncs::DoubleTime() - serversRefreshTime );
@@ -407,8 +461,6 @@ void CMenuGameListModel::AddServerToList( netadr_t adr, const char *info )
 
 void CMenuServerBrowser::Connect( server_t &server )
 {
-	char buf[256];
-
 	// prevent refresh during connect
 	menu_internetgames->refreshTime = uiStatic.realTime + 999999;
 
@@ -436,12 +488,21 @@ void CMenuServerBrowser::Connect( server_t &server )
 
 	staticWaitingPassword = false;
 
-	snprintf( buf, sizeof( buf ), "connect %s %s",
-		EngFuncs::NET_AdrToString( server.adr ),
-		server.isLegacy ? "legacy" : "" );
-	buf[sizeof( buf ) - 1] = 0;
+	const char *sadr = EngFuncs::NET_AdrToString( server.adr );
+	const char *prot = server.ToProtocol();
 
-	EngFuncs::ClientCmd( FALSE, buf );
+	if( menu_internetgames->m_bLanOnly == false )
+	{
+		if( menu_internetgames->historyList.Count() > 20 ) // FIXME: make configurable
+			menu_internetgames->historyList.FastRemove( 0 );
+		menu_internetgames->historyList.AddToTail( favlist_entry_t( sadr, prot, true ) );
+
+
+		menu_internetgames->SaveLists();
+	}
+
+	EngFuncs::ClientCmdF( false, "connect \"%s\" \"%s\"\n", sadr, prot );
+
 	UI_ConnectionProgress_Connect( "" );
 }
 
@@ -455,11 +516,119 @@ void CMenuServerBrowser::JoinGame()
 	gameListModel.OnActivateEntry( gameList.GetCurrentIndex() );
 }
 
+void CMenuServerBrowser::FavoriteServer()
+{
+	int i = gameList.GetCurrentIndex();
+
+	if( !gameListModel.servers.IsValidIndex( i ))
+		return;
+
+	server_t &serv = gameListModel.servers[i];
+	const char *sadr = EngFuncs::NET_AdrToString( serv.adr );
+
+	serv.favorite = !serv.favorite;
+
+	ToggleFavoriteButton( !serv.favorite );
+
+	if( serv.favorite )
+	{
+		favlist_entry_t entry( sadr, serv.ToProtocol() );
+		favoritesList.AddToTail( entry );
+	}
+	else
+	{
+		FOR_EACH_VEC( favoritesList, i )
+		{
+			if( !strcmp( favoritesList[i].sadr, sadr ))
+			{
+				favoritesList.FastRemove( i );
+				break;
+			}
+		}
+	}
+}
+
+void CMenuServerBrowser::MaybeEnableFavoriteButton( void )
+{
+	bool is_nat = EngFuncs::GetCvarFloat( "cl_nat" ) > 0;
+
+	favorite->SetGrayed( is_nat );
+}
+
+void CMenuServerBrowser::ToggleFavoriteButton( bool en )
+{
+	if( en )
+	{
+		favorite->SetNameAndStatus( L( "Favorite" ), L( "Add this server to favorites list" ));
+		favorite->SetPicture( PC_FAVORITE );
+	}
+	else
+	{
+		favorite->SetNameAndStatus( L( "Unfavorite" ), L( "Remove this server from favorites list" ));
+		favorite->SetPicture( PC_UNFAVORITE );
+	}
+}
+
 void CMenuServerBrowser::ClearList()
 {
 	gameListModel.Flush();
 	joinGame->SetGrayed( true );
 	viewGameInfo->SetGrayed( true );
+	favorite->SetGrayed( true );
+}
+
+void CMenuServerBrowser::ParseServerListFromFile( const char *filename, CUtlVector<favlist_entry_t> &list )
+{
+	byte *pfile = EngFuncs::COM_LoadFile( filename );
+	char *afile = (char *)pfile;
+
+	while( true )
+	{
+		favlist_entry_t entry( "", "", true );
+
+		afile = EngFuncs::COM_ParseFile( afile, entry.sadr, sizeof( entry.sadr ));
+		if( !afile )
+			break;
+
+		afile = EngFuncs::COM_ParseFile( afile, entry.prot, sizeof( entry.prot ));
+		if( !afile )
+			break;
+
+		list.AddToTail( entry );
+	}
+
+	EngFuncs::COM_FreeFile( pfile );
+}
+
+void CMenuServerBrowser::SaveServerListToFile( const char *filename, const CUtlVector<favlist_entry_t> &list )
+{
+	CUtlString s;
+
+	if( list.Count() == 0 )
+	{
+		EngFuncs::DeleteFile( filename );
+		return;
+	}
+
+	FOR_EACH_VEC( list, i )
+	{
+		if( !list[i].favorited )
+			continue;
+
+		s.AppendFormat( "%s %s\n", list[i].sadr, list[i].prot );
+	}
+
+	EngFuncs::COM_SaveFile( filename, s.Get( ), s.Length( ));
+}
+
+void CMenuServerBrowser::QueryServerList( const CUtlVector<favlist_entry_t> &list )
+{
+	FOR_EACH_VEC( list, i )
+	{
+		EngFuncs::ClientCmdF( false, "queryserver \"%s\" \"%s\"", list[i].sadr, list[i].prot );
+	}
+
+	UI_MenuResetPing_f();
 }
 
 void CMenuServerBrowser::RefreshList()
@@ -470,16 +639,19 @@ void CMenuServerBrowser::RefreshList()
 	{
 		EngFuncs::ClientCmd( FALSE, "localservers\n" );
 	}
-	else
+	else if( uiStatic.realTime > refreshTime2 )
 	{
-		if( uiStatic.realTime > refreshTime2 )
-		{
+		if( tabSwitch.GetState() == 2 )
+			QueryServerList( favoritesList );
+		else if( tabSwitch.GetState() == 3 )
+			QueryServerList( historyList );
+		else
 			EngFuncs::ClientCmd( FALSE, "internetservers\n" );
-			refreshTime2 = uiStatic.realTime + (EngFuncs::GetCvarFloat("cl_nat") ? 4000:1000);
-			refresh->SetGrayed( true );
-			if( uiStatic.realTime + 20000 < refreshTime )
-				refreshTime = uiStatic.realTime + 20000;
-		}
+
+		refreshTime2 = uiStatic.realTime + (EngFuncs::GetCvarFloat("cl_nat") ? 4000:1000);
+		refresh->SetGrayed( true );
+		if( uiStatic.realTime + 20000 < refreshTime )
+			refreshTime = uiStatic.realTime + 20000;
 	}
 }
 
@@ -491,6 +663,89 @@ void CMenuServerBrowser::ViewGameInfo()
 		return;
 
 	UI_ServerInfo_Menu( gameListModel.servers[idx].adr, gameListModel.servers[idx].name, gameListModel.servers[idx].isLegacy );
+}
+
+void CMenuServerBrowser::OnTabSwitch()
+{
+	int idx = tabSwitch.GetState();
+
+	switch( idx )
+	{
+	case 0: // Direct
+	case 1: // NAT
+		EngFuncs::CvarSetValue( "cl_nat", idx );
+		break;
+	default: // Favorites and History
+		EngFuncs::CvarSetValue( "cl_nat", 0.0f );
+		break;
+	}
+
+	ClearList();
+	RefreshList();
+}
+
+void CMenuServerBrowser::OnChangeSelectedServer( void )
+{
+	int i = gameList.GetCurrentIndex();
+
+	if( !gameListModel.servers.IsValidIndex( i ))
+		return;
+
+	bool fav = gameListModel.servers[i].favorite;
+	ToggleFavoriteButton( !fav );
+}
+
+void CMenuServerBrowser::ShowAddServerBox( void )
+{
+	addServerBox.Show();
+}
+
+void CMenuServerBrowser::AddServer( void )
+{
+	netadr_t adr;
+
+	if( !EngFuncs::textfuncs.pNetAPI->StringToAdr( (char *)addressField.GetBuffer(), &adr ))
+	{
+		UI_ShowMessageBox( L( "Invalid address" ));
+		return;
+	}
+
+	CUtlString info;
+	info.AppendFormat( "\\host\\%s", addressField.GetBuffer( ));
+	info.AppendFormat( "\\gamedir\\%s", gMenu.m_gameinfo.gamefolder );
+	info.Append( "\\map\\unknown\\numcl\\0\\maxcl\\0" );
+
+	switch( (int)serverProtocol.GetCurrentValue( ))
+	{
+	case 0:
+		info.Append( "\\p\\49" );
+		break;
+	case 1:
+		info.Append( "\\p\\48\\legacy\\1" );
+		break;
+	case 2:
+		info.Append( "\\p\\48\\gs\\1" );
+		break;
+	}
+
+	server_t serv( adr, info.Get(), false );
+
+	serv.UpdateData();
+	serv.SetPing( 9.9999f );
+
+	// FIXME: for now we can only show custom servers at favorites tab
+	favlist_entry_t entry( addressField.GetBuffer(), serv.ToProtocol(), false );
+	favoritesList.AddToTail( entry );
+
+	if( tabSwitch.GetState() != 2 )
+		tabSwitch.SetState( 2 );
+
+	// add a dummy entry after clearing out list
+	gameListModel.servers.AddToTail( serv );
+
+	// force an immediate refresh
+	refreshTime2 = uiStatic.realTime;
+	RefreshList();
 }
 
 /*
@@ -550,7 +805,9 @@ void CMenuServerBrowser::_Init( void )
 	});
 
 	viewGameInfo = AddButton( L( "View game info" ), L( "Get detail game info" ), PC_VIEW_GAME_INFO, VoidCb( &CMenuServerBrowser::ViewGameInfo ), QMF_GRAYED );
+	favorite = AddButton( L( "Favorite" ), L( "Add this server to favorites list" ), PC_FAVORITE, VoidCb( &CMenuServerBrowser::FavoriteServer ) );
 	refresh = AddButton( L( "Refresh" ), L( "Refresh servers list" ), PC_REFRESH, VoidCb( &CMenuServerBrowser::RefreshList ) );
+	addServer = AddButton( L( "Add server" ), L( "Manually enter server address and add it to the list" ), PC_ADD_SERVER, VoidCb( &CMenuServerBrowser::ShowAddServerBox ));
 
 	AddButton( L( "Done" ), L( "Return to main menu" ), PC_DONE, VoidCb( &CMenuServerBrowser::Hide ) );
 
@@ -562,6 +819,7 @@ void CMenuServerBrowser::_Init( void )
 
 	gameList.SetCharSize( QM_SMALLFONT );
 	gameList.SetupColumn( COLUMN_PASSWORD, NULL, 32.0f, true );
+	gameList.SetupColumn( COLUMN_FAVORITE, NULL, 32.0f, true );
 	gameList.SetupColumn( COLUMN_NAME, L( "Name" ), 0.40f );
 	gameList.SetupColumn( COLUMN_MAP, L( "GameUI_Map" ), 0.25f );
 	gameList.SetupColumn( COLUMN_PLAYERS, L( "Players" ), 100.0f, true );
@@ -570,24 +828,20 @@ void CMenuServerBrowser::_Init( void )
 	gameList.SetModel( &gameListModel );
 	gameList.bFramedHintText = true;
 	gameList.bAllowSorting = true;
+	gameList.onChanged = VoidCb( &CMenuServerBrowser::OnChangeSelectedServer );
+	gameList.SetRect( 360, 230, -20, 465 );
 
-	natOrDirect.AddSwitch( L( "Direct" ) );
-	natOrDirect.AddSwitch( "NAT" );
-	natOrDirect.eTextAlignment = QM_CENTER;
-	natOrDirect.bMouseToggle = false;
-	natOrDirect.LinkCvar( "cl_nat" );
-	natOrDirect.iSelectColor = uiInputFgColor;
-	// bit darker
-	natOrDirect.iFgTextColor = uiInputFgColor - 0x00151515;
-	SET_EVENT_MULTI( natOrDirect.onChanged,
-	{
-		CMenuSwitch *self = (CMenuSwitch*)pSelf;
-		CMenuServerBrowser *parent = (CMenuServerBrowser*)self->Parent();
-
-		self->WriteCvar();
-		parent->ClearList();
-		parent->RefreshList();
-	});
+	tabSwitch.SetRect( -550, gameList.pos.y - UI_OUTLINE_WIDTH - tabSwitch.size.h, -20, 35 );
+	tabSwitch.AddSwitch( L( "Direct" ));
+	tabSwitch.AddSwitch( "NAT" ); // intentionally not localized
+	tabSwitch.AddSwitch( L( "Favorites" ));
+	tabSwitch.AddSwitch( L( "History" ));
+	tabSwitch.eTextAlignment = QM_CENTER;
+	tabSwitch.bMouseToggle = false;
+	tabSwitch.bKeepToggleWidth = true;
+	tabSwitch.iSelectColor = uiInputFgColor;
+	tabSwitch.iFgTextColor = uiInputFgColor - 0x00151515; // bit darker
+	tabSwitch.onChanged = VoidCb( &CMenuServerBrowser::OnTabSwitch );
 
 	// server.dll needs for reading savefiles or startup newgame
 	if( !EngFuncs::CheckGameDll( ))
@@ -623,8 +877,35 @@ void CMenuServerBrowser::_Init( void )
 	askPassword.Init();
 	askPassword.AddItem( password );
 
+	addressField.bAllowColorstrings = false;
+	addressField.szName = NULL;
+	addressField.eTextAlignment = QM_LEFT;
+	addressField.SetRect( 64, 150, 512, 32 );
+
+	static const char *protlist[] =
+	{
+		"Xash3D 49 (New)",
+		"Xash3D 48 (Old)",
+		"GoldSource 48",
+	};
+	static CStringArrayModel protlistModel( protlist, V_ARRAYSIZE( protlist ));
+
+	serverProtocol.Setup( &protlistModel );
+	serverProtocol.SetCurrentValue( 0.0f );
+	serverProtocol.eTextAlignment = QM_LEFT;
+	serverProtocol.SetRect( 64, 100, 512, 32 );\
+
+	addServerBox.onPositive = VoidCb( &CMenuServerBrowser::AddServer );
+	addServerBox.SetMessage( L( "Enter server Internet address\n(e.g., 209.255.10.255:27015)" ));
+	addServerBox.dlgMessage1.SetCoord( 8, 8 ); // a bit offset
+	addServerBox.dlgMessage1.eTextAlignment = QM_TOPLEFT;
+	addServerBox.Link( this );
+	addServerBox.Init();
+	addServerBox.AddItem( serverProtocol );
+	addServerBox.AddItem( addressField );
+
 	AddItem( gameList );
-	AddItem( natOrDirect );
+	AddItem( tabSwitch );
 }
 
 /*
@@ -634,22 +915,6 @@ CMenuServerBrowser::VidInit
 */
 void CMenuServerBrowser::_VidInit()
 {
-	if( m_bLanOnly )
-	{
-		banner.SetPicture( ART_BANNER_LAN );
-		createGame->szStatusText = ( L( "Create new LAN game" ) );
-		natOrDirect.Hide();
-	}
-	else
-	{
-		banner.SetPicture( ART_BANNER_INET );
-		createGame->szStatusText = ( L( "Create new Internet game" ) );
-		natOrDirect.Show();
-	}
-
-	gameList.SetRect( 360, 230, -20, 465 );
-	natOrDirect.SetCoord( -20 - natOrDirect.size.w, gameList.pos.y - UI_OUTLINE_WIDTH - natOrDirect.size.h );
-
 	refreshTime = uiStatic.realTime + 500; // delay before update 0.5 sec
 	refreshTime2 = uiStatic.realTime + 500;
 }
@@ -658,12 +923,57 @@ void CMenuServerBrowser::Show()
 {
 	CMenuFramework::Show();
 
+	if( m_bLanOnly )
+	{
+		banner.SetPicture( ART_BANNER_LAN );
+		createGame->szStatusText = ( L( "Create new LAN game" ) );
+		favorite->Hide();
+		addServer->Hide();
+		tabSwitch.Hide();
+	}
+	else
+	{
+		banner.SetPicture( ART_BANNER_INET );
+		createGame->szStatusText = ( L( "Create new Internet game" ) );
+		favorite->Show();
+		addServer->Show();
+		tabSwitch.Show();
+
+		favoritesList.RemoveAll();
+		historyList.RemoveAll();
+		ParseServerListFromFile( "favorite_servers.lst", favoritesList );
+		ParseServerListFromFile( "history_servers.lst", historyList );
+	}
+
+	RealignButtons();
+
 	// clear out server table
 	staticWaitingPassword = false;
 	gameListModel.Flush();
 	gameList.SetSortingColumn( COLUMN_PING );
 	joinGame->SetGrayed( true );
 	viewGameInfo->SetGrayed( true );
+	favorite->SetGrayed( true );
+}
+
+void CMenuServerBrowser::SaveLists()
+{
+	// TODO: we can actually cache master server response, so every time
+	// player opens up this menu, they instantly get server list at first
+	// and then re-sync with master server is just delayed
+	// ... but I'm tired with this, so let's do it next time :)
+
+	if( m_bLanOnly )
+		return;
+
+	SaveServerListToFile( "favorite_servers.lst", favoritesList );
+	SaveServerListToFile( "history_servers.lst", historyList );
+}
+
+void CMenuServerBrowser::Hide()
+{
+	SaveLists();
+	CMenuFramework::Hide();
 }
 
 void CMenuServerBrowser::AddServerToList( netadr_t adr, const char *info )
@@ -679,10 +989,24 @@ void CMenuServerBrowser::AddServerToList( netadr_t adr, const char *info )
 	if( !IsVisible() )
 		return;
 
-	gameListModel.AddServerToList( adr, info );
+	const char *s = EngFuncs::NET_AdrToString( adr );
+	bool is_favorite = false;
+
+	FOR_EACH_VEC( favoritesList, i )
+	{
+		if( !strcmp( favoritesList[i].sadr, s ))
+		{
+			is_favorite = true;
+			break;
+		}
+	}
+
+	gameListModel.AddServerToList( adr, info, is_favorite );
 
 	joinGame->SetGrayed( false );
 	viewGameInfo->SetGrayed( false );
+	MaybeEnableFavoriteButton();
+	OnChangeSelectedServer();
 }
 
 /*

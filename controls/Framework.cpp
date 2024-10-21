@@ -147,6 +147,19 @@ CMenuPicButton * CMenuFramework::AddButton( const char *szName, const char *szSt
 	return btn;
 }
 
+void CMenuFramework::RealignButtons( void )
+{
+	for( int i = 0, j = 0; i < m_iBtnsNum; i++ )
+	{
+		if( !m_apBtns[i]->IsVisible())
+			continue;
+
+		m_apBtns[i]->SetCoord( 72, 230 + j * 50 );
+		m_apBtns[i]->CalcPosition();
+		j++;
+	}
+}
+
 bool CMenuFramework::KeyDown( int key )
 {
 	bool b = BaseClass::KeyDown( key );

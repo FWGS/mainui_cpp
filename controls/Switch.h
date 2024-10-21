@@ -41,6 +41,7 @@ public:
 	void AddSwitch( const char *text );
 
 	int GetState() { return m_iState; }
+	void SetState( int state );
 
 	bool bMouseToggle;
 	bool bKeepToggleWidth;

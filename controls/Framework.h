@@ -47,6 +47,8 @@ public:
 	CMenuPicButton *AddButton( const char *szName, const char *szStatus,
 		const char *szButtonPath, CEventCallback onReleased = CEventCallback(), int iFlags = 0, int hotkey = 0 );
 
+	void RealignButtons();
+
 	bool DrawAnimation() override;
 
 	void PrepareBannerAnimation( EAnimation direction, CMenuPicButton *initiator );

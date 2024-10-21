@@ -49,6 +49,16 @@ void CMenuSwitch::AddSwitch(const char *text)
 	m_switches.AddToTail( sw );
 }
 
+void CMenuSwitch::SetState( int i )
+{
+	if( !m_switches.IsValidIndex( i ))
+		return;
+
+	m_iState = i;
+	SetCvarValue( m_iState );
+	_Event( QM_CHANGED );
+}
+
 int CMenuSwitch::IsNewStateByMouseClick()
 {
 	int state = m_iState;
