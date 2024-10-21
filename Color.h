@@ -31,6 +31,12 @@ public:
 		return color;
 	}
 
+	inline CColor& operator =( CColor& c )
+	{
+		Set( c.rgba );
+		return c;
+	}
+
 	inline operator unsigned int() { return rgba; }
 
 	inline void Set( unsigned int color )
