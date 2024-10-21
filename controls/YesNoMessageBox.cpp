@@ -27,8 +27,11 @@ CMenuYesNoMessageBox::CMenuYesNoMessageBox( bool alert ) : BaseClass( "YesNoMess
 	bAutoHide = true;
 	m_bIsAlert = alert;
 	iFlags |= QMF_DIALOG;
+
 	dlgMessage1.iFlags = QMF_INACTIVE|QMF_DROPSHADOW;
 	dlgMessage1.eTextAlignment = QM_TOP;
+	dlgMessage1.SetRect( 0, 24, 640, 256 - 24 );
+	dlgMessage1.SetCharSize( QM_DEFAULTFONT );
 
 	if( m_bIsAlert )
 	{
@@ -73,6 +76,8 @@ CMenuYesNoMessageBox::Init
 */
 void CMenuYesNoMessageBox::_Init( void )
 {
+	SetRect( DLG_X + 192, 256, 640, 256 );
+
 	if( !m_bSetYes )
 		SetPositiveButton( L( "GameUI_OK" ), PC_OK );
 
@@ -103,14 +108,11 @@ CMenuYesNoMessageBox::VidInit
 */
 void CMenuYesNoMessageBox::_VidInit( void )
 {
-	SetRect( DLG_X + 192, 256, 640, 256 );
 	pos.x += uiStatic.xOffset;
 	pos.y += uiStatic.yOffset;
 	CalcPosition();
 	CalcSizes();
 
-	dlgMessage1.SetRect( 0, 24, 640, 256 - 24 );
-	dlgMessage1.SetCharSize( QM_DEFAULTFONT );
 
 }
 
