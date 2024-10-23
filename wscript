@@ -101,7 +101,6 @@ def build(bld):
 	bld.shlib(
 		source   = source,
 		target   = 'menu',
-		features = 'cxx',
 		includes = includes,
 		use      = libs,
 		install_path = bld.env.LIBDIR,
