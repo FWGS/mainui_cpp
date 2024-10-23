@@ -30,11 +30,10 @@ def options(opt):
 	return
 
 def configure(conf):
-	# conf.env.CXX11_MANDATORY = False
 	conf.load('fwgslib cxx11')
 	conf.env.append_unique('DEFINES', 'STDINT_H=<cstdint>')
 
-	if not conf.env.HAVE_CXX11:
+	if not conf.check_std('cxx11'):
 		conf.define('MY_COMPILER_SUCKS', 1)
 
 	conf.env.USE_STBTT = conf.options.USE_STBTT
