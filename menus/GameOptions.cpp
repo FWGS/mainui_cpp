@@ -37,7 +37,6 @@ public:
 	void SetNetworkMode( int maxpacket, int maxpayload, int cmdrate, int updaterate, int rate );
 private:
 	void _Init() override;
-	void Think() override;
 	void SaveCb( );
 	void RestoreCb( );
 	void Restore();
@@ -46,7 +45,7 @@ private:
 	CMenuSpinControl	maxFPS;
 	//CMenuCheckBox	hand;
 	CMenuCheckBox	allowDownload;
-	CMenuCheckBox	allowConsole;
+	CMenuPicButton	allowConsole;
 
 	CMenuSpinControl	cmdrate, updaterate, rate;
 	CMenuAction networkMode;
@@ -101,12 +100,6 @@ void CMenuGameOptions::RestoreCb()
 	Hide();
 }
 
-void CMenuGameOptions::Think()
-{
-	allowConsole.bChecked = gpGlobals->developer;
-	CMenuFramework::Think();
-}
-
 /*
 =================
 UI_GameOptions_Init
@@ -131,7 +124,7 @@ void CMenuGameOptions::_Init( void )
 
 	allowConsole.SetNameAndStatus( L( "Enable developer console" ), L( "Turns on console when engine was run without -console or -dev parameter" ));
 	allowConsole.SetCoord( 240, 365 );
-	allowConsole.onChanged.SetCommand( FALSE, "ui_allowconsole\n" );
+	allowConsole.onReleased.SetCommand( FALSE, "ui_allowconsole\n" );
 
 	cmdrate.SetRect( 650, 470, 200, 32 );
 	cmdrate.Setup( 20, 60, 5 );
