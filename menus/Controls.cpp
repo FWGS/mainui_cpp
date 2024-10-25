@@ -352,7 +352,7 @@ void CMenuControls::EnterGrabMode()
 {
 	if( !keysListModel.IsLineUsable( keysList.GetCurrentIndex() ) )
 	{
-		PlayLocalSound( uiStatic.sounds[SND_BUZZ] );
+		PlayLocalSound( uiStatic.sounds[SND_REMOVEKEY] );
 		return;
 	}
 
