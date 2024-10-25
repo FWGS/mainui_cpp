@@ -131,16 +131,19 @@ void CMenuAudio::_Init( void )
 	soundVolume.Setup( 0.0, 1.0, 0.05f );
 	soundVolume.onChanged = CMenuEditable::WriteCvarCb;
 	soundVolume.SetCoord( 320, 280 );
+	soundVolume.size.w = 300;
 
 	musicVolume.szName = L( "GameUI_MP3Volume" );
 	musicVolume.Setup( 0.0, 1.0, 0.05f );
 	musicVolume.onChanged = CMenuEditable::WriteCvarCb;
 	musicVolume.SetCoord( 320, 340 );
+	musicVolume.size.w = 300;
 
 	suitVolume.szName = L( "GameUI_HEVSuitVolume" );
 	suitVolume.Setup( 0.0, 1.0, 0.05f );
 	suitVolume.onChanged = CMenuEditable::WriteCvarCb;
 	suitVolume.SetCoord( 320, 400 );
+	suitVolume.size.w = 300;
 
 	static CStringArrayModel model( lerpingStr, V_ARRAYSIZE( lerpingStr ));
 	lerping.szName = L( "Sound interpolation" );
