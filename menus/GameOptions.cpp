@@ -111,7 +111,7 @@ void CMenuGameOptions::_Init( void )
 	maxFPS.SetNameAndStatus( L( "FPS limit" ), L( "Cap your game frame rate" ));
 	maxFPS.Setup( 20, 500, 20 );
 	maxFPS.LinkCvar( "fps_max", CMenuEditable::CVAR_VALUE );
-	maxFPS.SetRect( 240, 270, 220, 32 );
+	maxFPS.SetRect( 360, 260, 220, 32 );
 
 	//hand.SetNameAndStatus( "Use left hand", "Draw gun at left side" );
 	//hand.LinkCvar( "cl_righthand" );
@@ -119,23 +119,23 @@ void CMenuGameOptions::_Init( void )
 
 	allowDownload.SetNameAndStatus( L( "Allow download" ), L( "Allow download of files from servers" ) );
 	allowDownload.LinkCvar( "cl_allowdownload" );
-	allowDownload.SetCoord( 240, 315 );
+	allowDownload.SetCoord( 360, 315 );
 
 	allowConsole.SetNameAndStatus( L( "Enable developer console" ), L( "Turns on console when engine was run without -console or -dev parameter" ));
-	allowConsole.SetCoord( 240, 365 );
+	allowConsole.SetCoord( 360, 365 );
 	allowConsole.onReleased.SetCommand( FALSE, "ui_allowconsole\n" );
 
-	cmdrate.SetRect( 650, 470, 200, 32 );
+	cmdrate.SetRect( 600, 470, 200, 32 );
 	cmdrate.Setup( 20, 60, 5 );
 	cmdrate.LinkCvar( "cl_cmdrate", CMenuEditable::CVAR_VALUE );
 	cmdrate.SetNameAndStatus( L( "Command rate (cl_cmdrate)" ), L( "How many commands sent to server per second" ) );
 
-	updaterate.SetRect( 650, 570, 200, 32 );
+	updaterate.SetRect( 600, 570, 200, 32 );
 	updaterate.Setup( 20, 100, 5 );
 	updaterate.LinkCvar( "cl_updaterate", CMenuEditable::CVAR_VALUE );
 	updaterate.SetNameAndStatus( L( "Update rate (cl_updaterate)" ), L( "How many updates sent from server per second" ) );
 
-	rate.SetRect( 650, 670, 200, 32 );
+	rate.SetRect( 600, 670, 200, 32 );
 	rate.Setup( 2500, 90000, 500 );
 	rate.LinkCvar( "rate", CMenuEditable::CVAR_VALUE );
 	rate.SetNameAndStatus( L( "Network speed (rate)" ), L( "Limit traffic (bytes per second)" ) );
@@ -144,9 +144,9 @@ void CMenuGameOptions::_Init( void )
 	networkMode.szName = L( "Select network mode:" );
 	networkMode.colorBase = uiColorHelp;
 	networkMode.SetCharSize( QM_BIGFONT );
-	networkMode.SetRect( 240, 450, 400, 32 );
+	networkMode.SetRect( 77, 430, 400, 32 );
 
-	normal.SetRect( 240, 510, 24, 24 );
+	normal.SetRect( 77, 480, 32, 32 );
 	normal.szName = L( "Normal internet connection" ); 	// Такая строка где-то уже была, поэтому в отдельный файл НЕ ВЫНОШУ !
 	SET_EVENT_MULTI( normal.onChanged,
 	{
@@ -154,7 +154,7 @@ void CMenuGameOptions::_Init( void )
 		((CMenuCheckBox*)pSelf)->bChecked = true;
 	});
 
-	dsl.SetRect( 240, 560, 24, 24 );
+	dsl.SetRect( 77, 530, 32, 32 );
 	dsl.szName = L( "DSL or PPTP with limited packet size" );	// И такое тоже уже было !
 	SET_EVENT_MULTI( dsl.onChanged,
 	{
@@ -163,7 +163,7 @@ void CMenuGameOptions::_Init( void )
 	});
 
 
-	slowest.SetRect( 240, 610, 24, 24 );
+	slowest.SetRect( 77, 580, 32, 32 );
 	slowest.szName = L( "Slow connection mode (64kbps)" );	// Было, повтор !
 	SET_EVENT_MULTI( slowest.onChanged,
 	{
