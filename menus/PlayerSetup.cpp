@@ -173,8 +173,14 @@ public:
 
 	CMenuPlayerModelView	view;
 
-	CMenuCheckBox	showModels;
-	CMenuCheckBox	hiModels;
+	CMenuCheckBox showModels;
+	CMenuCheckBox hiModels;
+
+	CMenuCheckBox voiceEnable;
+	CMenuSlider transmitVolume;
+	CMenuSlider receiveVolume;
+	CMenuAction noProprietaryCodecNotice;
+
 	CMenuSlider	topColor;
 	CMenuSlider	bottomColor;
 
@@ -240,6 +246,10 @@ void CMenuPlayerSetup::CMenuLogoPreview::Draw()
 			EngFuncs::PIC_DrawTrans( ui_pt, ui_sz, &rc2 );
 		}
 	}
+
+	int textHeight = m_scPos.y - (m_scChSize * 1.5f);
+	uint textflags = ( iFlags & QMF_DROPSHADOW ) ? ETF_SHADOW : 0;
+	UI_DrawString( font, m_scPos.x, textHeight, m_scSize.w, m_scChSize, szName, uiColorHelp, m_scChSize, QM_LEFT, textflags | ETF_FORCECOL );
 
 	// draw the rectangle
 	if( eFocusAnimation == QM_HIGHLIGHTIFFOCUS && IsCurrentSelected() )
@@ -500,7 +510,10 @@ void CMenuPlayerSetup::_Init( void )
 	name.szName = L( "GameUI_PlayerName" );
 	name.iMaxLength = 32;
 	name.LinkCvar( "name" );
-	name.SetRect( 320, 260, 256, 36 );
+	name.SetRect( 360, 270, 300, 36 );
+
+	view.iFlags |= addFlags;
+	view.SetRect( 700, 270, 260, 300 );
 
 	modelsModel.Update();
 	if( !modelsModel.GetRows( ))
@@ -513,41 +526,25 @@ void CMenuPlayerSetup::_Init( void )
 		model.Setup( &modelsModel );
 		model.LinkCvar( "model", CMenuEditable::CVAR_STRING );
 		model.onChanged = VoidCb( &CMenuPlayerSetup::UpdateModel );
-		model.SetRect( 660, 580 + UI_OUTLINE_WIDTH, 260, 32 );
+		model.SetRect( 700, 570 + UI_OUTLINE_WIDTH, 260, 32 );
 	}
 
 	topColor.iFlags |= addFlags;
-	topColor.szName = L( "GameUI_PrimaryColor" );
-	topColor.Setup( 0.0, 255, 1 );
+	topColor.szName = L( "Colors" );
+	topColor.Setup( 0, 255, 1 );
 	topColor.LinkCvar( "topcolor" );
 	topColor.onCvarChange = CMenuEditable::WriteCvarCb;
 	topColor.onChanged = VoidCb( &CMenuPlayerSetup::ApplyColorToImagePreview );
-	topColor.SetCoord( 340, 520 );
-	topColor.size.w = 300;
+	topColor.SetCoord( 700, 660 );
+	topColor.size.w = 260;
 
 	bottomColor.iFlags |= addFlags;
-	bottomColor.szName = L( "GameUI_SecondaryColor" );
-	bottomColor.Setup( 0.0, 255.0, 1 );
+	bottomColor.Setup( 0, 255, 1 );
 	bottomColor.LinkCvar( "bottomcolor" );
 	bottomColor.onCvarChange = CMenuEditable::WriteCvarCb;
 	bottomColor.onChanged = VoidCb( &CMenuPlayerSetup::ApplyColorToImagePreview );;
-	bottomColor.SetCoord( 340, 590 );
-	bottomColor.size.w = 300;
-
-	showModels.iFlags |= addFlags;
-	showModels.szName = L( "Show 3D preview" );
-	showModels.onCvarChange = CMenuEditable::WriteCvarCb;
-	showModels.LinkCvar( "ui_showmodels" );
-	showModels.SetCoord( 340, 380 );
-
-	hiModels.iFlags |= addFlags;
-	hiModels.szName = L( "GameUI_HighModels" );
-	hiModels.onCvarChange = CMenuEditable::WriteCvarCb;
-	hiModels.LinkCvar( "cl_himodels" );
-	hiModels.SetCoord( 340, 430 );
-
-	view.iFlags |= addFlags;
-	view.SetRect( 660, 260, 260, 320 );
+	bottomColor.SetCoord( 700, 700 );
+	bottomColor.size.w = 260;
 
 	msgBox.SetMessage( L( "Please, choose another player name" ) );
 	msgBox.Link( this );
@@ -565,6 +562,42 @@ void CMenuPlayerSetup::_Init( void )
 	AddButton( L( "Adv. Options" ), nullptr, PC_ADV_OPT, UI_GameOptions_Menu );
 	gameOpt->SetGrayed( !UI_AdvUserOptions_IsAvailable() );
 
+	showModels.iFlags |= addFlags;
+	showModels.szName = L( "Show 3D preview" );
+	showModels.onCvarChange = CMenuEditable::WriteCvarCb;
+	showModels.LinkCvar( "ui_showmodels" );
+	showModels.SetCoord( 77, 230 + m_iBtnsNum * 50 + 10 );
+
+	hiModels.iFlags |= addFlags;
+	hiModels.szName = L( "GameUI_HighModels" );
+	hiModels.onCvarChange = CMenuEditable::WriteCvarCb;
+	hiModels.LinkCvar( "cl_himodels" );
+	hiModels.SetCoord( 77, showModels.pos.y + 50 );
+
+	voiceEnable.szName = L( "GameUI_EnableVoice" );
+	voiceEnable.onCvarChange = CMenuEditable::WriteCvarCb;
+	voiceEnable.LinkCvar( "voice_modenable" ); // unlike engine's voice_enable, this is synchronized with server
+	voiceEnable.SetCoord( 77, hiModels.pos.y + 50 );
+
+	transmitVolume.szName = L( "GameUI_VoiceTransmitVolume" );
+	transmitVolume.onCvarChange = CMenuEditable::WriteCvarCb;
+	transmitVolume.Setup( 0, 1, 0.05f );
+	transmitVolume.LinkCvar( "voice_transmit_scale" );
+	transmitVolume.SetCoord( 77, voiceEnable.pos.y + 100 );
+	transmitVolume.size.w = 300;
+
+	receiveVolume.szName = L( "GameUI_VoiceReceiveVolume" );
+	receiveVolume.onCvarChange = CMenuEditable::WriteCvarCb;
+	receiveVolume.Setup( 0, 1, 0.05f );
+	receiveVolume.LinkCvar( "voice_scale" );
+	receiveVolume.SetCoord( 77, transmitVolume.pos.y + 50 );
+	receiveVolume.size.w = 300;
+
+	noProprietaryCodecNotice.szName = L( "* Uses Opus Codec.\nOpen, royalty-free, highly versatile audio codec." );
+	noProprietaryCodecNotice.colorBase = uiColorHelp;
+	noProprietaryCodecNotice.SetCharSize( QM_SMALLFONT );
+	noProprietaryCodecNotice.SetRect( 77, receiveVolume.pos.y + 30, 400, 100 );
+
 	if( !hideLogos )
 	{
 		logosModel.Update();
@@ -580,21 +613,27 @@ void CMenuPlayerSetup::_Init( void )
 			for( size_t i = 0; i < V_ARRAYSIZE( g_LogoColors ); i++ )
 				itemlist[i] = L( g_LogoColors[i].name );
 
-			logoImage.SetRect( 72, 230 + m_iBtnsNum * 50 + 10, 200, 200 );
+			logoImage.szName = L( "Spraypaint image" );
+			logoImage.SetRect( 460, 370, 200, 200 );
 
 			logo.Setup( &logosModel );
 			logo.LinkCvar( "cl_logofile", CMenuEditable::CVAR_STRING );
 			logo.onChanged = VoidCb( &CMenuPlayerSetup::UpdateLogo );
-			logo.SetRect( 72, logoImage.pos.y + logoImage.size.h + UI_OUTLINE_WIDTH, 200, 32 );
+			logo.SetRect( 460, logoImage.pos.y + logoImage.size.h + UI_OUTLINE_WIDTH, 200, 32 );
 
 			logoColor.Setup( &colors );
 			logoColor.LinkCvar( "cl_logocolor", CMenuEditable::CVAR_STRING );
 			logoColor.onChanged = VoidCb( &CMenuPlayerSetup::ApplyColorToLogoPreview );;
-			logoColor.SetRect( 72, logo.pos.y + logo.size.h + UI_OUTLINE_WIDTH, 200, 32 );
+			logoColor.SetRect( 460, logo.pos.y + logo.size.h + UI_OUTLINE_WIDTH, 200, 32 );
 		}
 	}
 
 	AddItem( name );
+	AddItem( voiceEnable );
+	AddItem( transmitVolume );
+	AddItem( receiveVolume );
+	AddItem( noProprietaryCodecNotice );
+
 	if( !hideLogos )
 	{
 		UpdateLogo();
