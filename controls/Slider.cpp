@@ -54,7 +54,7 @@ void CMenuSlider::VidInit(  )
 	BaseClass::VidInit();
 
 	// scale the center box
-	m_scCenterBox.w = m_scSize.w / 5.0f;
+	m_scCenterBox.w = 40 * uiStatic.scaleX;
 	m_scCenterBox.h = m_scSize.h - m_iSliderOutlineWidth * 2;
 
 	m_iNumSteps = (m_flMaxValue - m_flMinValue) / m_flRange + 1;
