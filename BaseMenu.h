@@ -36,8 +36,8 @@ GNU General Public License for more details.
 #define MAX_HINT_TEXT		512
 
 // menu buttons dims
-#define UI_BUTTONS_WIDTH		240
-#define UI_BUTTONS_HEIGHT		40
+#define UI_BUTTONS_WIDTH  250 // ( 156 / 640 ) * 1024
+#define UI_BUTTONS_HEIGHT 42  // ( 26 / 480 ) * 768
 
 #define UI_DESCEND			"gfx/shell/down"
 #define UI_ASCEND			"gfx/shell/up"
