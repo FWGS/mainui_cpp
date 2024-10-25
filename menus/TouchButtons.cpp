@@ -376,12 +376,12 @@ void CMenuTouchButtons::_Init( void )
 
 	banner.SetPicture(ART_BANNER);
 
-	done.SetNameAndStatus( L( "Done" ), L( "Save changes and go back to the Touch Menu" ) );
+	done.szName = L( "Done" );
 	done.SetPicture( PC_DONE );
 	done.onReleased = ExitMenuCb;
 	done.onReleased.pExtra = (void*)"touch_writeconfig\n";
 
-	cancel.SetNameAndStatus( L( "GameUI_Cancel" ), L( "Discard changes and go back to the Touch Menu" ) );
+	cancel.szName = L( "GameUI_Cancel" );
 	cancel.SetPicture( PC_CANCEL );
 	cancel.onReleased = ExitMenuCb;
 	cancel.onReleased.pExtra = (void*)"touch_reloadconfig\n";

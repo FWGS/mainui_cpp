@@ -176,8 +176,8 @@ void CMenuScriptConfig::ListItemCvarGetCb(CMenuBaseItem *pSelf, void *pExtra)
 void CMenuScriptConfig::_Init( void )
 {
 	AddItem( banner );
-	AddButton( L( "Done" ), L( "Save and Go back to previous menu" ), PC_DONE, VoidCb( &CMenuScriptConfig::SaveAndPopMenu ) );
-	AddButton( L( "GameUI_Cancel" ), L( "Go back to the previous menu" ), PC_CANCEL, VoidCb( &CMenuScriptConfig::Hide ) );
+	AddButton( L( "Done" ), nullptr, PC_DONE, VoidCb( &CMenuScriptConfig::SaveAndPopMenu ) );
+	AddButton( L( "GameUI_Cancel" ), nullptr, PC_CANCEL, VoidCb( &CMenuScriptConfig::Hide ) );
 
 	if( !m_pVars )
 		return;

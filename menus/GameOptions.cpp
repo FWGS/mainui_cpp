@@ -108,15 +108,14 @@ UI_GameOptions_Init
 void CMenuGameOptions::_Init( void )
 {
 	banner.SetPicture( ART_BANNER );
-	maxFPS.szName = L( "FPS limit" );
-	maxFPS.szStatusText = L( "Cap your game frame rate" );
+	maxFPS.SetNameAndStatus( L( "FPS limit" ), L( "Cap your game frame rate" ));
 	maxFPS.Setup( 20, 500, 20 );
 	maxFPS.LinkCvar( "fps_max", CMenuEditable::CVAR_VALUE );
 	maxFPS.SetRect( 240, 270, 220, 32 );
 
 	//hand.SetNameAndStatus( "Use left hand", "Draw gun at left side" );
 	//hand.LinkCvar( "cl_righthand" );
-	// hand.SetCoord( 240, 330 );
+	//hand.SetCoord( 240, 330 );
 
 	allowDownload.SetNameAndStatus( L( "Allow download" ), L( "Allow download of files from servers" ) );
 	allowDownload.LinkCvar( "cl_allowdownload" );
@@ -173,8 +172,8 @@ void CMenuGameOptions::_Init( void )
 	});
 
 	AddItem( banner );
-	AddButton( L( "Done" ), L( "Save changes and go back to the Customize Menu" ), PC_DONE, VoidCb( &CMenuGameOptions::SaveCb ) );
-	AddButton( L( "GameUI_Cancel" ), L( "Go back to the Customize Menu" ), PC_CANCEL, VoidCb( &CMenuGameOptions::RestoreCb ) );
+	AddButton( L( "Done" ), nullptr, PC_DONE, VoidCb( &CMenuGameOptions::SaveCb ) );
+	AddButton( L( "GameUI_Cancel" ), nullptr, PC_CANCEL, VoidCb( &CMenuGameOptions::RestoreCb ) );
 
 	AddItem( maxFPS );
 	//AddItem( hand );

@@ -299,22 +299,22 @@ UI_LoadGame_Init
 */
 void CMenuLoadGame::_Init( void )
 {
-	save.SetNameAndStatus( L( "GameUI_Save" ), L( "Save current game" ) );
+	save.szName = L( "GameUI_Save" );
 	save.SetPicture( PC_SAVE_GAME );
 	save.onReleased = VoidCb( &CMenuLoadGame::SaveGame );
 	save.SetCoord( 72, 230 );
 
-	load.SetNameAndStatus( L( "GameUI_Load" ), L( "Load saved game" ) );
+	load.szName = L( "GameUI_Load" );
 	load.SetPicture( PC_LOAD_GAME );
 	load.onReleased = VoidCb( &CMenuLoadGame::LoadGame );
 	load.SetCoord( 72, 230 );
 
-	remove.SetNameAndStatus( L( "Delete" ), L( "Delete saved game" ) );
+	remove.szName = L( "Delete" );
 	remove.SetPicture( PC_DELETE );
 	remove.onReleased = msgBox.MakeOpenEvent();
 	remove.SetCoord( 72, 280 );
 
-	cancel.SetNameAndStatus( L( "GameUI_Cancel" ), L( "Return back to main menu" ) );
+	cancel.szName = L( "GameUI_Cancel" );
 	cancel.SetPicture( PC_CANCEL );
 	cancel.onReleased = VoidCb( &CMenuLoadGame::Hide );
 	cancel.SetCoord( 72, 330 );

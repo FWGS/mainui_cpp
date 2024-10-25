@@ -470,7 +470,7 @@ void CMenuServerInfo::_Init()
 	server_pingtime.SetCharSize( QM_SMALLFONT );
 	server_pingtime.SetRect( 72, 560, 250, 80 );
 
-	done.SetNameAndStatus( L( "Done" ), L( "Go back to the Multiplayer Menu" ));
+	done.szName = L( "Done" );
 	done.SetPicture( PC_DONE );
 	done.onReleased = VoidCb( &CMenuServerInfo::Hide );
 	done.SetCoord( 72, 650 );

@@ -303,7 +303,7 @@ void CMenuTouchOptions::_Init( void )
 {
 	banner.SetPicture(ART_BANNER);
 
-	done.SetNameAndStatus( L( "Done" ), L( "Go back to the Touch Menu" ) );
+	done.szName = L( "Done" );
 	done.SetPicture( PC_DONE );
 	done.onReleased = VoidCb( &CMenuTouchOptions::SaveAndPopMenu );
 
@@ -358,7 +358,7 @@ void CMenuTouchOptions::_Init( void )
 	profilename.szName = L( "New Profile:" );
 	profilename.iMaxLength = 16;
 
-	reset.SetNameAndStatus( L( "Reset" ), L( "Reset sensitivity settings" ) );
+	reset.szName = L( "Reset" );
 	reset.SetPicture("gfx/shell/btn_touch_reset");
 	reset.onReleased = VoidCb( &CMenuTouchOptions::ResetMsgBox );
 

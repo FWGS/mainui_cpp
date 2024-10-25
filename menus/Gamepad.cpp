@@ -202,7 +202,6 @@ void CMenuGamePad::_Init( void )
 
 	banner.SetPicture( ART_BANNER );
 
-
 	enableOsk.SetNameAndStatus( L( "Builtin on-screen keyboard" ), L( "Enable builtin on-screen keyboard in case your platform doesn't have any" ));
 
 	axisBind_label.eTextAlignment = QM_CENTER;
@@ -233,12 +232,10 @@ void CMenuGamePad::_Init( void )
 	invYaw.SetNameAndStatus( L( "Invert" ), L( "Invert yaw axis" ) );
 
 	AddItem( banner );
-	AddButton( L( "Controls" ), L( "Change keyboard and mouse settings" ), PC_CONTROLS, UI_Controls_Menu );
-	AddButton( L( "Done" ), L( "Go back to the Configuration Menu" ), PC_DONE, VoidCb( &CMenuGamePad::SaveAndPopMenu ) );	// Обе строки уже встречались ранее !!
+	AddButton( L( "Controls" ), nullptr, PC_CONTROLS, UI_Controls_Menu );
+	AddButton( L( "Done" ), nullptr, PC_DONE, VoidCb( &CMenuGamePad::SaveAndPopMenu ) );	// Обе строки уже встречались ранее !!
 	for( i = 0; i < 6; i++ )
-	{
 		AddItem( axisBind[i] );
-	}
 	AddItem( enableOsk );
 	AddItem( side );
 	AddItem( invSide );

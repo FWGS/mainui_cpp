@@ -249,13 +249,9 @@ void CMenuCustomGame::_Init( void )
 	msgBox.Link( this );
 
 	AddItem( banner );
-	load = AddButton( L( "Activate" ), L( "Activate selected custom game" ), PC_ACTIVATE,
-		VoidCb( &CMenuCustomGame::ShowDialog ) );
-
-	go2url = AddButton( L( "Visit web site" ), L( "Visit the web site of game developers" ), PC_VISIT_WEB_SITE,
-		MenuCb( &CMenuCustomGame::Go2Site ) );
-	AddButton( L( "Done" ), L( "Return to main menu" ), PC_DONE,	// Done - уже где-то было, поэтому в отдельный файл повторно не выношу
-		VoidCb( &CMenuCustomGame::Hide ) );
+	load = AddButton( L( "Activate" ), nullptr, PC_ACTIVATE, VoidCb( &CMenuCustomGame::ShowDialog ) );
+	go2url = AddButton( L( "Visit web site" ), nullptr, PC_VISIT_WEB_SITE, MenuCb( &CMenuCustomGame::Go2Site ) );
+	AddButton( L( "Done" ), nullptr, PC_DONE, VoidCb( &CMenuCustomGame::Hide ) );
 
 	modList.onChanged = VoidCb( &CMenuCustomGame::UpdateExtras );
 	modList.SetupColumn( 0, L( "GameUI_Type" ), 0.20f );

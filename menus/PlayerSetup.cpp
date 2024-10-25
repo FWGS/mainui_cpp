@@ -497,13 +497,13 @@ void CMenuPlayerSetup::_Init( void )
 
 	banner.SetPicture(ART_BANNER);
 
-	name.szStatusText = L( "Enter your multiplayer display name" );
+	name.szName = L( "GameUI_PlayerName" );
 	name.iMaxLength = 32;
 	name.LinkCvar( "name" );
 	name.SetRect( 320, 260, 256, 36 );
 
 	modelsModel.Update();
-	if( !modelsModel.GetRows() )
+	if( !modelsModel.GetRows( ))
 	{
 		model.SetVisibility( false );
 		hideModels = true;
@@ -517,7 +517,7 @@ void CMenuPlayerSetup::_Init( void )
 	}
 
 	topColor.iFlags |= addFlags;
-	topColor.SetNameAndStatus( L( "GameUI_PrimaryColor" ), L( "Set a player model top color" ) );
+	topColor.szName = L( "GameUI_PrimaryColor" );
 	topColor.Setup( 0.0, 255, 1 );
 	topColor.LinkCvar( "topcolor" );
 	topColor.onCvarChange = CMenuEditable::WriteCvarCb;
@@ -526,7 +526,7 @@ void CMenuPlayerSetup::_Init( void )
 	topColor.size.w = 300;
 
 	bottomColor.iFlags |= addFlags;
-	bottomColor.SetNameAndStatus( L( "GameUI_SecondaryColor" ), L( "Set a player model bottom color" ) );
+	bottomColor.szName = L( "GameUI_SecondaryColor" );
 	bottomColor.Setup( 0.0, 255.0, 1 );
 	bottomColor.LinkCvar( "bottomcolor" );
 	bottomColor.onCvarChange = CMenuEditable::WriteCvarCb;
@@ -535,13 +535,13 @@ void CMenuPlayerSetup::_Init( void )
 	bottomColor.size.w = 300;
 
 	showModels.iFlags |= addFlags;
-	showModels.SetNameAndStatus( L( "Show 3D preview" ), L( "Show 3D player models instead of preview thumbnails" ) );
+	showModels.szName = L( "Show 3D preview" );
 	showModels.onCvarChange = CMenuEditable::WriteCvarCb;
 	showModels.LinkCvar( "ui_showmodels" );
 	showModels.SetCoord( 340, 380 );
 
 	hiModels.iFlags |= addFlags;
-	hiModels.SetNameAndStatus( L( "GameUI_HighModels" ), L( "Show HD models in multiplayer" ) );
+	hiModels.szName = L( "GameUI_HighModels" );
 	hiModels.onCvarChange = CMenuEditable::WriteCvarCb;
 	hiModels.LinkCvar( "cl_himodels" );
 	hiModels.SetCoord( 340, 430 );
@@ -554,17 +554,16 @@ void CMenuPlayerSetup::_Init( void )
 
 	AddItem( banner );
 
-	AddButton( L( "Done" ), L( "Go back to the Multiplayer Menu" ), PC_DONE, VoidCb( &CMenuPlayerSetup::SaveAndPopMenu ) );
-	CMenuPicButton *gameOpt = AddButton( L( "Game options" ), L( "Configure handness, fov and other advanced options" ), PC_GAME_OPTIONS );
+	AddButton( L( "Done" ), nullptr, PC_DONE, VoidCb( &CMenuPlayerSetup::SaveAndPopMenu ) );
+	CMenuPicButton *gameOpt = AddButton( L( "Game options" ), nullptr, PC_GAME_OPTIONS );
 	SET_EVENT_MULTI( gameOpt->onReleased,
 	{
 		((CMenuPlayerSetup*)pSelf->Parent())->SetConfig();
 		UI_AdvUserOptions_Menu();
 	});
 
-	AddButton( L( "Adv. Options" ), "", PC_ADV_OPT, UI_GameOptions_Menu );
+	AddButton( L( "Adv. Options" ), nullptr, PC_ADV_OPT, UI_GameOptions_Menu );
 	gameOpt->SetGrayed( !UI_AdvUserOptions_IsAvailable() );
-
 
 	if( !hideLogos )
 	{

@@ -342,7 +342,7 @@ void CMenuVidModes::_Init( void )
 	vidList.SetupColumn( 0, L( "GameUI_Resolution" ), 1.0f );
 	vidList.SetModel( &vidListModel );
 
-	vsync.SetNameAndStatus( L( "GameUI_VSync" ), L( "GameUI_VSync" ) );
+	vsync.szName = L( "GameUI_VSync" );
 	vsync.SetCoord( 360, 670 );
 	vsync.LinkCvar( "gl_vsync" );
 
@@ -360,7 +360,7 @@ void CMenuVidModes::_Init( void )
 	renderers.onCvarWrite = VoidCb( &CMenuVidModes::WriteRendererConfig );
 	renderers.bUpdateImmediately = true;
 
-	windowMode.SetNameAndStatus( L( "Window mode" ), L( "Select desired window mode" ) );
+	windowMode.szName = L( "Window mode" );
 	windowMode.Setup( &windowModeModel );
 	windowMode.SetRect( 80, 550, 250, 32 );
 	windowMode.SetCharSize( QM_SMALLFONT );
@@ -373,8 +373,8 @@ void CMenuVidModes::_Init( void )
 	});
 
 	AddItem( banner );
-	AddButton( L( "GameUI_Apply" ), L( "Apply changes" ), PC_OK, VoidCb( &CMenuVidModes::SetConfig ) );
-	AddButton( L( "GameUI_Cancel" ), L( "Return back to previous menu" ), PC_CANCEL, VoidCb( &CMenuVidModes::Hide ) );
+	AddButton( L( "GameUI_Apply" ), nullptr, PC_OK, VoidCb( &CMenuVidModes::SetConfig ) );
+	AddButton( L( "GameUI_Cancel" ), nullptr, PC_CANCEL, VoidCb( &CMenuVidModes::Hide ) );
 	AddItem( renderers );
 	AddItem( windowMode );
 	AddItem( vsync );

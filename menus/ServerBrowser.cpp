@@ -559,13 +559,11 @@ void CMenuServerBrowser::ToggleFavoriteButton( bool en )
 {
 	if( en )
 	{
-		favorite->SetNameAndStatus( L( "Favorite" ), L( "Add this server to favorites list" ));
-		favorite->SetPicture( PC_FAVORITE );
+		favorite->szName = L( "Favorite" );
 	}
 	else
 	{
-		favorite->SetNameAndStatus( L( "Unfavorite" ), L( "Remove this server from favorites list" ));
-		favorite->SetPicture( PC_UNFAVORITE );
+		favorite->szName = L( "Unfavorite" );
 	}
 }
 
@@ -791,7 +789,7 @@ void CMenuServerBrowser::_Init( void )
 {
 	AddItem( banner );
 
-	joinGame = AddButton( L( "Join game" ), L( "Join to selected game" ), PC_JOIN_GAME, VoidCb( &CMenuServerBrowser::JoinGame ), QMF_GRAYED );
+	joinGame = AddButton( L( "Join game" ), nullptr, PC_JOIN_GAME, VoidCb( &CMenuServerBrowser::JoinGame ), QMF_GRAYED );
 	joinGame->onReleasedClActive = msgBox.MakeOpenEvent();
 
 	createGame = AddButton( L( "GameUI_GameMenu_CreateServer" ), NULL, PC_CREATE_GAME );
@@ -804,12 +802,12 @@ void CMenuServerBrowser::_Init( void )
 		UI_CreateGame_Menu();
 	});
 
-	viewGameInfo = AddButton( L( "View game info" ), L( "Get detail game info" ), PC_VIEW_GAME_INFO, VoidCb( &CMenuServerBrowser::ViewGameInfo ), QMF_GRAYED );
-	favorite = AddButton( L( "Favorite" ), L( "Add this server to favorites list" ), PC_FAVORITE, VoidCb( &CMenuServerBrowser::FavoriteServer ) );
-	refresh = AddButton( L( "Refresh" ), L( "Refresh servers list" ), PC_REFRESH, VoidCb( &CMenuServerBrowser::RefreshList ) );
-	addServer = AddButton( L( "Add server" ), L( "Manually enter server address and add it to the list" ), PC_ADD_SERVER, VoidCb( &CMenuServerBrowser::ShowAddServerBox ));
+	viewGameInfo = AddButton( L( "View game info" ), nullptr, PC_VIEW_GAME_INFO, VoidCb( &CMenuServerBrowser::ViewGameInfo ), QMF_GRAYED );
+	favorite = AddButton( L( "Favorite" ), nullptr, nullptr, VoidCb( &CMenuServerBrowser::FavoriteServer ) );
+	refresh = AddButton( L( "Refresh" ), nullptr, PC_REFRESH, VoidCb( &CMenuServerBrowser::RefreshList ) );
+	addServer = AddButton( L( "Add server" ), nullptr, PC_ADD_SERVER, VoidCb( &CMenuServerBrowser::ShowAddServerBox ));
 
-	AddButton( L( "Done" ), L( "Return to main menu" ), PC_DONE, VoidCb( &CMenuServerBrowser::Hide ) );
+	AddButton( L( "Done" ), nullptr, PC_DONE, VoidCb( &CMenuServerBrowser::Hide ) );
 
 	msgBox.SetMessage( L( "Join a network game will exit any current game, OK to exit?" ) );
 	msgBox.SetPositiveButton( L( "GameUI_OK" ), PC_OK );
@@ -926,7 +924,6 @@ void CMenuServerBrowser::Show()
 	if( m_bLanOnly )
 	{
 		banner.SetPicture( ART_BANNER_LAN );
-		createGame->szStatusText = ( L( "Create new LAN game" ) );
 		favorite->Hide();
 		addServer->Hide();
 		tabSwitch.Hide();
@@ -934,7 +931,6 @@ void CMenuServerBrowser::Show()
 	else
 	{
 		banner.SetPicture( ART_BANNER_INET );
-		createGame->szStatusText = ( L( "Create new Internet game" ) );
 		favorite->Show();
 		addServer->Show();
 		tabSwitch.Show();
