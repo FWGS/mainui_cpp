@@ -52,7 +52,7 @@ void CMenuTable::VidInit()
 	colorStroke.SetDefault( uiInputFgColor );
 	iStrokeFocusedColor.SetDefault( uiInputTextColor );
 
-	if( iStrokeWidth == 0 ) iStrokeWidth = uiStatic.outlineWidth;
+	iStrokeWidth = uiStatic.outlineWidth;
 
 	iNumRows = ( m_scSize.h - iStrokeWidth * 2 ) / m_scChSize - 1;
 
@@ -106,7 +106,7 @@ void CMenuTable::VidInit()
 	}
 
 	// calculate header size(position is table position)
-	headerSize.w = m_scSize.w - arrow.w + iStrokeWidth;
+	headerSize.w = m_scSize.w - arrow.w + iStrokeWidth * 2;
 
 	// box is lower than header
 	boxPos.x = m_scPos.x;

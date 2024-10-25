@@ -39,8 +39,7 @@ void CMenuPlayerModelView::VidInit()
 	colorStroke.SetDefault( uiInputFgColor );
 	colorFocus.SetDefault( uiInputTextColor );
 
-	if( iStrokeWidth == 0 )
-		iStrokeWidth = uiStatic.outlineWidth;
+	iStrokeWidth = uiStatic.outlineWidth;
 
 	CMenuBaseItem::VidInit();
 
