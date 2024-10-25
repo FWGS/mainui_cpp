@@ -827,9 +827,9 @@ void CMenuServerBrowser::_Init( void )
 	gameList.bFramedHintText = true;
 	gameList.bAllowSorting = true;
 	gameList.onChanged = VoidCb( &CMenuServerBrowser::OnChangeSelectedServer );
-	gameList.SetRect( 360, 230, -20, 465 );
+	gameList.SetSize( -20, 465 );
 
-	tabSwitch.SetRect( -550, gameList.pos.y - UI_OUTLINE_WIDTH - tabSwitch.size.h, -20, 35 );
+	tabSwitch.SetRect( 360, 230, -20, 32 );
 	tabSwitch.AddSwitch( L( "Direct" ));
 	tabSwitch.AddSwitch( "NAT" ); // intentionally not localized
 	tabSwitch.AddSwitch( L( "Favorites" ));
@@ -915,6 +915,15 @@ void CMenuServerBrowser::_VidInit()
 {
 	refreshTime = uiStatic.realTime + 500; // delay before update 0.5 sec
 	refreshTime2 = uiStatic.realTime + 500;
+
+	if( m_bLanOnly )
+	{
+		gameList.SetCoord( 360, 230 );
+	}
+	else
+	{
+		gameList.SetCoord( 360, 230 + tabSwitch.size.h + uiStatic.outlineWidth );
+	}
 }
 
 void CMenuServerBrowser::Show()
