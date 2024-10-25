@@ -348,6 +348,7 @@ void CMenuPicButton::Draw( )
 			light_blur_color = colorBase;
 
 		pos.x += 7 * uiStatic.scaleX;
+		pos.y -= uiStatic.scaleY;
 
 		if( this != m_pParent->ItemAtCursor() )
 		{
