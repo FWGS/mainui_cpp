@@ -157,6 +157,7 @@
 "No preview"                                                              ""
 "Nonlinear looking (touch_nonlinear_look)"                                ""
 "Normal internet connection"                                              ""
+"Not supported on your GPU"                                               ""
 "On-screen controls for touchscreen"                                      ""
 "Open interactive editor"                                                 ""
 "Open the game advanced options menu"                                     ""

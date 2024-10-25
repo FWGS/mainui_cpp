@@ -262,6 +262,26 @@ void CMenuVidOptions::Reload()
 	vbo.SetGrayed( !gl_active );
 	vbo.SetInactive( !gl_active );
 
+	if( gl_active )
+	{
+		if( EngFuncs::textfuncs.pfnIsCvarReadOnly( "gl_vbo" ) > 0 )
+		{
+			SET_EVENT_MULTI( vbo.onCvarChange,
+			{
+				CMenuCheckBox *cb = (CMenuCheckBox *)pSelf;
+				cb->bChecked = false;
+				UI_ShowMessageBox( L( "Not supported on your GPU" ));
+			});
+
+			vbo.onCvarWrite = CEventCallback::NoopCb;
+		}
+		else
+		{
+			vbo.onCvarWrite.Reset();
+			vbo.onCvarChange.Reset();
+		}
+	}
+
 	swwater.SetGrayed( !gl_active );
 	swwater.SetInactive( !gl_active );
 
