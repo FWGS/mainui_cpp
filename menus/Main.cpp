@@ -245,9 +245,14 @@ void CMenuMain::CMenuMainBanner::VidInit()
 	m_flTimeUntilLogoBlipMax = 1.4f;
 
 	m_fLogoImageX = m_nLogoImageXMin + ((m_nLogoImageXMax - m_nLogoImageXMin) / 2.0f);
+
+#if 0 // original GameUI logic
 	if( ScreenHeight > 600 )
 		m_nLogoImageY = 60 * uiStatic.scaleY;
 	else m_nLogoImageY = 20 * uiStatic.scaleY;
+#else // similar to logo.avi position
+	m_nLogoImageY = ( 70 / 480.0f ) * 768.0f * uiStatic.scaleY;
+#endif
 
 	m_nLogoBGOffsetX = scale * -320.0f;
 	m_nLogoBGOffsetY = m_nLogoImageY - scale * 54.0f;
@@ -630,17 +635,70 @@ UI_Main_Init
 */
 void CMenuMain::VidInit( bool connected )
 {
+	int hoffset = ( 70 / 640.0 ) * 1024.0;
+
+	// in original menu Previews is located at specific point
+	int previews_voffset = ( 404 / 480.0 ) * 768.0;
+
+	// no visible console button gap
+	int ygap = (( 404 - 373 ) / 480.0 ) * 768.0;
+
 	// statically positioned items
 	minimizeBtn.SetRect( uiStatic.width - 72, 13, 32, 32 );
 	quitButton.SetRect( uiStatic.width - 36, 13, 32, 32 );
-	disconnect.SetCoord( 72, 180 );
-	resumeGame.SetCoord( 72, 230 );
-	newGame.SetCoord( 72, 280 );
-	hazardCourse.SetCoord( 72, 330 );
 
-	bool isSingle = gpGlobals->maxClients < 2;
+	previews.SetCoord( hoffset, previews_voffset );
+	quit.SetCoord( hoffset, previews_voffset + ygap );
 
-	if( CL_IsActive() && isSingle )
+	// let's start calculating positions
+	int yoffset = previews_voffset - ygap;
+
+	if( bCustomGame )
+	{
+		customGame.SetCoord( hoffset, yoffset );
+		yoffset -= ygap;
+	}
+
+	multiPlayer.SetCoord( hoffset, yoffset );
+	yoffset -= ygap;
+
+	bool single = gpGlobals->maxClients < 2;
+
+	saveRestore.SetCoord( hoffset, yoffset );
+	yoffset -= ygap;
+
+	configuration.SetCoord( hoffset, yoffset );
+	yoffset -= ygap;
+
+	if( bTrainMap )
+	{
+		hazardCourse.SetCoord( hoffset, yoffset );
+		yoffset -= ygap;
+	}
+
+	newGame.SetCoord( hoffset, yoffset );
+	yoffset -= ygap;
+
+	if( connected )
+	{
+		resumeGame.SetCoord( hoffset, yoffset );
+		yoffset -= ygap;
+
+		if( !single )
+		{
+			disconnect.SetCoord( hoffset, yoffset );
+			yoffset -= ygap;
+		}
+	}
+
+	console.SetCoord( hoffset, yoffset );
+	yoffset -= ygap;
+
+	// now figure out what's visible
+	resumeGame.SetVisibility( connected );
+	disconnect.SetVisibility( connected && !single );
+
+	if( connected && single )
 	{
 		saveRestore.SetNameAndStatus( L( "Save\\Load Game" ), L( "StringsList_192" ) );
 		saveRestore.SetPicture( PC_SAVE_LOAD_GAME );
@@ -652,56 +710,6 @@ void CMenuMain::VidInit( bool connected )
 		saveRestore.SetPicture( PC_LOAD_GAME );
 		saveRestore.onReleased = UI_LoadGame_Menu;
 	}
-
-	if( connected )
-	{
-		resumeGame.Show();
-		if( CL_IsActive() && !isSingle )
-		{
-			disconnect.Show();
-			console.pos.y = 130;
-		}
-		else
-		{
-			disconnect.Hide();
-			console.pos.y = 180;
-		}
-	}
-	else
-	{
-		resumeGame.Hide();
-		disconnect.Hide();
-		console.pos.y = 230;
-	}
-
-	console.pos.x = 72;
-	console.CalcPosition();
-
-	int saveRestorePos = 330;
-	if (bTrainMap) saveRestorePos += 50; 
-	saveRestore.SetCoord( 72, saveRestorePos );
-
-	int configurationPos = 380;
-	if (bTrainMap) configurationPos += 50; 
-	configuration.SetCoord( 72, configurationPos );
-
-	int multiPlayerPos = 430;
-	if (bTrainMap) multiPlayerPos += 50; 
-	multiPlayer.SetCoord( 72, multiPlayerPos );
-	
-	int customGamePos = 480;
-	if (bTrainMap) customGamePos += 50; 
-	customGame.SetCoord( 72, customGamePos );
-
-	int previewsPos = 480;
-	if (bCustomGame) previewsPos += 50;
-	if (bTrainMap) previewsPos += 50;
-	previews.SetCoord( 72, previewsPos );
-
-	int quitPos = 530;
-	if (bCustomGame) quitPos += 50;
-	if (bTrainMap) quitPos += 50;
-	quit.SetCoord( 72, quitPos);
 }
 
 void CMenuMain::_VidInit()
