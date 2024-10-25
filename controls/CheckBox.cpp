@@ -71,8 +71,8 @@ bool CMenuCheckBox::KeyUp( int key )
 			bChecked = !bChecked;	// apply on release
 			SetCvarValue( bChecked );
 			_Event( QM_CHANGED );
-			PlayLocalSound( sound ); // emit sound only when changed
 		}
+		PlayLocalSound( sound );
 	}
 
 	return sound != NULL;
@@ -95,8 +95,8 @@ bool CMenuCheckBox::KeyDown( int key )
 			bChecked = !bChecked;	// apply on release
 			SetCvarValue( bChecked );
 			_Event( QM_CHANGED );
-			PlayLocalSound( sound ); // emit sound only when changed
 		}
+		PlayLocalSound( sound );
 	}
 
 	return sound != NULL;
