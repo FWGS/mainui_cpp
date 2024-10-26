@@ -64,8 +64,9 @@ struct server_t
 	bool havePassword;
 	bool isLegacy;
 	bool isGoldSrc;
+	bool pending_info;
 
-	server_t( netadr_t adr, const char *info, bool is_favorite );
+	server_t( netadr_t adr, const char *info, bool is_favorite, bool pending_info = false );
 	void UpdateData();
 	void SetPing( float ping );
 
@@ -139,6 +140,35 @@ struct favlist_entry_t
 		Q_strncpy( this->sadr, sadr, sizeof( this->sadr ));
 		Q_strncpy( this->prot, prot, sizeof( this->prot ));
 		this->favorited = favorited;
+	}
+
+	void GenerateDummyInfoString( CUtlString &info ) const
+	{
+		info.AppendFormat( "\\host\\%s", sadr );
+		info.AppendFormat( "\\gamedir\\%s", gMenu.m_gameinfo.gamefolder );
+		info.Append( "\\map\\unknown\\numcl\\0\\maxcl\\0" );
+		if( !stricmp( prot, "current" ) || !strcmp( prot, "49" ))
+		{
+			info.Append( "\\p\\49" );
+		}
+		else if( !stricmp( prot, "legacy" ) || !strcmp( prot, "48" ))
+		{
+			info.Append( "\\p\\48\\legacy\\1" );
+		}
+		else if( !stricmp( prot, "goldsrc" ) || !stricmp( prot, "gs" ))
+		{
+			info.Append( "\\p\\48\\gs\\1" );
+		}
+		else
+		{
+			UI_ShowMessageBox( "Invalid protocol while generating dummy info string" );
+			info.Clear();
+		}
+	}
+
+	void QueryServer( void ) const
+	{
+		EngFuncs::ClientCmdF( false, "queryserver \"%s\" \"%s\"", sadr, prot );
 	}
 
 	char sadr[128];
@@ -340,8 +370,8 @@ void UI_LanGame_Menu( void )
 	UI_ServerBrowser_Menu();
 }
 
-server_t::server_t( netadr_t adr, const char *info, bool is_favorite ) :
-	adr( adr ), favorite( is_favorite )
+server_t::server_t( netadr_t adr, const char *info, bool is_favorite, bool pending_info ) :
+	adr( adr ), favorite( is_favorite ), pending_info( pending_info )
 {
 	Q_strncpy( this->info, info, sizeof( this->info ));
 }
@@ -437,12 +467,20 @@ void CMenuGameListModel::OnActivateEntry( int line )
 void CMenuGameListModel::AddServerToList( netadr_t adr, const char *info, bool is_favorite )
 {
 	int i;
+	int pos = -1;
 
 	// ignore if duplicated
 	for( i = 0; i < servers.Count(); i++ )
 	{
 		if( !EngFuncs::NET_CompareAdr( &servers[i].adr, &adr ))
+		{
+			if( servers[i].pending_info )
+			{
+				pos = i;
+				break;
+			}
 			return;
+		}
 
 		if( !stricmp( servers[i].info, info ))
 			return;
@@ -453,7 +491,14 @@ void CMenuGameListModel::AddServerToList( netadr_t adr, const char *info, bool i
 	server.UpdateData();
 	server.SetPing( EngFuncs::DoubleTime() - serversRefreshTime );
 
-	servers.AddToTail( server );
+	if( pos >= 0 )
+	{
+		servers[pos] = server;
+	}
+	else
+	{
+		servers.AddToTail( server );
+	}
 
 	if( m_iSortingColumn != -1 )
 		Sort( m_iSortingColumn, m_bAscend );
@@ -623,7 +668,35 @@ void CMenuServerBrowser::QueryServerList( const CUtlVector<favlist_entry_t> &lis
 {
 	FOR_EACH_VEC( list, i )
 	{
-		EngFuncs::ClientCmdF( false, "queryserver \"%s\" \"%s\"", list[i].sadr, list[i].prot );
+		netadr_t adr;
+
+		if( !EngFuncs::textfuncs.pNetAPI->StringToAdr( (char *)list[i].sadr, &adr ))
+			continue;
+
+		bool found = false;
+
+		FOR_EACH_VEC( gameListModel.servers, j )
+		{
+			if( !EngFuncs::NET_CompareAdr( &gameListModel.servers, &adr ))
+			{
+				found = true;
+				break;
+			}
+		}
+
+		if( !found )
+		{
+			CUtlString fakeInfoString;
+			list[i].GenerateDummyInfoString( fakeInfoString );
+
+			server_t serv( adr, fakeInfoString, list[i].favorited, true );
+			serv.UpdateData();
+			serv.SetPing( 9.999f );
+
+			gameListModel.servers.AddToTail( serv );
+		}
+
+		list[i].QueryServer();
 	}
 
 	UI_MenuResetPing_f();
@@ -708,42 +781,42 @@ void CMenuServerBrowser::AddServer( void )
 		return;
 	}
 
-	CUtlString info;
-	info.AppendFormat( "\\host\\%s", addressField.GetBuffer( ));
-	info.AppendFormat( "\\gamedir\\%s", gMenu.m_gameinfo.gamefolder );
-	info.Append( "\\map\\unknown\\numcl\\0\\maxcl\\0" );
+	const char *proto;
 
 	switch( (int)serverProtocol.GetCurrentValue( ))
 	{
 	case 0:
-		info.Append( "\\p\\49" );
+		proto = "49";
 		break;
 	case 1:
-		info.Append( "\\p\\48\\legacy\\1" );
+		proto = "48";
 		break;
 	case 2:
-		info.Append( "\\p\\48\\gs\\1" );
+		proto = "gs";
 		break;
+	default:
+		UI_ShowMessageBox( L( "Invalid protocol" ));
+		return;
 	}
 
-	server_t serv( adr, info.Get(), false );
-
-	serv.UpdateData();
-	serv.SetPing( 9.9999f );
-
 	// FIXME: for now we can only show custom servers at favorites tab
-	favlist_entry_t entry( addressField.GetBuffer(), serv.ToProtocol(), false );
+
+	favlist_entry_t entry( addressField.GetBuffer(), proto, false );
 	favoritesList.AddToTail( entry );
 
 	if( tabSwitch.GetState() != 2 )
 		tabSwitch.SetState( 2 );
 
-	// add a dummy entry after clearing out list
+	CUtlString fakeInfoString;
+	entry.GenerateDummyInfoString( fakeInfoString );
+
+	server_t serv( adr, fakeInfoString, false, true );
+	serv.UpdateData();
+	serv.SetPing( 9.999f );
 	gameListModel.servers.AddToTail( serv );
 
-	// force an immediate refresh
-	refreshTime2 = uiStatic.realTime;
-	RefreshList();
+	entry.QueryServer();
+	UI_MenuResetPing_f();
 }
 
 /*
