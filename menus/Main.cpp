@@ -436,8 +436,11 @@ void CMenuMain::QuitDialogCb()
 
 void CMenuMain::DisconnectCb()
 {
-	EngFuncs::ClientCmd( FALSE, "disconnect\n" );
+	EngFuncs::ClientCmd( false, "disconnect\n" );
 	VidInit( false );
+	CalcPosition();
+	CalcSizes();
+	VidInitItems();
 }
 
 void CMenuMain::DisconnectDialogCb()
