@@ -60,7 +60,7 @@ private:
 
 	void VidInit(bool connected);
 
-	void QuitDialog( void *pExtra = NULL );
+	void QuitDialogCb();
 	void DisconnectCb();
 	void DisconnectDialogCb();
 	void HazardCourseDialogCb();
@@ -423,7 +423,7 @@ void CMenuMain::CMenuMainBanner::AnimatedTitleDraw()
 	}
 }
 
-void CMenuMain::QuitDialog(void *pExtra)
+void CMenuMain::QuitDialogCb()
 {
 	if( CL_IsActive() && EngFuncs::GetCvarFloat( "host_serverstate" ) && EngFuncs::GetCvarFloat( "maxplayers" ) == 1.0f )
 		dialog.SetMessage( L( "StringsList_235" ) );
@@ -470,7 +470,7 @@ bool CMenuMain::KeyDown( int key )
 		}
 		else
 		{
-			QuitDialog( );
+			QuitDialogCb( );
 		}
 		return true;
 	}
@@ -566,12 +566,12 @@ void CMenuMain::_Init( void )
 	quit.SetNameAndStatus( L( "GameUI_GameMenu_Quit" ), L( "GameUI_QuitConfirmationText" ) );
 	quit.SetPicture( PC_QUIT );
 	quit.iFlags |= QMF_NOTIFY;
-	quit.onReleased = MenuCb( &CMenuMain::QuitDialog );
+	quit.onReleased = VoidCb( &CMenuMain::QuitDialogCb );
 
 	quitButton.SetPicture( ART_CLOSEBTN_N, ART_CLOSEBTN_F, ART_CLOSEBTN_D );
 	quitButton.iFlags = QMF_MOUSEONLY;
 	quitButton.eFocusAnimation = QM_HIGHLIGHTIFFOCUS;
-	quitButton.onReleased = MenuCb( &CMenuMain::QuitDialog );
+	quitButton.onReleased = VoidCb( &CMenuMain::QuitDialogCb );
 
 	minimizeBtn.SetPicture( ART_MINIMIZE_N, ART_MINIMIZE_F, ART_MINIMIZE_D );
 	minimizeBtn.iFlags = QMF_MOUSEONLY;
