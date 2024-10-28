@@ -605,10 +605,12 @@ void CMenuServerBrowser::ToggleFavoriteButton( bool en )
 	if( en )
 	{
 		favorite->szName = L( "Favorite" );
+		favorite->SetPicture( PC_FAVORITE, 'o' );
 	}
 	else
 	{
 		favorite->szName = L( "Unfavorite" );
+		favorite->SetPicture( PC_UNFAVORITE, 'o' );
 	}
 }
 
@@ -876,7 +878,7 @@ void CMenuServerBrowser::_Init( void )
 	});
 
 	viewGameInfo = AddButton( L( "View game info" ), nullptr, PC_VIEW_GAME_INFO, VoidCb( &CMenuServerBrowser::ViewGameInfo ), QMF_GRAYED );
-	favorite = AddButton( L( "Favorite" ), nullptr, nullptr, VoidCb( &CMenuServerBrowser::FavoriteServer ) );
+	favorite = AddButton( L( "Favorite" ), nullptr, PC_FAVORITE, VoidCb( &CMenuServerBrowser::FavoriteServer ), 0, 'o' );
 	refresh = AddButton( L( "Refresh" ), nullptr, PC_REFRESH, VoidCb( &CMenuServerBrowser::RefreshList ) );
 	addServer = AddButton( L( "Add server" ), nullptr, PC_ADD_SERVER, VoidCb( &CMenuServerBrowser::ShowAddServerBox ));
 
