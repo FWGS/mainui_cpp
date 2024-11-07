@@ -604,7 +604,7 @@ bool CBaseFont::ReadFromCache( const char *filename, charRange_t *range, size_t 
 	{
 		Con_Printf( "Font cache file is too short\n" );
 		EngFuncs::COM_FreeFile( data );
-		EngFuncs::COM_RemoveFile( filename );
+		EngFuncs::DeleteFile( filename );
 		return false;
 	}
 
@@ -612,7 +612,7 @@ bool CBaseFont::ReadFromCache( const char *filename, charRange_t *range, size_t 
 	{
 		Con_Printf( "Wrong font cache file format\n" );
 		EngFuncs::COM_FreeFile( data );
-		EngFuncs::COM_RemoveFile( filename );
+		EngFuncs::DeleteFile( filename );
 		return false;
 	}
 
@@ -620,7 +620,7 @@ bool CBaseFont::ReadFromCache( const char *filename, charRange_t *range, size_t 
 	{
 		Con_Printf( "Wrong font cache file version. Expected %d, got %d\n", CACHED_FONT_VERSION, hdr->version );
 		EngFuncs::COM_FreeFile( data );
-		EngFuncs::COM_RemoveFile( filename );
+		EngFuncs::DeleteFile( filename );
 		return false;
 	}
 
@@ -628,7 +628,7 @@ bool CBaseFont::ReadFromCache( const char *filename, charRange_t *range, size_t 
 	{
 		Con_Printf( "Font cache file has different character set. Expected %d characters in set, got %d\n", charsCount, hdr->charsCount );
 		EngFuncs::COM_FreeFile( data );
-		EngFuncs::COM_RemoveFile( filename );
+		EngFuncs::DeleteFile( filename );
 		return false;
 	}
 
@@ -636,7 +636,7 @@ bool CBaseFont::ReadFromCache( const char *filename, charRange_t *range, size_t 
 	{
 		Con_Printf( "Font cache file is too short (2nd check)\n" );
 		EngFuncs::COM_FreeFile( data );
-		EngFuncs::COM_RemoveFile( filename );
+		EngFuncs::DeleteFile( filename );
 		return false;
 	}
 
@@ -646,7 +646,7 @@ bool CBaseFont::ReadFromCache( const char *filename, charRange_t *range, size_t 
 	{
 		Con_Printf( "Font cache BMP file id check failed\n" );
 		EngFuncs::COM_FreeFile( data );
-		EngFuncs::COM_RemoveFile( filename );
+		EngFuncs::DeleteFile( filename );
 		return false;
 	}
 
@@ -654,7 +654,7 @@ bool CBaseFont::ReadFromCache( const char *filename, charRange_t *range, size_t 
 	{
 		Con_Printf( "Font cache file is too short or too long (3rd check)\n" );
 		EngFuncs::COM_FreeFile( data );
-		EngFuncs::COM_RemoveFile( filename );
+		EngFuncs::DeleteFile( filename );
 		return false;
 	}
 
@@ -664,7 +664,7 @@ bool CBaseFont::ReadFromCache( const char *filename, charRange_t *range, size_t 
 	{
 		Con_Printf( "Failed to load font cache BMP\n" );
 		EngFuncs::COM_FreeFile( data );
-		EngFuncs::COM_RemoveFile( filename );
+		EngFuncs::DeleteFile( filename );
 		return false;
 	}
 
@@ -681,7 +681,7 @@ bool CBaseFont::ReadFromCache( const char *filename, charRange_t *range, size_t 
 				Con_Printf( "Font cache file has different character set. Expected %d, got %d", range[i].Character( j ), ch->ch );
 				EngFuncs::COM_FreeFile( data );
 				EngFuncs::PIC_Free( filename );
-				EngFuncs::COM_RemoveFile( filename );
+				EngFuncs::DeleteFile( filename );
 				return false;
 			}
 
