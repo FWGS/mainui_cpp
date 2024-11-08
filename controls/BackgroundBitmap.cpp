@@ -276,7 +276,7 @@ bool CMenuBackgroundBitmap::CheckBackgroundSplash( bool gamedirOnly )
 
 		return true;
 	}
-	
+
 	return false;
 }
 
