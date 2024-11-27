@@ -44,192 +44,25 @@ CStbFont::CStbFont() : CBaseFont(),
 
 CStbFont::~CStbFont()
 {
-	delete [] m_pFontData;
 }
 
-bool CStbFont::FindFontDataFile(const char *name, int tall, int weight, int flags, char *dataFile, int dataFileChars)
+bool CStbFont::FindFontDataFile( const char *name, int tall, int weight, int flags, char *dataFile, int dataFileChars )
 {
-#if defined(__ANDROID__)
-	const char *fontFileName, *fontFileNamePost = NULL;
-
-	// Silly code to load fonts on Android.
-	// TODO: Find a way to find fonts on Android
-	if( !strcmp( name, "Roboto" ) || !strcmp( name, "RobotoCondensed" ) )
+	if( !strcmp( name, "Trebuchet MS" ))
 	{
-		fontFileName = name;
-		if( weight > 500 )
-		{
-			if( flags & FONT_ITALIC )
-				fontFileNamePost = "BoldItalic";
-			else
-				fontFileNamePost = "Bold";
-		}
-		else if( weight < 400 )
-		{
-			if( flags & FONT_ITALIC )
-				fontFileNamePost = "LightItalic";
-			else
-				fontFileNamePost = "Light";
-		}
-		else
-		{
-			if( flags & FONT_ITALIC )
-				fontFileNamePost = "Italic";
-			else
-				fontFileNamePost = "Regular";
-		}
+		Q_strncpy( dataFile, "gfx/shell/FiraSans-Regular.ttf", dataFileChars );
+		return true;
 	}
-	else // DroidSans
+	else if( !strcmp( name, "Tahoma" ))
 	{
-		fontFileName = "DroidSans";
-		if( weight > 500 )
-			fontFileNamePost = "Bold";
+		Q_strncpy( dataFile, "gfx/shell/tahoma.ttf", dataFileChars );
+		return true;
 	}
 
-	if( fontFileNamePost )
-		snprintf( dataFile, dataFileChars, "/system/fonts/%s-%s.ttf", fontFileName, fontFileNamePost );
-	else
-		snprintf( dataFile, dataFileChars, "/system/fonts/%s.ttf", fontFileName );
-
-	if( access( dataFile, R_OK ) != 0 )
-	{
-		fontFileNamePost = NULL;
-		// fallback to droid sans, if requested font is not droid sans
-		if( strcmp( name, "DroidSans" ) )
-		{
-			fontFileName = "DroidSans";
-			if( weight > 500 )
-				fontFileNamePost = "Bold";
-
-			if( fontFileNamePost )
-				snprintf( dataFile, dataFileChars, "/system/fonts/%s-%s.ttf", fontFileName, fontFileNamePost );
-			else
-				snprintf( dataFile, dataFileChars, "/system/fonts/%s.ttf", fontFileName );
-
-			if( access( dataFile, R_OK ) != 0 )
-			{
-				return false; // can't even fallback to droid sans
-			}
-		}
-		else
-		{
-			return false; // can't even fallback to droid sans
-		}
-	}
-
-	return true;
-#elif defined __linux__ // call fontconfig
-	char cmd[256];
-	int len = 0;
-	FILE *fp;
-
-	len = snprintf( cmd, sizeof( cmd ) - len, "fc-match -f %%{file} \"%s\"", name );
-	if( flags & FONT_ITALIC )
-		len += snprintf( cmd + len, sizeof( cmd ) - len, ":style=Italic" );
-
-	if( weight > 500 )
-		len += snprintf( cmd + len, sizeof( cmd ) - len, ":weight=%d", weight );
-
-	cmd[len] = 0;
-
-	if( (fp = popen( cmd, "r") ) == NULL )
-	{
-		Con_Printf( "fontconfig: Error opening pipe!\n" );
-		return false;
-	}
-
-	fgets( dataFile, dataFileChars, fp );
-
-	if( pclose(fp) )
-	{
-		Con_Printf( "fontconfig: Command not found or exited with error status\n" );
-        return false;
-    }
-
-	// fallback with empty fontname if font not found
-	if( strlen( dataFile ) < 2 )
-	{
-		if( name[0] )
-			return FindFontDataFile( "", tall, weight, flags, dataFile, dataFileChars );
-		else
-			return false;
-	}
-
-	return true;
-#elif defined(__APPLE__)
-	const char *fontFileName, *fontFileNamePost = NULL;
-
-	// Silly code to load fonts on OSX.
-	// TODO: Find a way to find fonts on OSX
-	if( !strcmp( name, "Trebuchet MS" ) )
-	{
-		fontFileName = name;
-		if( weight > 500 )
-		{
-			if( flags & FONT_ITALIC )
-				fontFileNamePost = "Bold Italic";
-			else
-				fontFileNamePost = "Bold";
-		}
-		else
-		{
-			if( flags & FONT_ITALIC )
-				fontFileNamePost = "Italic";
-		}
-	}
-	else // DroidSans
-	{
-		fontFileName = "Tahoma";
-		if( weight > 500 )
-			fontFileNamePost = "Bold";
-	}
-
-	if( fontFileNamePost )
-		snprintf( dataFile, dataFileChars, "/Library/Fonts/%s %s.ttf", fontFileName, fontFileNamePost );
-	else
-		snprintf( dataFile, dataFileChars, "/Library/Fonts/%s.ttf", fontFileName );
-
-	if( access( dataFile, R_OK ) != 0 )
-	{
-		fontFileNamePost = NULL;
-		// fallback to Tahoma, if requested font is not droid sans
-		if( strcmp( name, "Tahoma" ) )
-		{
-			fontFileName = "Tahoma";
-			if( weight > 500 )
-				fontFileNamePost = "Bold";
-
-			if( fontFileNamePost )
-				snprintf( dataFile, dataFileChars, "/Library/Fonts/%s %s.ttf", fontFileName, fontFileNamePost );
-			else
-				snprintf( dataFile, dataFileChars, "/Library/Fonts/%s.ttf", fontFileName );
-
-			if( access( dataFile, R_OK ) != 0 )
-			{
-				return false; // can't even fallback to Tahoma
-			}
-		}
-		else
-		{
-			return false; // can't even fallback to Tahoma
-		}
-	}
-
-	return true;
-#elif defined _WIN32
-	if( !strcmp( name, "Arial" ) )
-		snprintf( dataFile, dataFileChars, "%s\\Fonts\\arial.ttf", getenv( "WINDIR" ) );
-	else
-		snprintf( dataFile, dataFileChars, "%s\\Fonts\\trebucbd.ttf", getenv( "WINDIR" ) );
-	return true;
-#else
-	// strcpy( dataFile, "/usr/share/fonts/truetype/droid/DroidSans.ttf");
-	// return true;
-#error "Can't find fonts!"
-#endif
+	return false;
 }
 
-bool CStbFont::Create(const char *name, int tall, int weight, int blur, float brighten, int outlineSize, int scanlineOffset, float scanlineScale, int flags)
+bool CStbFont::Create( const char *name, int tall, int weight, int blur, float brighten, int outlineSize, int scanlineOffset, float scanlineScale, int flags )
 {
 	Q_strncpy( m_szName, name, sizeof( m_szName ) );
 	m_iTall = tall;
@@ -245,30 +78,16 @@ bool CStbFont::Create(const char *name, int tall, int weight, int blur, float br
 	m_fScanlineScale = scanlineScale;
 
 
-	if( !FindFontDataFile( name, tall, weight, flags, m_szRealFontFile, 4096 ) )
+	if( !FindFontDataFile( name, tall, weight, flags, m_szRealFontFile, sizeof( m_szRealFontFile )))
 	{
 		Con_Printf( "Unable to find font named %s\n", name );
 		m_szName[0] = 0;
 		return false;
 	}
 
+	m_pFontData = g_FontMgr->LoadFontDataFile( m_szRealFontFile );
 
-	// EngFuncs::COM_LoadFile does not allow open files from /
-	FILE *fd = fopen( m_szRealFontFile, "rb" );
-	if( !fd )
-	{
-		Con_Printf( "Unable to open font %s!\n", m_szRealFontFile );
-		return false;
-	}
-
-	fseek( fd, 0, SEEK_END );
-	size_t len = ftell( fd );
-	fseek( fd, 0, SEEK_SET );
-
-	m_pFontData = new byte[len+1];
-	size_t red = fread( m_pFontData, 1, len, fd );
-	fclose( fd );
-	if( red != len )
+	if( !m_pFontData )
 	{
 		Con_Printf( "Unable to read font file %s!\n", m_szRealFontFile );
 		return false;
