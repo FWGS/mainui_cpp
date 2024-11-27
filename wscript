@@ -55,25 +55,12 @@ def configure(conf):
 		conf.env.append_unique('CXXFLAGS', '-fno-exceptions')
 
 	if conf.env.DEST_OS != 'win32' and conf.env.DEST_OS != 'dos':
-		if not conf.env.USE_STBTT and not conf.options.LOW_MEMORY:
+		if not conf.options.USE_STBTT and not conf.options.LOW_MEMORY:
 			conf.check_pkg('freetype2', 'FT2', FT2_CHECK)
 			conf.check_pkg('fontconfig', 'FC', FC_CHECK)
 			conf.define('MAINUI_USE_FREETYPE', 1)
-		conf.check_cxx(lib='rt', mandatory=False)
 
 def build(bld):
-	libs = ['werror']
-
-	if bld.env.DEST_OS != 'win32':
-		if not bld.env.USE_STBTT:
-			libs += ['FT2', 'FC']
-		libs += ['RT']
-	else:
-		libs += ['GDI32', 'USER32']
-
-	if bld.env.DEST_OS == 'linux':
-		libs += ['RT']
-
 	source = bld.path.ant_glob([
 		'*.cpp',
 		'miniutl/*.cpp',
@@ -101,7 +88,7 @@ def build(bld):
 		source   = source,
 		target   = 'menu',
 		includes = includes,
-		use      = libs,
+		use      = 'werror FT2 FC GDI32 USER32',
 		install_path = bld.env.LIBDIR,
 		subsystem = bld.env.MSVC_SUBSYSTEM,
 		cmake_skip = True
