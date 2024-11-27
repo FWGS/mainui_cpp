@@ -29,15 +29,9 @@ GNU General Public License for more details.
 
 #include "BitmapFont.h"
 
-#if defined __ANDROID__ || defined CS16CLIENT
-#define DEFAULT_MENUFONT "RobotoCondensed"
-#define DEFAULT_CONFONT  "DroidSans"
-#define DEFAULT_WEIGHT   1000
-#else
 #define DEFAULT_MENUFONT "Trebuchet MS"
 #define DEFAULT_CONFONT  "Tahoma"
 #define DEFAULT_WEIGHT   500
-#endif
 
 CFontManager *g_FontMgr;
 
@@ -47,6 +41,7 @@ CFontManager::CFontManager()
 	FT_Init_FreeType( &CFreeTypeFont::m_Library );
 #endif
 	m_Fonts.EnsureCapacity( 4 );
+	m_FontFiles.EnsureCapacity( 2 );
 }
 
 CFontManager::~CFontManager()
@@ -56,6 +51,14 @@ CFontManager::~CFontManager()
 	FT_Done_FreeType( CFreeTypeFont::m_Library );
 	CFreeTypeFont::m_Library = NULL;
 #endif
+
+	FOR_EACH_HASHMAP( m_FontFiles, i )
+	{
+		byte *p = m_FontFiles.Element( i );
+		EngFuncs::COM_FreeFile( p );
+	}
+
+	m_FontFiles.Purge();
 }
 
 void CFontManager::VidInit( void )
@@ -532,4 +535,17 @@ HFont CFontBuilder::Create()
 	}
 
 	return g_FontMgr->m_Fonts.AddToTail(font) + 1;
+}
+
+byte *CFontManager::LoadFontDataFile( const char *vfspath )
+{
+	int i = m_FontFiles.Find( vfspath );
+	if( i != m_FontFiles.InvalidIndex( ))
+		return m_FontFiles[i];
+
+	byte *p = EngFuncs::COM_LoadFile( vfspath );
+	if( p != nullptr )
+		m_FontFiles.Insert( vfspath, p );
+
+	return p;
 }
