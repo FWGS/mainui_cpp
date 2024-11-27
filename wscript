@@ -36,7 +36,9 @@ def configure(conf):
 	if not conf.check_std('cxx11'):
 		conf.define('MY_COMPILER_SUCKS', 1)
 
-	conf.env.USE_STBTT = conf.options.USE_STBTT
+	if conf.env.DEST_OS == 'darwin' or conf.env.DEST_OS == 'android' or conf.env.MAGX:
+		conf.options.USE_STBTT = True
+
 	conf.define('MAINUI_USE_CUSTOM_FONT_RENDER', 1)
 
 	nortti = {
@@ -46,9 +48,7 @@ def configure(conf):
 
 	conf.env.append_unique('CXXFLAGS', conf.get_flags_by_compiler(nortti, conf.env.COMPILER_CC))
 
-	if conf.env.DEST_OS == 'darwin' or conf.env.DEST_OS == 'android' or conf.env.MAGX:
-		conf.env.USE_STBTT = True
-		conf.define('MAINUI_USE_STB', 1)
+	conf.define_cond('MAINUI_USE_STB', conf.options.USE_STBTT)
 
 	if conf.env.DEST_OS == 'android':
 		conf.define('NO_STL', 1)
