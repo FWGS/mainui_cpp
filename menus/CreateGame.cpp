@@ -99,7 +99,7 @@ void CMenuCreateGame::Begin( CMenuBaseItem *pSelf, void *pExtra )
 		return;
 
 	if( item == 0 )
-		item = EngFuncs::RandomLong( 1, menu->mapsListModel.GetRows() );
+		item = EngFuncs::RandomLong( 1, menu->mapsListModel.GetRows() - 1 );
 
 	const char *mapName = menu->mapsListModel[item].name;
 
