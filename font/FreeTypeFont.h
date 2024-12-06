@@ -48,7 +48,6 @@ private:
 	FT_Face face;
 	static FT_Library m_Library;
 	byte *m_pFontData;
-	bool FindFontDataFile(const char *name, int tall, int weight, int flags, char *dataFile, int dataFileChars);
 
 	friend class CFontManager;
 };

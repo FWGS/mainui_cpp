@@ -537,6 +537,22 @@ HFont CFontBuilder::Create()
 	return g_FontMgr->m_Fonts.AddToTail(font) + 1;
 }
 
+bool CFontManager::FindFontDataFile( const char *name, int tall, int weight, int flags, char *dataFile, size_t dataFileChars )
+{
+	if( !strcmp( name, "Trebuchet MS" ))
+	{
+		Q_strncpy( dataFile, "gfx/fonts/FiraSans-Regular.ttf", dataFileChars );
+		return true;
+	}
+	else if( !strcmp( name, "Tahoma" ))
+	{
+		Q_strncpy( dataFile, "gfx/fonts/tahoma.ttf", dataFileChars );
+		return true;
+	}
+
+	return false;
+}
+
 byte *CFontManager::LoadFontDataFile( const char *vfspath, int *plen )
 {
 	int i = m_FontFiles.Find( vfspath );

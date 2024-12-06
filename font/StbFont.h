@@ -38,9 +38,6 @@ public:
 	bool HasChar( int ch ) const override;
 
 private:
-	char m_szRealFontFile[4096];
-	bool FindFontDataFile(const char *name, int tall, int weight, int flags, char *dataFile, int dataFileChars);
-
 	byte *m_pFontData;
 	stbtt_fontinfo m_fontInfo;
 

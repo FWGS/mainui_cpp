@@ -36,22 +36,6 @@ CFreeTypeFont::~CFreeTypeFont()
 {
 }
 
-bool CFreeTypeFont::FindFontDataFile( const char *name, int tall, int weight, int flags, char *dataFile, int dataFileChars )
-{
-	if( !strcmp( name, "Trebuchet MS" ))
-	{
-		Q_strncpy( dataFile, "gfx/fonts/FiraSans-Regular.ttf", dataFileChars );
-		return true;
-	}
-	else if( !strcmp( name, "Tahoma" ))
-	{
-		Q_strncpy( dataFile, "gfx/fonts/tahoma.ttf", dataFileChars );
-		return true;
-	}
-
-	return false;
-}
-
 bool CFreeTypeFont::Create(const char *name, int tall, int weight, int blur, float brighten, int outlineSize, int scanlineOffset, float scanlineScale, int flags)
 {
 	char font_face_path[256];
@@ -70,7 +54,7 @@ bool CFreeTypeFont::Create(const char *name, int tall, int weight, int blur, flo
 	m_iScanlineOffset = scanlineOffset;
 	m_fScanlineScale = scanlineScale;
 
-	if( !FindFontDataFile( name, tall, weight, flags, font_face_path, sizeof( font_face_path )))
+	if( !g_FontMgr->FindFontDataFile( name, tall, weight, flags, font_face_path, sizeof( font_face_path )))
 	{
 		Con_Printf( "Unable to find font named %s\n", name );
 		m_szName[0] = 0;

@@ -70,6 +70,7 @@ public:
 
 	int GetEllipsisWide( HFont font ); // cached wide of "..."
 
+	bool FindFontDataFile( const char *name, int tall, int weight, int flags, char *dataFile, size_t dataFileChars );
 	unsigned char *LoadFontDataFile( const char *virtualpath, int *length = nullptr );
 private:
 	int  GetCharacterWidth( HFont font, int ch );
