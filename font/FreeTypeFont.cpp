@@ -27,7 +27,7 @@ FT_Library CFreeTypeFont::m_Library;
 
 
 CFreeTypeFont::CFreeTypeFont() : CBaseFont(),
-	face(), m_szRealFontFile()
+	face()
 {
 
 }
@@ -36,94 +36,27 @@ CFreeTypeFont::~CFreeTypeFont()
 {
 }
 
-/**
- * Find a matching font where @type (one of FC_*) is equal to @value. For a
- * list of types, see http://fontconfig.org/fontconfig-devel/x19.html#AEN27.
- * The variable arguments are a list of triples, just like the first three
- * arguments, and must be NULL terminated.
- *
- * For example,
- *   FontMatchString(FC_FILE, FcTypeString, "/usr/share/fonts/myfont.ttf", NULL);
- *
- * Ripped from skia source code
- */
-static FcPattern* FontMatch(const char* type, ...)
-{
-	FcValue fcvalue;
-	va_list ap;
-
-	va_start(ap, type);
-
-	FcPattern* pattern = FcPatternCreate();
-
-	for (;;) {
-		// FcType is promoted to int when passed through ...
-		fcvalue.type = static_cast<FcType>(va_arg(ap, int));
-		switch (fcvalue.type) {
-			case FcTypeString:
-				fcvalue.u.s = va_arg(ap, const FcChar8 *);
-				break;
-			case FcTypeInteger:
-				fcvalue.u.i = va_arg(ap, int);
-				break;
-			default:
-				ASSERT(("FontMatch unhandled type"));
-		}
-		FcPatternAdd(pattern, type, fcvalue, FcFalse);
-
-		type = va_arg(ap, const char *);
-		if (!type)
-			break;
-	};
-	va_end(ap);
-
-	FcConfigSubstitute(NULL, pattern, FcMatchPattern);
-	FcDefaultSubstitute(pattern);
-
-	FcResult result;
-	FcPattern* match = FcFontMatch(NULL, pattern, &result);
-	FcPatternDestroy(pattern);
-
-	return match;
-}
-
 bool CFreeTypeFont::FindFontDataFile( const char *name, int tall, int weight, int flags, char *dataFile, int dataFileChars )
 {
-	int nFcWeight = weight / 5;
-	FcPattern *pattern;
-	FcChar8 *filename;
-
-	bool bRet;
-
-	if( !FcInit() )
-		return false;
-
-	int slant = FC_SLANT_ROMAN;
-	if( flags & ( FONT_ITALIC ))
-		slant = FC_SLANT_ITALIC;
-
-	pattern = FontMatch(
-		FC_FAMILY, FcTypeString,  name,
-		FC_WEIGHT, FcTypeInteger, nFcWeight,
-		FC_SLANT,  FcTypeInteger, slant,
-		NULL );
-
-	if( !pattern )
-		return false;
-
-	if( !FcPatternGetString( pattern, "file", 0, &filename ) )
+	if( !strcmp( name, "Trebuchet MS" ))
 	{
-		bRet = true;
-		Q_strncpy( dataFile, (char*)filename, dataFileChars );
+		Q_strncpy( dataFile, "gfx/fonts/FiraSans-Regular.ttf", dataFileChars );
+		return true;
 	}
-	else bRet = false;
+	else if( !strcmp( name, "Tahoma" ))
+	{
+		Q_strncpy( dataFile, "gfx/fonts/tahoma.ttf", dataFileChars );
+		return true;
+	}
 
-	FcPatternDestroy( pattern );
-	return bRet;
+	return false;
 }
 
 bool CFreeTypeFont::Create(const char *name, int tall, int weight, int blur, float brighten, int outlineSize, int scanlineOffset, float scanlineScale, int flags)
 {
+	char font_face_path[256];
+	int font_face_length;
+
 	Q_strncpy( m_szName, name, sizeof( m_szName ) );
 	m_iTall = tall;
 	m_iWeight = weight;
@@ -137,15 +70,24 @@ bool CFreeTypeFont::Create(const char *name, int tall, int weight, int blur, flo
 	m_iScanlineOffset = scanlineOffset;
 	m_fScanlineScale = scanlineScale;
 
-	if( !FindFontDataFile( name, tall, weight, flags, m_szRealFontFile, sizeof( m_szRealFontFile ) ) )
+	if( !FindFontDataFile( name, tall, weight, flags, font_face_path, sizeof( font_face_path )))
 	{
 		Con_Printf( "Unable to find font named %s\n", name );
 		m_szName[0] = 0;
 		return false;
 	}
 
-	if( FT_New_Face( m_Library, m_szRealFontFile, 0, &face ))
+	m_pFontData = g_FontMgr->LoadFontDataFile( font_face_path, &font_face_length );
+
+	if( !m_pFontData )
 	{
+		Con_Printf( "Unable to read font file %s!\n", font_face_path );
+		return false;
+	}
+
+	if( FT_New_Memory_Face( m_Library, m_pFontData, font_face_length, 0, &face ))
+	{
+		Con_Printf( "Unable to create font %s!\n", font_face_path );
 		return false;
 	}
 

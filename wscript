@@ -15,13 +15,6 @@ FT2_CHECK='''extern "C" {
 int main() { return FT_Init_FreeType( NULL ); }
 '''
 
-FC_CHECK='''extern "C" {
-#include <fontconfig/fontconfig.h>
-}
-
-int main() { return (int)FcInit(); }
-'''
-
 def options(opt):
 	grp = opt.add_option_group('MainUI C++ options')
 	grp.add_option('--enable-stbtt', action = 'store_true', dest = 'USE_STBTT', default = False,
@@ -57,7 +50,6 @@ def configure(conf):
 	if conf.env.DEST_OS != 'win32' and conf.env.DEST_OS != 'dos':
 		if not conf.options.USE_STBTT and not conf.options.LOW_MEMORY:
 			conf.check_pkg('freetype2', 'FT2', FT2_CHECK)
-			conf.check_pkg('fontconfig', 'FC', FC_CHECK)
 			conf.define('MAINUI_USE_FREETYPE', 1)
 
 def build(bld):
@@ -88,7 +80,7 @@ def build(bld):
 		source   = source,
 		target   = 'menu',
 		includes = includes,
-		use      = 'werror FT2 FC GDI32 USER32',
+		use      = 'werror FT2 GDI32 USER32',
 		install_path = bld.env.LIBDIR,
 		subsystem = bld.env.MSVC_SUBSYSTEM,
 		cmake_skip = True

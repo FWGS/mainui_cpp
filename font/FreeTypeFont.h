@@ -22,7 +22,6 @@ GNU General Public License for more details.
 
 extern "C"
 {
-    #include <fontconfig/fontconfig.h>
     #include <ft2build.h>
     #include FT_FREETYPE_H
 }
@@ -48,7 +47,7 @@ public:
 private:
 	FT_Face face;
 	static FT_Library m_Library;
-	char m_szRealFontFile[4096];
+	byte *m_pFontData;
 	bool FindFontDataFile(const char *name, int tall, int weight, int flags, char *dataFile, int dataFileChars);
 
 	friend class CFontManager;
