@@ -38,7 +38,7 @@ GNU General Public License for more details.
 #include "Utils.h"
 
 CStbFont::CStbFont() : CBaseFont(),
-	m_szRealFontFile(), m_pFontData( NULL )
+	m_pFontData( NULL )
 {
 }
 
@@ -50,12 +50,12 @@ bool CStbFont::FindFontDataFile( const char *name, int tall, int weight, int fla
 {
 	if( !strcmp( name, "Trebuchet MS" ))
 	{
-		Q_strncpy( dataFile, "gfx/shell/FiraSans-Regular.ttf", dataFileChars );
+		Q_strncpy( dataFile, "gfx/fonts/FiraSans-Regular.ttf", dataFileChars );
 		return true;
 	}
 	else if( !strcmp( name, "Tahoma" ))
 	{
-		Q_strncpy( dataFile, "gfx/shell/tahoma.ttf", dataFileChars );
+		Q_strncpy( dataFile, "gfx/fonts/tahoma.ttf", dataFileChars );
 		return true;
 	}
 
@@ -64,6 +64,8 @@ bool CStbFont::FindFontDataFile( const char *name, int tall, int weight, int fla
 
 bool CStbFont::Create( const char *name, int tall, int weight, int blur, float brighten, int outlineSize, int scanlineOffset, float scanlineScale, int flags )
 {
+	char font_face_path[256];
+
 	Q_strncpy( m_szName, name, sizeof( m_szName ) );
 	m_iTall = tall;
 	m_iWeight = weight;
@@ -78,24 +80,24 @@ bool CStbFont::Create( const char *name, int tall, int weight, int blur, float b
 	m_fScanlineScale = scanlineScale;
 
 
-	if( !FindFontDataFile( name, tall, weight, flags, m_szRealFontFile, sizeof( m_szRealFontFile )))
+	if( !FindFontDataFile( name, tall, weight, flags, font_face_path, sizeof( font_face_path )))
 	{
 		Con_Printf( "Unable to find font named %s\n", name );
 		m_szName[0] = 0;
 		return false;
 	}
 
-	m_pFontData = g_FontMgr->LoadFontDataFile( m_szRealFontFile );
+	m_pFontData = g_FontMgr->LoadFontDataFile( font_face_path );
 
 	if( !m_pFontData )
 	{
-		Con_Printf( "Unable to read font file %s!\n", m_szRealFontFile );
+		Con_Printf( "Unable to read font file %s!\n", font_face_path );
 		return false;
 	}
 
 	if( !stbtt_InitFont( &m_fontInfo, m_pFontData, 0 ) )
 	{
-		Con_Printf( "Unable to create font %s!\n", m_szRealFontFile );
+		Con_Printf( "Unable to create font %s!\n", font_face_path );
 		m_szName[0] = 0;
 		return false;
 	}
