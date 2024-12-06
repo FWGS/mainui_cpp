@@ -70,7 +70,7 @@ public:
 
 	int GetEllipsisWide( HFont font ); // cached wide of "..."
 
-	unsigned char *LoadFontDataFile( const char *virtualpath );
+	unsigned char *LoadFontDataFile( const char *virtualpath, int *length = nullptr );
 private:
 	int  GetCharacterWidth( HFont font, int ch );
 	int  GetTextWide( HFont font, const char *text, int size = -1 );
@@ -78,7 +78,12 @@ private:
 	void UploadTextureForFont(CBaseFont *font );
 
 	CUtlVector<CBaseFont*> m_Fonts;
-	CUtlHashMap<CUtlString, unsigned char *> m_FontFiles;
+	struct font_file
+	{
+		int length;
+		unsigned char *data;
+	};
+	CUtlHashMap<CUtlString, font_file> m_FontFiles;
 
 	friend class CFontBuilder;
 };

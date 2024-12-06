@@ -54,7 +54,7 @@ CFontManager::~CFontManager()
 
 	FOR_EACH_HASHMAP( m_FontFiles, i )
 	{
-		byte *p = m_FontFiles.Element( i );
+		byte *p = m_FontFiles.Element( i ).data;
 		EngFuncs::COM_FreeFile( p );
 	}
 
@@ -537,15 +537,26 @@ HFont CFontBuilder::Create()
 	return g_FontMgr->m_Fonts.AddToTail(font) + 1;
 }
 
-byte *CFontManager::LoadFontDataFile( const char *vfspath )
+byte *CFontManager::LoadFontDataFile( const char *vfspath, int *plen )
 {
 	int i = m_FontFiles.Find( vfspath );
 	if( i != m_FontFiles.InvalidIndex( ))
-		return m_FontFiles[i];
+	{
+		if( plen )
+			*plen = m_FontFiles[i].length;
 
-	byte *p = EngFuncs::COM_LoadFile( vfspath );
+		return m_FontFiles[i].data;
+	}
+	int len = 0;
+	byte *p = EngFuncs::COM_LoadFile( vfspath, &len );
 	if( p != nullptr )
-		m_FontFiles.Insert( vfspath, p );
+	{
+		if( plen )
+			*plen = len;
+
+		font_file file = { len, p };
+		m_FontFiles.Insert( vfspath, file );
+	}
 
 	return p;
 }
