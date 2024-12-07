@@ -37,7 +37,6 @@ CMenuDropDown::CMenuDropDown() : BaseClass()
 
 void CMenuDropDown::VidInit()
 {
-	iSelectColor.SetDefault( uiPromptTextColor );
 	iBackgroundColor.SetDefault( uiColorBlack );
 	iFgTextColor.SetDefault( uiInputFgColor );
 	iBgTextColor.SetDefault( uiPromptTextColor );
@@ -156,13 +155,10 @@ void CMenuDropDown::SetMenuOpen( bool isOpen )
 void CMenuDropDown::Draw()
 {
 	uint textflags = ETF_NO_WRAP;
-	uint selectColor = iSelectColor;
 	uint borderColor = uiInputFgColor;
 
 	if( iFlags & QMF_DROPSHADOW )
 		textflags |= ETF_SHADOW;
-	if( iFlags & QMF_GRAYED )
-		selectColor = uiColorDkGrey;
 
 	if( m_isOpen )
 	{

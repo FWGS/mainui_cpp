@@ -83,7 +83,6 @@ public:
 
 	virtual void SetCvar() = 0;
 
-	CColor iSelectColor;
 	CColor iBackgroundColor;
 	CColor iFgTextColor;
 	CColor iBgTextColor;
