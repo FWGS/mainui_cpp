@@ -44,6 +44,7 @@ public:
 	void GetCharRGBA(int ch, Point pt, Size sz, unsigned char *rgba, Size &drawSize) override;
 	void GetCharABCWidthsNoCache( int ch, int &a, int &b, int &c ) override;
 	bool HasChar( int ch ) const override;
+	const char *GetBackendName() const override { return "ft2"; }
 private:
 	FT_Face face;
 	static FT_Library m_Library;

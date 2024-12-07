@@ -25,7 +25,7 @@ CBaseFont::CBaseFont()
 	m_iEllipsisWide( 0 ),
 	m_glyphs(0, 0), m_ABCCache( 0, 0 )
 {
-	m_szName[0] = 0;
+	m_szTextureName[0] = m_szName[0] = 0;
 	SetDefLessFunc( m_glyphs );
 	SetDefLessFunc( m_ABCCache );
 }
@@ -38,7 +38,7 @@ CBaseFont::GetTextureName
 Mangle texture name, so using same font names with different attributes will not confuse engine or font renderer
 =========================
 +*/
-void CBaseFont::GetTextureName(char *dst, size_t len) const
+void CBaseFont::GetTextureName( char *dst, size_t len ) const
 {
 	char attribs[256];
 	int i = 0;
@@ -64,13 +64,13 @@ void CBaseFont::GetTextureName(char *dst, size_t len) const
 	// faster loading: don't query filesystem, tell engine to skip everything and load only from buffer
 	if( i == 0 )
 	{
-		snprintf( dst, len - 1, "#%s_%i_%i_font.bmp", GetName(), GetTall(), GetWeight() );
+		snprintf( dst, len - 1, "#%s_%i_%i_%s_font.bmp", GetName(), GetTall(), GetWeight(), GetBackendName( ));
 		dst[len - 1] = 0;
 	}
 	else
 	{
 		attribs[i] = 0;
-		snprintf( dst, len - 1, "#%s_%i_%i_%s_font.bmp", GetName(), GetTall(), GetWeight(), attribs );
+		snprintf( dst, len - 1, "#%s_%i_%i_%s_%s_font.bmp", GetName(), GetTall(), GetWeight(), attribs, GetBackendName( ));
 		dst[len - 1] = 0;
 	}
 }
@@ -83,11 +83,10 @@ void CBaseFont::UploadGlyphsForRanges(charRange_t *range, int rangeSize)
 	const int height = GetHeight();
 	const int tempSize = maxWidth * height * 4; // allocate temporary buffer for max possible glyph size
 	const Point nullPt( 0, 0 );
-	char name[256];
 
-	GetTextureName( name, sizeof( name ));
+	GetTextureName( m_szTextureName, sizeof( m_szTextureName ));
 
-	if( ReadFromCache( name, range, rangeSize ))
+	if( ReadFromCache( m_szTextureName, range, rangeSize ))
 	{
 		int dotWideA, dotWideB, dotWideC;
 		GetCharABCWidths( '.', dotWideA, dotWideB, dotWideC );
@@ -207,9 +206,9 @@ void CBaseFont::UploadGlyphsForRanges(charRange_t *range, int rangeSize)
 		}
 	}
 
-	HIMAGE hImage = EngFuncs::PIC_Load( name, bmp.GetBitmap(), bmp.GetBitmapHdr()->fileSize, 0 );
+	HIMAGE hImage = EngFuncs::PIC_Load( m_szTextureName, bmp.GetBitmap(), bmp.GetBitmapHdr()->fileSize, 0 );
 
-	SaveToCache( name, range, rangeSize, &bmp );
+	SaveToCache( m_szTextureName, range, rangeSize, &bmp );
 
 	delete[] temp;
 
@@ -228,9 +227,8 @@ void CBaseFont::UploadGlyphsForRanges(charRange_t *range, int rangeSize)
 
 CBaseFont::~CBaseFont()
 {
-	char name[256];
-	GetTextureName( name, sizeof( name ) );
-	EngFuncs::PIC_Free( name );
+	if( m_szTextureName[0] != 0 )
+		EngFuncs::PIC_Free( m_szTextureName );
 }
 
 void CBaseFont::GetCharABCWidths( int ch, int &a, int &b, int &c )
@@ -283,53 +281,41 @@ bool CBaseFont::IsEqualTo(const char *name, int tall, int weight, int blur, int 
 
 void CBaseFont::DebugDraw()
 {
-	HIMAGE hImage;
-	char name[256];
+	HIMAGE const hImage = EngFuncs::PIC_Load( m_szTextureName );
+	const int w = EngFuncs::PIC_Width( hImage );
+	const int h = EngFuncs::PIC_Height( hImage );
 
+	int x = 0;
+	EngFuncs::PIC_Set( hImage, 255, 255, 255 );
+	EngFuncs::PIC_DrawTrans( Point( x, 0 ), Size( w, h ));
+
+	for( int i = m_glyphs.FirstInorder();; i = m_glyphs.NextInorder( i ) )
 	{
-		GetTextureName( name, sizeof( name ) );
-
-		hImage = EngFuncs::PIC_Load( name );
-		int w, h;
-		w = EngFuncs::PIC_Width( hImage );
-		h = EngFuncs::PIC_Height( hImage );
-		int x = 0;
-		EngFuncs::PIC_Set( hImage, 255, 255, 255 );
-		EngFuncs::PIC_DrawTrans( Point(x, 0), Size( w, h ) );
-
-		for( int i = m_glyphs.FirstInorder();; i = m_glyphs.NextInorder( i ) )
+		if( m_glyphs[i].texture == hImage )
 		{
-			if( m_glyphs[i].texture == hImage )
-			{
-				Point pt;
-				Size sz;
-				pt.x = x + m_glyphs[i].rect.left;
-				pt.y = m_glyphs[i].rect.top;
+			Point pt;
+			Size sz;
+			pt.x = x + m_glyphs[i].rect.left;
+			pt.y = m_glyphs[i].rect.top;
+			sz.w = m_glyphs[i].rect.right - m_glyphs[i].rect.left;
+			sz.h = m_glyphs[i].rect.bottom - pt.y;
+			UI_DrawRectangleExt( pt, sz, PackRGBA( 255, 0, 0, 255 ), 1 );
 
-				sz.w = m_glyphs[i].rect.right - m_glyphs[i].rect.left;
-				sz.h = m_glyphs[i].rect.bottom - pt.y;
+			int a, b, c;
+			GetCharABCWidths( m_glyphs[i].ch, a, b, c );
 
-				UI_DrawRectangleExt( pt, sz, PackRGBA( 255, 0, 0, 255 ), 1 );
+			pt.x -= a;
+			sz.w += c + a;
+			UI_DrawRectangleExt( pt, sz, PackRGBA( 0, 255, 0, 255 ), 1, QM_LEFT | QM_RIGHT );
 
-				int a, b, c;
-				GetCharABCWidths( m_glyphs[i].ch, a, b, c );
-
-				pt.x -= a;
-				sz.w += c + a;
-
-				UI_DrawRectangleExt( pt, sz, PackRGBA( 0, 255, 0, 255 ), 1, QM_LEFT | QM_RIGHT );
-
-				int ascender = GetAscent();
-
-				pt.y += ascender;
-				UI_DrawRectangleExt( pt, sz, PackRGBA( 0, 0, 255, 255 ), 1, QM_TOP );
-			}
-
-			if( i == m_glyphs.LastInorder() )
-				break;
+			const int ascender = GetAscent();
+			pt.y += ascender;
+			UI_DrawRectangleExt( pt, sz, PackRGBA( 0, 0, 255, 255 ), 1, QM_TOP );
 		}
-	}
 
+		if( i == m_glyphs.LastInorder() )
+			break;
+	}
 }
 
 void CBaseFont::ApplyBlur(Size rgbaSz, byte *rgba)
