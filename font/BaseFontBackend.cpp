@@ -402,41 +402,63 @@ void CBaseFont::ApplyOutline(Point pt, Size rgbaSz, byte *rgba)
 	if( !m_iOutlineSize )
 		return;
 
-	int x, y;
+	uint *tmp = new uint[rgbaSz.w * rgbaSz.h]; // matrix where we accumulate alpha values
+	memset( tmp, 0, sizeof( *tmp ) * rgbaSz.w * rgbaSz.h );
 
-	for( y = pt.x; y < rgbaSz.h; y++ )
+	for( int y = pt.x; y < rgbaSz.h; y++ )
 	{
-		for( x = pt.y; x < rgbaSz.w; x++ )
+		for( int x = pt.y; x < rgbaSz.w; x++ )
 		{
 			byte *src = &rgba[(x + (y * rgbaSz.w)) * 4];
 
-			if( src[3] != 0 )
-				continue;
-
-			int shadowX, shadowY;
-
-			for( shadowX = -m_iOutlineSize; shadowX <= m_iOutlineSize; shadowX++ )
+			for( int shadowX = -m_iOutlineSize; shadowX <= m_iOutlineSize; shadowX++ )
 			{
-				for( shadowY = -m_iOutlineSize; shadowY <= m_iOutlineSize; shadowY++ )
+				for( int shadowY = -m_iOutlineSize; shadowY <= m_iOutlineSize; shadowY++ )
 				{
-					if( !shadowX && !shadowY )
-						continue;
-
 					int testX = shadowX + x, testY = shadowY + y;
-					if( testX < 0 || testX >= rgbaSz.w ||
-						testY < 0 || testY >= rgbaSz.h )
+					if( testX < 0 || testX >= rgbaSz.w || testY < 0 || testY >= rgbaSz.h )
 						continue;
 
-					byte *test = &rgba[(testX + (testY * rgbaSz.w)) * 4];
-					if( test[0] == 0 || test[1] == 0 || test[3] == 0 )
-						continue;
-
-					src[0] = src[1] = src[2] = 0;
-					src[3] = -1;
+					uint *dst = &tmp[(testX + (testY * rgbaSz.w))];
+					*dst += src[3];
 				}
 			}
 		}
 	}
+
+	// find total amount of adjacent pixels
+	int total = m_iOutlineSize * 4 + m_iOutlineSize * m_iOutlineSize * 4;
+
+	for( int y = pt.x; y < rgbaSz.h; y++ )
+	{
+		for( int x = pt.y; x < rgbaSz.w; x++ )
+		{
+			byte *src = &rgba[(x + (y * rgbaSz.w)) * 4];
+			uint *dst = &tmp[(x + (y * rgbaSz.w))];
+
+			if( *dst == 0 )
+				continue;
+
+			uint val = *dst / (double)total;
+
+			val *= ( m_iOutlineSize + 1 ); // make it darker
+
+			// is this pixel painted by font renderer
+			if( src[3] > 0 )
+			{
+				// blend it with outline
+				src[0] = src[1] = src[2] = src[3];
+				src[3] = Q_min( src[3] + val, 255 );
+			}
+			else
+			{
+				src[0] = src[1] = src[2] = 0; // black outline
+				src[3] = Q_min( val, 255 );
+			}
+		}
+	}
+
+	delete[] tmp;
 }
 
 void CBaseFont::ApplyScanline(Size rgbaSz, byte *rgba)
