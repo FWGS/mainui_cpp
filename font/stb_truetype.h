@@ -2663,6 +2663,13 @@ STBTT_DEF float stbtt_ScaleForPixelHeight(const stbtt_fontinfo *info, float heig
    return (float) height / fheight;
 }
 
+// a1ba: added for mainui_cpp
+STBTT_DEF double stbtt_ScaleForPixelHeightPrecision(const stbtt_fontinfo *info, double height)
+{
+   int fheight = ttSHORT(info->data + info->hhea + 4) - ttSHORT(info->data + info->hhea + 6);
+   return (double) height / fheight;
+}
+
 STBTT_DEF float stbtt_ScaleForMappingEmToPixels(const stbtt_fontinfo *info, float pixels)
 {
    int unitsPerEm = ttUSHORT(info->data + info->head + 18);
