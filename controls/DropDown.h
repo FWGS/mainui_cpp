@@ -44,11 +44,6 @@ public:
 	void VidInit() override;
 	void Draw() override;
 
-	void Clear()
-	{
-		m_iState = 0;
-	}
-
 	int GetCount()
 	{
 		return m_szNames.Count();
@@ -98,6 +93,12 @@ public:
 protected:
 	CMenuDropDown();
 
+	void Clear()
+	{
+		m_iState = 0;
+		m_szNames.RemoveAll();
+	}
+
 	void AddItemName ( const char *text )
 	{
 		m_szNames.AddToTail( text );
@@ -127,6 +128,12 @@ public:
 	void SetCvar() override
 	{
 		SetCvarString( m_Values[m_iState] );
+	}
+
+	void Clear()
+	{
+		CMenuDropDown::Clear();
+		m_Values.RemoveAll();
 	}
 
 	void AddItem( const char *text, const char *value )
@@ -160,6 +167,12 @@ public:
 		SetCvarValue( m_Values[m_iState] );
 	}
 
+	void Clear()
+	{
+		CMenuDropDown::Clear();
+		m_Values.RemoveAll();
+	}
+
 	void AddItem( const char *text, int value )
 	{
 		m_Values.AddToTail( value );
@@ -189,6 +202,12 @@ public:
 	void SetCvar() override
 	{
 		SetCvarValue( m_Values[m_iState] );
+	}
+
+	void Clear()
+	{
+		CMenuDropDown::Clear();
+		m_Values.RemoveAll();
 	}
 
 	void AddItem( const char *text, float value )
