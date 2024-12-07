@@ -238,29 +238,21 @@ void CBaseFont::GetCharABCWidths( int ch, int &a, int &b, int &c )
 	abc_t find;
 	find.ch = ch;
 
-	unsigned short i = m_ABCCache.Find( find );
-	if( i != 65535 && m_ABCCache.IsValidIndex(i) )
+	const int i = m_ABCCache.Find( find );
+	if( m_ABCCache.IsValidIndex( i ))
 	{
-		a = m_ABCCache[i].a;
-		b = m_ABCCache[i].b;
-		c = m_ABCCache[i].c;
+		find = m_ABCCache[i];
+		a = find.a;
+		b = find.b;
+		c = find.c;
 		return;
 	}
 
 	// not found in cache
 	GetCharABCWidthsNoCache( ch, find.a, find.b, find.c );
 
-	find.a -= m_iBlur + m_iOutlineSize;
+	find.a -= m_iBlur;
 	find.b += m_iBlur + m_iOutlineSize;
-
-	if( m_iOutlineSize )
-	{
-		if( find.a < 0 )
-			find.a += m_iOutlineSize;
-
-		if( find.c < 0 )
-			find.c += m_iOutlineSize;
-	}
 
 	a = find.a;
 	b = find.b;
