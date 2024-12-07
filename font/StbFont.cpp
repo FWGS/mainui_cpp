@@ -87,15 +87,15 @@ bool CStbFont::Create( const char *name, int tall, int weight, int blur, float b
 	}
 
 	// HACKHACK: for some reason size scales between ft2 and stbtt are different
-	scale = stbtt_ScaleForPixelHeight(&m_fontInfo, tall + 2);
+	scale = stbtt_ScaleForPixelHeightPrecision( &m_fontInfo, tall + 4 );
 	int x0, y0, x1, y1;
 
-	stbtt_GetFontVMetrics(&m_fontInfo, &m_iAscent, NULL, NULL );
-	m_iAscent *= scale;
+	stbtt_GetFontVMetrics( &m_fontInfo, &m_iAscent, NULL, NULL );
+	m_iAscent = round( m_iAscent * scale );
 
 	stbtt_GetFontBoundingBox( &m_fontInfo, &x0, &y0, &x1, &y1 );
-	m_iHeight = (( y1 - y0 ) * scale); // maybe wrong!
-	m_iMaxCharWidth = (( x1 - x0 ) * scale); // maybe wrong!
+	m_iHeight = round(( y1 - y0 ) * scale ); // maybe wrong!
+	m_iMaxCharWidth = round(( x1 - x0 ) * scale ); // maybe wrong!
 
 	return true;
 }
@@ -174,14 +174,9 @@ void CStbFont::GetCharABCWidthsNoCache(int ch, int &a, int &b, int &c)
 	stbtt_GetCodepointHMetrics( &m_fontInfo, ch, &horiAdvance, &horiBearingX );
 	width = x1 - x0;
 
-	a = horiBearingX * scale;
-
-	// HACKHACK: stbtt does not support hinting,
-	// so we add 1 pixel margin here and stbtt
-	// won't look bad on too small screen resolutions
-	b = width * scale + 1;
-
-	c = (horiAdvance - horiBearingX - width) * scale;
+	a = round( horiBearingX * scale );
+	b = round( width * scale );
+	c = round(( horiAdvance - horiBearingX - width ) * scale );
 }
 
 bool CStbFont::HasChar(int ch) const

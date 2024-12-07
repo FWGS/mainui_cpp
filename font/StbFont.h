@@ -41,7 +41,7 @@ private:
 	byte *m_pFontData;
 	stbtt_fontinfo m_fontInfo;
 
-	float scale;
+	double scale;
 
 	friend class CFontManager;
 };
