@@ -37,7 +37,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define MAX_PING 9.999f
 #define FILTER_MAX_MAPS 16
-#define FILTER_ANY_MAP "any map"
 
 class CMenuServerBrowser;
 
@@ -635,7 +634,7 @@ void CMenuGameListModel::AddServerToList( netadr_t adr, const char *info, bool i
 			parent->filterMap.Clear();
 			for( int i = Q_min( FILTER_MAX_MAPS, filterMaps.Count() ); i--; )
 				parent->filterMap.AddItem( filterMaps[i].GetDisplay(), filterMaps[i].name );
-			parent->filterMap.AddItem( FILTER_ANY_MAP, "" );
+			parent->filterMap.AddItem( L( "any map" ), "" );
 
 			if( !filterMap.name[0] )
 				parent->filterMap.SelectLast( false );
@@ -766,7 +765,7 @@ void CMenuServerBrowser::ClearList()
 	filterMap.Clear();
 	if( gameListModel.filterMap.name[0] )
 		filterMap.AddItem( gameListModel.filterMap.GetDisplay(), gameListModel.filterMap.name );
-	filterMap.AddItem( FILTER_ANY_MAP, "" );
+	filterMap.AddItem( L( "any map" ), "" );
 
 	gameListModel.Flush();
 	joinGame->SetGrayed( true );
@@ -1161,7 +1160,7 @@ void CMenuServerBrowser::_Init( void )
 	filterPing.AddItem( "100ms", 100.0f );
 	filterPing.AddItem( "50ms", 50.0f );
 	filterPing.AddItem( "20ms", 20.0f );
-	filterPing.AddItem( "ping", MAX_PING * 1000.0f );
+	filterPing.AddItem( L( "ping" ), MAX_PING * 1000.0f );
 	filterPing.SelectLast( );
 	filterPing.bDropUp = true;
 	filterPing.eTextAlignment = QM_LEFT;
@@ -1178,9 +1177,9 @@ void CMenuServerBrowser::_Init( void )
 		parent->RefreshList();
 	});
 
-	filterEmpty.AddItem( "empty", '1' );
-	filterEmpty.AddItem( "not empty", '0' );
-	filterEmpty.AddItem( "any", 0 );
+	filterEmpty.AddItem( L( "empty" ), '1' );
+	filterEmpty.AddItem( L( "not empty" ), '0' );
+	filterEmpty.AddItem( L( "any" ), 0 );
 	filterEmpty.SelectLast( false );
 	filterEmpty.bDropUp = true;
 	filterEmpty.eTextAlignment = QM_LEFT;
@@ -1197,9 +1196,9 @@ void CMenuServerBrowser::_Init( void )
 		parent->RefreshList();
 	});
 
-	filterFull.AddItem( "full", '1' );
-	filterFull.AddItem( "not full", '0' );
-	filterFull.AddItem( "any", 0 );
+	filterFull.AddItem( L( "full" ), '1' );
+	filterFull.AddItem( L( "not full" ), '0' );
+	filterFull.AddItem( L( "any" ), 0 );
 	filterFull.SelectLast( false );
 	filterFull.bDropUp = true;
 	filterFull.eTextAlignment = QM_LEFT;
@@ -1216,7 +1215,7 @@ void CMenuServerBrowser::_Init( void )
 		parent->RefreshList();
 	});
 
-	filterMap.AddItem( FILTER_ANY_MAP, "" );
+	filterMap.AddItem( L( "any map" ), "" );
 	filterMap.bDropUp = true;
 	filterMap.eTextAlignment = QM_LEFT;
 	filterMap.iSelectColor = uiInputFgColor;
