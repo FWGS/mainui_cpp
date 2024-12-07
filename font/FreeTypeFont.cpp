@@ -87,25 +87,24 @@ void CFreeTypeFont::GetCharRGBA(int ch, Point pt, Size sz, unsigned char *rgba, 
 {
 	FT_UInt idx = FT_Get_Char_Index( face, ch );
 	FT_Error error;
-	FT_GlyphSlot slot;
-	byte *buf, *dst;
-	int a, b, c;
 
-	GetCharABCWidths( ch, a, b, c );
+	{
+		int a, b, c;
+		GetCharABCWidths( ch, a, b, c );
+	}
 
-	if( ( error = FT_Load_Glyph( face, idx, FT_LOAD_RENDER | FT_LOAD_TARGET_NORMAL ) ) )
+	if(( error = FT_Load_Glyph( face, idx, FT_LOAD_RENDER | FT_LOAD_TARGET_NORMAL )))
 	{
 		Con_Printf( "Error in FT_Load_Glyph: %x\n", error );
 		return;
 	}
 
-	slot = face->glyph;
-	buf = slot->bitmap.buffer;
-	dst = rgba;
+	const FT_GlyphSlot slot = face->glyph;
 
 	// see where we should start rendering
 	const int pushDown = m_iAscent - slot->bitmap_top;
 	const int pushLeft = slot->bitmap_left;
+	const int bitmap_pitch = slot->bitmap.pitch < 0 ? -slot->bitmap.pitch : slot->bitmap.pitch;
 
 	// set where we start copying from
 	int ystart = 0;
@@ -124,24 +123,31 @@ void CFreeTypeFont::GetCharRGBA(int ch, Point pt, Size sz, unsigned char *rgba, 
 	if( pushLeft + xend > sz.w )
 		xend += sz.w - ( pushLeft + xend );
 
-	buf = &slot->bitmap.buffer[ ystart * slot->bitmap.width ];
-	dst = rgba + 4 * sz.w * ( ystart + pushDown );
+	const uint8_t *buf = &slot->bitmap.buffer[ ystart * bitmap_pitch ];
+	uint8_t *dst = rgba + 4 * sz.w * ( ystart + pushDown );
 
-	// iterate through copying the generated dib into the texture
-	for (int j = ystart; j < yend; j++, dst += 4 * sz.w, buf += slot->bitmap.width )
+	for( int j = ystart; j < yend; j++, dst += 4 * sz.w, buf += bitmap_pitch )
 	{
 		uint32_t *xdst = (uint32_t*)(dst + 4 * ( m_iBlur + m_iOutlineSize ));
-		for (int i = xstart; i < xend; i++, xdst++)
+		for( int i = xstart; i < xend; i++, xdst++ )
 		{
-			if( buf[i] > 0 )
+			*xdst = 0; // initialize with black and null alpha
+			if( slot->bitmap.pixel_mode == FT_PIXEL_MODE_MONO )
 			{
-				// paint white and alpha
-				*xdst = PackRGBA( 0xFF, 0xFF, 0xFF, buf[i] );
+				if( buf[i >> 3] & ( 0x80 >> ( i & 7 )))
+					*xdst = PackRGBA( 0xFF, 0xFF, 0xFF, 0xFF );
+			}
+			else if( slot->bitmap.pixel_mode == FT_PIXEL_MODE_GRAY )
+			{
+				if( buf[i] > 0 ) // paint white and alpha
+					*xdst = PackRGBA( 0xFF, 0xFF, 0xFF, buf[i] );
 			}
 			else
 			{
-				// paint black and null alpha
-				*xdst = 0;
+				if(( i & 1 ) ^ ( j & 1 )) // small emo texture for unsupported modes
+					*xdst = PackRGBA( 0xFF, 0x00, 0xFF, 0xFF );
+				else
+					*xdst = PackRGBA( 0x00, 0x00, 0x00, 0xFF );
 			}
 		}
 	}
