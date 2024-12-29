@@ -289,8 +289,8 @@ void CMenuMain::_Init( void )
 	if ( bTrainMap )
 		AddItem( hazardCourse );
 
-	AddItem( saveRestore );
 	AddItem( configuration );
+	AddItem( saveRestore );
 	AddItem( multiPlayer );
 
 	if ( bCustomGame )
