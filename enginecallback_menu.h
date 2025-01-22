@@ -532,7 +532,7 @@ public:
 		return textfuncs.pfnCompareAdr( a, b );
 	}
 
-	static inline void ClientCmdF( bool now, const char *fmt, ... ) _format( 2 )
+	static inline void ClientCmdF( bool now, const char *fmt, ... ) FORMAT_CHECK( 2 )
 	{
 		va_list va;
 		char buf[4096];
@@ -544,7 +544,7 @@ public:
 		ClientCmd( now, buf );
 	}
 
-	static inline void CvarSetStringF( const char *cvar, const char *fmt, ... ) _format( 2 )
+	static inline void CvarSetStringF( const char *cvar, const char *fmt, ... ) FORMAT_CHECK( 2 )
 	{
 		va_list va;
 		char buf[4096];
