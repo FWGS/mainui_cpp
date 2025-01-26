@@ -355,7 +355,7 @@ void CMenuPicButton::Draw( )
 			if( a > 0 )
 			{
 				UI_DrawString( uiStatic.hHeavyBlur, pos, m_scSize, szName,
-					InterpColor( uiColorBlack, heavy_blur_color, a / 255.0f ), m_scChSize, eTextAlignment, heavy_blur_flags );
+					PackAlpha( heavy_blur_color, a ), m_scChSize, eTextAlignment, heavy_blur_flags );
 			}
 			UI_DrawString( uiStatic.hLightBlur, pos, m_scSize, szName, light_blur_color, m_scChSize, eTextAlignment, light_blur_flags );
 		}
