@@ -328,5 +328,12 @@
 "Water ripples"                                                           ""
 "Window mode"                                                             ""
 "Windowed"                                                                ""
+"any map"                                                                 ""
+"any"                                                                     ""
+"ping"                                                                    ""
+"full"                                                                    ""
+"not full"                                                                ""
+"empty"                                                                   ""
+"not empty"                                                               ""
 }
 }
