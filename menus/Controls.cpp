@@ -297,30 +297,29 @@ void CMenuControls::ResetKeysList( void )
 
 bool CMenuControls::CGrabKeyMessageBox::KeyUp( int key )
 {
+	EUISounds sound;
 	CMenuControls *parent = ((CMenuControls*)m_pParent);
 
 	// defining a key
 	// escape is special, should allow rebind all keys on gamepad
 	if( UI::Key::IsConsole( key ) || key == K_ESCAPE )
 	{
-		Hide();
-		PlayLocalSound( uiStatic.sounds[SND_BUZZ] );
-		return true;
+		sound = SND_BUZZ;
 	}
 	else
 	{
 		char cmd[4096];
-
 		const char *bindName = parent->keysListModel.keysBind[parent->keysList.GetCurrentIndex()];
+
 		snprintf( cmd, sizeof( cmd ), "bind \"%s\" \"%s\"\n", EngFuncs::KeynumToString( key ), bindName );
 		EngFuncs::ClientCmd( TRUE, cmd );
+
+		sound = SND_LAUNCH;
 	}
 
 	parent->keysListModel.Update();
-
 	Hide();
-
-	PlayLocalSound( uiStatic.sounds[SND_LAUNCH] );
+	PlayLocalSound( uiStatic.sounds[sound] );
 
 	return true;
 }
