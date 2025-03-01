@@ -74,7 +74,7 @@ CMenuYesNoMessageBox::CMenuYesNoMessageBox( bool alert ) : BaseClass( "YesNoMess
 CMenuYesNoMessageBox::Init
 ==============
 */
-void CMenuYesNoMessageBox::_Init( void )
+void CMenuYesNoMessageBox::_Init()
 {
 	SetRect( DLG_X + 192, 256, 640, 256 );
 
@@ -106,14 +106,13 @@ void CMenuYesNoMessageBox::_Init( void )
 CMenuYesNoMessageBox::VidInit
 ==============
 */
-void CMenuYesNoMessageBox::_VidInit( void )
+void CMenuYesNoMessageBox::_VidInit()
 {
+	SetRect( DLG_X + 192, 256, 640, 256 );
 	pos.x += uiStatic.xOffset;
 	pos.y += uiStatic.yOffset;
 	CalcPosition();
 	CalcSizes();
-
-
 }
 
 /*
@@ -121,7 +120,7 @@ void CMenuYesNoMessageBox::_VidInit( void )
 CMenuYesNoMessageBox::Draw
 ==============
 */
-void CMenuYesNoMessageBox::Draw( void )
+void CMenuYesNoMessageBox::Draw()
 {
 	UI_FillRect( 0,0, gpGlobals->scrWidth, gpGlobals->scrHeight, 0x40000000 );
 	CMenuBaseWindow::Draw();
@@ -263,7 +262,7 @@ void UI_ShowMessageBox( const char *text )
 	msgBox.Show();
 }
 
-void UI_ShowMessageBox_f( void )
+void UI_ShowMessageBox_f()
 {
 	UI_ShowMessageBox( EngFuncs::CmdArgv(1) );
 }
