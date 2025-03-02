@@ -364,39 +364,49 @@ void CMenuPlayerSetup::UpdateModel()
 	// just force display string and do nothing
 	if( !mdl )
 	{
-		model.ForceDisplayString( EngFuncs::GetCvarString( "model" ) );
+		model.ForceDisplayString( EngFuncs::GetCvarString( "model" ));
 		return;
 	}
 
 	snprintf( image, sizeof( image ), "models/player/%s/%s.bmp", mdl, mdl );
 	view.hPlayerImage = EngFuncs::PIC_Load( image, PIC_KEEP_SOURCE );
-
 	ApplyColorToImagePreview();
+
 	EngFuncs::CvarSetString( "model", mdl );
-	if( !strcmp( mdl, "player" ) )
+	if( !strcmp( mdl, "player" ))
 		strcpy( image, "models/player.mdl" );
 	else
-		snprintf( image, sizeof(image), "models/player/%s/%s.mdl", mdl, mdl );
+		snprintf( image, sizeof( image ), "models/player/%s/%s.mdl", mdl, mdl );
+
 	if( view.ent )
 		EngFuncs::SetModel( view.ent, image );
 }
 
 void CMenuPlayerSetup::UpdateLogo()
 {
-	char filename[1024];
-	int pos = logo.GetCurrentValue();
+	const int pos = logo.GetCurrentValue();
+
+	logoImage.color = &g_LogoColors[0];
+	logoColor.SetCurrentValue( L( g_LogoColors[0].name ));
+	logoColor.SetGrayed( true );
 
 	if( pos < 0 )
-		return;
-
-	logosModel.GetFullPath( filename, sizeof( filename ), pos );
-	logoImage.hImage = EngFuncs::PIC_Load( filename, 0 );
-	if( logosModel.IsPng( pos ))
 	{
-		logoImage.color = &g_LogoColors[0];
-		logoColor.SetGrayed( true );
+		logoImage.hImage = 0;
+		return;
 	}
-	else
+
+	char filename[1024];
+	const int temp = logosModel.GetFullPath( filename, sizeof( filename ), pos );
+	if(( temp < 0 ) || ( temp > sizeof( filename )))
+	{
+		logoImage.hImage = 0;
+		return;
+	}
+
+	logoImage.hImage = EngFuncs::PIC_Load( filename, 0 );
+
+	if( !logosModel.IsPng( pos ))
 	{
 		CBMP *bmpFile = CBMP::LoadFile( filename );
 		if( bmpFile->GetBitmapHdr()->bitsPerPixel == 8 )
@@ -404,15 +414,10 @@ void CMenuPlayerSetup::UpdateLogo()
 			ApplyColorToLogoPreview();
 			logoColor.SetGrayed( false );
 		}
-		else
-		{
-			logoImage.color = &g_LogoColors[0];
-			logoColor.SetGrayed( true );
-		}
 		delete bmpFile;
 	}
 
-	EngFuncs::CvarSetString( "cl_logofile", logo.GetCurrentString() );
+	EngFuncs::CvarSetString( "cl_logofile", logo.GetCurrentString( ));
 	logoColor.WriteCvar();
 }
 
