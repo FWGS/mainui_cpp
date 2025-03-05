@@ -234,7 +234,7 @@ UI_VidModes_SetConfig
 */
 void CMenuVidModes::SetConfig( )
 {
-	bool testMode = true;
+	bool testMode = false;
 	int  currentWindowModeIndex = windowMode.GetCurrentValue();
 	int  currentModeIndex = vidList.GetCurrentIndex();
 	bool isVidModeChanged = prevMode != currentModeIndex;
