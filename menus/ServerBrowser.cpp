@@ -246,7 +246,7 @@ struct filterMap_t
 	}
 
 private:
-	char display[64];
+	char display[128];
 	unsigned short count;
 
 	void UpdateDisplay()
