@@ -571,34 +571,23 @@ char *Q_pretifymem( float value, int digitsafterdecimal )
 	if( value > onemb )
 	{
 		value /= onemb;
-		suffix = " Mb";
+		suffix = "Mb";
 	}
 	else if( value > onekb )
 	{
 		value /= onekb;
-		suffix = " Kb";
+		suffix = "Kb";
 	}
 	else
 	{
-		suffix = " bytes";
+		suffix = "bytes";
 	}
-
-	// clamp to >= 0
-	digitsafterdecimal = Q_max( digitsafterdecimal, 0 );
 
 	// if it's basically integral, don't do any decimals
-	if( fabs( value - (int)value ) < 0.00001f )
-	{
-		snprintf( val, sizeof( val ), "%i%s", (int)value, suffix );
-	}
+	if( fabs( value - (int)value ) < 0.00001f || digitsafterdecimal <= 0 )
+		snprintf( val, sizeof( val ), "%i %s", (int)round( value ), suffix );
 	else
-	{
-		char fmt[32];
-
-		// otherwise, create a format string for the decimals
-		snprintf( fmt, sizeof( fmt ), "%%.%if%s", digitsafterdecimal, suffix );
-		snprintf( val, sizeof( val ), fmt, (double)value );
-	}
+		snprintf( val, sizeof( val ), "%.*f %s", digitsafterdecimal, (double)value, suffix );
 
 	// copy from in to out
 	i = val;
