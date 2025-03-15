@@ -199,6 +199,8 @@ void CMenuSavesListModel::Update( void )
 	{
 		save_t save;
 		char comment[256];
+		char time[CS_TIME];
+		char date[CS_TIME];
 
 		// strip path, leave only filename (empty slots doesn't have savename)
 		COM_FileBase( filenames[i], save.name, sizeof( save.name ));
@@ -220,7 +222,10 @@ void CMenuSavesListModel::Update( void )
 
 		// they are defined by comment string format
 		// time and date
-		snprintf( save.date, sizeof( save.date ), "%s %s", comment + CS_SIZE, comment + CS_SIZE + CS_TIME );
+		Q_strncpy( time, comment + CS_SIZE, CS_TIME );
+		Q_strncpy( date, comment + CS_SIZE + CS_TIME, CS_TIME );
+
+		snprintf( save.date, sizeof( save.date ), "%s %s", time, date );
 
 		// ingame time
 		Q_strncpy( save.elapsed_time, comment + CS_SIZE + CS_TIME * 2, sizeof( save.elapsed_time ));
@@ -253,7 +258,7 @@ void CMenuSavesListModel::Update( void )
 			Q_strncpy( s, title, sizeof( s ));
 
 			if( type )
-				snprintf( save.comment, sizeof( save.comment ), "[%s]%s", type, L( s ));
+				snprintf( save.comment, sizeof( save.comment ), "[%.16s]%s", type, L( s ));
 			else Q_strncpy( save.comment, L( s ), sizeof( save.comment ));
 		}
 		else
