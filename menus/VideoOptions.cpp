@@ -23,6 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "PicButton.h"
 #include "Slider.h"
 #include "CheckBox.h"
+#include "YesNoMessageBox.h"
 
 #define ART_BANNER	  	"gfx/shell/head_vidoptions"
 #define ART_GAMMA		"gfx/shell/gamma"
@@ -61,6 +62,8 @@ public:
 	CMenuCheckBox	overbright;
 	CMenuCheckBox	filtering;
 	CMenuCheckBox	detailtex;
+	CMenuCheckBox	hudscale;
+	CMenuYesNoMessageBox	msgBox;
 
 	HIMAGE		hTestImage;
 };
@@ -102,6 +105,7 @@ void CMenuVidOptions::SaveAndPopMenu( void )
 	swwater.WriteCvar();
 	overbright.WriteCvar();
 	filtering.WriteCvar();
+	hudscale.WriteCvar();
 	// gamma and brightness is already written
 
 	CMenuFramework::SaveAndPopMenu();
@@ -216,6 +220,50 @@ void CMenuVidOptions::_Init( void )
 	filtering.SetCoord( 72, height );
 	height += 50;
 
+	hudscale.szName = L( "Auto scale HUD" );
+	hudscale.SetCoord( 72, height );
+	height += 50;
+
+	msgBox.SetMessage( L( "^1WARNING: This is an experimental option and turning it on might break mods!^7\n\nReload the game or reconnect to the server to apply the settings."));
+	msgBox.onNegative.pExtra = &hudscale;
+	SET_EVENT_MULTI( msgBox.onNegative,
+	{
+		CMenuCheckBox *cb = (CMenuCheckBox *)pExtra;
+
+		cb->bChecked = false;
+		cb->SetCvarValue( 0.0f );
+	});
+
+	SET_EVENT_MULTI( hudscale.onChanged,
+	{
+		CMenuCheckBox *cb = (CMenuCheckBox *)pSelf;
+		CMenuVidOptions *parent = (CMenuVidOptions *)pSelf->Parent();
+
+		if( EngFuncs::ClientInGame( ))
+		{
+			// bring up warning message box
+			// FIXME: try to save the game, apply the settings, and then load it back. This will be useful when changing resolution too.
+			parent->msgBox.Show();
+		}
+	});
+
+	SET_EVENT_MULTI( hudscale.onCvarWrite,
+	{
+		CMenuCheckBox *cb = (CMenuCheckBox *)pSelf;
+
+		if( cb->bChecked )
+		{
+			// automatically scale HUD as if we have 1024x768 screen
+			// (saving aspect ratio)
+			// FIXME: allow configuring this value?
+			EngFuncs::CvarSetValue( cb->CvarName(), 1024.0f );
+		}
+		else
+		{
+			EngFuncs::CvarSetValue( cb->CvarName(), 0.0f );
+		}
+	});
+
 	AddItem( banner );
 	AddItem( done );
 #if LEGACY_VIEWSIZE
@@ -228,6 +276,7 @@ void CMenuVidOptions::_Init( void )
 	AddItem( swwater );
 	AddItem( overbright );
 	AddItem( filtering );
+	AddItem( hudscale );
 	AddItem( testImage );
 
 #if LEGACY_VIEWSIZE
@@ -242,6 +291,7 @@ void CMenuVidOptions::_Init( void )
 	vbo.LinkCvar( "gl_vbo" );
 	overbright.LinkCvar( "gl_overbright" );
 	// skip filtering.LinkCvar, different names in ref_gl and ref_soft
+	hudscale.LinkCvar( "hud_scale" );
 }
 
 void CMenuVidOptions::_VidInit()
