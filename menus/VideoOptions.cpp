@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -55,8 +55,8 @@ public:
 	CMenuSlider	screenSize;
 #endif
 	CMenuSlider	gammaIntensity;
-	CMenuSlider	glareReduction;
-	CMenuCheckBox   vbo;
+	CMenuSlider	brightness;
+	CMenuCheckBox	vbo;
 	CMenuCheckBox	swwater;
 	CMenuCheckBox	overbright;
 	CMenuCheckBox	filtering;
@@ -73,7 +73,7 @@ CMenuVidOptions::UpdateConfig
 void CMenuVidOptions::UpdateConfig( void )
 {
 	float val1 = RemapVal( gammaIntensity.GetCurrentValue(), 0.0, 1.0, 1.8, 3.0 );
-	float val2 = RemapVal( glareReduction.GetCurrentValue(), 0.0, 1.0, 0.0, 3.0 );
+	float val2 = RemapVal( brightness.GetCurrentValue(), 0.0, 1.0, 0.0, 3.0 );
 	EngFuncs::CvarSetValue( "gamma", val1 );
 	EngFuncs::CvarSetValue( "brightness", val2 );
 	EngFuncs::ProcessImage( hTestImage, val1, val2 );
@@ -85,11 +85,11 @@ void CMenuVidOptions::GetConfig( void )
 	float val2 = EngFuncs::GetCvarFloat( "brightness" );
 
 	gammaIntensity.SetCurrentValue( RemapVal( val1, 1.8f, 3.0f, 0.0f, 1.0f ) );
-	glareReduction.SetCurrentValue( RemapVal( val2, 0.0f, 3.0f, 0.0f, 1.0f ) );
+	brightness.SetCurrentValue( RemapVal( val2, 0.0f, 3.0f, 0.0f, 1.0f ) );
 	EngFuncs::ProcessImage( hTestImage, val1, val2 );
 
 	gammaIntensity.SetOriginalValue( val1 );
-	glareReduction.SetOriginalValue( val2 );
+	brightness.SetOriginalValue( val2 );
 }
 
 void CMenuVidOptions::SaveAndPopMenu( void )
@@ -183,11 +183,11 @@ void CMenuVidOptions::_Init( void )
 	gammaIntensity.onCvarGet = VoidCb( &CMenuVidOptions::GetConfig );
 	height += 60;
 
-	glareReduction.SetCoord( 72, height );
-	glareReduction.szName = L( "GameUI_Brightness" );
-	glareReduction.Setup( 0, 1.0, 0.025 );
-	glareReduction.onChanged = VoidCb( &CMenuVidOptions::UpdateConfig );
-	glareReduction.onCvarGet = VoidCb( &CMenuVidOptions::GetConfig );
+	brightness.SetCoord( 72, height );
+	brightness.szName = L( "GameUI_Brightness" );
+	brightness.Setup( 0, 1.0, 0.025 );
+	brightness.onChanged = VoidCb( &CMenuVidOptions::UpdateConfig );
+	brightness.onCvarGet = VoidCb( &CMenuVidOptions::GetConfig );
 	height += 60;
 
 	done.szName = L( "GameUI_OK" );
@@ -222,7 +222,7 @@ void CMenuVidOptions::_Init( void )
 	AddItem( screenSize );
 #endif
 	AddItem( gammaIntensity );
-	AddItem( glareReduction );
+	AddItem( brightness );
 	AddItem( detailtex );
 	AddItem( vbo );
 	AddItem( swwater );
@@ -235,7 +235,7 @@ void CMenuVidOptions::_Init( void )
 #endif
 
 	gammaIntensity.LinkCvar( "gamma" );
-	glareReduction.LinkCvar( "brightness" );
+	brightness.LinkCvar( "brightness" );
 
 	detailtex.LinkCvar( "r_detailtextures" );
 	swwater.LinkCvar( "r_ripple" );
