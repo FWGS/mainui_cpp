@@ -149,6 +149,7 @@ void CMenuVidModesModel::Update()
 
 void CMenuRenderersModel::Update()
 {
+	const char *r_refdll_loaded = EngFuncs::GetCvarString( "r_refdll_loaded" );
 	m_refs.Purge();
 
 	for( int i = 0; ; i++ )
@@ -158,14 +159,18 @@ void CMenuRenderersModel::Update()
 		if( !EngFuncs::GetRenderers( i, temp.shortName, sizeof( temp.shortName ), temp.readable, sizeof( temp.readable )))
 			break;
 
+		// append asterisk to currently loaded renderer
+		if( !stricmp( r_refdll_loaded, temp.shortName ))
+			strncat( temp.readable, "*", sizeof( temp.readable ));
+
 		m_refs.AddToTail( temp );
 	}
 }
 
 void CMenuVidModes::GetRendererConfig()
 {
-	// get current loaded renderer
-	const char *refdll = EngFuncs::GetCvarString( "r_refdll_loaded" );
+	// get current _configured_ renderer
+	const char *refdll = EngFuncs::GetCvarString( "r_refdll" );
 
 	if( !refdll[0] )
 	{
