@@ -63,7 +63,7 @@ public:
 	void DiscardChanges();
 
 	// Update cvar values from engine
-	void UpdateCvar();
+	void UpdateCvar( bool forceUpdate );
 
 	CEventCallback onCvarWrite;  // called on final writing of cvar value
 	CEventCallback onCvarChange; // called on internal values changes
@@ -73,7 +73,6 @@ public:
 	DECLARE_EVENT_TO_ITEM_METHOD( CMenuEditable, WriteCvar )
 	DECLARE_EVENT_TO_ITEM_METHOD( CMenuEditable, DiscardChanges )
 	DECLARE_EVENT_TO_ITEM_METHOD( CMenuEditable, ResetCvar )
-	DECLARE_EVENT_TO_ITEM_METHOD( CMenuEditable, UpdateCvar )
 
 	bool bUpdateImmediately;
 
@@ -81,7 +80,6 @@ protected:
 	const char *m_szCvarName;
 	cvarType_e  m_eType;
 
-	bool		m_bForceUpdate;
 	char		m_szString[CS_SIZE], m_szOriginalString[CS_SIZE];
 	float		m_flValue, m_flOriginalValue;
 
