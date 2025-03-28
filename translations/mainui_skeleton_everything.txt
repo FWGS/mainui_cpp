@@ -335,5 +335,6 @@
 "not full"                                                                ""
 "empty"                                                                   ""
 "not empty"                                                               ""
+"Auto scale HUD"                                                          ""
 }
 }
