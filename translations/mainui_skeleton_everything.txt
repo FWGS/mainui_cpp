@@ -335,5 +335,7 @@
 "not full"                                                                ""
 "empty"                                                                   ""
 "not empty"                                                               ""
+"Auto scale HUD"                                                          ""
+"^1WARNING: This is an experimental option and turning it on might break mods!^7\n\nReload the game or reconnect to the server to apply the settings." ""
 }
 }
