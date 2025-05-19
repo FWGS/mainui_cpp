@@ -79,6 +79,8 @@ def build(bld):
 	bld.shlib(
 		source   = source,
 		target   = 'menu',
+		cflags = ['-fPIC'],
+		linkflags = ['-s', 'SIDE_MODULE=1'],
 		includes = includes,
 		use      = 'werror FT2 GDI32 USER32',
 		install_path = bld.env.LIBDIR,
