@@ -79,7 +79,7 @@ def build(bld):
 	bld.shlib(
 		source   = source,
 		target   = 'menu',
-		cflags = ['-fPIC'],
+		cflags = ['-fPIC', '-fvisibility=hidden'],
 		linkflags = ['-s', 'SIDE_MODULE=1'],
 		includes = includes,
 		use      = 'werror FT2 GDI32 USER32',
