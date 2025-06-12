@@ -76,11 +76,17 @@ def build(bld):
 		'sdk_includes/pm_shared'
 	]
 
+	linkflags = []
+	cflags = []
+	if any('em++' in c for c in bld.env.CXX):
+		linkflags += ['-s', 'SIDE_MODULE=1']
+		cflags += ['-fPIC', '-fvisibility=hidden']
+
 	bld.shlib(
 		source   = source,
 		target   = 'menu',
-		cflags = ['-fPIC', '-fvisibility=hidden'],
-		linkflags = ['-s', 'SIDE_MODULE=1'],
+		cflags = cflags,
+		linkflags = linkflags,
 		includes = includes,
 		use      = 'werror FT2 GDI32 USER32',
 		install_path = bld.env.LIBDIR,
