@@ -182,7 +182,7 @@ struct favlist_entry_t
 
 	void QueryServer( void ) const
 	{
-		EngFuncs::ClientCmdF( false, "queryserver \"%s\" \"%s\"", sadr, prot );
+		EngFuncs::ClientCmdF( false, "ui_queryserver \"%s\" \"%s\"", sadr, prot );
 	}
 
 	char sadr[128];
