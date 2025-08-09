@@ -38,7 +38,7 @@ file(GLOB MAINUI_MENUS_SOURCES "menus/*.cpp" "menus/dynamic/*.cpp")
 file(GLOB MAINUI_FONT_RENDER_SOURCES "font/*.cpp")
 file(GLOB MAINUI_SOURCES "miniutl/*.cpp" "*.cpp")
 
-add_library(menu SHARED ${MAINUI_CONTROLS} ${MAINUI_MENUS_SOURCES} ${MAINUI_FONT_RENDER_SOURCES} ${MAINUI_SOURCES})
+add_library(menu SHARED ${MAINUI_CONTROLS_SOURCES} ${MAINUI_MENUS_SOURCES} ${MAINUI_FONT_RENDER_SOURCES} ${MAINUI_SOURCES})
 
 if(NOT WIN32 AND NOT MINGW)
 	add_compile_options(-Wall -Wextra -Wno-unused-parameter -Wno-unused-variable)
