@@ -263,6 +263,7 @@ inline bool IsEnd( int key )
 	switch( key )
 	{
 	case K_END:
+	case K_KP_END:
 		return true;
 	}
 	return false;
