@@ -455,6 +455,7 @@ static void Localize_AddToDictionary( const char *name, const char *lang )
 		{
 			// Con_DPrintf("New token: %s %s\n", token, szLocString );
 			Localize_ProcessString( token, token );
+			Localize_ProcessString( szLocString, szLocString );
 			Dictionary_Insert( token, szLocString );
 			i++;
 		}
