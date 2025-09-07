@@ -132,55 +132,12 @@ static void UI_InitAliasStrings( void )
 		if( MenuStrings[aliasStrings[i].idx][0]) // check if not initialized by strings.lst
 			continue;
 
-		char token[1024];
-		char token2[1024];
+		char token[64];
 		snprintf( token, sizeof( token ), "StringsList_%d", aliasStrings[i].idx );
 
-		const char *fmt = L( token );
-		if( fmt == token )
-		{
-			fmt = aliasStrings[i].defAliasString;
-		}
-		else
-		{
-			// validate format string
-			char *p = (char *)fmt;
-			int s = 0;
-			qboolean fail = false;
-
-			while(( p = strchr( p, '%' )))
-			{
-				if( p[1] == '%' )
-				{
-					p += 2;
-					continue;
-				}
-
-				if( p[1] != 's' )
-				{
-					fail = true;
-					break;
-				}
-
-				s++;
-				p++;
-
-				if( s > 1 )
-				{
-					fail = true;
-					break;
-				}
-			}
-
-			if( fail )
-			{
-				Con_Printf( "%s: Only singular %%s is allowed in alias strings (localization token %s)\n", __func__, token );
-				fmt = aliasStrings[i].defAliasString;
-			}
-		}
-
-		snprintf( token2, sizeof( token2 ), fmt, gMenu.m_gameinfo.title );
-		MenuStrings[aliasStrings[i].idx] = StringCopy( token2 );
+		CUtlString fmt( L( token ));
+		fmt.Replace( "%s", gMenu.m_gameinfo.title );
+		MenuStrings[aliasStrings[i].idx] = fmt.DetachRawPtr();
 
 		Dictionary_Insert( token, MenuStrings[aliasStrings[i].idx] );
 	}
