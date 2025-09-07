@@ -507,9 +507,6 @@ static void Localize_Init( void )
 		Dictionary_Insert( buf, MenuStrings[i] );
 	}
 
-	// strings.lst compatible aliasstrings then
-	UI_InitAliasStrings ();
-
 	// always load default language translation
 	Localize_InitLanguage( "english" );
 
@@ -517,6 +514,9 @@ static void Localize_Init( void )
 
 	if( language[0] && strcmp( language, "english" ))
 		Localize_InitLanguage( language );
+
+	// strings.lst compatible aliasstrings then
+	UI_InitAliasStrings ();
 }
 
 static void Localize_Free( void )
