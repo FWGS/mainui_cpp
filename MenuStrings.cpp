@@ -135,7 +135,11 @@ static void UI_InitAliasStrings( void )
 		char token[64];
 		snprintf( token, sizeof( token ), "StringsList_%d", aliasStrings[i].idx );
 
-		CUtlString fmt( L( token ));
+		const char *fmt_str = L( token );
+		if( fmt_str == token ) // not found
+			fmt_str = aliasStrings[i].defAliasString;
+
+		CUtlString fmt( fmt_str );
 		fmt.Replace( "%s", gMenu.m_gameinfo.title );
 		MenuStrings[aliasStrings[i].idx] = fmt.DetachRawPtr();
 
