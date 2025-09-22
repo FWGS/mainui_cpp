@@ -266,9 +266,9 @@ void CMenuVidOptions::_Init( void )
 
 	SET_EVENT_MULTI( hudscale.onCvarGet,
 	{
-		CMenuCheckbox *cb = (CMenuCheckBox *)pSelf;
+		CMenuCheckBox *cb = (CMenuCheckBox *)pSelf;
 
-		cb->bChecked = EngFuncs::GetCvarValue( cb->CvarName() ) >= 640.0f;
+		cb->bChecked = EngFuncs::GetCvarFloat( cb->CvarName() ) >= 640.0f;
 	});
 
 	AddItem( banner );
