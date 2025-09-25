@@ -33,6 +33,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 cvar_t		*ui_showmodels;
 cvar_t		*ui_show_window_stack;
 cvar_t		*ui_borderclip;
+cvar_t		*ui_prefer_won_background;
 
 uiStatic_t	uiStatic;
 static CMenuEntry	*s_pEntries = NULL;
@@ -612,6 +613,9 @@ void UI_UpdateMenu( float flTime )
 	// set from user configs
 	if( loadStuff )
 	{
+		// load background bitmaps
+		CMenuBackgroundBitmap::LoadBackground( );
+
 		// load localized strings
 		UI_LoadCustomStrings();
 
@@ -1037,8 +1041,6 @@ int UI_VidInit( void )
 	// trying to load chapterbackgrounds.txt
 	UI_LoadBackgroundMapList ();
 
-	CMenuBackgroundBitmap::LoadBackground( );
-
 	// reload all menu buttons
 	UI_LoadBmpButtons ();
 
@@ -1126,6 +1128,7 @@ void UI_Init( void )
 	ui_showmodels = EngFuncs::CvarRegister( "ui_showmodels", "0", FCVAR_ARCHIVE );
 	ui_show_window_stack = EngFuncs::CvarRegister( "ui_show_window_stack", "0", FCVAR_ARCHIVE );
 	ui_borderclip = EngFuncs::CvarRegister( "ui_borderclip", "0", FCVAR_ARCHIVE );
+	ui_prefer_won_background = EngFuncs::CvarRegister( "ui_prefer_won_background", "0", FCVAR_ARCHIVE );
 
 	// show cl_predict dialog
 	EngFuncs::CvarRegister( "menu_mp_firsttime2", "1", FCVAR_ARCHIVE );
