@@ -49,6 +49,22 @@ private:
 	char elapsed_time[CS_SIZE];
 };
 
+/*
+============
+COM_CompareSaves
+============
+*/
+static int COM_CompareSaves( const void *a, const void *b )
+{
+	const char *file1 = *((const char **)a);
+	const char *file2 = *((const char **)b);
+	int bResult = 0;
+
+	EngFuncs::CompareFileTime( file2, file1, &bResult );
+
+	return bResult;
+}
+
 class CMenuSavePreview : public CMenuBaseItem
 {
 public:
@@ -181,7 +197,7 @@ void CMenuSavesListModel::Update( void )
 	filenames = EngFuncs::GetFilesList( "save/*.sav", &numFiles, TRUE );
 
 	// sort the saves in reverse order (oldest past at the end)
-	qsort( filenames, numFiles, sizeof( *filenames ), (cmpfunc)COM_CompareSaves );
+	qsort( filenames, numFiles, sizeof( *filenames ), COM_CompareSaves );
 
 	if( parent->IsSaveMode( ) && CL_IsActive( ))
 	{

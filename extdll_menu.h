@@ -79,7 +79,6 @@ GNU General Public License for more details.
 #define snprintf	_snprintf
 #endif
 
-typedef int (*cmpfunc)( const void *a, const void *b );
 typedef unsigned char byte;
 typedef unsigned int uint;
 

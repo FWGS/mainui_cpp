@@ -166,25 +166,6 @@ char *StringCopy( const char *input )
 
 /*
 ============
-COM_CompareSaves
-============
-*/
-int COM_CompareSaves( const void **a, const void **b )
-{
-	char *file1, *file2;
-
-	file1 = (char *)*a;
-	file2 = (char *)*b;
-
-	int bResult;
-
-	EngFuncs::CompareFileTime( file2, file1, &bResult );
-
-	return bResult;
-}
-
-/*
-============
 COM_FileBase
 
 Extracts the base name of a file (no path, no extension, assumes '/' as path separator)
