@@ -250,7 +250,7 @@ void CMenuPicButton::Draw( )
 	if( iOldState == BUTTON_NOFOCUS && state != BUTTON_NOFOCUS )
 		iFocusStartTime = uiStatic.realTime;
 
-	if( szStatusText && iFlags & QMF_NOTIFY )
+	if( szStatusText && FBitSet( iFlags, QMF_NOTIFY ) && !FBitSet( gMenu.m_gameinfo.flags, GFL_NOSKILLS ))
 	{
 		Point coord;
 
