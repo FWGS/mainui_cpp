@@ -544,15 +544,28 @@ UI_StartBackGroundMap
 */
 bool UI_StartBackGroundMap( void )
 {
-	static bool	first = TRUE;
+	static int check_dll;
 
-	if( !first ) return FALSE;
+	// the list is empty
+	if( uiStatic.bgmaps.IsEmpty())
+		return false;
 
-	first = FALSE;
+	// check if server dll available only once, as it might be implemented
+	// very inefficiently
+	if( !check_dll )
+	{
+		if( EngFuncs::CheckGameDll( ))
+			check_dll = 1;
+		else
+			check_dll = -1;
+	}
+
+	if( check_dll < 0 )
+		return false;
 
 	// some map is already running
-	if( uiStatic.bgmaps.IsEmpty() || CL_IsActive() || gpGlobals->demoplayback )
-		return FALSE;
+	if( CL_IsActive() || EngFuncs::GetCvarFloat( "cl_background" ) != 0.0f || gpGlobals->demoplayback )
+		return false;
 
 	int bgmapid = EngFuncs::RandomLong( 0, uiStatic.bgmaps.Count() - 1 );
 
@@ -610,10 +623,6 @@ void UI_UpdateMenu( float flTime )
 		// load scr
 		UI_LoadScriptConfig();
 
-		// load background track
-		if( !CL_IsActive( ))
-			EngFuncs::PlayBackgroundTrack( "media/gamestartup", "media/gamestartup" );
-
 		loadStuff = false;
 	}
 
@@ -644,9 +653,20 @@ void UI_UpdateMenu( float flTime )
 
 	if( uiStatic.firstDraw )
 	{
-		// we loading background so skip SCR_Update
-		if( UI_StartBackGroundMap( ))
-			return;
+		static bool first = true;
+
+		if( first )
+		{
+			first = false;
+
+			// we loading background so skip SCR_Update
+			if( UI_StartBackGroundMap( ))
+				return;
+
+			// load background track
+			if( !CL_IsActive( ))
+				EngFuncs::PlayBackgroundTrack( "media/gamestartup", "media/gamestartup" );
+		}
 
 		uiStatic.firstDraw = false;
 	}
