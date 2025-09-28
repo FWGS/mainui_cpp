@@ -469,7 +469,7 @@ public:
 		engfuncs.pfnProcessImage( texnum, gamma, topColor, bottomColor );
 	}
 
-	static inline int	CompareFileTime( char *filename1, char *filename2, int *iCompare )
+	static inline int CompareFileTime( const char *filename1, const char *filename2, int *iCompare )
 	{
 		return engfuncs.pfnCompareFileTime( filename1, filename2, iCompare );
 	}
@@ -497,10 +497,6 @@ public:
 		if( textfuncs.pfnEnableTextInput )
 			textfuncs.pfnEnableTextInput( enable );
 	}
-
-	static int UtfProcessChar( int ch );
-	static int UtfMoveLeft( const char *str, int pos );
-	static int UtfMoveRight( const char *str, int pos, int length );
 
 	static inline bool GetRenderers( int num, char *sz1, size_t s1, char *sz2, size_t s2 )
 	{

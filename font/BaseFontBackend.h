@@ -27,10 +27,10 @@ GNU General Public License for more details.
 
 struct charRange_t
 {
-	int chMin;
-	int chMax;
-	const int *sequence;
-	int size;
+	uint32_t chMin;
+	uint32_t chMax;
+	const uint32_t *sequence;
+	size_t size;
 
 	size_t Length() const
 	{
