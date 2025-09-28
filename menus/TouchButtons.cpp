@@ -156,10 +156,10 @@ void CMenuTouchButtons::CButtonListModel::Update()
 
 	buttons.RemoveAll();
 
-	EngFuncs::ClientCmd( TRUE, "" ); // perform Cbuf_Execute()
+	EngFuncs::ClientCmd( true, "" ); // perform Cbuf_Execute()
 
 	gettingList = true;
-	EngFuncs::ClientCmd( TRUE, "touch_list\n" );
+	EngFuncs::ClientCmd( true, "touch_list\n" );
 	gettingList = false;
 
 	parent->UpdateFields();

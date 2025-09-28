@@ -293,7 +293,7 @@ bool CMenuBackgroundBitmap::LoadWONBackground( bool gamedirOnly )
 		if( gamedirOnly )
 		{
 			// if we doesn't have logo.avi in gamedir we don't want to draw it
-			s_bEnableLogoMovie = EngFuncs::FileExists( "media/logo.avi", TRUE );
+			s_bEnableLogoMovie = EngFuncs::FileExists( "media/logo.avi", true );
 		}
 
 		return true;

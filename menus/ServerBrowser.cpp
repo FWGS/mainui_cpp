@@ -451,7 +451,7 @@ void UI_ServerBrowser_Menu( void )
 	if ( gpGlobals->demoplayback && EngFuncs::GetCvarFloat( "cl_background" ))
 	{
 		uiStatic.m_iOldMenuDepth = uiStatic.menu.Count();
-		EngFuncs::ClientCmd( FALSE, "stop\n" );
+		EngFuncs::ClientCmd( false, "stop\n" );
 		uiStatic.m_fDemosPlayed = true;
 	}
 
@@ -875,7 +875,7 @@ void CMenuServerBrowser::RefreshList()
 
 	if( m_bLanOnly )
 	{
-		EngFuncs::ClientCmd( FALSE, "localservers\n" );
+		EngFuncs::ClientCmd( false, "localservers\n" );
 	}
 	else if( uiStatic.realTime > refreshTime2 )
 	{
@@ -910,7 +910,7 @@ void CMenuServerBrowser::RefreshList()
 				buf += n;
 			}
 
-			EngFuncs::ClientCmdF( FALSE, "internetservers %s\n", filter );
+			EngFuncs::ClientCmdF( false, "internetservers %s\n", filter );
 		}
 
 		refreshTime2 = uiStatic.realTime + (EngFuncs::GetCvarFloat("cl_nat") ? 4000:1000);

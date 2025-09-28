@@ -62,14 +62,6 @@ GNU General Public License for more details.
 #undef bound
 #endif
 
-#ifndef FALSE
-#define FALSE	0
-#endif
-
-#ifndef TRUE
-#define TRUE	(!FALSE)
-#endif
-
 #if !defined(_WIN32) && !defined(__MINGW32__)
 #define stricmp		strcasecmp
 #define strnicmp	strncasecmp

@@ -194,7 +194,7 @@ void CMenuSavesListModel::Update( void )
 	int numFiles;
 
 	RemoveAll();
-	filenames = EngFuncs::GetFilesList( "save/*.sav", &numFiles, TRUE );
+	filenames = EngFuncs::GetFilesList( "save/*.sav", &numFiles, true );
 
 	// sort the saves in reverse order (oldest past at the end)
 	qsort( filenames, numFiles, sizeof( *filenames ), COM_CompareSaves );
@@ -375,7 +375,7 @@ void CMenuLoadGame::LoadGame()
 
 	snprintf( cmd, sizeof( cmd ), "load \"%s\"\n", name );
 	EngFuncs::StopBackgroundTrack( );
-	EngFuncs::ClientCmd( FALSE, cmd );
+	EngFuncs::ClientCmd( false, cmd );
 	UI_CloseMenu();
 }
 
@@ -391,7 +391,7 @@ void CMenuLoadGame::SaveGame()
 	EngFuncs::PIC_Free( cmd );
 
 	snprintf( cmd, sizeof( cmd ), "save \"%s\"\n", name );
-	EngFuncs::ClientCmd( FALSE, cmd );
+	EngFuncs::ClientCmd( false, cmd );
 	UI_CloseMenu();
 }
 
@@ -419,7 +419,7 @@ void CMenuLoadGame::DeleteGame()
 	const char *name = savesListModel[savesList.GetCurrentIndex( )].name;
 
 	snprintf( cmd, sizeof( cmd ), "killsave \"%s\"\n", name );
-	EngFuncs::ClientCmd( TRUE, cmd );
+	EngFuncs::ClientCmd( true, cmd );
 
 	snprintf( cmd, sizeof( cmd ), "save/%s.bmp", name );
 	EngFuncs::PIC_Free( cmd );

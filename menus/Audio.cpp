@@ -87,7 +87,7 @@ void CMenuAudio::VibrateChanged()
 	{
 		char cmd[64];
 		snprintf( cmd, 64, "vibrate %f", newVibrate );
-		EngFuncs::ClientCmd( FALSE, cmd );
+		EngFuncs::ClientCmd( false, cmd );
 		vibration.WriteCvar();
 		oldVibrate = newVibrate;
 	}

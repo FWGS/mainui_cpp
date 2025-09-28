@@ -451,7 +451,7 @@ static void Localize_InitLanguage( const char *language )
 
 static void Localize_Init( void )
 {
-	EngFuncs::ClientCmd( TRUE, "exec mainui.cfg\n" );
+	EngFuncs::ClientCmd( true, "exec mainui.cfg\n" );
 
 	hashed_cmds.Purge();
 
