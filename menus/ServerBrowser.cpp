@@ -1006,7 +1006,7 @@ void CMenuServerBrowser::AddServer( void )
 
 	server_t serv( adr, fakeInfoString, false, true );
 	serv.UpdateData();
-	serv.SetPing( 9.999f );
+	serv.SetPing( MAX_PING );
 	gameListModel.servers.AddToTail( serv );
 
 	entry.QueryServer();
@@ -1361,7 +1361,7 @@ void CMenuServerBrowser::AddServerToList( netadr_t adr, const char *info )
 	{
 		if( !strcmp( favoritesList[i].sadr, s ))
 		{
-			is_favorite = true;
+			is_favorite = favoritesList[i].favorited;
 			break;
 		}
 	}
