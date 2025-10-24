@@ -42,13 +42,10 @@ private:
 	void VibrateChanged();
 	void SaveAndPopMenu() override;
 
-	void LerpingCvarWrite();
-
 	CMenuSlider	soundVolume;
 	CMenuSlider	musicVolume;
 	CMenuSlider	suitVolume;
 	CMenuSlider	vibration;
-	CMenuSpinControl lerping;
 	CMenuCheckBox noDSP;
 	CMenuCheckBox useAlphaDSP;
 	CMenuCheckBox muteFocusLost;
@@ -69,7 +66,6 @@ void CMenuAudio::GetConfig( void )
 	suitVolume.LinkCvar( "suitvolume" );
 	vibration.LinkCvar( "vibration_length" );
 
-	lerping.LinkCvar( "s_lerping", CMenuEditable::CVAR_VALUE );
 	noDSP.LinkCvar( "room_off" );
 	useAlphaDSP.LinkCvar( "dsp_coeff_table" );
 	muteFocusLost.LinkCvar( "snd_mute_losefocus" );
@@ -104,7 +100,6 @@ void CMenuAudio::SaveAndPopMenu()
 	musicVolume.WriteCvar();
 	suitVolume.WriteCvar();
 	vibration.WriteCvar();
-	lerping.WriteCvar();
 	noDSP.WriteCvar();
 	useAlphaDSP.WriteCvar();
 	muteFocusLost.WriteCvar();
@@ -120,11 +115,6 @@ CMenuAudio::Init
 */
 void CMenuAudio::_Init( void )
 {
-	static const char *lerpingStr[] =
-	{
-		L( "GameUI_Disable" ), L( "Balance" ), L( "Quality" )
-	};
-
 	banner.SetPicture(ART_BANNER);
 
 	soundVolume.szName = L( "GameUI_SoundEffectVolume" );
@@ -144,13 +134,6 @@ void CMenuAudio::_Init( void )
 	suitVolume.onChanged = CMenuEditable::WriteCvarCb;
 	suitVolume.SetCoord( 320, 400 );
 	suitVolume.size.w = 300;
-
-	static CStringArrayModel model( lerpingStr, V_ARRAYSIZE( lerpingStr ));
-	lerping.szName = L( "Sound interpolation" );
-	lerping.Setup( &model );
-	lerping.onChanged = CMenuEditable::WriteCvarCb;
-	lerping.font = QM_SMALLFONT;
-	lerping.SetRect( 320, 470, 300, 32 );
 
 	noDSP.szName = L( "Disable DSP effects" );
 	noDSP.onChanged = CMenuEditable::WriteCvarCb;
@@ -181,7 +164,6 @@ void CMenuAudio::_Init( void )
 	AddItem( soundVolume );
 	AddItem( musicVolume );
 	AddItem( suitVolume );
-	AddItem( lerping );
 	AddItem( noDSP );
 	AddItem( useAlphaDSP );
 	AddItem( muteFocusLost );
