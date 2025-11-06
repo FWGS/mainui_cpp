@@ -185,10 +185,6 @@ inline size_t Q_strncpy( char *dst, const char *src, size_t size )
 
 #define MAX_SCOREBOARDNAME	32 // engine and dlls allows only 32 chars
 
-// color strings
-#define ColorIndex( c )		((( c ) - '0' ) & 7 )
-#define IsColorString( p )		( p && *( p ) == '^' && *(( p ) + 1) && *(( p ) + 1) >= '0' && *(( p ) + 1 ) <= '9' )
-
 // stringize utilites
 #define STR( x ) #x
 #define STR2( x ) STR( x )
