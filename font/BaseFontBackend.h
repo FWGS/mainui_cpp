@@ -25,6 +25,10 @@ GNU General Public License for more details.
 #define SCALE_FONTS
 #endif
 
+#if defined(_WIN32)
+#undef GetCharABCWidths
+#endif // defined(_WIN32)
+
 struct charRange_t
 {
 	uint32_t chMin;
