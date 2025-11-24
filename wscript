@@ -15,6 +15,13 @@ FT2_CHECK='''extern "C" {
 int main() { return FT_Init_FreeType( NULL ); }
 '''
 
+VASPRINTF_TEST='''#define _GNU_SOURCE
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdarg.h>
+int main() { char *strp; char *fmt; va_list ap; return vasprintf( &strp, fmt, ap ); }
+'''
+
 def options(opt):
 	grp = opt.add_option_group('MainUI C++ options')
 	grp.add_option('--enable-stbtt', action = 'store_true', dest = 'USE_STBTT', default = False,
@@ -31,6 +38,9 @@ def configure(conf):
 
 	if conf.env.DEST_OS == 'darwin' or conf.env.DEST_OS == 'android' or conf.env.MAGX:
 		conf.options.USE_STBTT = True
+
+	if conf.env.DEST_OS == 'irix' and conf.env.COMPILER_CC == 'gcc':
+		conf.define('IRIX_GCC_SIGNBIT_COMPAT', 1)
 
 	conf.define('MAINUI_USE_CUSTOM_FONT_RENDER', 1)
 
@@ -51,6 +61,9 @@ def configure(conf):
 		if not conf.options.USE_STBTT and not conf.options.LOW_MEMORY:
 			conf.check_pkg('freetype2', 'FT2', FT2_CHECK)
 			conf.define('MAINUI_USE_FREETYPE', 1)
+
+	if conf.check_cc(fragment=VASPRINTF_TEST, msg='Checking for vasprintf', mandatory=False):
+		conf.define('HAVE_VASPRINTF', 1)
 
 def build(bld):
 	source = bld.path.ant_glob([
