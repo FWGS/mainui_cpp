@@ -188,7 +188,7 @@ size_t Q_UTF16ToUTF8( char *dst, size_t dstsize, const uint16_t *src, size_t src
 		uint32_t ch;
 		size_t len;
 
-		ch = Q_DecodeUTF16( &state, src[srci] );
+		ch = Q_DecodeUTF16( &state, LittleShort( src[srci] ) );
 
 		if( ch == 0 )
 			continue;
