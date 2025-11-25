@@ -184,7 +184,7 @@ size_t Q_UTF16ToUTF8( char *dst, size_t dstsize, const uint16_t *src, size_t src
 		;
 	size_t dsti = 0, srci;
 
-	if( !dst || !src || !dstsize || !srcsize )
+	if( !src || !srcsize )
 		return 0;
 
 	for( srci = 0; srci < srcsize && src[srci]; srci++ )
@@ -199,13 +199,22 @@ size_t Q_UTF16ToUTF8( char *dst, size_t dstsize, const uint16_t *src, size_t src
 
 		len = Q_CodepointLength( ch );
 
-		if( dsti + len + 1 > dstsize )
-			break;
+		// ability to query size of utf16 string encoded in utf8
+		if( dst == NULL && dstsize == 0 )
+		{
+			dsti += len;
+		}
+		else
+		{
+			if( dsti + len + 1 > dstsize )
+				break;
 
-		dsti += Q_EncodeUTF8( &dst[dsti], ch );
+			dsti += Q_EncodeUTF8( &dst[dsti], ch );
+		}
 	}
 
-	dst[dsti] = 0;
+	if( dst )
+		dst[dsti] = 0;
 
 	return dsti;
 }
