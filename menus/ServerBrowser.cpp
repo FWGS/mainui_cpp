@@ -66,7 +66,6 @@ struct server_t
 	char ipstr[64];
 	bool favorite;
 	bool havePassword;
-	bool isLegacy;
 	bool isGoldSrc;
 	bool pending_info;
 
@@ -76,16 +75,8 @@ struct server_t
 
 	const char *ToProtocol( void )
 	{
-		if( isLegacy ) return "48";
 		if( isGoldSrc ) return "gs";
 		return "49";
-	}
-
-	int Rank( const server_t &other ) const
-	{
-		if( isLegacy > other.isLegacy ) return 100;
-		else if( isLegacy < other.isLegacy ) return -100;
-		return 0;
 	}
 
 	int NameCmp( const server_t &other ) const
@@ -127,16 +118,14 @@ struct server_t
 		return numcl >= maxcl;
 	}
 
-	// make generic
-	// always rank new servers higher, even when sorting in reverse order
 #define GENERATE_COMPAR_FN( method ) \
 	static int method ## Ascend( const void *a, const void *b ) \
 	{\
-		return (( const server_t *)a)->Rank( *(( const server_t *)b) ) + (( const server_t *)a)->method( *(( const server_t *)b) );\
+		return (( const server_t *)a)->method( *(( const server_t *)b) );\
 	}\
 	static int method ## Descend( const void *a, const void *b ) \
 	{\
-		return (( const server_t *)a)->Rank( *(( const server_t *)b) ) + (( const server_t *)b)->method( *(( const server_t *)a) );\
+		return (( const server_t *)b)->method( *(( const server_t *)a) );\
 	}\
 
 	GENERATE_COMPAR_FN( NameCmp )
@@ -164,10 +153,6 @@ struct favlist_entry_t
 		if( !stricmp( prot, "current" ) || !strcmp( prot, "49" ))
 		{
 			info.Append( "\\p\\49" );
-		}
-		else if( !stricmp( prot, "legacy" ) || !strcmp( prot, "48" ))
-		{
-			info.Append( "\\p\\48\\legacy\\1" );
 		}
 		else if( !stricmp( prot, "goldsrc" ) || !stricmp( prot, "gs" ))
 		{
@@ -302,17 +287,6 @@ public:
 
 	bool GetCellColors( int line, int column, unsigned int &textColor, bool &force) const override
 	{
-		if( servers[line].isLegacy )
-		{
-			CColor color = uiPromptTextColor;
-			color.a = color.a * 0.5;
-			textColor = color;
-
-			// allow colorstrings only in server name
-			force = column != COLUMN_NAME;
-
-			return true;
-		}
 		return false;
 	}
 
@@ -488,15 +462,11 @@ void server_t::UpdateData( void )
 	snprintf( clientsstr, sizeof( clientsstr ), "%d\\%d", numcl, maxcl );
 	havePassword = !strcmp( Info_ValueForKey( info, "password" ), "1" );
 	isGoldSrc = !strcmp( Info_ValueForKey( info, "gs" ), "1" );
-	isLegacy = !strcmp( Info_ValueForKey( info, "legacy" ), "1" );
 }
 
 void server_t::SetPing( float ping )
 {
 	ping = bound( 0.0f, ping, MAX_PING );
-
-	if( isLegacy )
-		ping /= 2;
 
 	this->ping = ping;
 	snprintf( pingstr, sizeof( pingstr ), "%.f ms", ping * 1000 );
@@ -927,7 +897,7 @@ void CMenuServerBrowser::ViewGameInfo()
 	if( idx < 0 || idx >= gameListModel.GetRows( ))
 		return;
 
-	UI_ServerInfo_Menu( gameListModel.servers[idx].adr, gameListModel.servers[idx].name, gameListModel.servers[idx].isLegacy );
+	UI_ServerInfo_Menu( gameListModel.servers[idx].adr, gameListModel.servers[idx].name );
 }
 
 void CMenuServerBrowser::OnTabSwitch()
