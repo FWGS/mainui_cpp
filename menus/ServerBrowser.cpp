@@ -953,9 +953,6 @@ void CMenuServerBrowser::AddServer( void )
 		proto = "49";
 		break;
 	case 1:
-		proto = "48";
-		break;
-	case 2:
 		proto = "gs";
 		break;
 	default:
@@ -1119,8 +1116,7 @@ void CMenuServerBrowser::_Init( void )
 
 	static const char *protlist[] =
 	{
-		"Xash3D 49 (New)",
-		"Xash3D 48 (Old)",
+		"Xash3D 49",
 		"GoldSource 48",
 	};
 	static CStringArrayModel protlistModel( protlist, V_ARRAYSIZE( protlist ));
