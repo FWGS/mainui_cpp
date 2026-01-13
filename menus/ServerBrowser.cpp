@@ -774,6 +774,10 @@ void CMenuServerBrowser::ParseServerListFromFile( const char *filename, CUtlVect
 		if( !afile )
 			break;
 
+		// ignore legacy protocol
+		if( !strcmp( entry.prot, "48" ))
+			continue;
+
 		list.AddToTail( entry );
 	}
 
