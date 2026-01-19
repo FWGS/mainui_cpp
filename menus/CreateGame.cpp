@@ -66,6 +66,7 @@ public:
 	CMenuCreateGame() : CMenuFramework("CMenuCreateGame"), mapsListModel( this ) { }
 	static void Begin( CMenuBaseItem *pSelf, void *pExtra );
 
+	void Show() override;
 	void Reload( void ) override;
 	void SaveCvars( void );
 
@@ -116,12 +117,12 @@ void CMenuCreateGame::Begin( CMenuBaseItem *pSelf, void *pExtra )
 
 	EngFuncs::CvarSetValue( "deathmatch", 1.0f );	// start deathmatch as default
 	menu->SaveCvars();
+	UI_SaveScriptConfig();
 
 	EngFuncs::PlayBackgroundTrack( NULL, NULL );
 
 	// all done, start server
 	const char *listenservercfg = EngFuncs::GetCvarString( "lservercfgfile" );
-	EngFuncs::WriteServerConfig( listenservercfg );
 
 	char cmd[1024];
 	snprintf( cmd, sizeof( cmd ), "exec %s\n", listenservercfg );
@@ -239,6 +240,9 @@ void CMenuCreateGame::_Init( void )
 	SET_EVENT_MULTI( maxClients.onCvarGet,
 	{
 		CMenuField *self = (CMenuField*)pSelf;
+		const char *val = EngFuncs::GetCvarString( self->CvarName() );
+		self->SetBuffer( val );
+
 		const char *buf = self->GetBuffer();
 
 		int players = atoi( buf );
@@ -279,6 +283,18 @@ void CMenuCreateGame::_VidInit()
 	hostName.SetRect( 350, 260, 205, 32 );
 	maxClients.SetRect( 350, 360, 205, 32 );
 	password.SetRect( 350, 460, 205, 32 );
+}
+
+void CMenuCreateGame::Show()
+{
+	UI_LoadScriptConfig();
+
+	hostName.UpdateCvar( true );
+	maxClients.UpdateCvar( true );
+	password.UpdateCvar( true );
+	nat.UpdateCvar( true );
+
+	CMenuBaseWindow::Show();
 }
 
 void CMenuCreateGame::SaveCvars()

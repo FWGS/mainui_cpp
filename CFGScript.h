@@ -77,6 +77,7 @@ struct scrvardef_t
 };
 
 scrvardef_t *CSCR_LoadDefaultCVars( const char *scriptfilename, int *count );
+void CSCR_SaveToFile( const char *filename, const char *description, scrvardef_t *list );
 void CSCR_FreeList( scrvardef_t *list );
 
 #endif // CFGSCRIPT_H
