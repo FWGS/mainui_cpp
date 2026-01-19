@@ -296,16 +296,15 @@ void CMenuSavesListModel::Update( void )
 
 	if( !parent->IsSaveMode( ))
 	{
-		parent->levelShot.SetSaveName( IsValidIndex( 0 ) ? Element( 0 ).name : nullptr );
 		parent->load.SetGrayed( !IsValidIndex( 0 ) );
 	}
 	else
 	{
-		parent->levelShot.SetSaveName( nullptr );
 		parent->save.SetGrayed( !IsValidIndex( 0 ) || !CL_IsActive( ));
 	}
 
 	parent->remove.SetGrayed( !IsValidIndex( 0 ));
+	parent->UpdateGame();
 }
 
 void CMenuSavesListModel::OnDeleteEntry( int line )
