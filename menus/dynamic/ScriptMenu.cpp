@@ -62,7 +62,8 @@ public:
 		for( int i = m_iPagesIndex, j = 0; j < m_iPagesCount; i++, j++ )
 			((CMenuScriptConfigPage*)m_pItems[i])->Save();
 
-		CMenuFramework::SaveAndPopMenu();
+		UI_SaveScriptConfig();
+		Hide();
 	}
 
 	void FlipMenu( void );
@@ -341,6 +342,14 @@ void UI_LoadScriptConfig()
 	// yes, create cvars if needed
 	menu_serveroptions->SetScriptConfig( "settings.scr", true );
 	menu_useroptions->SetScriptConfig( "user.scr", true );
+}
+
+void UI_SaveScriptConfig()
+{
+	if( menu_serveroptions && menu_serveroptions->m_pVars )
+		CSCR_SaveToFile( "settings.scr", "SERVER_OPTIONS", menu_serveroptions->m_pVars );
+	if( menu_useroptions && menu_useroptions->m_pVars )
+		CSCR_SaveToFile( "user.scr", "INFO_OPTIONS", menu_useroptions->m_pVars );
 }
 
 bool UI_AdvUserOptions_IsAvailable()
