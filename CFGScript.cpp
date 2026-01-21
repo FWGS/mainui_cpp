@@ -301,7 +301,10 @@ scrvardef_t *CSCR_LoadDefaultCVars( const char *scriptfilename, int *count )
 		// Create a new object
 		if( CSCR_ParseSingleCvar( &state, &var ) )
 		{
-			EngFuncs::CvarSetString( var.name, var.value );
+			// Ignore variable values from user.scr, as GoldSrc does
+			if( stricmp( scriptfilename, "user.scr" ) != 0 )
+				EngFuncs::CvarSetString( var.name, var.value );
+
 			scrvardef_t *entry = new scrvardef_t;
 			*entry = var;
 
