@@ -83,7 +83,9 @@ public:
 		{
 			char path[128];
 			snprintf( path, sizeof( path ), "save/%s.bmp", name );
-			saveshot.Load( path );
+			saveshot.ForceUnload();
+			if( EngFuncs::FileExists( path, true ) )
+				saveshot.Load( path );
 
 			if( saveshot.IsValid( ))
 			{
