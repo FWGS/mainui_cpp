@@ -1291,8 +1291,10 @@ void CMenuServerBrowser::Show()
 
 		favoritesList.RemoveAll();
 		historyList.RemoveAll();
-		ParseServerListFromFile( "favorite_servers.lst", favoritesList );
-		ParseServerListFromFile( "history_servers.lst", historyList );
+		if( EngFuncs::FileExists( "favorite_servers.lst", true ) )
+			ParseServerListFromFile( "favorite_servers.lst", favoritesList );
+		if( EngFuncs::FileExists( "history_servers.lst", true ) )
+			ParseServerListFromFile( "history_servers.lst", historyList );
 	}
 
 	RealignButtons();
