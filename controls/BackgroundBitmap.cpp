@@ -286,8 +286,6 @@ freefile:
 
 bool CMenuBackgroundBitmap::LoadWONBackground( bool gamedirOnly )
 {
-	s_bEnableLogoMovie = false;
-
 	if( EngFuncs::FileExists( ART_BACKGROUND, gamedirOnly ))
 	{
 		bimage_t img;
@@ -301,12 +299,6 @@ bool CMenuBackgroundBitmap::LoadWONBackground( bool gamedirOnly )
 		img.size.w = EngFuncs::PIC_Width( img.hImage );
 		img.size.h = EngFuncs::PIC_Height( img.hImage );
 		s_WONBackground = img;
-
-		if( gamedirOnly )
-		{
-			// if we doesn't have logo.avi in gamedir we don't want to draw it
-			s_bEnableLogoMovie = EngFuncs::FileExists( "media/logo.avi", true );
-		}
 
 		return true;
 	}
@@ -370,6 +362,9 @@ void CMenuBackgroundBitmap::LoadBackground()
 	}
 	else if( LoadWONBackground( false ))
 		Con_DPrintf( "%s: found %s background in %s directory\n", __func__, "won", "game" );
+
+	// logo.avi should be an independent asset from the background image
+	s_bEnableLogoMovie = EngFuncs::FileExists( "media/logo.avi", false );
 
 	UpdatePreference();
 }
