@@ -966,22 +966,37 @@ void CMenuServerBrowser::AddServer( void )
 
 	// FIXME: for now we can only show custom servers at favorites tab
 
+	// Check for duplicates in favorites list
+	FOR_EACH_VEC( favoritesList, i )
+	{
+		if( !strcmp( favoritesList[i].sadr, addressField.GetBuffer() ) &&
+		    !strcmp( favoritesList[i].prot, proto ))
+		{
+			UI_ShowMessageBox( L( "Server already in favorites" ));
+			return;
+		}
+	}
+
 	favlist_entry_t entry( addressField.GetBuffer(), proto, false );
 	favoritesList.AddToTail( entry );
 
 	if( tabSwitch.GetState() != 2 )
+	{
 		tabSwitch.SetState( 2 );
+	}
+	else
+	{
+		CUtlString fakeInfoString;
+		entry.GenerateDummyInfoString( fakeInfoString );
 
-	CUtlString fakeInfoString;
-	entry.GenerateDummyInfoString( fakeInfoString );
+		server_t serv( adr, fakeInfoString, false, true );
+		serv.UpdateData();
+		serv.SetPing( MAX_PING );
+		gameListModel.servers.AddToTail( serv );
 
-	server_t serv( adr, fakeInfoString, false, true );
-	serv.UpdateData();
-	serv.SetPing( MAX_PING );
-	gameListModel.servers.AddToTail( serv );
-
-	entry.QueryServer();
-	UI_MenuResetPing_f();
+		entry.QueryServer();
+		UI_MenuResetPing_f();
+	}
 }
 
 /*
