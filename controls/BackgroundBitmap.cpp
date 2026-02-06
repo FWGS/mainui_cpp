@@ -174,25 +174,37 @@ void CMenuBackgroundBitmap::Draw()
 #else
 	p.x = p.y = 0;
 
-	// work out scaling factors
-	if( ScreenWidth * s.h > ScreenHeight * s.w )
+	// Stretch the background image if the user chose to do so
+	if( ui_background_stretch->value )
 	{
 		xScale = ScreenWidth / s.w;
-		yScale = xScale;
+		yScale = ScreenHeight / s.h;
 	}
 	else
 	{
-		yScale = ScreenHeight / s.h;
-		xScale = yScale;
+		// work out scaling factors
+		if( ScreenWidth * s.h > ScreenHeight * s.w )
+		{
+			xScale = ScreenWidth / s.w;
+			yScale = xScale;
+		}
+		else
+		{
+			yScale = ScreenHeight / s.h;
+			xScale = yScale;
+		}
 	}
 #endif
 
-	// center wide background (for example if background is wider than our window)
 	int xOffset = 0, yOffset = 0;
-	if( s.w * xScale > ScreenWidth )
-		xOffset = ( ScreenWidth - s.w * xScale ) / 2;
-	else if( s.h * yScale > ScreenHeight )
-		yOffset = ( ScreenHeight - s.h * yScale ) / 2;
+	if( !ui_background_stretch->value )
+	{
+		// center wide background (for example if background is wider than our window)
+		if( s.w * xScale > ScreenWidth )
+			xOffset = ( ScreenWidth - s.w * xScale ) / 2;
+		else if( s.h * yScale > ScreenHeight )
+			yOffset = ( ScreenHeight - s.h * yScale ) / 2;
+	}
 
 	if( s_state == DRAW_WON )
 		DrawBackgroundPiece( s_WONBackground, p, xOffset, yOffset, xScale, yScale );
