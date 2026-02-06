@@ -21,6 +21,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 void CMenuMovieBanner::VidInit()
 {
+	EngFuncs::PrecacheLogo( "logo.avi" );
+
 	float scaleX = ScreenWidth / 640.0f;
 	float scaleY = ScreenHeight / 480.0f;
 
@@ -37,7 +39,7 @@ void CMenuMovieBanner::Draw()
 	if( EngFuncs::ClientInGame() && EngFuncs::GetCvarFloat( "ui_renderworld" ))
 		return;
 
-	if( EngFuncs::GetLogoLength() <= 0.05f || EngFuncs::GetLogoWidth() <= 32 )
+	if( EngFuncs::GetLogoLength() <= 0 || EngFuncs::GetLogoWidth() <= 32 )
 		return;
 
 	EngFuncs::DrawLogo( "logo.avi", m_scPos.x, m_scPos.y, m_scSize.w, m_scSize.h );
