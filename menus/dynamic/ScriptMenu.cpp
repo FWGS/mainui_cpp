@@ -352,6 +352,26 @@ void UI_SaveScriptConfig()
 		CSCR_SaveToFile( "user.scr", "INFO_OPTIONS", menu_useroptions->m_pVars );
 }
 
+void UI_ApplyServerSettings()
+{
+	int count = 0;
+	scrvardef_t *vars = CSCR_LoadDefaultCVars( "settings.scr", &count );
+
+	if( !vars || count <= 0 )
+	{
+		if( vars )
+			CSCR_FreeList( vars );
+		return;
+	}
+
+	for( scrvardef_t *var = vars; var; var = var->next )
+	{
+		EngFuncs::CvarSetString( var->name, var->value );
+	}
+
+	CSCR_FreeList( vars );
+}
+
 bool UI_AdvUserOptions_IsAvailable()
 {
 	return menu_useroptions->m_pVars != NULL;

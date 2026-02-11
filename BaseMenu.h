@@ -229,6 +229,7 @@ void UI_CloseMenu( void );
 // SCR support
 void UI_LoadScriptConfig( void );
 void UI_SaveScriptConfig( void );
+void UI_ApplyServerSettings( void );
 
 class CMenuEntry
 {
