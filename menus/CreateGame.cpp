@@ -118,6 +118,7 @@ void CMenuCreateGame::Begin( CMenuBaseItem *pSelf, void *pExtra )
 	EngFuncs::CvarSetValue( "deathmatch", 1.0f );	// start deathmatch as default
 	menu->SaveCvars();
 	UI_SaveScriptConfig();
+	UI_ApplyServerSettings();
 
 	EngFuncs::PlayBackgroundTrack( NULL, NULL );
 
