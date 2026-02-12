@@ -176,5 +176,5 @@ void CMenuCheckBox::Draw( void )
 
 void CMenuCheckBox::UpdateEditable()
 {
-	bChecked = !!EngFuncs::GetCvarFloat( m_szCvarName );
+	bChecked = !!CvarValue();
 }

@@ -174,6 +174,63 @@ void CMenuScriptConfig::ListItemCvarGetCb(CMenuBaseItem *pSelf, void *pExtra)
 	}
 }
 
+static void ScriptGenericCvarGetCb( CMenuBaseItem *pSelf, void *pExtra )
+{
+	CMenuEditable *self = (CMenuEditable*)pSelf;
+	scrvardef_t *var = (scrvardef_t*)pExtra;
+
+	if( !var ) return;
+
+	switch( var->type )
+	{
+	case T_BOOL:
+		self->SetOriginalValue( var->value[0] == '1' ? 1.0f : 0.0f );
+		break;
+	case T_NUMBER:
+		self->SetOriginalValue( (float)atof( var->value ) );
+		break;
+	case T_STRING:
+		self->SetOriginalString( var->value );
+		break;
+	default:
+		break;
+	}
+}
+
+static void ScriptGenericCvarWriteCb( CMenuBaseItem *pSelf, void *pExtra )
+{
+	CMenuEditable *self = (CMenuEditable*)pSelf;
+	scrvardef_t *var = (scrvardef_t*)pExtra;
+
+	if( !var ) return;
+
+	switch( var->type )
+	{
+	case T_BOOL:
+	{
+		int v = (int)self->CvarValue();
+		Q_strncpy( var->value, v ? "1" : "0", sizeof( var->value ) );
+		break;
+	}
+	case T_NUMBER:
+	{
+		char tmp[64];
+		snprintf( tmp, sizeof( tmp ), "%g", self->CvarValue() );
+		Q_strncpy( var->value, tmp, sizeof( var->value ) );
+		break;
+	}
+	case T_STRING:
+	{
+		const char *s = self->CvarString();
+		if( s ) Q_strncpy( var->value, s, sizeof( var->value ) );
+		else var->value[0] = '\0';
+		break;
+	}
+	default:
+		break;
+	}
+}
+
 void CMenuScriptConfig::_Init( void )
 {
 	AddItem( banner );
@@ -217,6 +274,11 @@ void CMenuScriptConfig::_Init( void )
 
 			editable = checkbox;
 			cvarType = CMenuEditable::CVAR_VALUE;
+
+			editable->onCvarGet = ScriptGenericCvarGetCb;
+			editable->onCvarGet.pExtra = (void*)var;
+			editable->onCvarWrite = ScriptGenericCvarWriteCb;
+			editable->onCvarWrite.pExtra = (void*)var;
 			break;
 		}
 		case T_NUMBER:
@@ -234,6 +296,11 @@ void CMenuScriptConfig::_Init( void )
 			editable = spinControl;
 
 			cvarType = CMenuEditable::CVAR_VALUE;
+
+			editable->onCvarGet = ScriptGenericCvarGetCb;
+			editable->onCvarGet.pExtra = (void*)var;
+			editable->onCvarWrite = ScriptGenericCvarWriteCb;
+			editable->onCvarWrite.pExtra = (void*)var;
 			break;
 		}
 		case T_STRING:
@@ -242,6 +309,11 @@ void CMenuScriptConfig::_Init( void )
 			field->iMaxLength = CS_SIZE;
 			editable = field;
 			cvarType = CMenuEditable::CVAR_STRING;
+
+			editable->onCvarGet = ScriptGenericCvarGetCb;
+			editable->onCvarGet.pExtra = (void*)var;
+			editable->onCvarWrite = ScriptGenericCvarWriteCb;
+			editable->onCvarWrite.pExtra = (void*)var;
 			break;
 		}
 		case T_LIST:
@@ -370,6 +442,34 @@ void UI_ApplyServerSettings()
 	}
 
 	CSCR_FreeList( vars );
+}
+
+const char *UI_GetScriptCvar( const char *name )
+{
+	if( menu_serveroptions && menu_serveroptions->m_pVars )
+	{
+		for( scrvardef_t *var = menu_serveroptions->m_pVars; var; var = var->next )
+		{
+			if( !strcmp( var->name, name ) )
+				return var->value;
+		}
+	}
+	return EngFuncs::GetCvarString( name );
+}
+
+void UI_SetScriptCvar( const char *name, const char *value )
+{
+	if( menu_serveroptions && menu_serveroptions->m_pVars )
+	{
+		for( scrvardef_t *var = menu_serveroptions->m_pVars; var; var = var->next )
+		{
+			if( !strcmp( var->name, name ) )
+			{
+				Q_strncpy( var->value, value, sizeof( var->value ) );
+				return;
+			}
+		}
+	}
 }
 
 bool UI_AdvUserOptions_IsAvailable()

@@ -415,10 +415,7 @@ void CSCR_SaveToFile( const char *filename, const char *description, scrvardef_t
 
 	for( scrvardef_t *var = list; var; var = var->next )
 	{
-		const char *currentValue = EngFuncs::GetCvarString( var->name );
-
-		if ( !currentValue ) 
-			currentValue = var->value;
+		const char *currentValue = var->value;
 
 		buffer.AppendFormat( "\t\"%s\"\n", var->name );
 		buffer.AppendFormat( "\t{\n" );

@@ -230,6 +230,8 @@ void UI_CloseMenu( void );
 void UI_LoadScriptConfig( void );
 void UI_SaveScriptConfig( void );
 void UI_ApplyServerSettings( void );
+const char *UI_GetScriptCvar( const char *name );
+void UI_SetScriptCvar( const char *name, const char *value );
 
 class CMenuEntry
 {
