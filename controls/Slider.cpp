@@ -209,7 +209,7 @@ void CMenuSlider::Draw( void )
 
 void CMenuSlider::UpdateEditable()
 {
-	float flValue = EngFuncs::GetCvarFloat( m_szCvarName );
+	float flValue = CvarValue();
 
 	m_flCurValue = flValue;
 }

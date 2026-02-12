@@ -76,7 +76,7 @@ void CMenuEditable::UpdateCvar( bool haveUpdate )
 	if( onCvarGet )
 	{
 		onCvarGet( this );
-		haveUpdate = false; // FIXME: add return values to events
+		haveUpdate = true; // FIXME: add return values to events
 	}
 	else if( m_szCvarName )
 	{

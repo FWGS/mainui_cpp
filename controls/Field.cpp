@@ -532,7 +532,7 @@ void CMenuField::Draw( void )
 
 void CMenuField::UpdateEditable()
 {
-	const char *szValue = EngFuncs::GetCvarString( m_szCvarName );
+	const char *szValue = CvarString();
 
 	if( szValue )
 	{

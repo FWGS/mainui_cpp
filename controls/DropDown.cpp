@@ -217,7 +217,7 @@ void CMenuDropDown::Draw()
 
 void CMenuDropDownStr::UpdateEditable()
 {
-	const char *val = EngFuncs::GetCvarString( m_szCvarName );
+	const char *val = CvarString();
 	int state = 0;
 
 	for( int i = 0; i < m_Values.Count(); i++ )
@@ -235,7 +235,7 @@ void CMenuDropDownStr::UpdateEditable()
 
 void CMenuDropDownInt::UpdateEditable()
 {
-	int val = EngFuncs::GetCvarFloat( m_szCvarName );
+	int val = CvarValue();
 	int state = 0;
 
 	for( int i = 0; i < m_Values.Count(); i++ )
@@ -253,7 +253,7 @@ void CMenuDropDownInt::UpdateEditable()
 
 void CMenuDropDownFloat::UpdateEditable()
 {
-	float val = EngFuncs::GetCvarFloat( m_szCvarName );
+	float val = CvarValue();
 	int state = 0;
 
 	for( int i = 0; i < m_Values.Count(); i++ )
