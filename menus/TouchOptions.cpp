@@ -93,6 +93,8 @@ void CMenuTouchOptions::CProfiliesListModel::Update( void )
 	int numFiles;
 	const char *curprofile;
 
+	RemoveAll();
+
 	filenames = EngFuncs::GetFilesList( "touch_presets/*.cfg", &numFiles, true );
 
 	if( filenames && numFiles > 0 )
