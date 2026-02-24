@@ -13,7 +13,6 @@ FILES_LIST=" \
 	common/event_args.h \
 	common/gameinfo.h \
 	common/kbutton.h \
-	common/mathlib.h \
 	common/netadr.h \
 	common/net_api.h \
 	common/port.h \
