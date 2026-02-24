@@ -33,6 +33,14 @@ GNU General Public License for more details.
 
 #define MAX_INFO_STRING	256	// engine limit
 
+#ifndef M_PI
+#define M_PI    (double)3.14159265358979323846
+#endif
+
+#define M_PI2   ((double)(M_PI * 2))
+#define M_PI_F  ((float)(M_PI))
+#define M_PI2_F ((float)(M_PI2))
+
 #define RAD2DEG( x )	((float)(x) * (float)(180.f / (float)M_PI))
 #define DEG2RAD( x )	((float)(x) * (float)((float)M_PI / 180.f))
 

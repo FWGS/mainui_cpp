@@ -19,7 +19,6 @@ GNU General Public License for more details.
 
 // HLSDK includes
 #include "const.h"
-#include "keydefs.h"
 #include "ref_params.h"
 #include "cl_entity.h"
 #include "com_model.h"
