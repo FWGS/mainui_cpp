@@ -878,6 +878,15 @@ void UI_Precache( void )
 	EngFuncs::PIC_Load( UI_DOWNARROWFOCUS );
 	EngFuncs::PIC_Load( "gfx/shell/splash" );
 
+	// load all menu buttons
+	UI_LoadBmpButtons( );
+
+	// all menu buttons have the same view sizes
+	if( uiStatic.buttons_width == 0 || uiStatic.buttons_height == 0 )
+		uiStatic.buttons_draw_size = Size( UI_BUTTONS_WIDTH, UI_BUTTONS_HEIGHT );
+	else
+		uiStatic.buttons_draw_size = Size( uiStatic.buttons_width * 1024 / 640, uiStatic.buttons_height * 768 / 480 );
+
 	for( CMenuEntry *entry = s_pEntries; entry; entry = entry->m_pNext )
 	{
 		if( entry->m_pfnPrecache )
@@ -1021,7 +1030,12 @@ int UI_VidInit( void )
 
 		return 0;
 	}
-	if(!calledOnce) UI_Precache();
+
+	if( !calledOnce )
+	{
+		UI_Precache();
+	}
+
 	// don't allow screenwidth is slower than 4:3 screens
 	// it's really not intended to use, just for keeping menu working
 	if (ScreenWidth * 3 < ScreenHeight * 4)
@@ -1036,23 +1050,16 @@ int UI_VidInit( void )
 		uiStatic.yOffset = 0;
 	}
 
-
 	uiStatic.width = ScreenWidth / uiStatic.scaleX;
 	// move cursor to screen center
 	uiStatic.cursorX = ScreenWidth / 2;
 	uiStatic.cursorY = ScreenHeight / 2;
 	uiStatic.outlineWidth = 4;
 
-	// all menu buttons have the same view sizes
-	uiStatic.buttons_draw_size = Size( UI_BUTTONS_WIDTH, UI_BUTTONS_HEIGHT ).Scale();
-
 	UI_ScaleCoords( NULL, NULL, &uiStatic.outlineWidth, NULL );
 
 	// trying to load chapterbackgrounds.txt
 	UI_LoadBackgroundMapList ();
-
-	// reload all menu buttons
-	UI_LoadBmpButtons ();
 
 	// VidInit FontManager
 	g_FontMgr->VidInit();

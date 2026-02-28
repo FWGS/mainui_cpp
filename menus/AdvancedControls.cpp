@@ -195,7 +195,6 @@ void CAdvancedControls::_Init( void )
 	inputDev.iFlags |= QMF_NOTIFY;
 	if( CL_IsActive() && !EngFuncs::GetCvarFloat( "host_serverstate" ))
 		inputDev.SetGrayed( true );
-	//inputDev.SetRect( 72, 230, UI_BUTTONS_WIDTH, UI_BUTTONS_HEIGHT );
 	inputDev.SetCoord( 72, 210 );
 
 	AddItem( banner );

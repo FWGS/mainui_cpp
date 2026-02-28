@@ -116,7 +116,7 @@ CMenuPicButton::CMenuPicButton() : BaseClass()
 	m_iLastFocusTime = -512;
 	bPulse = false;
 
-	SetSize( UI_BUTTONS_WIDTH, UI_BUTTONS_HEIGHT );
+	size = uiStatic.buttons_draw_size;
 
 	SetCharSize( QM_DEFAULTFONT );
 }
@@ -208,9 +208,6 @@ bool CMenuPicButton::KeyDown( int key )
 	return handled;
 }
 
-
-// #define ALT_PICBUTTON_FOCUS_ANIM
-
 /*
 =================
 CMenuPicButton::DrawButton
@@ -219,14 +216,7 @@ CMenuPicButton::DrawButton
 void CMenuPicButton::DrawButton( int r, int g, int b, int a, wrect_t *rects, int state )
 {
 	EngFuncs::PIC_Set( hPic, r, g, b, a );
-#ifdef ALT_PICBUTTON_FOCUS_ANIM
-	UI::PushScissor( m_scPos.x, m_scPos.y, uiStatic.buttons_draw_width * flFill, uiStatic.buttons_draw_height );
-#endif
-	EngFuncs::PIC_DrawAdditive( m_scPos, uiStatic.buttons_draw_size, &rects[state] );
-
-#ifdef ALT_PICBUTTON_FOCUS_ANIM
-	UI::PopScissor();
-#endif
+	EngFuncs::PIC_DrawAdditive( m_scPos, uiStatic.buttons_draw_size.Scale(), &rects[state] );
 }
 
 /*
@@ -254,7 +244,7 @@ void CMenuPicButton::Draw( )
 	{
 		Point coord;
 
-		coord.x = m_scPos.x + 290 * uiStatic.scaleX;
+		coord.x = m_scPos.x + ( uiStatic.buttons_draw_size.w + 40 ) * uiStatic.scaleX;
 		coord.y = m_scPos.y + m_scSize.h / 2 - EngFuncs::ConsoleCharacterHeight() / 2;
 
 		int	r, g, b;
