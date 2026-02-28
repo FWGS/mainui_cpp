@@ -181,17 +181,34 @@ static void ScriptGenericCvarGetCb( CMenuBaseItem *pSelf, void *pExtra )
 
 	if( !var ) return;
 
+	// Prefer actual engine cvar value when available; otherwise, fallback to script value
 	switch( var->type )
 	{
 	case T_BOOL:
-		self->SetOriginalValue( var->value[0] == '1' ? 1.0f : 0.0f );
+	{
+		float eng = EngFuncs::GetCvarFloat( var->name );
+		float scr = ( var->value[0] == '1' ) ? 1.0f : 0.0f;
+		if( eng != scr ) self->SetOriginalValue( eng );
+		else self->SetOriginalValue( scr );
 		break;
+	}
 	case T_NUMBER:
-		self->SetOriginalValue( (float)atof( var->value ) );
+	{
+		float eng = EngFuncs::GetCvarFloat( var->name );
+		float scr = (float)atof( var->value );
+		if( eng != scr ) self->SetOriginalValue( eng );
+		else self->SetOriginalValue( scr );
 		break;
+	}
 	case T_STRING:
-		self->SetOriginalString( var->value );
+	{
+		const char *eng = EngFuncs::GetCvarString( var->name );
+		if( eng && strcmp( eng, var->value ) )
+			self->SetOriginalString( eng );
+		else
+			self->SetOriginalString( var->value );
 		break;
+	}
 	default:
 		break;
 	}
@@ -210,6 +227,7 @@ static void ScriptGenericCvarWriteCb( CMenuBaseItem *pSelf, void *pExtra )
 	{
 		int v = (int)self->CvarValue();
 		Q_strncpy( var->value, v ? "1" : "0", sizeof( var->value ) );
+		EngFuncs::CvarSetValue( var->name, (float)v );
 		break;
 	}
 	case T_NUMBER:
@@ -217,6 +235,7 @@ static void ScriptGenericCvarWriteCb( CMenuBaseItem *pSelf, void *pExtra )
 		char tmp[64];
 		snprintf( tmp, sizeof( tmp ), "%g", self->CvarValue() );
 		Q_strncpy( var->value, tmp, sizeof( var->value ) );
+		EngFuncs::CvarSetValue( var->name, self->CvarValue() );
 		break;
 	}
 	case T_STRING:
@@ -224,6 +243,7 @@ static void ScriptGenericCvarWriteCb( CMenuBaseItem *pSelf, void *pExtra )
 		const char *s = self->CvarString();
 		if( s ) Q_strncpy( var->value, s, sizeof( var->value ) );
 		else var->value[0] = '\0';
+		EngFuncs::CvarSetString( var->name, var->value );
 		break;
 	}
 	default:
