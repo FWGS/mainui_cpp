@@ -253,6 +253,11 @@ void CMenuFramework::CMenuBannerBitmap::Draw( Point pt, Size sz )
 
 void CMenuFramework::CMenuBannerBitmap::Draw()
 {
+	CMenuFramework *pParent = (CMenuFramework *)Parent();
+
+	if (pParent && (pParent->bannerAnimDirection == ANIM_OPENING || pParent->eTransitionType == ANIM_OPENING))
+		return;
+
 	Draw( m_scPos, m_scSize );
 }
 
