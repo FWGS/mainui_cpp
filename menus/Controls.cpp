@@ -26,11 +26,18 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "YesNoMessageBox.h"
 #include "MessageBox.h"
 #include "Table.h"
+#include "utlvector.h"
 
 #define ART_BANNER		"gfx/shell/head_controls"
-#define MAX_KEYS 256
 
 class CMenuControls;
+
+struct CMenuKey {
+	char name[64+4]; // token + two colorcodes two characters each
+	char bind[64];
+	char first[20];
+	char second[20];
+};
 
 class CMenuKeysModel : public CMenuBaseModel
 {
@@ -40,21 +47,27 @@ public:
 	void Update();
 	void OnActivateEntry( int line );
 	void OnDeleteEntry( int line );
+
 	int GetRows() const
 	{
-		return m_iNumItems;
+		return keys.Count();
 	}
+
 	int GetColumns() const
 	{
 		return 3; // cmd, key1, key2
 	}
+
 	const char *GetCellText( int line, int column )
 	{
-		switch( column )
+		if( keys.IsValidIndex( line ))
 		{
-		case 0: return name[line];
-		case 1: return firstKey[line];
-		case 2: return secondKey[line];
+			switch( column )
+			{
+			case 0: return keys[line].name;
+			case 1: return keys[line].first;
+			case 2: return keys[line].second;
+			}
 		}
 
 		return NULL;
@@ -67,14 +80,11 @@ public:
 
 	bool IsLineUsable( int line )
 	{
-		return keysBind[line][0] != 0;
+		return keys.IsValidIndex( line ) && keys[line].bind[0] != 0;
 	}
 
-	char name[MAX_KEYS][64+4]; // token + two colorcodes two characters each
-	char keysBind[MAX_KEYS][64];
-	char firstKey[MAX_KEYS][20];
-	char secondKey[MAX_KEYS][20];
-	int m_iNumItems;
+	CUtlVector<CMenuKey> keys;
+
 private:
 	CMenuControls *parent;
 };
@@ -123,17 +133,24 @@ void CMenuControls::GetKeyBindings( const char *command, int *twoKeys )
 {
 	twoKeys[0] = twoKeys[1] = -1;
 
-	for( int i = 0, count = 0; i < MAX_KEYS; i++ )
+	for( int i = 0, count = 0; ; i++ )
 	{
+		const char *str = EngFuncs::KeynumToString( i );
+
+		if( !strcmp( str, "<OUT OF RANGE>" ))
+			break;
+
 		const char *b = EngFuncs::KEY_GetBinding( i );
-		if( !b ) continue;
+		if( !b )
+			continue;
 
 		if( !stricmp( command, b ))
 		{
 			twoKeys[count] = i;
 			count++;
 
-			if( count == 2 ) break;
+			if( count == 2 )
+				break;
 		}
 	}
 
@@ -148,17 +165,20 @@ void CMenuControls::GetKeyBindings( const char *command, int *twoKeys )
 
 void CMenuControls::UnbindCommand( const char *command )
 {
-	int i, l;
-	const char *b;
+	const size_t command_len = strlen( command );
 
-	l = strlen( command );
-
-	for( i = 0; i < MAX_KEYS; i++ )
+	for( int i = 0; ; i++ )
 	{
-		b = EngFuncs::KEY_GetBinding( i );
-		if( !b ) continue;
+		const char *str = EngFuncs::KeynumToString( i );
 
-		if( !strncmp( b, command, l ))
+		if( !strcmp( str, "<OUT OF RANGE>" ))
+			break;
+
+		const char *b = EngFuncs::KEY_GetBinding( i );
+		if( !b )
+			continue;
+
+		if( !strncmp( b, command, command_len ))
 			EngFuncs::KEY_SetBinding( i, "" );
 	}
 }
@@ -168,19 +188,14 @@ void CMenuKeysModel::Update( void )
 	char *afile = (char *)EngFuncs::COM_LoadFile( "gfx/shell/kb_act.lst", NULL );
 	char *pfile = afile;
 	char token[64];
-	int i = 0;
+
+	keys.Purge();
 
 	if( !afile )
 	{
-		m_iNumItems = 0;
-
-		Con_Printf( "UI_Parse_KeysList: kb_act.lst not found\n" );
+		UI_ShowMessageBox( "UI_Parse_KeysList: kb_act.lst not found\n" );
 		return;
 	}
-
-	memset( keysBind, 0, sizeof( keysBind ));
-	memset( firstKey, 0, sizeof( firstKey ));
-	memset( secondKey, 0, sizeof( secondKey ));
 
 	while(( pfile = EngFuncs::COM_ParseFile( pfile, token, sizeof( token ))) != NULL )
 	{
@@ -188,60 +203,65 @@ void CMenuKeysModel::Update( void )
 		{
 			// separator
 			pfile = EngFuncs::COM_ParseFile( pfile, token, sizeof( token ));
-			if( !pfile ) break;	// technically an error
+			if( !pfile )
+				break;	// technically an error
+
+			CMenuKey key = { 0 };
 
 			if( token[0] == '#' )
-				snprintf( name[i], sizeof( name[i] ), "^6%s^7", L( token ));
+				snprintf( key.name, sizeof( key.name ), "^6%s^7", L( token ));
 			else
-				snprintf( name[i], sizeof( name[i] ), "^6%s^7", token );
+				snprintf( key.name, sizeof( key.name ), "^6%s^7", token );
 
-			keysBind[i][0] = firstKey[i][0] = secondKey[i][0] = 0;
-			i++;
+			keys.AddToTail( key );
 		}
 		else
 		{
 			// key definition
 			int	keys[2];
+			CMenuKey key = { 0 };
 
 			CMenuControls::GetKeyBindings( token, keys );
-			Q_strncpy( keysBind[i], token, sizeof( keysBind[i] ));
+			Q_strncpy( key.bind, token, sizeof( key.bind ));
 
 			pfile = EngFuncs::COM_ParseFile( pfile, token, sizeof( token ));
-			if( !pfile ) break; // technically an error
+			if( !pfile )
+				break; // technically an error
 
 			if( token[0] == '#' )
-				snprintf( name[i], sizeof( name[i] ), "^6%s^7", L( token ));
+				snprintf( key.name, sizeof( key.name ), "^6%s^7", L( token ));
 			else
-				snprintf( name[i], sizeof( name[i] ), "^6%s^7", token );
+				snprintf( key.name, sizeof( key.name ), "^6%s^7", token );
 
 			if( keys[0] != -1 )
 			{
 				const char *str = EngFuncs::KeynumToString( keys[0] );
 
-				if( !str )
-					firstKey[i][0] = 0;
-				else if( !strnicmp( str, "MOUSE", 5 ))
-					snprintf( firstKey[i], sizeof( firstKey[i] ), "^5%s^7", str );
-				else
-					snprintf( firstKey[i], sizeof( firstKey[i] ), "^3%s^7", str );
+				if( str )
+				{
+					if( !strnicmp( str, "MOUSE", 5 ))
+						snprintf( key.first, sizeof( key.first ), "^5%s^7", str );
+					else
+						snprintf( key.first, sizeof( key.first ), "^3%s^7", str );
+				}
 			}
 
 			if( keys[1] != -1 )
 			{
 				const char *str = EngFuncs::KeynumToString( keys[1] );
 
-				if( !str )
-					secondKey[i][0] = 0;
-				else if( !strnicmp( str, "MOUSE", 5 ))
-					snprintf( secondKey[i], sizeof( secondKey[i] ), "^5%s^7", str );
-				else
-					snprintf( secondKey[i], sizeof( secondKey[i] ), "^3%s^7", str );
+				if( str )
+				{
+					if( !strnicmp( str, "MOUSE", 5 ))
+						snprintf( key.second, sizeof( key.second ), "^5%s^7", str );
+					else
+						snprintf( key.second, sizeof( key.second ), "^3%s^7", str );
+				}
 			}
-			i++;
+
+			this->keys.AddToTail( key );
 		}
 	}
-
-	m_iNumItems = i;
 
 	EngFuncs::COM_FreeFile( afile );
 }
@@ -264,7 +284,7 @@ void CMenuControls::ResetKeysList( void )
 
 	if( !afile )
 	{
-		Con_Printf( "UI_Parse_KeysList: kb_act.lst not found\n" );
+		UI_ShowMessageBox( "UI_Parse_KeysList: kb_act.lst not found\n" );
 		return;
 	}
 	
@@ -302,17 +322,16 @@ bool CMenuControls::CGrabKeyMessageBox::KeyUp( int key )
 
 	// defining a key
 	// escape is special, should allow rebind all keys on gamepad
-	if( UI::Key::IsConsole( key ) || key == K_ESCAPE )
+	if( UI::Key::IsConsole( key ) || key == K_ESCAPE
+		|| !parent->keysListModel.keys.IsValidIndex( parent->keysList.GetCurrentIndex( )))
 	{
 		sound = SND_BUZZ;
 	}
 	else
 	{
-		char cmd[4096];
-		const char *bindName = parent->keysListModel.keysBind[parent->keysList.GetCurrentIndex()];
+		const char *bindName = parent->keysListModel.keys[parent->keysList.GetCurrentIndex( )].bind;
 
-		snprintf( cmd, sizeof( cmd ), "bind \"%s\" \"%s\"\n", EngFuncs::KeynumToString( key ), bindName );
-		EngFuncs::ClientCmd( true, cmd );
+		EngFuncs::ClientCmdF( true, "bind \"%s\" \"%s\"\n", EngFuncs::KeynumToString( key ), bindName );
 
 		sound = SND_LAUNCH;
 	}
@@ -331,13 +350,13 @@ bool CMenuControls::CGrabKeyMessageBox::KeyDown( int key )
 
 void CMenuControls::UnbindEntry()
 {
-	if( !keysListModel.IsLineUsable( keysList.GetCurrentIndex() ) )
+	if( !keysListModel.IsLineUsable( keysList.GetCurrentIndex( )))
 	{
 		PlayLocalSound( uiStatic.sounds[SND_BUZZ] );
 		return; // not a key
 	}
 
-	const char *bindName = keysListModel.keysBind[keysList.GetCurrentIndex()];
+	const char *bindName = keysListModel.keys[keysList.GetCurrentIndex( )].bind;
 
 	UnbindCommand( bindName );
 	PlayLocalSound( uiStatic.sounds[SND_REMOVEKEY] );
@@ -349,14 +368,14 @@ void CMenuControls::UnbindEntry()
 
 void CMenuControls::EnterGrabMode()
 {
-	if( !keysListModel.IsLineUsable( keysList.GetCurrentIndex() ) )
+	if( !keysListModel.IsLineUsable( keysList.GetCurrentIndex( )))
 	{
 		PlayLocalSound( uiStatic.sounds[SND_REMOVEKEY] );
 		return;
 	}
 
 	// entering to grab-mode
-	const char *bindName = keysListModel.keysBind[keysList.GetCurrentIndex()];
+	const char *bindName = keysListModel.keys[keysList.GetCurrentIndex( )].bind;
 
 	int keys[2];
 
