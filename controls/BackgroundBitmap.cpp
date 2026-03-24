@@ -219,8 +219,6 @@ bool CMenuBackgroundBitmap::LoadSteamBackground( bool gamedirOnly )
 
 	bool loaded = false;
 
-	s_bEnableLogoMovie = false; // no logos for Steam background
-
 	// try 25'th anniversary update background first
 	if( FBitSet( gMenu.m_gameinfo.flags, GFL_HD_BACKGROUND ))
 		afile = (char *)EngFuncs::COM_LoadFile( "resource/HD_BackgroundLayout.txt" );
@@ -335,6 +333,10 @@ void CMenuBackgroundBitmap::UpdatePreference()
 			s_state = DRAW_COLOR;
 	}
 
+	// Prevent logo.avi to be shown on any background type other than won
+	if( s_state != DRAW_WON && s_bEnableLogoMovie )
+		s_bEnableLogoMovie = false;
+
 	ClearBits( ui_prefer_won_background->flags, FCVAR_CHANGED );
 }
 
@@ -361,7 +363,7 @@ void CMenuBackgroundBitmap::LoadBackground()
 		s_bGameHasWONBackground = true;
 	}
 	else if( LoadWONBackground( false ))
-		Con_DPrintf( "%s: found %s background in %s directory\n", __func__, "won", "game" );
+		Con_DPrintf( "%s: found %s background in %s directory\n", __func__, "won", "base" );
 
 	// logo.avi should be an independent asset from the background image
 	s_bEnableLogoMovie = EngFuncs::FileExists( "media/logo.avi", false );
