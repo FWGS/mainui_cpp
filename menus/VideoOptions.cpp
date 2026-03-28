@@ -309,7 +309,6 @@ void CMenuVidOptions::_VidInit()
 
 void CMenuVidOptions::Reload()
 {
-	CMenuFramework::Reload();
 	bool gl_active = !strnicmp( EngFuncs::GetCvarString( "r_refdll_loaded" ), "gl", 2 );
 	bool soft_active = !stricmp( EngFuncs::GetCvarString( "r_refdll_loaded" ), "soft" );
 
@@ -381,6 +380,8 @@ void CMenuVidOptions::Reload()
 		filtering.SetGrayed( true );
 		filtering.SetInactive( true );
 	}
+
+	CMenuFramework::Reload();
 }
 
 ADD_MENU( menu_vidoptions, CMenuVidOptions, UI_VidOptions_Menu );
