@@ -273,7 +273,7 @@ void CMenuMain::_Init( void )
 		if( animatedBanner.TryLoad())
 			AddItem( animatedBanner );
 	}
-	else if( CMenuBackgroundBitmap::ShouldDrawLogoMovie( ))
+	else
 	{
 		AddItem( movieBanner );
 	}

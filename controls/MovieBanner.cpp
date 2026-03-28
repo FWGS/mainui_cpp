@@ -18,6 +18,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 #include "MovieBanner.h"
+#include "BackgroundBitmap.h"
 
 // In WON menus the background is always 640x480
 const float splashWidth = 640.0f;
@@ -70,6 +71,9 @@ void CMenuMovieBanner::Draw()
 		// Logo needs to be reset when this CVAR changes
 		VidInit();
 	}
+
+	if( !CMenuBackgroundBitmap::ShouldDrawLogoMovie() )
+		return;
 
 	if( EngFuncs::ClientInGame() && EngFuncs::GetCvarFloat( "ui_renderworld" ))
 		return;
