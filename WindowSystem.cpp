@@ -266,7 +266,7 @@ void CWindowStack::Remove( CMenuBaseWindow *menu )
 
 	if( idx == stack.InvalidIndex() )
 	{
-		Con_DPrintf( "CWindowStack::Remove: can't remove not opened window" );
+		Con_DPrintf( "CWindowStack::Remove: can't remove not opened window\n" );
 	}
 
 	if( this == &uiStatic.menu ) // hack!
