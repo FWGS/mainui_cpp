@@ -93,8 +93,8 @@ static const byte Enby[] = {
 	0x2C, 0x2C, 0x2C,
 };
 
-#define FLAG_L( str, x ) str, x, sizeof( x ) / 3
-#define FLAG( x ) FLAG_L( #x, x )
+#define FLAG_L( str, val, x ) str, val, x, sizeof( x ) / 3
+#define FLAG( x ) FLAG_L( #x, #x, x )
 
 // TODO: Get rid of this hardcoded mess
 // allow user to set whatever they want
@@ -102,20 +102,21 @@ static const byte Enby[] = {
 static const struct logo_color_t
 {
 	const char *name;
+	const char *value;
 	const byte *rgb;
 	int stripes;
 } g_LogoColors[] =
 {
-{ "FullColor", 0, 0 },
-{ FLAG_L( "#Valve_Orange", Orange ) }, // L( "Valve_Orange" )
-{ FLAG_L( "#Valve_Yellow", Yellow ) }, // L( "Valve_Yellow" )
-{ FLAG_L( "#Valve_Blue",   Blue )   }, // L( "Valve_Blue" )
-{ FLAG_L( "#Valve_Ltblue", Ltblue ) }, // L( "Valve_Ltblue" )
-{ FLAG_L( "#Valve_Green",  Green )  }, // L( "Valve_Green" )
-{ FLAG_L( "#Valve_Red",    Red )    }, // L( "Valve_Red" )
-{ FLAG_L( "#Valve_Brown",  Brown )  }, // L( "Valve_Brown" )
-{ FLAG_L( "#Valve_Ltgray", Ltgray ) }, // L( "Valve_Ltgray" )
-{ FLAG_L( "#Valve_Dkgray", Dkgray ) }, // L( "Valve_Dkgray" )
+{ "FullColor", "FullColor", 0, 0 },
+{ FLAG_L( "#Valve_Orange", "Orange", Orange ) },
+{ FLAG_L( "#Valve_Yellow", "Yellow", Yellow ) },
+{ FLAG_L( "#Valve_Blue",   "Blue",   Blue )   },
+{ FLAG_L( "#Valve_Ltblue", "Ltblue", Ltblue ) },
+{ FLAG_L( "#Valve_Green",  "Green",  Green )  },
+{ FLAG_L( "#Valve_Red",    "Red",    Red )    },
+{ FLAG_L( "#Valve_Brown",  "Brown",  Brown )  },
+{ FLAG_L( "#Valve_Ltgray", "Ltgray", Ltgray ) },
+{ FLAG_L( "#Valve_Dkgray", "Dkgray", Dkgray ) },
 { FLAG( Rainbow ) },
 { FLAG( Lesbian ) },
 { FLAG( Gay )     },
@@ -385,36 +386,44 @@ void CMenuPlayerSetup::UpdateModel()
 void CMenuPlayerSetup::UpdateLogo()
 {
 	const int pos = logo.GetCurrentValue();
-
-	logoImage.color = &g_LogoColors[0];
-	logoColor.SetCurrentValue( L( g_LogoColors[0].name ));
-	logoColor.SetGrayed( true );
+	bool colorable = false;
 
 	if( pos < 0 )
 	{
 		logoImage.hImage = 0;
-		return;
 	}
-
-	char filename[1024];
-	const int temp = logosModel.GetFullPath( filename, sizeof( filename ), pos );
-	if(( temp < 0 ) || ( temp > sizeof( filename )))
+	else
 	{
-		logoImage.hImage = 0;
-		return;
-	}
-
-	logoImage.hImage = EngFuncs::PIC_Load( filename, 0 );
-
-	if( !logosModel.IsPng( pos ))
-	{
-		CBMP *bmpFile = CBMP::LoadFile( filename );
-		if( bmpFile->GetBitmapHdr()->bitsPerPixel == 8 )
+		char filename[1024];
+		const int temp = logosModel.GetFullPath( filename, sizeof( filename ), pos );
+		if(( temp < 0 ) || ( temp > sizeof( filename )))
 		{
-			ApplyColorToLogoPreview();
-			logoColor.SetGrayed( false );
+			logoImage.hImage = 0;
 		}
-		delete bmpFile;
+		else
+		{
+			logoImage.hImage = EngFuncs::PIC_Load( filename, 0 );
+
+			if( !logosModel.IsPng( pos ))
+			{
+				CBMP *bmpFile = CBMP::LoadFile( filename );
+				if( bmpFile->GetBitmapHdr()->bitsPerPixel == 8 )
+					colorable = true;
+				delete bmpFile;
+			}
+		}
+	}
+
+	if( colorable )
+	{
+		ApplyColorToLogoPreview();
+		logoColor.SetGrayed( false );
+	}
+	else
+	{
+		logoImage.color = &g_LogoColors[0];
+		logoColor.SetCurrentValue( L( g_LogoColors[0].name ));
+		logoColor.SetGrayed( true );
 	}
 
 	EngFuncs::CvarSetString( "cl_logofile", logo.GetCurrentString( ));
@@ -628,7 +637,24 @@ void CMenuPlayerSetup::_Init( void )
 
 			logoColor.Setup( &colors );
 			logoColor.LinkCvar( "cl_logocolor", CMenuEditable::CVAR_STRING );
-			logoColor.onChanged = VoidCb( &CMenuPlayerSetup::ApplyColorToLogoPreview );;
+			SET_EVENT_MULTI( logoColor.onCvarGet, {
+				const char *val = EngFuncs::GetCvarString( "cl_logocolor" );
+				for( size_t i = 0; i < V_ARRAYSIZE( g_LogoColors ); i++ )
+				{
+					if( !stricmp( val, g_LogoColors[i].value ))
+					{
+						((CMenuEditable *)pSelf)->SetOriginalString( L( g_LogoColors[i].name ));
+						return;
+					}
+				}
+				((CMenuEditable *)pSelf)->SetOriginalString( L( g_LogoColors[0].name ));
+			});
+			SET_EVENT_MULTI( logoColor.onCvarWrite, {
+				int idx = (int)((CMenuSpinControl *)pSelf)->GetCurrentValue();
+				if( idx >= 0 && idx < (int)V_ARRAYSIZE( g_LogoColors ))
+					EngFuncs::CvarSetString( "cl_logocolor", g_LogoColors[idx].value );
+			});
+			logoColor.onChanged = VoidCb( &CMenuPlayerSetup::ApplyColorToLogoPreview );
 			logoColor.SetRect( 460, logo.pos.y + logo.size.h + UI_OUTLINE_WIDTH, 200, 32 );
 		}
 	}
