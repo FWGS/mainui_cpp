@@ -50,6 +50,12 @@ typedef ssize_t  fs_size_t;
 typedef unsigned int uint;
 typedef void *(*pfnCreateInterface_t)( const char *, int * );
 
+// Quake definition
+typedef struct link_s
+{
+	struct link_s *prev, *next;
+} link_t;
+
 #undef true
 #undef false
 
@@ -109,9 +115,18 @@ typedef int qboolean;
 	#define ALLOC_CHECK( x )   __attribute__(( alloc_size( x )))
 	#define WARN_UNUSED_RESULT __attribute__(( warn_unused_result ))
 	#define RENAME_SYMBOL( x ) asm( x )
+	#if !defined( offsetof )
+		#define offsetof( s, m )   __builtin_offsetof( s, m )
+	#endif // !defined( offsetof )
 #elif defined( _MSC_VER )
 	#define EXPORT __declspec( dllexport )
 #endif
+
+#ifdef ARRAYSIZE
+#undef ARRAYSIZE
+#endif // ARRAYSIZE
+
+#define ARRAYSIZE( p )	( sizeof(( p ))/ sizeof(( p )[0] ))
 
 #if defined( __SANITIZE_ADDRESS__ )
 	#define USE_ASAN 1
@@ -164,27 +179,27 @@ typedef int qboolean;
 #endif // !defined( PFN_RETURNS_NONNULL )
 
 #if !defined( NORETURN )
-        #define NORETURN
+	#define NORETURN
 #endif // !defined( NORETURN )
 
 #if !defined( NONNULL )
-        #define NONNULL
+	#define NONNULL
 #endif // !defined( NONNULL )
 
 #if !defined( FORMAT_CHECK )
-        #define FORMAT_CHECK( x )
+	#define FORMAT_CHECK( x )
 #endif // !defined( FORMAT_CHECK )
 
 #if !defined( ALLOC_CHECK )
-        #define ALLOC_CHECK( x )
+	#define ALLOC_CHECK( x )
 #endif // !defined( ALLOC_CHECK )
 
 #if !defined( WARN_UNUSED_RESULT )
-        #define WARN_UNUSED_RESULT
+	#define WARN_UNUSED_RESULT
 #endif // !defined( WARN_UNUSED_RESULT )
 
 #if !defined( RENAME_SYMBOL )
-        #define RENAME_SYMBOL( x )
+	#define RENAME_SYMBOL( x )
 #endif // !defined( RENAME_SYMBOL )
 
 #if !defined( unlikely ) || !defined( likely )
@@ -195,6 +210,10 @@ typedef int qboolean;
 #if !defined( XASH_RESTRICT )
 	#define XASH_RESTRICT
 #endif
+
+#if !defined( offsetof )
+	#define offsetof( s, m ) (size_t)&(((s *)0)->m )
+#endif // !defined( offsetof )
 
 #if __STDC_VERSION__ >= 202311L || __cplusplus >= 201103L // C23 or C++ static_assert is a keyword
 	#define STATIC_ASSERT_( ignore, x, y ) static_assert( x, y )

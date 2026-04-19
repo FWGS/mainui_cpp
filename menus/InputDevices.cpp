@@ -18,8 +18,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
+#include "q_client.h"
+
 #include "Framework.h"
-#include "kbutton.h"
 #include "MenuStrings.h"
 #include "Bitmap.h"
 #include "PicButton.h"
