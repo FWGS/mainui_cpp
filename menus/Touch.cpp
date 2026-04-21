@@ -50,6 +50,9 @@ void UI_Touch_Menu( void )
 		menu_touch->AddButton( L( "Touch buttons" ), L( "Add, remove, edit touch buttons" ), PC_TOUCH_BUTTONS,
 			UI_TouchButtons_Menu, QMF_NOTIFY, 'b' );
 
+		menu_touch->AddButton( L( "Gyroscope" ), L( "Built-in device gyroscope options" ), PC_GYRO,
+			UI_MobileGyro_Menu, QMF_NOTIFY, 'g' );
+
 		menu_touch->AddButton( L( "Done" ),  L( "Go back to the previous menu" ), PC_DONE, VoidCb( &CMenuFramework::Hide ), QMF_NOTIFY );
 	}
 
