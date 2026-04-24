@@ -339,6 +339,9 @@ CBMP* CBMP::LoadFile( const char *filename )
 	if( bmp->id[0] != 'B' || bmp->id[1] != 'M' )
 		return NULL;
 
+	// convert on-disk little-endian header fields to host byte order
+	CBMP::SwapBmpHdrToLE( bmp );
+
 	// bogus data
 	if( !bmp->width || !bmp->height )
 		return NULL;

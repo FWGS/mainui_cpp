@@ -91,6 +91,9 @@ void UI_LoadBmpButtons()
 	int pic_count = bmp->GetBitmapHdr()->height / uiStatic.buttons_height / 3;
 	int src_pos = bmp->GetBitmapHdr()->height * stride;
 
+	uint fileSize = cutted_bmp.GetBitmapHdr()->fileSize;
+	cutted_bmp.SwapHdrToLE();
+
 	for( int i = 0; i < pic_count; i++ )
 	{
 		int dst_pos = blockHeight * stride;
@@ -123,7 +126,7 @@ void UI_LoadBmpButtons()
 		}
 
 		// upload image into video memory
-		uiStatic.buttonsPics[i] = EngFuncs::PIC_Load( fname, cutted_bmp.GetBitmap(), cutted_bmp.GetBitmapHdr()->fileSize );
+		uiStatic.buttonsPics[i] = EngFuncs::PIC_Load( fname, cutted_bmp.GetBitmap(), fileSize );
 	}
 
 	delete bmp;

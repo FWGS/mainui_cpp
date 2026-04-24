@@ -185,6 +185,14 @@ Then you can use another oneliner to query all variables:
 	#endif // !XASH_WIN32
 #endif
 
+// both macros are always defined, so they can be used in #if and as plain C expressions
+#ifndef XASH_BIG_ENDIAN
+	#define XASH_BIG_ENDIAN 0
+#endif
+#ifndef XASH_LITTLE_ENDIAN
+	#define XASH_LITTLE_ENDIAN 0
+#endif
+
 //================================================================
 //
 //           CPU ARCHITECTURE DEFINES
