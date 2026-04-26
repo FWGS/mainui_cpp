@@ -278,7 +278,7 @@
     <ClInclude Include="..\BMPUtils.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="..\BtnsBMPTable.h">
+    <ClInclude Include="..\Btns.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="..\CFGScript.h">

@@ -491,9 +491,7 @@ void CMenuPlayerSetup::WriteNewLogo( void )
 		if( logoImage.color->stripes >= 1 )
 			bmpFile->RemapLogo( logoImage.color->stripes, logoImage.color->rgb );
 
-		uint fileSize = bmpFile->GetBitmapHdr()->fileSize;
-		bmpFile->SwapHdrToLE();
-		EngFuncs::COM_SaveFile( "logos/remapped.bmp", bmpFile->GetBitmap(), fileSize );
+		bmpFile->Save( "logos/remapped.bmp" );
 		EngFuncs::CvarSetString( "cl_logoext", "bmp" );
 
 		delete bmpFile;

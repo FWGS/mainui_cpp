@@ -20,7 +20,7 @@ GNU General Public License for more details.
 #include "PicButton.h"
 #include "Utils.h"
 #include "Scissor.h"
-#include "BtnsBMPTable.h"
+#include "Btns.h"
 #include <stdlib.h>
 #include "Framework.h"
 
@@ -267,16 +267,18 @@ void CMenuPicButton::Draw( )
 		{
 			if( button_id >= 0 )
 			{
-				rects[i].top = uiStatic.buttons_points[i];
-				rects[i].bottom = uiStatic.buttons_points[i] + uiStatic.buttons_height;
+				rects[i].left = uiStatic.btns.GetX( button_id );
+				rects[i].right = uiStatic.btns.GetX( button_id ) + uiStatic.btns.GetWidth();
+				rects[i].top = uiStatic.btns.GetY( button_id ) + i * uiStatic.btns.GetTexStride();
+				rects[i].bottom = rects[i].top + uiStatic.btns.GetTexH();
 			}
 			else
 			{
+				rects[i].left = 0;
+				rects[i].right = EngFuncs::PIC_Width( hPic );
 				rects[i].top = round( EngFuncs::PIC_Height( hPic ) * i / 3.0f );
 				rects[i].bottom = round( EngFuncs::PIC_Height( hPic ) * ( i + 1 ) / 3.0f );
 			}
-			rects[i].left = 0;
-			rects[i].right = uiStatic.buttons_width;
 		}
 
 		// decay
@@ -384,7 +386,7 @@ void CMenuPicButton::SetPicture( EDefaultBtns ID )
 	if( ID < 0 || ID > PC_BUTTONCOUNT )
 		return; // bad id
 
-	hPic = uiStatic.buttonsPics[ID];
+	hPic = uiStatic.btns.GetPic( ID );
 	button_id = ID;
 	hotkey = g_hotkeys[ID];
 }

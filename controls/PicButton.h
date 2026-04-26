@@ -16,7 +16,7 @@ GNU General Public License for more details.
 #ifndef MENU_PICBUTTON_H
 #define MENU_PICBUTTON_H
 
-#include "BtnsBMPTable.h"
+#include "Btns.h"
 #include "BaseWindow.h"
 
 // Use hover bitmap from btns_main.bmp instead of head_%s.bmp

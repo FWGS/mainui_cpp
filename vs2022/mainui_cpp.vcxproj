@@ -226,7 +226,7 @@
   <ItemGroup>
     <ClInclude Include="..\BaseMenu.h" />
     <ClInclude Include="..\BMPUtils.h" />
-    <ClInclude Include="..\BtnsBMPTable.h" />
+    <ClInclude Include="..\Btns.h" />
     <ClInclude Include="..\CFGScript.h" />
     <ClInclude Include="..\Color.h" />
     <ClInclude Include="..\controls\Action.h" />

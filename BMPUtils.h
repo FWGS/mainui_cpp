@@ -248,6 +248,20 @@ public:
 		SwapBmpHdrToLE((bmp_t *)data );
 	}
 
+	inline HIMAGE Upload( const char *name, int flags = 0 )
+	{
+		uint fileSize = GetBitmapHdr()->fileSize;
+		SwapHdrToLE();
+		return EngFuncs::PIC_Load( name, GetBitmap(), fileSize, flags );
+	}
+
+	inline void Save( const char *name )
+	{
+		uint fileSize = GetBitmapHdr()->fileSize;
+		SwapHdrToLE();
+		EngFuncs::COM_SaveFile( name, GetBitmap(), fileSize );
+	}
+
 	inline byte *GetBitmap()
 	{
 		return data;

@@ -24,7 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "PicButton.h"
 #include "keydefs.h"
 #include "Utils.h"
-#include "BtnsBMPTable.h"
+#include "Btns.h"
 #include "YesNoMessageBox.h"
 #include "BackgroundBitmap.h"
 #include "FontManager.h"
@@ -879,13 +879,13 @@ void UI_Precache( void )
 	EngFuncs::PIC_Load( "gfx/shell/splash" );
 
 	// load all menu buttons
-	UI_LoadBmpButtons( );
+	uiStatic.btns.LoadBmpButtons();
 
 	// all menu buttons have the same view sizes
-	if( uiStatic.buttons_width == 0 || uiStatic.buttons_height == 0 )
+	if( uiStatic.btns.GetWidth() == 0 || uiStatic.btns.GetHeight() == 0 )
 		uiStatic.buttons_draw_size = Size( UI_BUTTONS_WIDTH, UI_BUTTONS_HEIGHT );
 	else
-		uiStatic.buttons_draw_size = Size( uiStatic.buttons_width * 1024 / 640, uiStatic.buttons_height * 768 / 480 );
+		uiStatic.buttons_draw_size = Size( uiStatic.btns.GetWidth() * 1024 / 640, uiStatic.btns.GetHeight() * 768 / 480 );
 
 	for( CMenuEntry *entry = s_pEntries; entry; entry = entry->m_pNext )
 	{

@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "BaseMenu.h"
 #include "Utils.h"
 #include "keydefs.h"
-#include "BtnsBMPTable.h"
+#include "Btns.h"
 #include "utflib.h"
 
 #if defined _WIN32

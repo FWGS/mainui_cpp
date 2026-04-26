@@ -208,9 +208,7 @@ void CBaseFont::UploadGlyphsForRanges(charRange_t *range, int rangeSize)
 
 	SaveToCache( m_szTextureName, range, rangeSize, &bmp );
 
-	uint fileSize = bmp.GetBitmapHdr()->fileSize;
-	bmp.SwapHdrToLE();
-	HIMAGE hImage = EngFuncs::PIC_Load( m_szTextureName, bmp.GetBitmap(), fileSize, 0 );
+	HIMAGE hImage = bmp.Upload( m_szTextureName );
 
 	delete[] temp;
 

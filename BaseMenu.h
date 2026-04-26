@@ -21,7 +21,7 @@ GNU General Public License for more details.
 #include "EventSystem.h"
 #include "Utils.h"
 #include "FontManager.h"
-#include "BtnsBMPTable.h"
+#include "Btns.h"
 #include "WindowSystem.h"
 #include "Image.h"
 #include "utlstring.h"
@@ -113,12 +113,7 @@ typedef struct
 	int		initialized;
 
 	// btns_main.bmp stuff
-	HIMAGE	buttonsPics[PC_BUTTONCOUNT];
-
-	int		buttons_width; // btns_main.bmp global width
-	int		buttons_height; // one button height
-	int		buttons_points[3];
-
+	CBtnsManager btns;
 	Size		buttons_draw_size; // scaled image what we drawing
 	int		width;
 	bool	textInput;
@@ -219,7 +214,6 @@ inline void UI_DrawRectangleExt( Point pos, Size size, const unsigned int color,
 }
 
 void UI_StartSound( const char *sound );
-void UI_LoadBmpButtons();
 
 int UI_CreditsActive( void );
 void UI_DrawFinalCredits( void );
