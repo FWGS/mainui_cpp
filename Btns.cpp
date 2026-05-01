@@ -45,21 +45,21 @@ void CBtnsManager::LoadBmpButtons()
 	const bmp_t *hdr = bmp->GetBitmapHdr();
 	const int bpp = hdr->bitsPerPixel / 8;
 
-	if( bpp == 0 || hdr->width == 0 || hdr->height < PC_BUTTONCOUNT * 3 )
+	width = hdr->width;
+	height = 26; // virtual button height for layout
+
+	const int button_w = hdr->width;
+	const int button_tex_h = height; // WON buttons are always 26px in height
+	const int src_cell_h = button_tex_h * 3;
+	const int pic_count = Q_min( hdr->height / button_tex_h / 3, PC_BUTTONCOUNT );
+
+	if( bpp == 0 || button_w == 0 || pic_count <= 0 )
 	{
 		delete bmp;
 		return;
 	}
 
 	const int src_stride = (( hdr->width * bpp ) + 3 ) & ~3;
-
-	width = hdr->width;
-	height = 26; // virtual button height for layout
-
-	const int button_w = hdr->width;
-	const int button_tex_h = hdr->height / PC_BUTTONCOUNT / 3;
-	const int src_cell_h = button_tex_h * 3;
-	const int pic_count = hdr->height / button_tex_h / 3;
 
 	// atlas cell dimensions including guard pixels
 	const int state_step = button_tex_h + BTN_GUARD_SIZE;
