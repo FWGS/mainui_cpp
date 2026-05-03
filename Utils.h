@@ -166,6 +166,9 @@ int KEY_GetKey( const char *binding );			// ripped out from engine
 char *StringCopy( const char *input );			// copy string into new memory
 void Com_EscapeCommand( char *newCommand, const char *oldCommand, int len );
 void UI_EnableTextInput( bool enable );
+int UI_DrawHudCharacter( int x, int y, int ch, int r, int g, int b );
+int UI_GetHudFontHeight( void );
+int UI_GetHudCharWidth( int ch );
 
 void UI_LoadCustomStrings( void );
 const char *L( const char *szStr ); // L means Localize!
