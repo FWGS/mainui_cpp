@@ -193,8 +193,8 @@ void CMenuYesNoMessageBox::HighlightChoice( EHighlight yesno )
 	}
 	else
 	{
-		yes.bPulse = yesno == HIGHLIGHT_YES ? true : false;
-		no.bPulse = yesno == HIGHLIGHT_NO ? true : false;
+		yes.bPulse = yesno == HIGHLIGHT_YES;
+		no.bPulse = yesno == HIGHLIGHT_NO;
 	}
 }
 

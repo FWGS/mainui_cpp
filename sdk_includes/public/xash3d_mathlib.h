@@ -341,7 +341,7 @@ static inline qboolean VectorCompareEpsilon( const vec3_t vec1, const vec3_t vec
 	vec_t ay = fabs( vec1[1] - vec2[1] );
 	vec_t az = fabs( vec1[2] - vec2[2] );
 
-	return ( ax <= epsilon ) && ( ay <= epsilon ) && ( az <= epsilon ) ? true : false;
+	return ( ax <= epsilon ) && ( ay <= epsilon ) && ( az <= epsilon );
 }
 
 static inline float VectorNormalizeLength2( const vec3_t v, vec3_t out )

@@ -97,10 +97,10 @@ void CMenuGamePad::GetConfig( void )
 	pitch.SetCurrentValue( fabs( _pitch ));
 	yaw.SetCurrentValue( fabs( _yaw ));
 
-	invSide.bChecked = _side < 0.0f ? true: false;
-	invFwd.bChecked = _forward < 0.0f ? true: false;
-	invPitch.bChecked = _pitch < 0.0f ? true: false;
-	invYaw.bChecked = _yaw < 0.0f ? true: false;
+	invSide.bChecked = _side < 0.0f;
+	invFwd.bChecked = _forward < 0.0f;
+	invPitch.bChecked = _pitch < 0.0f;
+	invYaw.bChecked = _yaw < 0.0f;
 
 	// I made a monster...
 	for( unsigned int i = 0; i < sizeof( binding ) - 1; i++ )
