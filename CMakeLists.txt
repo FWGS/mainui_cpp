@@ -83,7 +83,9 @@ endif()
 
 if(NOT BUILD_AS_PART_OF_ENGINE)
 	# grab platform library suffix
-	set_target_postfix(menu)
+    set_target_properties(menu PROPERTIES
+        DEBUG_POSTFIX "_d"
+    )
 else()
 	# install to the same directory as engine
         set(GAMEDIR ".")

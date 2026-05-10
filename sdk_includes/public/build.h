@@ -91,6 +91,7 @@ Then you can use another oneliner to query all variables:
 #undef XASH_PSVITA
 #undef XASH_WASI
 #undef XASH_WASM
+#undef XASH_SPARC
 
 //================================================================
 //
@@ -143,8 +144,8 @@ Then you can use another oneliner to query all variables:
 		#define XASH_EMSCRIPTEN 1
 	#elif defined __gnu_hurd__
 		#define XASH_HURD 1
-	#else
-		#error
+    #else
+        #error
 	#endif
 #endif
 
@@ -265,6 +266,8 @@ Then you can use another oneliner to query all variables:
 		#define XASH_64BIT 1
 	#endif
 	#define XASH_WASM 1
+#elif defined __sparc__
+    #define XASH_SPARC 1
 #else
 	#error "Place your architecture name here! If this is a mistake, try to fix conditions above and report a bug"
 #endif
