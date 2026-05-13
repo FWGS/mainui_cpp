@@ -161,7 +161,7 @@ void CMenuRenderersModel::Update()
 
 		// append asterisk to currently loaded renderer
 		if( !stricmp( r_refdll_loaded, temp.shortName ))
-			strncat( temp.readable, "*", sizeof( temp.readable ));
+			strncat( temp.readable, "*", sizeof( temp.readable ) - strlen( temp.readable ) - 1 );
 
 		m_refs.AddToTail( temp );
 	}
