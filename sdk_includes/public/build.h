@@ -62,35 +62,34 @@ Then you can use another oneliner to query all variables:
 #undef XASH_BIG_ENDIAN
 #undef XASH_DOS4GW
 #undef XASH_E2K
-#undef XASH_EMSCRIPTEN
 #undef XASH_FREEBSD
 #undef XASH_HAIKU
 #undef XASH_HURD
 #undef XASH_IOS
 #undef XASH_IRIX
-#undef XASH_JS
 #undef XASH_LINUX
 #undef XASH_LITTLE_ENDIAN
 #undef XASH_MIPS
 #undef XASH_MOBILE_PLATFORM
 #undef XASH_NETBSD
+#undef XASH_NSWITCH
 #undef XASH_OPENBSD
 #undef XASH_POSIX
 #undef XASH_PPC
+#undef XASH_PSP
+#undef XASH_PSVITA
 #undef XASH_RISCV
 #undef XASH_RISCV_DOUBLEFP
 #undef XASH_RISCV_SINGLEFP
 #undef XASH_RISCV_SOFTFP
 #undef XASH_SERENITY
+#undef XASH_SPARC
 #undef XASH_SUNOS
 #undef XASH_TERMUX
-#undef XASH_WIN32
-#undef XASH_X86
-#undef XASH_NSWITCH
-#undef XASH_PSP
-#undef XASH_PSVITA
 #undef XASH_WASI
 #undef XASH_WASM
+#undef XASH_WIN32
+#undef XASH_X86
 
 //================================================================
 //
@@ -139,8 +138,6 @@ Then you can use another oneliner to query all variables:
 		#define XASH_WASI 1
 	#elif defined __sun__
 		#define XASH_SUNOS 1
-	#elif defined __EMSCRIPTEN__
-		#define XASH_EMSCRIPTEN 1
 	#elif defined __gnu_hurd__
 		#define XASH_HURD 1
 	#else
@@ -208,9 +205,6 @@ Then you can use another oneliner to query all variables:
 	#define XASH_ARM   8
 #elif defined __mips__
 	#define XASH_MIPS 1
-// commented out to avoid misdetection, modern Emscripten versions target WASM only
-//#elif defined __EMSCRIPTEN__
-//	#define XASH_JS 1
 #elif defined __e2k__
 	#define XASH_64BIT 1
 	#define XASH_E2K 1
@@ -265,6 +259,11 @@ Then you can use another oneliner to query all variables:
 		#define XASH_64BIT 1
 	#endif
 	#define XASH_WASM 1
+#elif defined __sparc__
+	#define XASH_SPARC 1
+	#if defined __arch64__
+		#define XASH_64BIT 1
+	#endif
 #else
 	#error "Place your architecture name here! If this is a mistake, try to fix conditions above and report a bug"
 #endif

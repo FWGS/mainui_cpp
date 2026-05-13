@@ -48,7 +48,7 @@ For more information, please refer to <http://unlicense.org/>
 #define PLATFORM_APPLE      5
 #define PLATFORM_NETBSD     6
 #define PLATFORM_OPENBSD    7
-#define PLATFORM_EMSCRIPTEN 8
+// reserved
 #define PLATFORM_DOS4GW     9
 #define PLATFORM_HAIKU      10
 #define PLATFORM_SERENITY   11
@@ -74,8 +74,6 @@ For more information, please refer to <http://unlicense.org/>
 	#define XASH_PLATFORM PLATFORM_NETBSD
 #elif XASH_OPENBSD
 	#define XASH_PLATFORM PLATFORM_OPENBSD
-#elif XASH_EMSCRIPTEN
-	#define XASH_PLATFORM PLATFORM_EMSCRIPTEN
 #elif XASH_DOS4GW
 	#define XASH_PLATFORM PLATFORM_DOS4GW
 #elif XASH_HAIKU
@@ -109,11 +107,12 @@ For more information, please refer to <http://unlicense.org/>
 #define ARCHITECTURE_AMD64   2
 #define ARCHITECTURE_ARM     3
 #define ARCHITECTURE_MIPS    4
-#define ARCHITECTURE_JS      6
+// reserved
 #define ARCHITECTURE_E2K     7
 #define ARCHITECTURE_RISCV   8
 #define ARCHITECTURE_PPC     9
 #define ARCHITECTURE_WASM    10
+#define ARCHITECTURE_SPARC   11
 
 #if XASH_AMD64
 	#define XASH_ARCHITECTURE ARCHITECTURE_AMD64
@@ -123,8 +122,6 @@ For more information, please refer to <http://unlicense.org/>
 	#define XASH_ARCHITECTURE ARCHITECTURE_ARM
 #elif XASH_MIPS
 	#define XASH_ARCHITECTURE ARCHITECTURE_MIPS
-#elif XASH_JS
-	#define XASH_ARCHITECTURE ARCHITECTURE_JS
 #elif XASH_E2K
 	#define XASH_ARCHITECTURE ARCHITECTURE_E2K
 #elif XASH_RISCV
@@ -133,6 +130,8 @@ For more information, please refer to <http://unlicense.org/>
 	#define XASH_ARCHITECTURE ARCHITECTURE_PPC
 #elif XASH_WASM
 	#define XASH_ARCHITECTURE ARCHITECTURE_WASM
+#elif XASH_SPARC
+	#define XASH_ARCHITECTURE ARCHITECTURE_SPARC
 #else
 	#error
 #endif
