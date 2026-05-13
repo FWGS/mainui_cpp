@@ -16,33 +16,11 @@ GNU General Public License for more details.
 #ifndef UTILS_H
 #define UTILS_H
 
-//extern ui_enginefuncs_t g_engfuncs;
-//extern ui_textfuncs_t g_textfuncs;
-
 #include "enginecallback_menu.h"
 #include "gameinfo.h"
 #include "FontManager.h"
 #include "BMPUtils.h"
 #include "miniutl.h"
-#if 0
-#include <tgmath.h>
-#endif
-
-#define FILE_GLOBAL	static
-#define DLL_GLOBAL
-
-#define MAX_INFO_STRING	256	// engine limit
-
-#ifndef M_PI
-#define M_PI    (double)3.14159265358979323846
-#endif
-
-#define M_PI2   ((double)(M_PI * 2))
-#define M_PI_F  ((float)(M_PI))
-#define M_PI2_F ((float)(M_PI2))
-
-#define RAD2DEG( x )	((float)(x) * (float)(180.f / (float)M_PI))
-#define DEG2RAD( x )	((float)(x) * (float)((float)M_PI / 180.f))
 
 //
 // How did I ever live without ASSERT?
@@ -50,10 +28,8 @@ GNU General Public License for more details.
 #ifdef _DEBUG
 void DBG_AssertFunction( bool fExpr, const char* szExpr, const char* szFile, int szLine, const char* szMessage );
 #define ASSERT( f )		DBG_AssertFunction( f, #f, __FILE__, __LINE__, NULL )
-#define ASSERTSZ( f, sz )	DBG_AssertFunction( f, #f, __FILE__, __LINE__, sz )
 #else
 #define ASSERT( f )
-#define ASSERTSZ( f, sz )
 #endif
 
 extern ui_globalvars_t		*gpGlobals;
@@ -168,7 +144,11 @@ void Com_EscapeCommand( char *newCommand, const char *oldCommand, int len );
 void UI_EnableTextInput( bool enable );
 
 void UI_LoadCustomStrings( void );
+#if defined( __GNUC__ ) || defined( __clang__ )
+const char *L( const char *szStr ) __attribute__(( format_arg( 1 ))); // L means Localize!
+#else
 const char *L( const char *szStr ); // L means Localize!
+#endif
 void UI_FreeCustomStrings( void );
 
 inline size_t Q_strncpy( char *dst, const char *src, size_t size )
