@@ -272,19 +272,16 @@ CMenuField::Char
 void CMenuField::Char( int key )
 {
 	int	len;
-	bool changed = false;
 
 	if( key == 'v' - 'a' + 1 )
 	{
 		// ctrl-v is paste
 		Paste();
-		changed = true;
 	}
 	else if( key == 'c' - 'a' + 1 )
 	{
 		// ctrl-c clears the field
 		Clear( );
-		changed = true;
 	}
 
 	len = strlen( szBuffer );
@@ -338,7 +335,6 @@ void CMenuField::Char( int key )
 
 		szBuffer[iCursor] = key;
 		iCursor++;
-		changed = true;
 	}
 	else
 	{
@@ -347,14 +343,12 @@ void CMenuField::Char( int key )
 		memmove( szBuffer + iCursor + 1, szBuffer + iCursor, len + 1 - iCursor );
 		szBuffer[iCursor] = key;
 		iCursor++;
-		changed = true;
 	}
 
 	if( iCursor > len )
 	{
 		szBuffer[iCursor] = 0;
 		iScroll = g_FontMgr->CutText( font, szBuffer, m_scChSize, iRealWidth, true );
-		changed = true;
 	}
 
 	SetCvarString( szBuffer );

@@ -236,7 +236,6 @@ void CMenuVidOptions::_Init( void )
 
 	SET_EVENT_MULTI( hudscale.onChanged,
 	{
-		CMenuCheckBox *cb = (CMenuCheckBox *)pSelf;
 		CMenuVidOptions *parent = (CMenuVidOptions *)pSelf->Parent();
 
 		if( EngFuncs::ClientInGame( ))
