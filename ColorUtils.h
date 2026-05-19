@@ -18,8 +18,7 @@ GNU General Public License for more details.
 #define COLORUTILS_H
 
 #include <math.h>
-#include "port.h"
-#include "utils.h"
+#include "Utils.h"
 
 namespace ColorUtils
 {
