@@ -113,7 +113,7 @@ void CMenuColorPickerDialog::_Init()
 	const int buttonsX  = ( Layout::PAD + Layout::PICKER_W ) - Layout::BTN_W - ( Layout::BTN_GAP / 2 );
 
 	m_btnOk.SetPicture( PC_OK );
-	m_btnOk.szName = L( "OK" );
+	m_btnOk.szName = L( "GameUI_OK" );
 	m_btnOk.eTextAlignment = QM_CENTER;
 	m_btnOk.SetRect( buttonsX, buttonY, Layout::BTN_W, Layout::BTN_H );
 	SET_EVENT_MULTI( m_btnOk.onReleased,
@@ -125,7 +125,7 @@ void CMenuColorPickerDialog::_Init()
 	});
 
 	m_btnCancel.SetPicture( PC_CANCEL );
-	m_btnCancel.szName = L( "Cancel" );
+	m_btnCancel.szName = L( "GameUI_Cancel" );
 	m_btnCancel.eTextAlignment = QM_CENTER;
 	m_btnCancel.SetRect( buttonsX + Layout::BTN_W + Layout::BTN_GAP, buttonY, Layout::BTN_W, Layout::BTN_H );
 	SET_EVENT_MULTI( m_btnCancel.onReleased,
