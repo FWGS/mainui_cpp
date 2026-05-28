@@ -216,7 +216,7 @@ void CMenuGamePad::_Init( void )
 	}
 
 	side.Setup( 0.0f, 1.0f, 0.1f );
-	side.SetNameAndStatus( L( "Side" ), L( "Side movement sensitity" ) );
+	side.SetNameAndStatus( L( "Side" ), L( "Side movement sensitivity" ) );
 	invSide.SetNameAndStatus( L( "Invert" ), L( "Invert side movement axis" ) );
 
 	forward.Setup( 0.0f, 1.0f, 0.1f );

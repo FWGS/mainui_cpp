@@ -317,7 +317,7 @@ void CMenuTouchOptions::_Init( void )
 	lookY.Setup( 50, 500, 5 );
 	lookY.LinkCvar( "touch_pitch" );
 
-	moveX.SetNameAndStatus( L( "Side" ), L( "Side movement sensitity" ) );
+	moveX.SetNameAndStatus( L( "Side" ), L( "Side movement sensitivity" ) );
 	moveX.Setup( 0.02, 1.0, 0.05 );
 	moveX.LinkCvar( "touch_sidezone" );
 
@@ -349,7 +349,7 @@ void CMenuTouchOptions::_Init( void )
 	multiplier.Setup( 100, 1000, 1 );
 	multiplier.LinkCvar( "touch_pow_mult" );
 
-	exponent.SetNameAndStatus( L( "Exponent" ), L( "Exponent factor, more agressive (touch_exp_mult)" ) );
+	exponent.SetNameAndStatus( L( "Exponent" ), L( "Exponent factor, more aggressive (touch_exp_mult)" ) );
 	exponent.Setup( 0, 100, 1 );
 	exponent.LinkCvar( "touch_exp_mult" );
 
