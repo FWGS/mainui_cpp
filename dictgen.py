@@ -48,7 +48,7 @@ def process_file(name):
 	trans = []
 
 	# TODO: dumb! It can't find multilines
-	with open(name, "r") as f:
+	with open(name, "r", encoding='utf-8') as f:
 		for line in f.readlines():
 			trans += re.findall(TRANSLATABLE_PATTERN, line)
 
