@@ -549,7 +549,7 @@ void CMenuPlayerSetup::_Init( void )
 		}
 		else
 		{
-		logoImage.szName = L( "Spraypaint image" );
+		logoImage.szName = L( "GameUI_SpraypaintImage" );
 		logoImage.SetRect( 460, 370, 200, 200 );
 
 		logo.Setup( &logosModel );
