@@ -252,6 +252,7 @@ bool CMenuField::KeyDown( int key )
 				if( iCursor > len )
 					iCursor = len;
 			}
+			else handled = false;
 		}
 		else handled = false;
 	}
