@@ -263,7 +263,7 @@ void CMenuColorPickerDialog::_Init()
 
 	static const char *presetItems[V_ARRAYSIZE( g_LogoPresets )];
 	for( size_t i = 0; i < V_ARRAYSIZE( g_LogoPresets ); i++ )
-		presetItems[i] = g_LogoPresets[i].name;
+		presetItems[i] = L( g_LogoPresets[i].name );
 	static CStringArrayModel presetModel( presetItems, V_ARRAYSIZE( g_LogoPresets ));
 
 	m_presetSpin.Setup( &presetModel );
@@ -276,7 +276,7 @@ void CMenuColorPickerDialog::_Init()
 
 	rowY += rowStep;
 
-	static const char *orientationItems[] = { "Vertical", "Horizontal" };
+	static const char *orientationItems[] = { L( "Vertical" ), L( "Horizontal" ) };
 	static CStringArrayModel orientationModel( orientationItems, 2 );
 	m_orientationSpin.Setup( &orientationModel );
 	m_orientationSpin.SetCurrentValue( 0.f );
