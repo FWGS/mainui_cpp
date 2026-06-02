@@ -172,7 +172,7 @@ public:
 		data = newData;
 	}
 
-	void RemapLogo( int stripes, const byte *rgb )
+	void RemapLogo( int stripes, const byte *rgb, bool horizontal = false )
 	{
 		// palette is always right after header
 		rgbquad_t *palette = GetPaletteData();
@@ -203,18 +203,18 @@ public:
 			return;
 
 		const bmp_t *hdr = GetBitmapHdr();
-		double lines_per_stripe = hdr->height / (double)stripes;
+		const double cells_per_stripe = ( horizontal ? hdr->width : hdr->height ) / (double)stripes;
 		byte *data = GetTextureData();
 
 		for( int i = 0; i < hdr->height; i++ )
 		{
-			int stripe = (int)(( hdr->height - i - 1 ) / lines_per_stripe );
-
 			for( int j = 0; j < hdr->width; j++ )
 			{
 				byte c = data[i * hdr->width + j];
 				if( c == 0 )
 					continue;
+
+				int stripe = horizontal ? j / cells_per_stripe : ( hdr->height - i - 1 ) / cells_per_stripe;
 
 				// remap to the palette
 				int idx = ( c / 256.0f ) * max_palette_slots; // remap to limited palette

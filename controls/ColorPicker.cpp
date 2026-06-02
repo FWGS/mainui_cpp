@@ -39,8 +39,8 @@ void CMenuColorPicker::VidInit()
 {
 	CMenuBaseItem::VidInit();
 
-	const int hueW = 20;
-	const int gap  = 6;
+	const int hueW = 20 * uiStatic.scaleX;
+	const int gap  = 6 * uiStatic.scaleX;
 
 	int side = Q_min( m_scSize.w - hueW - gap, m_scSize.h );
 

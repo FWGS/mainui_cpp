@@ -36,6 +36,7 @@ cvar_t		*ui_show_window_stack;
 cvar_t		*ui_borderclip;
 cvar_t		*ui_prefer_won_background;
 cvar_t		*ui_background_stretch;
+cvar_t		*ui_logohorizontal;
 
 uiStatic_t	uiStatic;
 static CMenuEntry	*s_pEntries = NULL;
@@ -1147,6 +1148,7 @@ void UI_Init( void )
 	ui_borderclip = EngFuncs::CvarRegister( "ui_borderclip", "0", FCVAR_ARCHIVE );
 	ui_prefer_won_background = EngFuncs::CvarRegister( "ui_prefer_won_background", "0", FCVAR_ARCHIVE );
 	ui_background_stretch = EngFuncs::CvarRegister( "ui_background_stretch", "0", FCVAR_ARCHIVE );
+	ui_logohorizontal = EngFuncs::CvarRegister( "ui_logohorizontal", "0", FCVAR_ARCHIVE );
 
 	// show cl_predict dialog
 	EngFuncs::CvarRegister( "menu_mp_firsttime2", "1", FCVAR_ARCHIVE );
