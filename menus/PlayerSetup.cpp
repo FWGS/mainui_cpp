@@ -350,7 +350,6 @@ void CMenuPlayerSetup::UpdateLogo()
 	logoImage.horizontal   = &m_horizontal;
 
 	btnChooseColor.SetGrayed( !m_logoColorable );
-	EngFuncs::CvarSetString( "cl_logofile", logo.GetCurrentString() );
 }
 
 void CMenuPlayerSetup::ShowColorPicker()
