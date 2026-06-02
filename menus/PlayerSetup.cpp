@@ -476,7 +476,7 @@ void CMenuPlayerSetup::WriteNewLogo( void )
 
 	logo.WriteCvar();
 
-	EngFuncs::CvarSetValue( "cl_logoupdate", EngFuncs::GetCvarFloat( "cl_logoupdate" ) == 0.0f ? 1.0f : 0.0f );
+	EngFuncs::CvarSetValue( "@cl_logoupdate", !EngFuncs::GetCvarFloat( "@cl_logoupdate" ));
 }
 
 /*
