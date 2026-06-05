@@ -28,8 +28,8 @@ public:
 	void SetMessage( const char *sz );
 private:
 	void _Init() override;
+	void Draw() override;
 
-	CMenuBackgroundBitmap background;
 	CMenuAction dlgMessage;
 };
 

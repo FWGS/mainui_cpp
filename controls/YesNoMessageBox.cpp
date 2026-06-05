@@ -90,9 +90,6 @@ void CMenuYesNoMessageBox::_Init()
 	if( !(bool)onPositive )
 		onPositive = CEventCallback::NoopCb;
 
-	background.bForceColor = true;
-	background.colorBase = uiPromptBgColor;
-	AddItem( background );
 	AddItem( dlgMessage1 );
 	AddItem( yes );
 
@@ -122,7 +119,11 @@ CMenuYesNoMessageBox::Draw
 */
 void CMenuYesNoMessageBox::Draw()
 {
-	UI_FillRect( 0,0, gpGlobals->scrWidth, gpGlobals->scrHeight, 0x40000000 );
+	UI_FillRect( 0, 0, gpGlobals->scrWidth, gpGlobals->scrHeight, 0x40000000 );
+
+	EngFuncs::FillRGBA( m_scPos.x, m_scPos.y, m_scSize.w, m_scSize.h, 20, 20, 20, 235 );
+	UI_DrawRectangle( m_scPos, m_scSize, uiInputFgColor );
+
 	CMenuBaseWindow::Draw();
 }
 

@@ -26,16 +26,19 @@ CMenuMessageBox::CMenuMessageBox(const char *name) : BaseClass( name )
 
 void CMenuMessageBox::_Init()
 {
-	background.bForceColor = true;
-	background.colorBase = uiPromptBgColor;
-
 	dlgMessage.eTextAlignment = QM_CENTER; // center
 	dlgMessage.iFlags = QMF_INACTIVE|QMF_DROPSHADOW;
 	dlgMessage.SetCoord( 0, 0 );
 	dlgMessage.size = size;
 
-	AddItem( background );
 	AddItem( dlgMessage );
+}
+
+void CMenuMessageBox::Draw()
+{
+	EngFuncs::FillRGBA( m_scPos.x, m_scPos.y, m_scSize.w, m_scSize.h, 20, 20, 20, 235 );
+	UI_DrawRectangle( m_scPos, m_scSize, uiInputFgColor );
+	BaseClass::Draw();
 }
 
 void CMenuMessageBox::SetMessage( const char *sz )
