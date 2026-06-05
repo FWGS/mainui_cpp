@@ -16,6 +16,10 @@
 #define CS_SIZE       64  // size of one config string
 #define CS_TIME	      16  // size of time string
 
+// FIXME: find better place for the shared definition
+#define MAX_CLIENT_BITS 5
+#define MAX_CLIENTS     (1<<MAX_CLIENT_BITS)// 5 bits == 32 clients ( int32 limit )
+
 // platform-specific alignment for types, to not break ABI
 #if XASH_PSP
 	#define MAYBE_ALIGNED( x ) __attribute__(( aligned( 16 )))
@@ -272,5 +276,12 @@ typedef int qboolean;
 	#define BigFloat( x ) SwapFloat( x )
 	#define HostFourCC( a, b, c, d ) LittleFourCC( a, b, c, d )
 #endif
+
+static inline short UnalignedShort( short *x )
+{
+	short y;
+	memcpy( &y, x, sizeof( y ) );
+	return y;
+}
 
 #endif // XASH_TYPES_H
