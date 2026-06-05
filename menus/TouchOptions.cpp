@@ -361,7 +361,7 @@ void CMenuTouchOptions::_Init( void )
 	profilename.iMaxLength = 16;
 
 	reset.szName = L( "Reset" );
-	reset.SetPicture("gfx/shell/btn_touch_reset");
+	reset.SetPicture( PC_TOUCH_RESET );
 	reset.onReleased = VoidCb( &CMenuTouchOptions::ResetMsgBox );
 
 	remove.SetNameAndStatus( L( "Delete" ), L( "Delete saved game" ) );
@@ -373,7 +373,7 @@ void CMenuTouchOptions::_Init( void )
 	apply.onReleased = VoidCb( &CMenuTouchOptions::Apply );
 
 	save.SetNameAndStatus( L( "GameUI_Save" ), L( "Save new profile" ) );
-	save.SetPicture("gfx/shell/btn_touch_save");
+	save.SetPicture( PC_TOUCH_SAVE );
 	save.onReleased = VoidCb( &CMenuTouchOptions::Save );
 
 	msgBox.SetPositiveButton( L( "GameUI_OK" ), PC_OK );

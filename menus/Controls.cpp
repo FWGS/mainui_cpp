@@ -27,63 +27,19 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "MessageBox.h"
 #include "Table.h"
 #include "utlvector.h"
+#include "KbActListModel.h"
 
 #define ART_BANNER		"gfx/shell/head_controls"
 
 class CMenuControls;
 
-struct CMenuKey {
-	char name[64+4]; // token + two colorcodes two characters each
-	char bind[64];
-	char first[20];
-	char second[20];
-};
-
-class CMenuKeysModel : public CMenuBaseModel
+class CMenuKeysModel : public CMenuKbActListModel
 {
 public:
-	CMenuKeysModel( CMenuControls *parent ) : parent( parent ) { }
+	CMenuKeysModel( CMenuControls *parent ) : CMenuKbActListModel( VIEW_BINDINGS ), parent( parent ) { }
 
-	void Update();
-	void OnActivateEntry( int line );
-	void OnDeleteEntry( int line );
-
-	int GetRows() const
-	{
-		return keys.Count();
-	}
-
-	int GetColumns() const
-	{
-		return 3; // cmd, key1, key2
-	}
-
-	const char *GetCellText( int line, int column )
-	{
-		if( keys.IsValidIndex( line ))
-		{
-			switch( column )
-			{
-			case 0: return keys[line].name;
-			case 1: return keys[line].first;
-			case 2: return keys[line].second;
-			}
-		}
-
-		return NULL;
-	}
-
-	bool IsCellTextWrapped( int line, int column )
-	{
-		return IsLineUsable( line );
-	}
-
-	bool IsLineUsable( int line )
-	{
-		return keys.IsValidIndex( line ) && keys[line].bind[0] != 0;
-	}
-
-	CUtlVector<CMenuKey> keys;
+	void OnActivateEntry( int line ) override;
+	void OnDeleteEntry( int line ) override;
 
 private:
 	CMenuControls *parent;
@@ -98,7 +54,6 @@ public:
 	void _VidInit();
 	void EnterGrabMode( void );
 	void UnbindEntry( void );
-	static void GetKeyBindings( const char *command, int *twoKeys );
 
 	// state toggle by
 	CMenuTable keysList;
@@ -124,45 +79,6 @@ private:
 	CMenuYesNoMessageBox msgBox2; // large msgbox
 };
 
-/*
-=================
-UI_Controls_GetKeyBindings
-=================
-*/
-void CMenuControls::GetKeyBindings( const char *command, int *twoKeys )
-{
-	twoKeys[0] = twoKeys[1] = -1;
-
-	for( int i = 0, count = 0; ; i++ )
-	{
-		const char *str = EngFuncs::KeynumToString( i );
-
-		if( !strcmp( str, "<OUT OF RANGE>" ))
-			break;
-
-		const char *b = EngFuncs::KEY_GetBinding( i );
-		if( !b )
-			continue;
-
-		if( !stricmp( command, b ))
-		{
-			twoKeys[count] = i;
-			count++;
-
-			if( count == 2 )
-				break;
-		}
-	}
-
-	// swap keys if needed
-	if( twoKeys[0] != -1 && twoKeys[1] != -1 )
-	{
-		int tempKey = twoKeys[1];
-		twoKeys[1] = twoKeys[0];
-		twoKeys[0] = tempKey;
-	}
-}
-
 void CMenuControls::UnbindCommand( const char *command )
 {
 	const size_t command_len = strlen( command );
@@ -181,89 +97,6 @@ void CMenuControls::UnbindCommand( const char *command )
 		if( !strncmp( b, command, command_len ))
 			EngFuncs::KEY_SetBinding( i, "" );
 	}
-}
-
-void CMenuKeysModel::Update( void )
-{
-	char *afile = (char *)EngFuncs::COM_LoadFile( "gfx/shell/kb_act.lst", NULL );
-	char *pfile = afile;
-	char token[64];
-
-	keys.Purge();
-
-	if( !afile )
-	{
-		UI_ShowMessageBox( "UI_Parse_KeysList: kb_act.lst not found\n" );
-		return;
-	}
-
-	while(( pfile = EngFuncs::COM_ParseFile( pfile, token, sizeof( token ))) != NULL )
-	{
-		if( !stricmp( token, "blank" ))
-		{
-			// separator
-			pfile = EngFuncs::COM_ParseFile( pfile, token, sizeof( token ));
-			if( !pfile )
-				break;	// technically an error
-
-			CMenuKey key = { 0 };
-
-			if( token[0] == '#' )
-				snprintf( key.name, sizeof( key.name ), "^6%s^7", L( token ));
-			else
-				snprintf( key.name, sizeof( key.name ), "^6%s^7", token );
-
-			keys.AddToTail( key );
-		}
-		else
-		{
-			// key definition
-			int	keys[2];
-			CMenuKey key = { 0 };
-
-			CMenuControls::GetKeyBindings( token, keys );
-			Q_strncpy( key.bind, token, sizeof( key.bind ));
-
-			pfile = EngFuncs::COM_ParseFile( pfile, token, sizeof( token ));
-			if( !pfile )
-				break; // technically an error
-
-			if( token[0] == '#' )
-				snprintf( key.name, sizeof( key.name ), "^6%s^7", L( token ));
-			else
-				snprintf( key.name, sizeof( key.name ), "^6%s^7", token );
-
-			if( keys[0] != -1 )
-			{
-				const char *str = EngFuncs::KeynumToString( keys[0] );
-
-				if( str )
-				{
-					if( !strnicmp( str, "MOUSE", 5 ))
-						snprintf( key.first, sizeof( key.first ), "^5%s^7", str );
-					else
-						snprintf( key.first, sizeof( key.first ), "^3%s^7", str );
-				}
-			}
-
-			if( keys[1] != -1 )
-			{
-				const char *str = EngFuncs::KeynumToString( keys[1] );
-
-				if( str )
-				{
-					if( !strnicmp( str, "MOUSE", 5 ))
-						snprintf( key.second, sizeof( key.second ), "^5%s^7", str );
-					else
-						snprintf( key.second, sizeof( key.second ), "^3%s^7", str );
-				}
-			}
-
-			this->keys.AddToTail( key );
-		}
-	}
-
-	EngFuncs::COM_FreeFile( afile );
 }
 
 void CMenuKeysModel::OnActivateEntry(int line)
@@ -323,13 +156,13 @@ bool CMenuControls::CGrabKeyMessageBox::KeyUp( int key )
 	// defining a key
 	// escape is special, should allow rebind all keys on gamepad
 	if( UI::Key::IsConsole( key ) || key == K_ESCAPE
-		|| !parent->keysListModel.keys.IsValidIndex( parent->keysList.GetCurrentIndex( )))
+		|| !parent->keysListModel.entries.IsValidIndex( parent->keysList.GetCurrentIndex( )))
 	{
 		sound = SND_BUZZ;
 	}
 	else
 	{
-		const char *bindName = parent->keysListModel.keys[parent->keysList.GetCurrentIndex( )].bind;
+		const char *bindName = parent->keysListModel.entries[parent->keysList.GetCurrentIndex( )].bind;
 
 		EngFuncs::ClientCmdF( true, "bind \"%s\" \"%s\"\n", EngFuncs::KeynumToString( key ), bindName );
 
@@ -356,7 +189,7 @@ void CMenuControls::UnbindEntry()
 		return; // not a key
 	}
 
-	const char *bindName = keysListModel.keys[keysList.GetCurrentIndex( )].bind;
+	const char *bindName = keysListModel.entries[keysList.GetCurrentIndex( )].bind;
 
 	UnbindCommand( bindName );
 	PlayLocalSound( uiStatic.sounds[SND_REMOVEKEY] );
@@ -375,11 +208,11 @@ void CMenuControls::EnterGrabMode()
 	}
 
 	// entering to grab-mode
-	const char *bindName = keysListModel.keys[keysList.GetCurrentIndex( )].bind;
+	const char *bindName = keysListModel.entries[keysList.GetCurrentIndex( )].bind;
 
 	int keys[2];
 
-	GetKeyBindings( bindName, keys );
+	CMenuKbActListModel::LookupBoundKeys( bindName, keys );
 	if( keys[1] != -1 )
 		UnbindCommand( bindName );
 
