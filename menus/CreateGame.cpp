@@ -219,7 +219,7 @@ void CMenuCreateGame::_Init( void )
 	banner.SetPicture( ART_BANNER );
 
 	nat.szName = L( "Use NAT Bypass instead of direct mode" );
-	nat.bChecked = true;
+	nat.bChecked = false;
 	nat.LinkCvar( "sv_nat" );
 
 	// add them here, so "done" button can be used by mapsListModel::Update
@@ -299,9 +299,10 @@ void CMenuCreateGame::_Init( void )
 void CMenuCreateGame::_VidInit()
 {
 	nat.SetCoord( 72, 685 );
-	if( !EngFuncs::GetCvarFloat("public") )
-		nat.Hide();
-	else nat.Show();
+	nat.Hide();
+	// if( !EngFuncs::GetCvarFloat("public") )
+	// 	nat.Hide();
+	// else nat.Show();
 
 	mapsList.SetRect( 590, 230, -20, 465 );
 
@@ -333,7 +334,8 @@ void CMenuCreateGame::SaveCvars()
 	UI_SetScriptCvar( "maxplayers", maxClients.GetBuffer() );
 	UI_SetScriptCvar( "sv_password", password.GetBuffer() );
 
-	EngFuncs::CvarSetValue( "sv_nat", EngFuncs::GetCvarFloat( "public" ) ? nat.bChecked : 0 );
+	EngFuncs::CvarSetValue( "sv_nat", 0 );
+	// EngFuncs::CvarSetValue( "sv_nat", EngFuncs::GetCvarFloat( "public" ) ? nat.bChecked : 0 );
 }
 
 void CMenuCreateGame::Reload( void )
