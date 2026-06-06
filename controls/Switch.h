@@ -38,7 +38,7 @@ public:
 	{
 		CMenuEditable::LinkCvar( name, CMenuEditable::CVAR_VALUE );
 	}
-	void AddSwitch( const char *text );
+	void AddSwitch( const char *text, bool hidden = false );
 
 	int GetState() { return m_iState; }
 	void SetState( int state );
@@ -63,6 +63,7 @@ private:
 		const char *name;
 		Point pt;
 		Size sz;
+		bool hidden;
 	};
 
 	CUtlVector<switch_t> m_switches;

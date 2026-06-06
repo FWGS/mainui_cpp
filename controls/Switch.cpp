@@ -42,10 +42,11 @@ CMenuSwitch::CMenuSwitch( ) : BaseClass( )
 	bChangeOnPressed = false;
 }
 
-void CMenuSwitch::AddSwitch(const char *text)
+void CMenuSwitch::AddSwitch( const char *text, bool hidden )
 {
 	switch_t sw;
 	sw.name = text;
+	sw.hidden = hidden;
 	m_switches.AddToTail( sw );
 }
 
@@ -99,11 +100,20 @@ void CMenuSwitch::VidInit()
 
 	sizes.EnsureCount( m_switches.Count( ));
 
+	int visible = 0;
 	for( i = 0; i < m_switches.Count( ); i++ )
 	{
-		if( m_switches[i].name != NULL && !bKeepToggleWidth )
+		if( !m_switches[i].hidden )
+			visible++;
+	}
+
+	for( i = 0; i < m_switches.Count( ); i++ )
+	{
+		if( m_switches[i].hidden )
+			sizes[i] = 0;
+		else if( m_switches[i].name != NULL && !bKeepToggleWidth )
 			sizes[i] = g_FontMgr->GetTextWideScaled( font, m_switches[i].name, m_scChSize );
-		else sizes[i] = (float)m_scSize.w / (float)m_switches.Count( );
+		else sizes[i] = (float)m_scSize.w / (float)visible;
 
 		sum += sizes[i];
 	}
@@ -218,6 +228,9 @@ void CMenuSwitch::Draw( void )
 
 	for( int i = 0; i < m_switches.Count(); i++ )
 	{
+		if( m_switches[i].hidden )
+			continue;
+
 		Point pt = m_switches[i].pt;
 		Size sz = m_switches[i].sz;
 
