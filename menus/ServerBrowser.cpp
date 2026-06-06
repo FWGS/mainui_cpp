@@ -69,6 +69,12 @@ struct server_t
 	bool isGoldSrc;
 	bool pending_info;
 
+	float prevPing;
+	float pingChangedTime;
+	int   prevNumcl;
+	float playersChangedTime;
+	float mapChangedTime;
+
 	server_t( netadr_t adr, const char *info, bool is_favorite, bool pending_info = false );
 	void UpdateData();
 	void SetPing( float ping );
@@ -287,7 +293,42 @@ public:
 
 	bool GetCellColors( int line, int column, unsigned int &textColor, bool &force) const override
 	{
-		return false;
+		const server_t &s = servers[line];
+		const float fadeTime = 1.5f;
+		const uint green = PackRGB( 64, 255, 64 );
+		const uint red = PackRGB( 255, 64, 64 );
+
+		float changedTime = 0.0f;
+		uint flashColor = green;
+
+		switch( column )
+		{
+		case COLUMN_PING:
+			changedTime = s.pingChangedTime;
+			flashColor = s.ping < s.prevPing ? green : red;
+			break;
+		case COLUMN_PLAYERS:
+			changedTime = s.playersChangedTime;
+			flashColor = s.numcl > s.prevNumcl ? green : red;
+			break;
+		case COLUMN_MAP:
+			changedTime = s.mapChangedTime;
+			flashColor = green;
+			break;
+		default:
+			return false;
+		}
+
+		if( changedTime <= 0.0f )
+			return false;
+
+		float age = EngFuncs::DoubleTime() - changedTime;
+		if( age >= fadeTime )
+			return false;
+
+		textColor = InterpColor( flashColor, uiPromptTextColor, age / fadeTime );
+		force = true;
+		return true;
 	}
 
 	void OnActivateEntry( int line ) override;
@@ -447,7 +488,9 @@ void UI_LanGame_Menu( void )
 }
 
 server_t::server_t( netadr_t adr, const char *info, bool is_favorite, bool pending_info ) :
-	adr( adr ), favorite( is_favorite ), pending_info( pending_info )
+	adr( adr ), favorite( is_favorite ), pending_info( pending_info ),
+	prevPing( 0.0f ), pingChangedTime( 0.0f ),
+	prevNumcl( 0 ), playersChangedTime( 0.0f ), mapChangedTime( 0.0f )
 {
 	Q_strncpy( this->info, info, sizeof( this->info ));
 }
@@ -541,21 +584,50 @@ void CMenuGameListModel::AddServerToList( netadr_t adr, const char *info, bool i
 	int i;
 	int pos = -1;
 
-	// ignore if duplicated
 	for( i = 0; i < servers.Count(); i++ )
 	{
 		if( !EngFuncs::NET_CompareAdr( &servers[i].adr, &adr ))
 		{
-			if( servers[i].pending_info )
+			pos = i;
+			break;
+		}
+	}
+
+	// update existing entry's ping/info in place; skip filter re-check
+	if( pos >= 0 )
+	{
+		float oldPing = servers[pos].ping;
+		int oldNumcl = servers[pos].numcl;
+		char oldMap[sizeof( servers[pos].mapname )];
+		Q_strncpy( oldMap, servers[pos].mapname, sizeof( oldMap ));
+		bool wasPending = servers[pos].pending_info;
+
+		Q_strncpy( servers[pos].info, info, sizeof( servers[pos].info ));
+		servers[pos].UpdateData();
+		servers[pos].SetPing( EngFuncs::DoubleTime() - serversRefreshTime );
+		servers[pos].pending_info = false;
+
+		if( !wasPending )
+		{
+			float now = EngFuncs::DoubleTime();
+
+			if( fabsf( servers[pos].ping - oldPing ) > 0.005f )
 			{
-				pos = i;
-				break;
+				servers[pos].prevPing = oldPing;
+				servers[pos].pingChangedTime = now;
 			}
-			return;
+			if( servers[pos].numcl != oldNumcl )
+			{
+				servers[pos].prevNumcl = oldNumcl;
+				servers[pos].playersChangedTime = now;
+			}
+			if( oldMap[0] && stricmp( servers[pos].mapname, oldMap ) != 0 )
+				servers[pos].mapChangedTime = now;
 		}
 
-		if( !stricmp( servers[i].info, info ))
-			return;
+		if( m_iSortingColumn != -1 )
+			Sort( m_iSortingColumn, m_bAscend );
+		return;
 	}
 
 	server_t server( adr, info, is_favorite );
@@ -611,10 +683,7 @@ void CMenuGameListModel::AddServerToList( netadr_t adr, const char *info, bool i
 		}
 	}
 
-	if( pos >= 0 )
-		servers[pos] = server;
-	else
-		servers.AddToTail( server );
+	servers.AddToTail( server );
 
 	if( m_iSortingColumn != -1 )
 		Sort( m_iSortingColumn, m_bAscend );
@@ -845,7 +914,7 @@ void CMenuServerBrowser::QueryServerList( const CUtlVector<favlist_entry_t> &lis
 
 void CMenuServerBrowser::RefreshList()
 {
-	ClearList();
+	gameListModel.serversRefreshTime = EngFuncs::DoubleTime();
 
 	if( m_bLanOnly )
 	{
@@ -1172,6 +1241,7 @@ void CMenuServerBrowser::_Init( void )
 		CMenuServerBrowser *parent = (CMenuServerBrowser*)self->Parent();
 
 		parent->gameListModel.filterPing = self->GetItem( ) / 1000.0f;
+		parent->ClearList();
 		parent->RefreshList();
 	});
 
@@ -1190,6 +1260,7 @@ void CMenuServerBrowser::_Init( void )
 		CMenuServerBrowser *parent = (CMenuServerBrowser*)self->Parent();
 
 		parent->gameListModel.filterEmpty = self->GetItem( );
+		parent->ClearList();
 		parent->RefreshList();
 	});
 
@@ -1208,6 +1279,7 @@ void CMenuServerBrowser::_Init( void )
 		CMenuServerBrowser *parent = (CMenuServerBrowser*)self->Parent();
 
 		parent->gameListModel.filterFull = self->GetItem( );
+		parent->ClearList();
 		parent->RefreshList();
 	});
 
@@ -1223,6 +1295,7 @@ void CMenuServerBrowser::_Init( void )
 		CMenuServerBrowser *parent = (CMenuServerBrowser*)self->Parent();
 
 		parent->gameListModel.SetFilterMap( self->GetItem( ) );
+		parent->ClearList();
 		parent->RefreshList();
 	});
 
