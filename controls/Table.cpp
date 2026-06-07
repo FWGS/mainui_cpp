@@ -106,7 +106,7 @@ void CMenuTable::VidInit()
 	}
 
 	// calculate header size(position is table position)
-	headerSize.w = m_scSize.w - arrow.w + iStrokeWidth * 2;
+	headerSize.w = m_scSize.w - arrow.w + iStrokeWidth;
 
 	// box is lower than header
 	boxPos.x = m_scPos.x;
