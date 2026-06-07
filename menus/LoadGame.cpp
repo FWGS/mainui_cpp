@@ -276,7 +276,15 @@ void CMenuSavesListModel::Update( void )
 			Q_strncpy( s, title, sizeof( s ));
 
 			if( type )
-				snprintf( save.comment, sizeof( save.comment ), "[%.16s]%s", type, L( s ));
+			{
+				// Localize known save-type identifiers (quick/autosave). Otherwise, fall back to original behavior.
+				if( !stricmp( type, "quick" ))
+					snprintf( save.comment, sizeof( save.comment ), "%s%s", L( "GameUI_QuickSave" ), L( s ));
+				else if( !stricmp( type, "autosave" ))
+					snprintf( save.comment, sizeof( save.comment ), "%s%s", L( "GameUI_AutoSave" ), L( s ));
+				else
+					snprintf( save.comment, sizeof( save.comment ), "[%.16s]%s", type, L( s ));
+			}
 			else Q_strncpy( save.comment, L( s ), sizeof( save.comment ));
 		}
 		else
