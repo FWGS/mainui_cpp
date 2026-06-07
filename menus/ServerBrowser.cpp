@@ -887,7 +887,7 @@ void CMenuServerBrowser::QueryServerList( const CUtlVector<favlist_entry_t> &lis
 
 		FOR_EACH_VEC( gameListModel.servers, j )
 		{
-			if( !EngFuncs::NET_CompareAdr( &gameListModel.servers, &adr ))
+			if( !EngFuncs::NET_CompareAdr( &gameListModel.servers[j].adr, &adr ))
 			{
 				found = true;
 				break;
