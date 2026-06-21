@@ -80,7 +80,7 @@ def build(bld):
 		source   = source,
 		target   = 'menu',
 		includes = includes,
-		use      = 'werror FT2 GDI32 USER32',
+		use      = 'werror FT2 GDI32 USER32 yy_thunks',
 		install_path = bld.env.LIBDIR,
 		cmake_skip = True
 	)
