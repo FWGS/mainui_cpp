@@ -89,8 +89,8 @@ bool CWinAPIFont::Create( const char *name, int tall, int weight, int blur, floa
 	::SelectObject( m_hDC, m_hFont );
 	::SetTextAlign( m_hDC, TA_LEFT | TA_TOP | TA_UPDATECP );
 
-	::TEXTMETRIC tm = { 0 };
-	if( !GetTextMetrics( m_hDC, &tm ) )
+	::TEXTMETRICW tm = { 0 };
+	if( !GetTextMetricsW( m_hDC, &tm ) )
 	{
 		Con_Printf( "Couldn't create windows font %s: GetTextMetrics failed\n", name );
 		return false;
@@ -139,13 +139,13 @@ void CWinAPIFont::GetCharRGBA( int ch, Point pt, Size sz, unsigned char *rgba, S
 	// try and get the glyph directly
 
 	::SelectObject( m_hDC, m_hFont );
-	bytesNeeded = ::GetGlyphOutline( m_hDC, ch, GGO_GRAY8_BITMAP, &glyphMetrics, 0, NULL, &mat2 );
+	bytesNeeded = ::GetGlyphOutlineW( m_hDC, ch, GGO_GRAY8_BITMAP, &glyphMetrics, 0, NULL, &mat2 );
 	
 	if( bytesNeeded > 0 )
 	{
 		// take it
 		unsigned char *lpbuf = ( unsigned char * )_alloca( bytesNeeded );
-		::GetGlyphOutline( m_hDC, ch, GGO_GRAY8_BITMAP, &glyphMetrics, bytesNeeded, lpbuf, &mat2 );
+		::GetGlyphOutlineW( m_hDC, ch, GGO_GRAY8_BITMAP, &glyphMetrics, bytesNeeded, lpbuf, &mat2 );
 		
 		// rows are on DWORD boundaries
 		wide = glyphMetrics.gmBlackBoxX;

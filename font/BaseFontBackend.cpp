@@ -555,8 +555,8 @@ int CBaseFont::DrawCharacter(int ch, Point pt, int charH, const unsigned int col
 #define CACHED_FONT_IDENT \
 	(('T'<<24)+('F'<<16)+('I'<<8)+'U') // little-endian "UIFT"
 
-// Version 2. Font blur has been changed, force font regeneration
-#define CACHED_FONT_VERSION 2
+// Version 3. WinAPI font rendering behavior changed, force font regeneration
+#define CACHED_FONT_VERSION 3
 
 struct char_data_t
 {
