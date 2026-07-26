@@ -40,7 +40,7 @@ struct charRange_t
 	{
 		if( sequence )
 			return size;
-		return chMax - chMin;
+		return chMax - chMin + 1;
 	}
 
 	int Character( size_t pos )
