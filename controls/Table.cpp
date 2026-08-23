@@ -127,15 +127,14 @@ bool CMenuTable::MouseMove( int x, int y )
 
 			ac_y += cursorDY;
 			cursorDY = 0;
-			if( ac_y > m_scChSize / 2.0f )
+
+			// keep the remainder, so slow dragging still scrolls the list
+			int rows = ac_y / m_scChSize;
+
+			if( rows )
 			{
-				iTopItem -= ac_y / m_scChSize - 0.5f;
-				ac_y = 0;
-			}
-			if( ac_y < -m_scChSize / 2.0f )
-			{
-				iTopItem -= ac_y / m_scChSize - 0.5f;
-				ac_y = 0;
+				iTopItem -= rows;
+				ac_y -= rows * m_scChSize;
 			}
 		}
 		else if( UI_CursorInRect( sbarPos, sbarSize ))
@@ -144,15 +143,13 @@ bool CMenuTable::MouseMove( int x, int y )
 
 			ac_y += cursorDY;
 			cursorDY = 0;
-			if( ac_y < -step )
+
+			int rows = ac_y / step;
+
+			if( rows )
 			{
-				iTopItem += ac_y / step + 0.5f;
-				ac_y = 0;
-			}
-			if( ac_y > step )
-			{
-				iTopItem += ac_y / step + 0.5f;
-				ac_y = 0;
+				iTopItem += rows;
+				ac_y -= rows * step;
 			}
 		}
 	}
