@@ -74,6 +74,7 @@ Then you can use another oneliner to query all variables:
 #undef XASH_NETBSD
 #undef XASH_NSWITCH
 #undef XASH_OPENBSD
+#undef XASH_OSX
 #undef XASH_POSIX
 #undef XASH_PPC
 #undef XASH_PSP
@@ -129,6 +130,8 @@ Then you can use another oneliner to query all variables:
 		#define XASH_APPLE 1
 		#if TARGET_OS_IOS
 			#define XASH_IOS 1
+		#elif !defined( TARGET_OS_OSX ) || TARGET_OS_OSX // TARGET_OS_OSX is only defined in 10.12+
+			#define XASH_OSX 1
 		#endif // TARGET_OS_IOS
 	#elif defined __SWITCH__
 		#define XASH_NSWITCH 1
