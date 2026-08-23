@@ -76,6 +76,7 @@ void CMenuField::_Event( int ev )
 		VidInit();
 		break;
 	case QM_GOTFOCUS:
+		EngFuncs::SetTextInputRect( m_scPos.x, m_scPos.y, m_scSize.w, m_scSize.h );
 		UI_EnableTextInput( true );
 		break;
 	case QM_IMRESIZED:
