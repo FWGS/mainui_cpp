@@ -162,7 +162,7 @@ bool CMenuTable::MouseMove( int x, int y )
 		{
 			//_Event( QM_CHANGED );
 
-			if((dist / 2) > ( m_scChSize / 2 ) && iTopItem < ( m_pModel->GetRows() - iNumRows - 1 ))
+			if((dist / 2) > ( m_scChSize / 2 ) && iTopItem < ( m_pModel->GetRows() - iNumRows ))
 			{
 				iTopItem++;
 			}
