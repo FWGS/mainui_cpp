@@ -278,6 +278,7 @@ void CMenuVidModes::SetConfig( )
 	}
 
 	vsync.WriteCvar();
+	renderers.WriteCvar();
 
 	if( isWindowedModeChanged )
 		EngFuncs::CvarSetValue( "fullscreen", currentWindowModeIndex );
@@ -289,10 +290,10 @@ void CMenuVidModes::SetConfig( )
 		vidList.SetCurrentIndex( currentModeIndex );
 	}
 
+	// let the test mode dialog have the screen to itself, it's on a timer
 	if( testMode )
 		return;
 
-	// let the test mode dialog have the screen to itself, it's on a timer
 	if( IsRendererChanged( ))
 		restartMsgBox.Show();
 	else
@@ -392,7 +393,6 @@ void CMenuVidModes::_Init( void )
 	renderers.SetCharSize( QM_SMALLFONT );
 	renderers.onCvarGet = VoidCb( &CMenuVidModes::GetRendererConfig );
 	renderers.onCvarWrite = VoidCb( &CMenuVidModes::WriteRendererConfig );
-	renderers.bUpdateImmediately = true;
 
 	windowMode.szName = L( "Window mode" );
 	windowMode.Setup( &windowModeModel );
