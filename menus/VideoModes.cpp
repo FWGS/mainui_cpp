@@ -99,7 +99,7 @@ private:
 	void Draw() override; // put test mode timer here
 
 public:
-	CMenuVidModes() : CMenuFramework( "CMenuVidModes" ) { testModeTimer = 0; }
+	CMenuVidModes() : CMenuFramework( "CMenuVidModes" ), restartMsgBox( true ), testModeTimer( 0 ) { }
 
 	void SetMode( int mode );
 	void SetMode( int w, int h );
@@ -112,6 +112,7 @@ public:
 
 	void GetRendererConfig();
 	void WriteRendererConfig();
+	bool IsRendererChanged();
 
 	CMenuCheckBox	vsync;
 
@@ -119,6 +120,7 @@ public:
 	CMenuVidModesModel vidListModel;
 
 	CMenuYesNoMessageBox testModeMsgBox;
+	CMenuYesNoMessageBox restartMsgBox;
 
 	CMenuRenderersModel renderersModel;
 	CMenuSpinControl renderers;
@@ -201,6 +203,17 @@ void CMenuVidModes::WriteRendererConfig()
 	EngFuncs::CvarSetString( "r_refdll", renderersModel.GetShortName( i ));
 }
 
+// the renderer library is only loaded on startup
+bool CMenuVidModes::IsRendererChanged()
+{
+	int i = renderers.GetCurrentValue();
+
+	if( i < 0 || i >= renderersModel.GetRows( ))
+		return false;
+
+	return stricmp( renderersModel.GetShortName( i ), EngFuncs::GetCvarString( "r_refdll_loaded" )) != 0;
+}
+
 void CMenuVidModes::GetConfig()
 {
 	float fullscreen = EngFuncs::GetCvarFloat( "fullscreen" );
@@ -276,7 +289,13 @@ void CMenuVidModes::SetConfig( )
 		vidList.SetCurrentIndex( currentModeIndex );
 	}
 
-	if( !testMode )
+	if( testMode )
+		return;
+
+	// let the test mode dialog have the screen to itself, it's on a timer
+	if( IsRendererChanged( ))
+		restartMsgBox.Show();
+	else
 		Hide();
 }
 
@@ -361,6 +380,10 @@ void CMenuVidModes::_Init( void )
 	testModeMsgBox.onPositive = VoidCb( &CMenuVidModes::FinalizeChanges );
 	testModeMsgBox.onNegative = VoidCb( &CMenuVidModes::RevertChanges );
 	testModeMsgBox.Link( this );
+
+	restartMsgBox.SetMessage( L( "Restart the game to apply changes" ) );
+	restartMsgBox.onPositive = VoidCb( &CMenuVidModes::Hide );
+	restartMsgBox.Link( this );
 
 	renderersModel.Update();
 	renderers.szName = L( "GameUI_Renderer" );
