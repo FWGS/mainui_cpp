@@ -601,13 +601,34 @@ void UI_CloseMenu( void )
 // =====================================================================
 
 
+static bool UI_UpdateWindowInsets( void )
+{
+	const float *insets = NULL;
+	int left = 0, top = 0, right = 0, bottom = 0;
+
+	if( EngFuncs::textfuncs.pfnGetNativeObject )
+		insets = (const float *)EngFuncs::textfuncs.pfnGetNativeObject( "WindowInsets" );
+	if( insets )
+	{
+		left = ceilf( ScreenWidth * insets[0] );
+		top = ceilf( ScreenHeight * insets[1] );
+		right = ceilf( ScreenWidth * insets[2] );
+		bottom = ceilf( ScreenHeight * insets[3] );
+	}
+	bool changed = left != uiStatic.safeLeft || top != uiStatic.safeTop ||
+		right != uiStatic.safeRight || bottom != uiStatic.safeBottom;
+	uiStatic.safeLeft = left;
+	uiStatic.safeTop = top;
+	uiStatic.safeRight = right;
+	uiStatic.safeBottom = bottom;
+	return changed;
+}
+
 /*
 =================
 UI_UpdateMenu
 =================
 */
-static bool UI_UpdateWindowInsets( void );
-
 void UI_UpdateMenu( float flTime )
 {
 	if( !uiStatic.initialized )
@@ -1028,28 +1049,6 @@ UI_VidInit
 =================
 */
 
-static bool UI_UpdateWindowInsets( void )
-{
-	const float *insets = NULL;
-	int left = 0, top = 0, right = 0, bottom = 0;
-
-	if( EngFuncs::textfuncs.pfnGetNativeObject )
-		insets = (const float *)EngFuncs::textfuncs.pfnGetNativeObject( "WindowInsets" );
-	if( insets )
-	{
-		left = ceilf( ScreenWidth * insets[0] );
-		top = ceilf( ScreenHeight * insets[1] );
-		right = ceilf( ScreenWidth * insets[2] );
-		bottom = ceilf( ScreenHeight * insets[3] );
-	}
-	bool changed = left != uiStatic.safeLeft || top != uiStatic.safeTop ||
-		right != uiStatic.safeRight || bottom != uiStatic.safeBottom;
-	uiStatic.safeLeft = left;
-	uiStatic.safeTop = top;
-	uiStatic.safeRight = right;
-	uiStatic.safeBottom = bottom;
-	return changed;
-}
 
 int UI_VidInit( void )
 {
