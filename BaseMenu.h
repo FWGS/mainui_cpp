@@ -101,6 +101,7 @@ typedef struct
 	bool	m_fNoOldBackground;
 	int 	m_iOldMenuDepth;
 
+	int safeLeft, safeTop, safeRight, safeBottom;
 	float	scaleX;
 	float	scaleY;
 	int		outlineWidth;
