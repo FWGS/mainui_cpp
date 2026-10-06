@@ -533,6 +533,10 @@ void CMenuField::UpdateEditable()
 	if( szValue )
 	{
 		Q_strncpy( szBuffer, szValue, iMaxLength + 1 );
+
+		// the text was replaced, put the cursor at its end like SetBuffer does
+		iCursor = strlen( szBuffer );
+		iScroll = g_FontMgr->CutText( font, szBuffer, m_scChSize, iRealWidth, true );
 	}
 }
 
