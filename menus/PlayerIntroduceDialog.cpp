@@ -34,6 +34,7 @@ public:
 	}
 
 	void WriteOrDiscard();
+	void Show() override;
 	void _Init() override;
 	bool KeyDown( int key ) override;
 
@@ -55,6 +56,14 @@ void CMenuPlayerIntroduceDialog::WriteOrDiscard()
 		name.WriteCvar();
 		SaveAndPopMenu();
 	}
+}
+
+void CMenuPlayerIntroduceDialog::Show()
+{
+	CMenuYesNoMessageBox::Show();
+
+	// the name is the only thing to fill here, so let the player type right away
+	SetCursorToItem( name );
 }
 
 bool CMenuPlayerIntroduceDialog::KeyDown( int key )
