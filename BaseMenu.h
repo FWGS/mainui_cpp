@@ -96,6 +96,7 @@ typedef struct
 	HFont hBoldFont;
 	HFont hLightBlur;
 	HFont hHeavyBlur;
+	HFont hHudFont;
 
 	bool	m_fDemosPlayed;
 	bool	m_fNoOldBackground;
