@@ -70,6 +70,7 @@ public:
 	CMenuCheckBox	enable;
 	CMenuCheckBox	grid;
 	CMenuCheckBox	nomouse;
+	CMenuCheckBox	safearea;
 	CMenuPicButton	reset;
 	CMenuPicButton	save;
 	CMenuPicButton	remove;
@@ -338,6 +339,9 @@ void CMenuTouchOptions::_Init( void )
 	nomouse.SetNameAndStatus( L( "Ignore mouse" ), L( "Ignore mouse input" ) );
 	nomouse.LinkCvar( "m_ignore" );
 
+	safearea.SetNameAndStatus( L( "Avoid screen notch" ), L( "Keep touch controls clear of the screen notch and camera cutout" ) );
+	safearea.LinkCvar( "touch_safearea" );
+
 	acceleration.SetNameAndStatus( L( "Enable acceleration" ), L( "Nonlinear looking (touch_nonlinear_look)" ) );
 	acceleration.LinkCvar( "touch_nonlinear_look" );
 
@@ -395,6 +399,7 @@ void CMenuTouchOptions::_Init( void )
 	AddItem( gridsize );
 	AddItem( enable );
 	AddItem( nomouse );
+	AddItem( safearea );
 	AddItem( acceleration );
 	AddItem( power );
 	AddItem( multiplier );
@@ -428,10 +433,11 @@ void CMenuTouchOptions::_VidInit( void )
 
 	enable.SetCoord( other_x, 255 );
 	nomouse.SetCoord( other_x, 305 );
-	acceleration.SetCoord( other_x, 355 );
-	power.SetCoord( other_x, 455 );
-	multiplier.SetCoord( other_x, 555 );
-	exponent.SetCoord( other_x, 655 );
+	safearea.SetCoord( other_x, 355 );
+	acceleration.SetCoord( other_x, 405 );
+	power.SetCoord( other_x, 485 );
+	multiplier.SetCoord( other_x, 565 );
+	exponent.SetCoord( other_x, 645 );
 
 }
 

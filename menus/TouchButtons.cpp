@@ -93,6 +93,7 @@ public:
 	void RemoveMsgBox();
 	void ResetMsgBox();
 	void UpdateFields();
+	void UpdateCommandFlags();
 
 	static void ExitMenuCb(CMenuBaseItem *pSelf, void *pExtra);
 	// Use an event system here!
@@ -117,6 +118,8 @@ public:
 	CMenuCheckBox	lock;
 	CMenuCheckBox	additive;
 	CMenuCheckBox	precision;
+	CMenuCheckBox	stick;
+	CMenuCheckBox	latch;
 	CMenuPicButton	reset;
 	CMenuPicButton	remove;
 	CMenuPicButton	save;
@@ -287,12 +290,24 @@ void CMenuTouchButtons::UpdateFields( )
 	hide.bChecked = !!( curflags & TOUCH_FL_HIDE );
 	additive.bChecked = !!( curflags & TOUCH_FL_DRAW_ADDITIVE );
 	precision.bChecked = !!( curflags & TOUCH_FL_PRECISION );
+	stick.bChecked = !!( curflags & TOUCH_FL_STICK );
+	latch.bChecked = !!( curflags & TOUCH_FL_COMMAND_LATCH );
 
 	name.Clear();
 	texture.SetBuffer( model.buttons[i].szTexture );
 	UpdateTexture();
 
 	command.SetBuffer( model.buttons[i].szCommand );
+	UpdateCommandFlags();
+}
+
+void CMenuTouchButtons::UpdateCommandFlags()
+{
+	const char *cmd = command.GetBuffer();
+
+	// these flags only affect specific commands
+	stick.SetGrayed( strcmp( cmd, "_joy" ) != 0 );
+	latch.SetGrayed( cmd[0] != '+' );
 }
 
 void CMenuTouchButtons::OpenFileDialog()
@@ -479,6 +494,16 @@ void CMenuTouchButtons::_Init( void )
 	precision.onChanged.pExtra = &curflags;
 	precision.onChanged = CMenuCheckBox::BitMaskCb;
 
+	stick.SetNameAndStatus( L( "Analog stick" ), L( "Move with an analog stick, for _joy buttons" ) );
+	stick.iMask = TOUCH_FL_STICK;
+	stick.onChanged.pExtra = &curflags;
+	stick.onChanged = CMenuCheckBox::BitMaskCb;
+
+	latch.SetNameAndStatus( L( "Toggle" ), L( "Press once to hold, press again to release, for + commands" ) );
+	latch.iMask = TOUCH_FL_COMMAND_LATCH;
+	latch.onChanged.pExtra = &curflags;
+	latch.onChanged = CMenuCheckBox::BitMaskCb;
+
 	save.SetNameAndStatus( L( "GameUI_Save" ), L( "Save as new button" ) );
 	save.SetPicture( PC_TOUCH_SAVE );
 	save.onReleased = VoidCb( &CMenuTouchButtons::SaveButton );
@@ -502,6 +527,7 @@ void CMenuTouchButtons::_Init( void )
 
 	command.szName = L( "Command:" );
 	command.iMaxLength = 255;
+	command.onChanged = VoidCb( &CMenuTouchButtons::UpdateCommandFlags );
 
 	texture.szName = L( "Texture:" );
 	texture.iMaxLength = 255;
@@ -532,6 +558,8 @@ void CMenuTouchButtons::_Init( void )
 	AddItem( hide );
 	AddItem( additive );
 	AddItem( precision );
+	AddItem( stick );
+	AddItem( latch );
 	AddItem( sp );
 	AddItem( mp );
 	AddItem( lock );
@@ -566,14 +594,16 @@ void CMenuTouchButtons::_VidInit()
 	blue.SetCoord( sliders_x, 270 );
 	alpha.SetCoord( sliders_x, 330 );
 
-	additive.SetCoord( 650, 470 );
+	additive.SetCoord( 650, 465 );
 
 	mp.SetCoord( 400, 420 );
 	sp.SetCoord( 160 - 72 + 400, 420 );
 	lock.SetCoord( 256 - 72 + 400, 420 );
 	hide.SetCoord( 384 - 72 + 400, 420 );
 
-	precision.SetCoord( 400, 470 );
+	precision.SetCoord( 400, 465 );
+	stick.SetCoord( 400, 510 );
+	latch.SetCoord( 650, 510 );
 	buttonList.SetRect( 72, 135, 300, 395 );
 
 	save.SetRect( 384 - 42 + 320, 550, 170, 50 );
@@ -610,6 +640,7 @@ void CMenuTouchButtons::OpenCommandPicker()
 void CMenuTouchButtons::OnCommandPicked( const char *cmd )
 {
 	command.SetBuffer( cmd );
+	UpdateCommandFlags();
 }
 
 void CMenuCommandPickerDialog::Confirm()
