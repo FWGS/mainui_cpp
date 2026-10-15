@@ -142,6 +142,14 @@ bool CMenuField::KeyDown( int key )
 {
 	bool handled = false;
 
+	// gamepad has no keys to type, ask the engine for the system keyboard with the text of this field
+	if( key == K_A_BUTTON )
+	{
+		EngFuncs::SetTextInputBuffer( szBuffer );
+		UI_EnableTextInput( true );
+		return true;
+	}
+
 	// clipboard paste
 	if( UI::Key::IsInsert( key ) && EngFuncs::KEY_IsDown( K_SHIFT ))
 	{
