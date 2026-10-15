@@ -81,6 +81,10 @@ int CMenuDropDown::IsNewStateByMouseClick()
 
 bool CMenuDropDown::KeyDown( int key )
 {
+	// open list takes arrows for itself, they change the value on key up
+	if( m_isOpen && !FBitSet( iFlags, QMF_MOUSEONLY ) && ( UI::Key::IsDownArrow( key ) || UI::Key::IsUpArrow( key )))
+		return true;
+
 	return false;
 }
 
@@ -103,9 +107,11 @@ bool CMenuDropDown::KeyUp( int key )
 
 	if( !FBitSet( iFlags, QMF_MOUSEONLY ) )
 	{
-		if( UI::Key::IsDownArrow( key ) )
+		// arrows move focus between items, so closed list keeps its value,
+		// otherwise just passing through it with keyboard or gamepad changes it
+		if( m_isOpen && UI::Key::IsDownArrow( key ))
 			state += 1;
-		else if( UI::Key::IsUpArrow( key ) )
+		else if( m_isOpen && UI::Key::IsUpArrow( key ))
 			state -= 1;
 		else if( UI::Key::IsEnter( key ) )
 		{
@@ -160,12 +166,19 @@ void CMenuDropDown::Draw()
 	if( iFlags & QMF_DROPSHADOW )
 		textflags |= ETF_SHADOW;
 
+	// show which item has focus, same color as focused table stroke
+	if( IsCurrentSelected( ))
+		borderColor = uiInputTextColor;
+
 	if( m_isOpen )
 	{
 		Point pt( m_scPos.x, m_scPos.y );
 
 		if( !bDropUp )
 			pt.y += m_scItemSize.h;
+
+		// without mouse over the list, highlight the item chosen with arrows
+		bool mouseOver = UI_CursorInRect( pt.x, pt.y, m_scItemSize.w, m_scSize.h - m_scItemSize.h );
 
 		// all other items
 		UI_FillRect( pt.x, pt.y, m_scItemSize.w, m_scSize.h - m_scItemSize.h, 0xff000000 );
@@ -174,7 +187,9 @@ void CMenuDropDown::Draw()
 			uint textColor = iBgTextColor;
 			uint tempflags = textflags;
 
-			if( UI_CursorInRect( pt, m_scItemSize ) && !(iFlags & (QMF_GRAYED|QMF_INACTIVE)))
+			bool highlight = mouseOver ? UI_CursorInRect( pt, m_scItemSize ) : i == m_iState;
+
+			if( highlight && !(iFlags & (QMF_GRAYED|QMF_INACTIVE)))
 			{
 				UI_FillRect( pt, m_scItemSize, colorFocus );
 				tempflags |= ETF_FORCECOL;
