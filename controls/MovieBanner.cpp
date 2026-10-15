@@ -26,6 +26,9 @@ const float splashHeight = 480.0f;
 
 void CMenuMovieBanner::VidInit()
 {
+	// decoration, must not take keyboard focus
+	SetBits( iFlags, QMF_INACTIVE );
+
 	EngFuncs::PrecacheLogo( "logo.avi" );
 
 	float xScale, yScale;

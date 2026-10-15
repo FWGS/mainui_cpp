@@ -85,6 +85,9 @@ bool CMenuAnimatedBanner::TryLoad()
 
 void CMenuAnimatedBanner::VidInit()
 {
+	// decoration, must not take keyboard focus
+	SetBits( iFlags, QMF_INACTIVE );
+
 	// in hardware mode, it's scaled by screen width
 	// in software mode, scale must be 1.0f
 	scale = ScreenWidth / 1024.0f;
