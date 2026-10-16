@@ -32,6 +32,7 @@ CMenuDropDown::CMenuDropDown() : BaseClass()
 	bDropUp = false;
 
 	m_iState = 0;
+	m_isOpen = false;
 	m_szNames.Purge();
 }
 
