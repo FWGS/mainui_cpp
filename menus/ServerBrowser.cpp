@@ -574,7 +574,6 @@ void CMenuGameListModel::Update( void )
 
 	if( servers.Count() )
 	{
-		parent->MaybeEnableFavoriteButton();
 		parent->OnChangeSelectedServer();
 		if( m_iSortingColumn != -1 )
 			Sort( m_iSortingColumn, m_bAscend );
@@ -932,7 +931,6 @@ void CMenuServerBrowser::QueryServerList( const CUtlVector<favlist_entry_t> &lis
 			if( curTab == tabSwitch.GetState() && gameListModel.GetRows() == 0 )
 			{
 				gameListModel.AddServerToList( adr, fakeInfoString, list[i].favorited );
-				MaybeEnableFavoriteButton();
 				OnChangeSelectedServer();
 			}
 		}
@@ -1047,7 +1045,12 @@ void CMenuServerBrowser::OnChangeSelectedServer( void )
 	viewGameInfo->SetGrayed( !selected );
 
 	if( !selected )
+	{
+		favorite->SetGrayed( true );
 		return;
+	}
+
+	MaybeEnableFavoriteButton();
 
 	bool fav = gameListModel.servers[i].favorite;
 	ToggleFavoriteButton( !fav );
@@ -1572,7 +1575,6 @@ void CMenuServerBrowser::AddServerToList( netadr_t adr, const char *info )
 
 		// Always update visible model for LAN
 		gameListModel.AddServerToList( adr, info, false );
-		MaybeEnableFavoriteButton();
 		OnChangeSelectedServer();
 		return;
 	}
@@ -1665,7 +1667,6 @@ void CMenuServerBrowser::AddServerToList( netadr_t adr, const char *info )
 	if( targetTab == curTabVisible )
 	{
 		gameListModel.AddServerToList( adr, info, is_favorite );
-		MaybeEnableFavoriteButton();
 		OnChangeSelectedServer();
 	}
 }
