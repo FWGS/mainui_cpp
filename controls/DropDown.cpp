@@ -41,6 +41,7 @@ void CMenuDropDown::VidInit()
 	iBackgroundColor.SetDefault( uiColorBlack );
 	iFgTextColor.SetDefault( uiInputFgColor );
 	iBgTextColor.SetDefault( uiPromptTextColor );
+	iBorderFocusedColor.SetDefault( uiInputTextColor );
 
 	BaseClass::VidInit();
 
@@ -169,7 +170,7 @@ void CMenuDropDown::Draw()
 
 	// show which item has focus, same color as focused table stroke
 	if( IsCurrentSelected( ))
-		borderColor = uiInputTextColor;
+		borderColor = iBorderFocusedColor;
 
 	if( m_isOpen )
 	{

@@ -86,6 +86,7 @@ public:
 	CColor iBackgroundColor;
 	CColor iFgTextColor;
 	CColor iBgTextColor;
+	CColor iBorderFocusedColor;
 
 	bool bDropUp;
 
