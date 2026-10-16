@@ -836,6 +836,8 @@ void CMenuServerBrowser::ClearList()
 	filterMap.AddItem( L( "any map" ), "" );
 
 	gameListModel.Flush();
+	// old selection points to a different server or past the end of the new list
+	gameList.SetCurrentIndex( 0 );
 	joinGame->SetGrayed( true );
 	viewGameInfo->SetGrayed( true );
 	favorite->SetGrayed( true );
@@ -1467,6 +1469,7 @@ void CMenuServerBrowser::Show()
 	// clear out server table
 	staticWaitingPassword = false;
 	gameListModel.Flush();
+	gameList.SetCurrentIndex( 0 );
 	gameList.SetSortingColumn( COLUMN_PING );
 	joinGame->SetGrayed( true );
 	viewGameInfo->SetGrayed( true );
