@@ -33,6 +33,7 @@ CMenuDropDown::CMenuDropDown() : BaseClass()
 
 	m_iState = 0;
 	m_isOpen = false;
+	m_bKeyboardHighlight = false;
 	m_szNames.Purge();
 }
 
@@ -100,6 +101,7 @@ bool CMenuDropDown::KeyUp( int key )
 		if( m_isOpen )
 			state = IsNewStateByMouseClick( );
 
+		m_bKeyboardHighlight = false;
 		MenuToggle( );
 		ret = true;
 	}
@@ -111,12 +113,14 @@ bool CMenuDropDown::KeyUp( int key )
 	{
 		// arrows move focus between items, so closed list keeps its value,
 		// otherwise just passing through it with keyboard or gamepad changes it
-		if( m_isOpen && UI::Key::IsDownArrow( key ))
-			state += 1;
-		else if( m_isOpen && UI::Key::IsUpArrow( key ))
-			state -= 1;
+		if( m_isOpen && ( UI::Key::IsDownArrow( key ) || UI::Key::IsUpArrow( key )))
+		{
+			state += UI::Key::IsDownArrow( key ) ? 1 : -1;
+			m_bKeyboardHighlight = true;
+		}
 		else if( UI::Key::IsEnter( key ) )
 		{
+			m_bKeyboardHighlight = true;
 			MenuToggle( );
 			return true;
 		}
@@ -138,6 +142,13 @@ bool CMenuDropDown::KeyUp( int key )
 	}
 
 	return ret;
+}
+
+bool CMenuDropDown::MouseMove( int x, int y )
+{
+	// the mouse is used again, highlight follows it
+	m_bKeyboardHighlight = false;
+	return true;
 }
 
 void CMenuDropDown::SetMenuOpen( bool isOpen )
@@ -179,8 +190,8 @@ void CMenuDropDown::Draw()
 		if( !bDropUp )
 			pt.y += m_scItemSize.h;
 
-		// without mouse over the list, highlight the item chosen with arrows
-		bool mouseOver = UI_CursorInRect( pt.x, pt.y, m_scItemSize.w, m_scSize.h - m_scItemSize.h );
+		// without mouse over the list, or when it's used with keyboard or gamepad, highlight the item chosen with arrows
+		bool mouseOver = !m_bKeyboardHighlight && UI_CursorInRect( pt.x, pt.y, m_scItemSize.w, m_scSize.h - m_scItemSize.h );
 
 		// all other items
 		UI_FillRect( pt.x, pt.y, m_scItemSize.w, m_scSize.h - m_scItemSize.h, 0xff000000 );
