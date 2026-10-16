@@ -145,6 +145,7 @@ bool CMenuField::KeyDown( int key )
 	// gamepad has no keys to type, ask the engine for the system keyboard with the text of this field
 	if( key == K_A_BUTTON )
 	{
+		EngFuncs::SetTextInputRect( m_scPos.x, m_scPos.y, m_scSize.w, m_scSize.h );
 		EngFuncs::SetTextInputBuffer( szBuffer );
 		UI_EnableTextInput( true );
 		return true;
