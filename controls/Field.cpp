@@ -293,6 +293,9 @@ void CMenuField::Char( int key )
 	{
 		// ctrl-c clears the field
 		Clear( );
+		SetCvarString( szBuffer );
+		_Event( QM_CHANGED );
+		return;
 	}
 
 	len = strlen( szBuffer );
