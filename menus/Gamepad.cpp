@@ -26,12 +26,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "CheckBox.h"
 #include "SpinControl.h"
 #include "StringArrayModel.h"
-#include "StringVectorModel.h"
+#include "BaseModel.h"
+#include "utlvector.h"
+#include "utlstring.h"
 #include "Table.h"
 #include "YesNoMessageBox.h"
 #include "Action.h"
 
 #define ART_BANNER			"gfx/shell/head_gamepad"
+#define ART_BANNER_FAVORITE "gfx/shell/favorite"
 
 enum engineAxis_t
 {
@@ -78,9 +81,34 @@ private:
 
 	CMenuCheckBox enableOsk;
 
-	CStringVectorModel presetsModel;
+	class CPresetsListModel : public CMenuBaseModel, public CUtlVector<CUtlString>
+	{
+	public:
+		void Update() override {}
+		int GetColumns() const override { return 2; }
+		int GetRows() const override { return Count(); }
+
+		const char *GetCellText( int line, int column ) override
+		{
+			if( column == 0 )
+				return Element( line ).String();
+
+			return line == iActive ? ART_BANNER_FAVORITE : NULL;
+		}
+
+		ECellType GetCellType( int line, int column ) override
+		{
+			return column == 0 ? CELL_TEXT : CELL_IMAGE_ADDITIVE;
+		}
+
+		unsigned int GetAlignmentForColumn( int column ) const override
+		{
+			return column == 0 ? QM_LEFT : QM_CENTER;
+		}
+
+		int iActive = -1;
+	} presetsModel;
 	CMenuTable presets;
-	CMenuAction presets_label;
 	CMenuPicButton applyPreset;
 	CMenuYesNoMessageBox msgBox;
 };
@@ -226,9 +254,9 @@ void CMenuGamePad::UpdatePresets()
 	const char *preset = EngFuncs::GetCvarString( "joy_preset" );
 	char **filenames;
 	int numFiles;
-	int current = 0;
 
 	presetsModel.RemoveAll();
+	presetsModel.iActive = -1;
 
 	// presets are shipped in engine's extras.pk3, so don't limit search to game directory
 	filenames = EngFuncs::GetFilesList( "gamepad_presets/*.cfg", &numFiles, false );
@@ -241,10 +269,10 @@ void CMenuGamePad::UpdatePresets()
 		presetsModel.AddToTail( name );
 
 		if( !strcmp( name, preset ))
-			current = presetsModel.Count() - 1;
+			presetsModel.iActive = presetsModel.Count() - 1;
 	}
 
-	presets.SetCurrentIndex( current );
+	presets.SetCurrentIndex( presetsModel.iActive >= 0 ? presetsModel.iActive : 0 );
 	applyPreset.SetGrayed( presetsModel.Count() == 0 );
 }
 
@@ -313,12 +341,9 @@ void CMenuGamePad::_Init( void )
 	yaw.SetNameAndStatus( L( "Look Y" ), L( "Vertical look sensitivity" ) );
 	invYaw.SetNameAndStatus( L( "Invert" ), L( "Invert yaw axis" ) );
 
-	presets_label.eTextAlignment = QM_CENTER;
-	presets_label.iFlags = QMF_INACTIVE|QMF_DROPSHADOW;
-	presets_label.colorBase = uiColorHelp;
-	presets_label.szName = L( "Presets" );
-
 	presets.SetModel( &presetsModel );
+	presets.SetupColumn( 0, L( "Presets" ), 1.0f );
+	presets.SetupColumn( 1, NULL, 32.0f, true );
 
 	applyPreset.SetNameAndStatus( L( "Activate" ), L( "Apply selected preset" ) );
 	applyPreset.SetPicture( PC_ACTIVATE );
@@ -344,7 +369,6 @@ void CMenuGamePad::_Init( void )
 	AddItem( yaw );
 	AddItem( invYaw );
 	AddItem( axisBind_label );
-	AddItem( presets_label );
 	AddItem( presets );
 	AddItem( applyPreset );
 }
@@ -360,8 +384,6 @@ void CMenuGamePad::_VidInit()
 		axisBind[i].SetRect( 360, y, 256, invSide.size.h );
 		axisBind[i].SetCharSize( QM_SMALLFONT );
 	}
-
-	enableOsk.SetCoord( 360, y );
 
 	int sliderAlign = invSide.size.h - side.size.h;
 
@@ -381,8 +403,7 @@ void CMenuGamePad::_VidInit()
 	yaw.SetCharSize( QM_SMALLFONT );
 	invYaw.SetCoord( 850, 430 );
 
-	presets_label.SetCoord( 630, 490 );
-	presets_label.SetCharSize( QM_SMALLFONT );
+	enableOsk.SetCoord( 630, 480 );
 
 	presets.SetRect( 630, 530, 330, 140 );
 
