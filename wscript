@@ -45,6 +45,8 @@ def configure(conf):
 
 	if conf.env.DEST_OS == 'android':
 		conf.define('NO_STL', 1)
+
+	if conf.env.DEST_OS in ['android', 'psp']:
 		conf.env.append_unique('CXXFLAGS', '-fno-exceptions')
 
 	if conf.env.DEST_OS != 'win32' and conf.env.DEST_OS != 'dos':
