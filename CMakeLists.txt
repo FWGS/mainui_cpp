@@ -84,6 +84,10 @@ endif()
 if(NOT BUILD_AS_PART_OF_ENGINE)
 	# grab platform library suffix
 	set_target_postfix(menu)
+	if(NOT DEFINED GAMEDIR AND DEFINED GAME_DIR)
+		# parent project provides GAME_DIR, use it as GAMEDIR for compatibility
+		set(GAMEDIR "${GAME_DIR}")
+	endif()
 else()
 	# install to the same directory as engine
         set(GAMEDIR ".")
