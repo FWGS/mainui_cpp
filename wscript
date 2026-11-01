@@ -29,7 +29,7 @@ def configure(conf):
 	if not conf.check_std('cxx11'):
 		conf.define('MY_COMPILER_SUCKS', 1)
 
-	if conf.env.DEST_OS in ['android', 'darwin', 'nswitch', 'psvita', 'emscripten'] or conf.env.MAGX:
+	if conf.env.DEST_OS in ['android', 'darwin', 'nswitch', 'psvita', 'ps4', 'emscripten'] or conf.env.MAGX:
 		conf.options.USE_STBTT = True
 
 	conf.define('MAINUI_USE_CUSTOM_FONT_RENDER', 1)
@@ -43,8 +43,7 @@ def configure(conf):
 
 	conf.define_cond('MAINUI_USE_STB', conf.options.USE_STBTT)
 
-	if conf.env.DEST_OS == 'android':
-		conf.define('NO_STL', 1)
+	if conf.env.DEST_OS in ['android', 'psp']:
 		conf.env.append_unique('CXXFLAGS', '-fno-exceptions')
 
 	if conf.env.DEST_OS != 'win32' and conf.env.DEST_OS != 'dos':

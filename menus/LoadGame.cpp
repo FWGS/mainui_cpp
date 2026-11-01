@@ -465,8 +465,6 @@ UI_LoadGame_Precache
 void UI_LoadSaveGame_Precache( void )
 {
 	menu_loadgame = new CMenuLoadGame();
-	EngFuncs::PIC_Load( ART_BANNER_SAVE );
-	EngFuncs::PIC_Load( ART_BANNER_LOAD );
 }
 
 void UI_LoadSaveGame_Menu( bool saveMode )

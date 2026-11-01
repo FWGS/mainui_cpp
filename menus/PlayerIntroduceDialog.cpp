@@ -34,6 +34,7 @@ public:
 	}
 
 	void WriteOrDiscard();
+	void Show() override;
 	void _Init() override;
 	bool KeyDown( int key ) override;
 
@@ -57,6 +58,14 @@ void CMenuPlayerIntroduceDialog::WriteOrDiscard()
 	}
 }
 
+void CMenuPlayerIntroduceDialog::Show()
+{
+	CMenuYesNoMessageBox::Show();
+
+	// the name is the only thing to fill here, so let the player type right away
+	SetCursorToItem( name );
+}
+
 bool CMenuPlayerIntroduceDialog::KeyDown( int key )
 {
 	if( UI::Key::IsEscape( key ) )
@@ -64,7 +73,8 @@ bool CMenuPlayerIntroduceDialog::KeyDown( int key )
 		return true; // handled
 	}
 
-	if( UI::Key::IsEnter( key ) && ItemAtCursor() == &name )
+	// gamepad A button on the name field opens the system keyboard, see CMenuField::KeyDown
+	if( UI::Key::IsEnter( key ) && key != K_A_BUTTON && ItemAtCursor() == &name )
 	{
 		WriteOrDiscard();
 	}

@@ -36,6 +36,28 @@ bool CMenuItemsHolder::Key( const int key, const bool down )
 	if( !m_pItems.Count() )
 		return false;
 
+	if( UI::Key::IsMouseWheel( key ) )
+	{
+		FOR_EACH_VEC( m_pItems, i )
+		{
+			CMenuBaseItem *item = m_pItems[i];
+
+			if( !item || FBitSet( item->iFlags, QMF_GRAYED | QMF_INACTIVE ) )
+				continue;
+
+			if( !item->IsVisible() )
+				continue;
+
+			if( !UI_CursorInRect( item->m_scPos, item->m_scSize ) )
+				continue;
+
+			if( down ? item->KeyDown( key ) : item->KeyUp( key ) )
+				return true;
+		}
+
+		return false;
+	}
+
 	CMenuBaseItem *item = NULL;
 	int cursorPrev;
 

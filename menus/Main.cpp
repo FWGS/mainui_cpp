@@ -45,6 +45,8 @@ public:
 
 	bool KeyDown( int key ) override;
 
+	void QuitDialogCb();
+
 private:
 	void _Init() override;
 	void _VidInit( ) override;
@@ -52,7 +54,6 @@ private:
 
 	void VidInit(bool connected);
 
-	void QuitDialogCb();
 	void DisconnectCb();
 	void DisconnectDialogCb();
 	void HazardCourseDialogCb();
@@ -91,7 +92,7 @@ void CMenuMain::QuitDialogCb()
 	else
 		dialog.SetMessage( L( "GameUI_QuitConfirmationText" ) );
 
-	dialog.onPositive.SetCommand( false, "quit\n" );
+	dialog.onPositive.SetCommand( false, "quit \"menu dialog\"\n" );
 	dialog.Show();
 }
 
@@ -270,7 +271,7 @@ void CMenuMain::_Init( void )
 
 	if( FBitSet( gMenu.m_gameinfo.flags, GFL_ANIMATED_TITLE ))
 	{
-		if( animatedBanner.TryLoad())
+		if( !uiStatic.lowmemory && animatedBanner.TryLoad())
 			AddItem( animatedBanner );
 	}
 	else
@@ -408,3 +409,26 @@ void CMenuMain::Think()
 }
 
 ADD_MENU( menu_main, CMenuMain, UI_Main_Menu );
+
+/*
+=================
+UI_QuitDialog_f
+
+called by the engine when the OS asks to quit (window close button, Cmd+Q on macOS...)
+=================
+*/
+static void UI_QuitDialog_f( void )
+{
+	// nothing to lose, quit immediately
+	if( !CL_IsActive( ))
+	{
+		EngFuncs::ClientCmd( false, "quit \"menu\"\n" );
+		return;
+	}
+
+	if( !UI_IsVisible( ))
+		UI_Main_Menu();
+
+	menu_main->QuitDialogCb();
+}
+ADD_COMMAND( menu_quit, UI_QuitDialog_f );

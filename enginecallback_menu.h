@@ -496,6 +496,18 @@ public:
 			textfuncs.pfnEnableTextInput( enable );
 	}
 
+	static inline void SetTextInputRect( int x, int y, int w, int h )
+	{
+		if( textfuncs.pfnSetTextInputRect )
+			textfuncs.pfnSetTextInputRect( x, y, w, h );
+	}
+
+	static inline void SetTextInputBuffer( const char *text )
+	{
+		if( textfuncs.pfnSetTextInputBuffer )
+			textfuncs.pfnSetTextInputBuffer( text );
+	}
+
 	static inline bool GetRenderers( int num, char *sz1, size_t s1, char *sz2, size_t s2 )
 	{
 		return textfuncs.pfnGetRenderers( num, sz1, s1, sz2, s2 ) != 0;

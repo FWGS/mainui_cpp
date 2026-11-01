@@ -76,6 +76,7 @@ void CMenuField::_Event( int ev )
 		VidInit();
 		break;
 	case QM_GOTFOCUS:
+		EngFuncs::SetTextInputRect( m_scPos.x, m_scPos.y, m_scSize.w, m_scSize.h );
 		UI_EnableTextInput( true );
 		break;
 	case QM_IMRESIZED:
@@ -140,6 +141,15 @@ CMenuField::Key
 bool CMenuField::KeyDown( int key )
 {
 	bool handled = false;
+
+	// gamepad has no keys to type, ask the engine for the system keyboard with the text of this field
+	if( key == K_A_BUTTON )
+	{
+		EngFuncs::SetTextInputRect( m_scPos.x, m_scPos.y, m_scSize.w, m_scSize.h );
+		EngFuncs::SetTextInputBuffer( szBuffer );
+		UI_EnableTextInput( true );
+		return true;
+	}
 
 	// clipboard paste
 	if( UI::Key::IsInsert( key ) && EngFuncs::KEY_IsDown( K_SHIFT ))
@@ -283,6 +293,9 @@ void CMenuField::Char( int key )
 	{
 		// ctrl-c clears the field
 		Clear( );
+		SetCvarString( szBuffer );
+		_Event( QM_CHANGED );
+		return;
 	}
 
 	len = strlen( szBuffer );
@@ -532,6 +545,10 @@ void CMenuField::UpdateEditable()
 	if( szValue )
 	{
 		Q_strncpy( szBuffer, szValue, iMaxLength + 1 );
+
+		// the text was replaced, put the cursor at its end like SetBuffer does
+		iCursor = strlen( szBuffer );
+		iScroll = g_FontMgr->CutText( font, szBuffer, m_scChSize, iRealWidth, true );
 	}
 }
 

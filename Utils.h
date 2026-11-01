@@ -271,6 +271,17 @@ inline bool IsMouse( int key )
 	return false;
 }
 
+inline bool IsMouseWheel( int key )
+{
+	switch( key )
+	{
+	case K_MWHEELUP:
+	case K_MWHEELDOWN:
+		return true;
+	}
+	return false;
+}
+
 inline bool IsUpArrow( int key )
 {
 	switch( key )

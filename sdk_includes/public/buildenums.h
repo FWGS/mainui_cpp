@@ -59,6 +59,8 @@ For more information, please refer to <http://unlicense.org/>
 #define PLATFORM_SUNOS      16
 #define PLATFORM_HURD       17
 #define PLATFORM_PSP        18
+#define PLATFORM_IOS    	19
+#define PLATFORM_PS4        20
 
 #if XASH_WIN32
 	#define XASH_PLATFORM PLATFORM_WIN32
@@ -66,8 +68,10 @@ For more information, please refer to <http://unlicense.org/>
 	#define XASH_PLATFORM PLATFORM_ANDROID
 #elif XASH_LINUX
 	#define XASH_PLATFORM PLATFORM_LINUX
-#elif XASH_APPLE
+#elif XASH_OSX
 	#define XASH_PLATFORM PLATFORM_APPLE
+#elif XASH_IOS
+	#define XASH_PLATFORM PLATFORM_IOS
 #elif XASH_FREEBSD
 	#define XASH_PLATFORM PLATFORM_FREEBSD
 #elif XASH_NETBSD
@@ -94,6 +98,8 @@ For more information, please refer to <http://unlicense.org/>
 	#define XASH_PLATFORM PLATFORM_HURD
 #elif XASH_PSP
 	#define XASH_PLATFORM PLATFORM_PSP
+#elif XASH_PS4
+	#define XASH_PLATFORM PLATFORM_PS4
 #else
 	#error
 #endif

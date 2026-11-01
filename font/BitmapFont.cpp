@@ -18,8 +18,15 @@ GNU General Public License for more details.
 #include "BitmapFont.h"
 #include "utflib.h"
 
+#if XASH_PSP
+#define MAINUI_FORCE_CONSOLE_BITMAP_FONT 1
+#define MAINUI_CONSOLE_FONT_HEIGHT 19
+#endif // XASH_PSP
+
 CBitmapFont::CBitmapFont() : CBaseFont(), hImage( 0 ) { }
 CBitmapFont::~CBitmapFont() { }
+
+
 #ifndef MAINUI_FORCE_CONSOLE_BITMAP_FONT
 #include "menufont.h"
 #endif
@@ -45,7 +52,7 @@ bool CBitmapFont::Create(const char *name, int tall, int weight, int blur, float
 	m_iAscent = 0;
 	m_iMaxCharWidth = 0;
 #ifndef MAINUI_FORCE_CONSOLE_BITMAP_FONT
-	if( tall > UI_CONSOLE_CHAR_HEIGHT * uiStatic.scaleY )
+	if( !uiStatic.lowmemory && tall > UI_CONSOLE_CHAR_HEIGHT * uiStatic.scaleY )
 	{
 		hImage = EngFuncs::PIC_Load( "#XASH_SYSTEMFONT_001.bmp", menufont_bmp, sizeof( menufont_bmp ), 0 );
 		iImageWidth = EngFuncs::PIC_Width( hImage );

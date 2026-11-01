@@ -393,8 +393,10 @@ void CMenuPicButton::SetPicture( EDefaultBtns ID )
 
 void CMenuPicButton::SetPicture( const char *filename, int hk )
 {
-	hPic = EngFuncs::PIC_Load( filename );
 	hotkey = hk;
+
+	if( !uiStatic.lowmemory )
+		hPic = EngFuncs::PIC_Load( filename );
 }
 
 bool CMenuPicButton::HotKey( int key )

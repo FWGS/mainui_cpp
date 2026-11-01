@@ -256,6 +256,7 @@ public:
 		filterPing = MAX_PING * 1000.0f;
 		filterEmpty = 0;
 		filterFull = 0;
+		filterProtocol = 0;
 	}
 
 	void Update() override;
@@ -359,6 +360,7 @@ public:
 	float filterPing;
 	char filterEmpty;
 	char filterFull;
+	char filterProtocol;
 	CUtlVector<server_t> servers;
 
 	filterMap_t filterMap;
@@ -423,6 +425,7 @@ public:
 	CMenuDropDownInt filterEmpty;
 	CMenuDropDownInt filterFull;
 	CMenuDropDownStr filterMap;
+	CMenuDropDownInt filterProtocol;
 
 	CMenuYesNoMessageBox msgBox;
 	CMenuTable	gameList;
@@ -575,8 +578,6 @@ void CMenuGameListModel::Update( void )
 
 	if( servers.Count() )
 	{
-		parent->joinGame->SetGrayed( false );
-		parent->MaybeEnableFavoriteButton();
 		parent->OnChangeSelectedServer();
 		if( m_iSortingColumn != -1 )
 			Sort( m_iSortingColumn, m_bAscend );
@@ -585,6 +586,9 @@ void CMenuGameListModel::Update( void )
 
 void CMenuGameListModel::OnActivateEntry( int line )
 {
+	if( !servers.IsValidIndex( line ))
+		return;
+
 	CMenuServerBrowser::Connect( servers[line] );
 }
 
@@ -655,6 +659,11 @@ void CMenuGameListModel::AddServerToList( netadr_t adr, const char *info, bool i
 	if( filterFull == '1' && !server.IsFull( ))
 		return;
 	if( filterFull == '0' && server.IsFull( ))
+		return;
+	
+	if( filterProtocol == '1' && server.isGoldSrc )
+		return;
+	if( filterProtocol == '2' && !server.isGoldSrc )
 		return;
 
 	if( filterMap.name[0] && colorstricmp( filterMap.name, server.mapname ) != 0 )
@@ -830,6 +839,8 @@ void CMenuServerBrowser::ClearList()
 	filterMap.AddItem( L( "any map" ), "" );
 
 	gameListModel.Flush();
+	// old selection points to a different server or past the end of the new list
+	gameList.SetCurrentIndex( 0 );
 	joinGame->SetGrayed( true );
 	viewGameInfo->SetGrayed( true );
 	favorite->SetGrayed( true );
@@ -924,9 +935,6 @@ void CMenuServerBrowser::QueryServerList( const CUtlVector<favlist_entry_t> &lis
 			if( curTab == tabSwitch.GetState() && gameListModel.GetRows() == 0 )
 			{
 				gameListModel.AddServerToList( adr, fakeInfoString, list[i].favorited );
-				joinGame->SetGrayed( false );
-				viewGameInfo->SetGrayed( false );
-				MaybeEnableFavoriteButton();
 				OnChangeSelectedServer();
 			}
 		}
@@ -1034,9 +1042,19 @@ void CMenuServerBrowser::OnTabSwitch()
 void CMenuServerBrowser::OnChangeSelectedServer( void )
 {
 	int i = gameList.GetCurrentIndex();
+	bool selected = gameListModel.servers.IsValidIndex( i );
 
-	if( !gameListModel.servers.IsValidIndex( i ))
+	// selection can be lost when the list is refreshed
+	joinGame->SetGrayed( !selected );
+	viewGameInfo->SetGrayed( !selected );
+
+	if( !selected )
+	{
+		favorite->SetGrayed( true );
 		return;
+	}
+
+	MaybeEnableFavoriteButton();
 
 	bool fav = gameListModel.servers[i].favorite;
 	ToggleFavoriteButton( !fav );
@@ -1349,6 +1367,25 @@ void CMenuServerBrowser::_Init( void )
 		parent->RefreshList();
 	});
 
+	filterProtocol.AddItem( "Xash3D 49", '1' );
+	filterProtocol.AddItem( "GoldSrc 48", '2' );
+	filterProtocol.AddItem( L( "All" ), 0 );
+	filterProtocol.SelectLast( false );
+	filterProtocol.bDropUp = true;
+	filterProtocol.eTextAlignment = QM_LEFT;
+	filterProtocol.iFgTextColor = uiInputFgColor - 0x00151515;
+	filterProtocol.SetCharSize( QM_SMALLFONT );
+	filterProtocol.SetSize( 130, 30 );
+	SET_EVENT_MULTI( filterProtocol.onChanged,
+	{
+		CMenuDropDownInt *self = (CMenuDropDownInt*)pSelf;
+		CMenuServerBrowser *parent = (CMenuServerBrowser*)self->Parent();
+
+		parent->gameListModel.filterProtocol = self->GetItem( );
+		parent->ClearList();
+		parent->RefreshList();
+	});
+
 	AddItem( gameList );
 	AddItem( tabSwitch );
 
@@ -1356,6 +1393,7 @@ void CMenuServerBrowser::_Init( void )
 	AddItem( filterEmpty );
 	AddItem( filterFull );
 	AddItem( filterMap );
+	AddItem( filterProtocol );
 }
 
 /*
@@ -1386,12 +1424,15 @@ void CMenuServerBrowser::_VidInit()
 	filterFull.SetCoord( x, y );
 	x += filterFull.size.w + 10;
 	filterMap.SetCoord( x, y );
+	x += filterMap.size.w + 10;
+	filterProtocol.SetCoord( x, y );
 
 	// force close all menus
 	filterPing.MenuClose( );
 	filterEmpty.MenuClose( );
 	filterFull.MenuClose( );
 	filterMap.MenuClose( );
+	filterProtocol.MenuClose( );
 }
 
 bool CMenuServerBrowser::IsAddressInTab( int tab, const netadr_t &adr ) const
@@ -1418,6 +1459,8 @@ void CMenuServerBrowser::Show()
 		favorite->Hide();
 		addServer->Hide();
 		tabSwitch.Hide();
+		filterProtocol.Hide();
+		gameListModel.filterProtocol = 0;
 	}
 	else
 	{
@@ -1425,6 +1468,8 @@ void CMenuServerBrowser::Show()
 		favorite->Show();
 		addServer->Show();
 		tabSwitch.Show();
+		filterProtocol.Show();
+		gameListModel.filterProtocol = filterProtocol.GetItem( );
 
 		favoritesList.RemoveAll();
 		historyList.RemoveAll();
@@ -1439,6 +1484,7 @@ void CMenuServerBrowser::Show()
 	// clear out server table
 	staticWaitingPassword = false;
 	gameListModel.Flush();
+	gameList.SetCurrentIndex( 0 );
 	gameList.SetSortingColumn( COLUMN_PING );
 	joinGame->SetGrayed( true );
 	viewGameInfo->SetGrayed( true );
@@ -1541,9 +1587,6 @@ void CMenuServerBrowser::AddServerToList( netadr_t adr, const char *info )
 
 		// Always update visible model for LAN
 		gameListModel.AddServerToList( adr, info, false );
-		joinGame->SetGrayed( false );
-		viewGameInfo->SetGrayed( false );
-		MaybeEnableFavoriteButton();
 		OnChangeSelectedServer();
 		return;
 	}
@@ -1636,10 +1679,6 @@ void CMenuServerBrowser::AddServerToList( netadr_t adr, const char *info )
 	if( targetTab == curTabVisible )
 	{
 		gameListModel.AddServerToList( adr, info, is_favorite );
-
-		joinGame->SetGrayed( false );
-		viewGameInfo->SetGrayed( false );
-		MaybeEnableFavoriteButton();
 		OnChangeSelectedServer();
 	}
 }

@@ -601,6 +601,29 @@ void UI_CloseMenu( void )
 // =====================================================================
 
 
+static bool UI_UpdateWindowInsets( void )
+{
+	const float *insets = NULL;
+	int left = 0, top = 0, right = 0, bottom = 0;
+
+	if( EngFuncs::textfuncs.pfnGetNativeObject )
+		insets = (const float *)EngFuncs::textfuncs.pfnGetNativeObject( "WindowInsets" );
+	if( insets )
+	{
+		left = ceilf( ScreenWidth * insets[0] );
+		top = ceilf( ScreenHeight * insets[1] );
+		right = ceilf( ScreenWidth * insets[2] );
+		bottom = ceilf( ScreenHeight * insets[3] );
+	}
+	bool changed = left != uiStatic.safeLeft || top != uiStatic.safeTop ||
+		right != uiStatic.safeRight || bottom != uiStatic.safeBottom;
+	uiStatic.safeLeft = left;
+	uiStatic.safeTop = top;
+	uiStatic.safeRight = right;
+	uiStatic.safeBottom = bottom;
+	return changed;
+}
+
 /*
 =================
 UI_UpdateMenu
@@ -610,6 +633,9 @@ void UI_UpdateMenu( float flTime )
 {
 	if( !uiStatic.initialized )
 		return;
+
+	if( UI_UpdateWindowInsets() )
+		UI_VidInit();
 
 	static bool loadStuff = true;
 
@@ -1022,6 +1048,8 @@ static void UI_LoadSounds( void )
 UI_VidInit
 =================
 */
+
+
 int UI_VidInit( void )
 {
 	static bool calledOnce = false;
@@ -1037,21 +1065,24 @@ int UI_VidInit( void )
 		UI_Precache();
 	}
 
-	// don't allow screenwidth is slower than 4:3 screens
-	// it's really not intended to use, just for keeping menu working
-	if (ScreenWidth * 3 < ScreenHeight * 4)
+	UI_UpdateWindowInsets();
+	float width = ScreenWidth - uiStatic.safeLeft - uiStatic.safeRight;
+	float height = ScreenHeight - uiStatic.safeTop - uiStatic.safeBottom;
+
+	if( width * 3 < height * 4 )
 	{
-		uiStatic.scaleX = uiStatic.scaleY = ScreenWidth / 1024.0f;
-		uiStatic.yOffset = ( ScreenHeight / 2.0f ) / uiStatic.scaleX - 768.0f / 2.0f;
+		uiStatic.scaleX = uiStatic.scaleY = width / 1024.0f;
+		uiStatic.yOffset = height / ( 2.0f * uiStatic.scaleY ) - 768.0f / 2.0f;
 	}
 	else
 	{
-		// Sizes are based on screen height
-		uiStatic.scaleX = uiStatic.scaleY = ScreenHeight / 768.0f;
+		uiStatic.scaleX = uiStatic.scaleY = height / 768.0f;
 		uiStatic.yOffset = 0;
 	}
 
-	uiStatic.width = ScreenWidth / uiStatic.scaleX;
+	uiStatic.xOffset = uiStatic.safeLeft / uiStatic.scaleX;
+	uiStatic.yOffset += uiStatic.safeTop / uiStatic.scaleY;
+	uiStatic.width = width / uiStatic.scaleX;
 	// move cursor to screen center
 	uiStatic.cursorX = ScreenWidth / 2;
 	uiStatic.cursorY = ScreenHeight / 2;
