@@ -76,7 +76,10 @@ static UI_EXTENDED_FUNCTIONS gExtendedTable =
 	UI_ConnectionProgress_Precache,
 	UI_ConnectionProgress_Connect,
 	UI_ConnectionProgress_ChangeLevel,
-	UI_ConnectionProgress_ParseServerInfo
+	UI_ConnectionProgress_ParseServerInfo,
+	UI_DrawHudCharacter,
+	UI_GetHudFontHeight,
+	UI_GetHudCharWidth,
 };
 
 extern "C" EXPORT int GetExtAPI( int version, UI_EXTENDED_FUNCTIONS *pFunctionTable, ui_extendedfuncs_t *pEngfuncsFromEngine )
