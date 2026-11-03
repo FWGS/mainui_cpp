@@ -228,6 +228,9 @@ CMenuFramework::CMenuBannerBitmap::CMenuBannerBitmap()
 
 void CMenuFramework::CMenuBannerBitmap::SetPicture(const char *pic)
 {
+	if( uiStatic.lowmemory )
+		return;
+
 	image.Load( pic );
 }
 
