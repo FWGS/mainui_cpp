@@ -1,0 +1,476 @@
+/*
+WorldMap.cpp - Condition Zero world map and mission select (CZ:DS)
+Own drawing in the menu library: the original window is VGUI2 and its controls are not available.
+Layout numbers are from the original resource/UI/WorldMap.res and WorldMapMissionSelect.res.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3 of the License, or
+(at your option) any later version.
+*/
+
+#include <map>
+#include <string>
+#include "BaseMenu.h"
+#include "BaseWindow.h"
+#include "Image.h"
+#include "keydefs.h"
+#include "Utils.h"
+#include "FontManager.h"
+#include <math.h>
+
+// the menu font (same as in FontManager.cpp)
+#define WORLDMAP_FONT   "Trebuchet MS"
+#define WORLDMAP_WEIGHT 500
+
+// all missions are open while the progress is not saved (testing). false = only the ones with "open" flag
+static const bool g_bAllOpen = true;
+
+struct WorldMapMission_t
+{
+	const char *prefix;  // #<prefix>_TITLE, _LOCATION, _TIME, ...
+	const char *image;   // gfx/vgui/<image>_large.tga
+	const char *map;
+	int x, y, w, h;
+};
+
+static const WorldMapMission_t g_Missions[] =
+{
+	{ "TRAINING", "cz_train", "cz_train01", 90, 115, 180, 15 },
+	{ "LOSTCAUSE", "cz_lostcause", "cz_lostcause", 479, 197, 155, 15 },
+	{ "RECOIL", "cz_recoil", "cz_recoil-intro", 332, 207, 150, 15 },
+	{ "SILO", "cz_silo", "cz_silo01", 453, 74, 180, 15 },
+	{ "BRECON", "cz_brecon", "cz_brecon01", 330, 90, 200, 15 },
+	{ "DRUGLAB", "cz_druglab", "cz_druglab1", 139, 211, 170, 15 },
+	{ "MOTORCADE", "cz_motor", "cz_motor1", 287, 129, 200, 15 },
+	{ "THINICE", "cz_thinice", "cz_thinice01", 238, 89, 90, 15 },
+	{ "DOWNED", "cz_downed", "cz_downed1", 149, 257, 200, 15 },
+	{ "TURNCRANK", "cz_turncrank", "cz_turncrank", 74, 132, 190, 15 },
+	{ "HANKAGAI", "cz_hankagai", "cz_hankagai1", 540, 115, 95, 15 },
+	{ "ALAMO", "cz_alamo", "cz_alamo", 317, 144, 55, 15 },
+	{ "HIGHRISE", "cz_highrise", "cz_hr01", 274, 111, 200, 15 },
+	{ "TRUTH", "cz_truth", "cz_truth1", 535, 130, 100, 15 },
+	{ "RUN", "cz_run", "cz_run1", 535, 99, 90, 15 },
+	{ "MIAMI", "cz_miami", "cz_miami1", 139, 154, 170, 15 },
+	{ "FASTLINE", "cz_fastline", "cz_fastline1", 537, 148, 95, 15 },
+	{ "PIPEDREAM", "cz_pipedream", "cz_pipedream1", 372, 141, 90, 15 },
+	{ "SANDSTORM", "cz_sandstorm", "cz_sandstorm", 370, 158, 160, 15 },
+};
+static const int g_iMissionCount = sizeof( g_Missions ) / sizeof( g_Missions[0] );
+
+// czeror_english.txt: UTF-16, "KEY" "value" pairs, values can have several lines
+static std::map<std::string, std::string> g_Strings;
+static bool g_bStringsLoaded = false;
+
+static void AppendUtf8( std::string &out, unsigned int c )
+{
+	if( c < 0x80 ) out += (char)c;
+	else if( c < 0x800 ) { out += (char)( 0xC0 | ( c >> 6 )); out += (char)( 0x80 | ( c & 0x3F )); }
+	else { out += (char)( 0xE0 | ( c >> 12 )); out += (char)( 0x80 | (( c >> 6 ) & 0x3F )); out += (char)( 0x80 | ( c & 0x3F )); }
+}
+
+static void LoadStrings()
+{
+	if( g_bStringsLoaded )
+		return;
+	g_bStringsLoaded = true;
+
+	int len = 0;
+	byte *data = EngFuncs::COM_LoadFile( "resource/czeror_english.txt", &len );
+	if( !data )
+		return;
+
+	std::string text;
+	if( len >= 2 && data[0] == 0xFF && data[1] == 0xFE ) // UTF-16 LE
+	{
+		for( int i = 2; i + 1 < len; i += 2 )
+			AppendUtf8( text, data[i] | ( data[i + 1] << 8 ));
+	}
+	else
+		text.assign( (const char *)data, len );
+	EngFuncs::COM_FreeFile( data );
+
+	size_t i = 0, n = text.size();
+	std::string tok[2];
+	int have = 0;
+	while( i < n )
+	{
+		char c = text[i];
+		if( c == '/' && i + 1 < n && text[i + 1] == '/' )
+		{
+			while( i < n && text[i] != '\n' ) i++;
+			continue;
+		}
+		if( c == '"' )
+		{
+			std::string s;
+			i++;
+			while( i < n && text[i] != '"' )
+			{
+				if( text[i] == '\\' && i + 1 < n )
+				{
+					i++;
+					s += ( text[i] == 'n' ) ? '\n' : text[i];
+				}
+				else if( text[i] != '\r' )
+					s += text[i];
+				i++;
+			}
+			i++;
+			tok[have++] = s;
+			if( have == 2 )
+			{
+				g_Strings[tok[0]] = tok[1];
+				have = 0;
+			}
+			continue;
+		}
+		i++;
+	}
+}
+
+static const char *S( const std::string &key )
+{
+	LoadStrings();
+	std::map<std::string, std::string>::const_iterator it = g_Strings.find( key );
+	return it != g_Strings.end() ? it->second.c_str() : key.c_str();
+}
+
+class CMenuWorldMap : public CMenuBaseWindow
+{
+public:
+	CMenuWorldMap() : CMenuBaseWindow( "CMenuWorldMap" ), m_bSelect( false ), m_iSelected( -1 ), m_iSkill( 1 ),
+		m_bLoaded( false ), m_flFontScale( 0 ) { for( int i = 0; i < 3; i++ ) m_hFonts[i] = -1; }
+
+	void Show() override;
+	void Draw() override;
+	bool KeyDown( int key ) override;
+	bool IsRoot() const override { return false; }
+
+private:
+	void LoadImages();
+	HFont GetFont( int heightAt480 );
+	void Layout();
+	void Image( CImage &img, int x, int y, int w, int h, unsigned int color = 0xFFFFFFFF );
+	void Text( const std::string &str, int x, int y, int w, int h, unsigned int col, int charH, uint justify );
+	bool In( int mx, int my, int x, int y, int w, int h ) const;
+	int  CurrentMission() const;
+	int  MissionAt( int mx, int my ) const;
+	void DrawMissionInfo( int idx );
+	void StartMission();
+
+	bool m_bSelect;
+	int  m_iSelected;
+	int  m_iSkill;
+	bool m_bLoaded;
+	float m_flScale;
+	int  m_iOffX, m_iOffY;
+
+	HFont m_hFonts[3];      // 12, 16, 20 px at 480p
+	float m_flFontScale;
+	CImage m_Tiles1[3][2];
+	CImage m_Tiles2[3][2];
+	CImage m_Marker[3]; // current, unlocked, locked
+	CImage m_MissionImg[32];
+	bool   m_MissionImgLoaded[32];
+};
+
+static CMenuWorldMap *g_pWorldMap = NULL;
+
+// the menu has only the 26 px default font and the 20 px small one: own fonts, made again when the scale changes
+HFont CMenuWorldMap::GetFont( int heightAt480 )
+{
+	if( fabs( m_flFontScale - m_flScale ) > 0.05f )
+	{
+		for( int i = 0; i < 3; i++ )
+			if( m_hFonts[i] != -1 )
+				g_FontMgr->DeleteFont( m_hFonts[i] );
+		const int h[3] = { 12, 16, 20 };
+		for( int i = 0; i < 3; i++ )
+			m_hFonts[i] = CFontBuilder( WORLDMAP_FONT, (int)( h[i] * m_flScale + 0.5f ), WORLDMAP_WEIGHT ).Create();
+		m_flFontScale = m_flScale;
+	}
+	return heightAt480 <= 12 ? m_hFonts[0] : ( heightAt480 <= 16 ? m_hFonts[1] : m_hFonts[2] );
+}
+
+void CMenuWorldMap::LoadImages()
+{
+	if( m_bLoaded )
+		return;
+	m_bLoaded = true;
+
+	for( int i = 0; i < 3; i++ )
+		for( int j = 0; j < 2; j++ )
+		{
+			char buf[64];
+			snprintf( buf, sizeof( buf ), "gfx/vgui/worldmap_%d_%d.tga", i, j );
+			m_Tiles1[i][j].Load( buf );
+			snprintf( buf, sizeof( buf ), "gfx/vgui/worldmap2_%d_%d.tga", i, j );
+			m_Tiles2[i][j].Load( buf );
+		}
+	m_Marker[0].Load( "gfx/vgui/missioncurrent.tga" );
+	m_Marker[1].Load( "gfx/vgui/missionunlocked.tga" );
+	m_Marker[2].Load( "gfx/vgui/missionlocked.tga" );
+	for( int i = 0; i < 32; i++ )
+		m_MissionImgLoaded[i] = false;
+}
+
+// the map is 4:3, centered, black bars on wide screens
+void CMenuWorldMap::Layout()
+{
+	float sx = ScreenWidth / 640.0f, sy = ScreenHeight / 480.0f;
+	m_flScale = sx < sy ? sx : sy;
+	m_iOffX = (int)( ( ScreenWidth - 640 * m_flScale ) * 0.5f );
+	m_iOffY = (int)( ( ScreenHeight - 480 * m_flScale ) * 0.5f );
+}
+
+void CMenuWorldMap::Image( CImage &img, int x, int y, int w, int h, unsigned int color )
+{
+	UI_DrawPic( m_iOffX + (int)( x * m_flScale ), m_iOffY + (int)( y * m_flScale ),
+		(int)( w * m_flScale + 0.5f ), (int)( h * m_flScale + 0.5f ), color, img );
+}
+
+void CMenuWorldMap::Text( const std::string &str, int x, int y, int w, int h, unsigned int col, int charH, uint justify )
+{
+	// the default font of the menu is 26 px: too big here. Headings take a 20 px font,
+	// the names on the map (15) a 12 px one, all the other texts a 16 px one
+	int fontH = 16;
+	if( charH >= 18 ) fontH = 20;
+	else if( charH == 15 ) fontH = 12;
+	HFont font = GetFont( fontH );
+	UI_DrawString( font, m_iOffX + (int)( x * m_flScale ), m_iOffY + (int)( y * m_flScale ),
+		(int)( w * m_flScale ), (int)( h * m_flScale ), str.c_str(), col, (int)( fontH * m_flScale ), justify, ETF_FORCECOL );
+}
+
+bool CMenuWorldMap::In( int mx, int my, int x, int y, int w, int h ) const
+{
+	int px = m_iOffX + (int)( x * m_flScale ), py = m_iOffY + (int)( y * m_flScale );
+	return mx >= px && my >= py && mx < px + (int)( w * m_flScale ) && my < py + (int)( h * m_flScale );
+}
+
+int CMenuWorldMap::MissionAt( int mx, int my ) const
+{
+	for( int i = 0; i < g_iMissionCount; i++ )
+		if( In( mx, my, g_Missions[i].x, g_Missions[i].y, g_Missions[i].w, g_Missions[i].h ))
+			return i;
+	return -1;
+}
+
+// the mission of the map that is loaded now, the first one otherwise
+int CMenuWorldMap::CurrentMission() const
+{
+	const char *map = EngFuncs::GetCvarString( "host_mapname" );
+	if( map && map[0] )
+	{
+		for( int i = 0; i < g_iMissionCount; i++ )
+		{
+			// cz_brecon01.. -> cz_brecon, cz_recoil-intro -> cz_recoil
+			size_t l = strlen( g_Missions[i].image );
+			if( !strncmp( map, g_Missions[i].image, l ))
+				return i;
+		}
+	}
+	return 0;
+}
+
+void CMenuWorldMap::Show()
+{
+	Layout();
+	m_bSelect = false;
+	m_iSelected = -1;
+	m_iSkill = (int)EngFuncs::GetCvarFloat( "skill" );
+	if( m_iSkill < 1 || m_iSkill > 3 ) m_iSkill = 1;
+	if( !uiStatic.menu.IsActive() )
+		UI_SetActiveMenu( true );
+	CMenuBaseWindow::Show();
+}
+
+void CMenuWorldMap::StartMission()
+{
+	if( m_iSelected < 0 )
+		return;
+
+	if( EngFuncs::GetCvarFloat( "host_serverstate" ) && EngFuncs::GetCvarFloat( "maxplayers" ) > 1 )
+		EngFuncs::HostEndGame( "end of the game" );
+
+	EngFuncs::CvarSetValue( "skill", (float)m_iSkill );
+	EngFuncs::CvarSetValue( "deathmatch", 0.0f );
+	EngFuncs::CvarSetValue( "teamplay", 0.0f );
+	EngFuncs::CvarSetValue( "pausable", 1.0f );
+	EngFuncs::CvarSetValue( "maxplayers", 1.0f );
+	EngFuncs::CvarSetValue( "coop", 0.0f );
+	EngFuncs::PlayBackgroundTrack( NULL, NULL );
+	EngFuncs::ClientCmdF( false, "map %s\n", g_Missions[m_iSelected].map );
+}
+
+// text block of one mission: the picture and the description under the world map
+void CMenuWorldMap::DrawMissionInfo( int idx )
+{
+	const unsigned int green = PackRGBA( 40, 210, 60, 255 );
+	const unsigned int gray = PackRGBA( 190, 190, 190, 255 );
+	std::string p = g_Missions[idx].prefix;
+
+	if( !m_MissionImgLoaded[idx] )
+	{
+		char buf[96];
+		snprintf( buf, sizeof( buf ), "gfx/vgui/%s_large.tga", g_Missions[idx].image );
+		m_MissionImg[idx].Load( buf );
+		m_MissionImgLoaded[idx] = true;
+	}
+	Image( m_MissionImg[idx], 20, 374, 87, 87 );
+	Text( S( "CZERO_Mission" ), 139, 361, 90, 39, PackRGBA( 215, 215, 215, 255 ), 22, QM_LEFT );
+	Text( S( p + "_TITLE" ), 225, 361, 400, 39, green, 22, QM_LEFT );
+	Text( S( p + "_BRIEF" ), 140, 392, 300, 70, gray, 14, QM_TOPLEFT );
+}
+
+void CMenuWorldMap::Draw()
+{
+	LoadImages();
+	Layout();
+
+	UI_FillRect( 0, 0, ScreenWidth, ScreenHeight, PackRGBA( 0, 0, 0, 255 ));
+
+	const int mx = uiStatic.cursorX, my = uiStatic.cursorY;
+	const int xs[3] = { 0, 256, 512 }, ys[2] = { 0, 256 };
+	const int ws[3] = { 256, 256, 128 }, hs[2] = { 256, 224 };
+	const unsigned int white = PackRGBA( 255, 255, 255, 255 );
+
+	if( !m_bSelect )
+	{
+		for( int i = 0; i < 3; i++ )
+			for( int j = 0; j < 2; j++ )
+				Image( m_Tiles1[i][j], xs[i], ys[j], ws[i], hs[j] );
+
+		int cur = CurrentMission();
+		int hover = MissionAt( mx, my );
+
+		for( int i = 0; i < g_iMissionCount; i++ )
+		{
+			const WorldMapMission_t &m = g_Missions[i];
+			CImage &mark = m_Marker[ i == cur ? 0 : 1 ];
+			Image( mark, m.x, m.y + 2, 10, 10 );
+			Text( S( std::string( m.prefix ) + "_TITLE" ), m.x + 14, m.y, m.w, m.h,
+				i == hover ? PackRGBA( 255, 255, 0, 255 ) : white, 15, QM_LEFT );
+		}
+
+		DrawMissionInfo( hover >= 0 ? hover : cur );
+
+		// Resume: only when a game is running
+		const bool inGame = EngFuncs::ClientInGame() != 0;
+		const bool onResume = inGame && In( mx, my, 504, 437, 80, 26 );
+		UI_DrawRectangle( m_iOffX + (int)( 504 * m_flScale ), m_iOffY + (int)( 437 * m_flScale ),
+			(int)( 80 * m_flScale ), (int)( 26 * m_flScale ), inGame ? white : PackRGBA( 110, 110, 110, 255 ));
+		Text( S( "CZERO_Resume" ), 504, 437, 80, 26, onResume ? PackRGBA( 255, 255, 0, 255 ) : ( inGame ? white : PackRGBA( 110, 110, 110, 255 )), 14, QM_CENTER );
+	}
+	else
+	{
+		for( int i = 0; i < 3; i++ )
+			for( int j = 0; j < 2; j++ )
+				Image( m_Tiles2[i][j], xs[i], ys[j], ws[i], hs[j] );
+
+		const WorldMapMission_t &m = g_Missions[m_iSelected];
+		std::string p = m.prefix;
+		const unsigned int label = PackRGBA( 215, 215, 215, 255 );
+		const unsigned int value = PackRGBA( 190, 190, 190, 255 );
+
+		Text( S( "CZERO_Mission" ), 20, 60, 90, 20, label, 20, QM_LEFT );
+		Text( S( p + "_TITLE" ), 110, 60, 250, 20, PackRGBA( 40, 210, 60, 255 ), 20, QM_LEFT );
+
+		Text( S( "CZERO_Time" ), 10, 90, 110, 20, label, 14, QM_TOPRIGHT );
+		Text( S( p + "_TIME" ), 130, 90, 230, 20, value, 14, QM_TOPLEFT );
+		Text( S( "CZERO_Locale" ), 10, 110, 110, 40, label, 14, QM_TOPRIGHT );
+		Text( S( p + "_LOCATION" ), 130, 110, 230, 40, value, 14, QM_TOPLEFT );
+		Text( S( "CZERO_Organization" ), 10, 150, 110, 20, label, 14, QM_TOPRIGHT );
+		Text( S( p + "_ORGANIZATION" ), 130, 150, 230, 20, value, 14, QM_TOPLEFT );
+		Text( S( "CZERO_Overview" ), 10, 170, 110, 20, label, 14, QM_TOPRIGHT );
+		Text( S( p + "_OVERVIEW" ), 130, 170, 230, 150, value, 14, QM_TOPLEFT );
+		Text( S( "CZERO_Objective" ), 10, 320, 110, 20, label, 14, QM_TOPRIGHT );
+		Text( S( p + "_OBJECTIVE" ), 130, 320, 230, 100, value, 14, QM_TOPLEFT );
+
+		if( !m_MissionImgLoaded[m_iSelected] )
+		{
+			char buf[96];
+			snprintf( buf, sizeof( buf ), "gfx/vgui/%s_large.tga", m.image );
+			m_MissionImg[m_iSelected].Load( buf );
+			m_MissionImgLoaded[m_iSelected] = true;
+		}
+		Image( m_MissionImg[m_iSelected], 381, 60, 243, 243 );
+
+		const char *skillKeys[3] = { "CZERO_EasySkill", "CZERO_MediumSkill", "CZERO_HardSkill" };
+		const int skillY[3] = { 314, 341, 370 };
+		for( int i = 0; i < 3; i++ )
+		{
+			const bool sel = m_iSkill == i + 1;
+			const bool hov = In( mx, my, 430, skillY[i], 200, 30 );
+			const int cx = 430 + 6, cy = skillY[i] + 6;
+			UI_DrawRectangle( m_iOffX + (int)( cx * m_flScale ), m_iOffY + (int)( cy * m_flScale ),
+				(int)( 10 * m_flScale ), (int)( 10 * m_flScale ), white );
+			if( sel )
+				UI_FillRect( m_iOffX + (int)( ( cx + 3 ) * m_flScale ), m_iOffY + (int)( ( cy + 3 ) * m_flScale ),
+					(int)( 4 * m_flScale ), (int)( 4 * m_flScale ), white );
+			Text( S( skillKeys[i] ), 430 + 24, skillY[i], 176, 30,
+				sel ? white : ( hov ? PackRGBA( 255, 255, 0, 255 ) : PackRGBA( 170, 170, 170, 255 )), 14, QM_LEFT );
+		}
+
+		struct { int x, y, w, h; const char *key; } btn[2] = {
+			{ 384, 410, 110, 22, "CZERO_Cancel" }, { 510, 410, 100, 22, "CZERO_Okay" } };
+		for( int i = 0; i < 2; i++ )
+		{
+			const bool hov = In( mx, my, btn[i].x, btn[i].y, btn[i].w, btn[i].h );
+			UI_DrawRectangle( m_iOffX + (int)( btn[i].x * m_flScale ), m_iOffY + (int)( btn[i].y * m_flScale ),
+				(int)( btn[i].w * m_flScale ), (int)( btn[i].h * m_flScale ), white );
+			Text( S( btn[i].key ), btn[i].x, btn[i].y, btn[i].w, btn[i].h, hov ? PackRGBA( 255, 255, 0, 255 ) : white, 13, QM_CENTER );
+		}
+	}
+}
+
+bool CMenuWorldMap::KeyDown( int key )
+{
+	if( UI::Key::IsEscape( key ))
+	{
+		if( m_bSelect )
+			m_bSelect = false;
+		else
+			UI_CloseMenu();
+		return true;
+	}
+
+	if( UI::Key::IsConsole( key ))
+	{
+		EngFuncs::KEY_SetDest( KEY_CONSOLE );
+		return true;
+	}
+
+	if( key != K_MOUSE1 )
+		return true;
+
+	const int mx = uiStatic.cursorX, my = uiStatic.cursorY;
+
+	if( !m_bSelect )
+	{
+		int hit = MissionAt( mx, my );
+		if( hit >= 0 )
+		{
+			m_iSelected = hit;
+			m_bSelect = true;
+		}
+		else if( EngFuncs::ClientInGame() && In( mx, my, 504, 437, 80, 26 ))
+			UI_CloseMenu();
+	}
+	else
+	{
+		const int skillY[3] = { 314, 341, 370 };
+		for( int i = 0; i < 3; i++ )
+			if( In( mx, my, 430, skillY[i], 200, 30 ))
+				m_iSkill = i + 1;
+
+		if( In( mx, my, 384, 410, 110, 22 ))
+			m_bSelect = false;
+		else if( In( mx, my, 510, 410, 100, 22 ))
+			StartMission();
+	}
+	return true;
+}
+
+// console: menu_worldmap
+ADD_MENU( menu_worldmap, CMenuWorldMap, UI_WorldMap_Menu );
