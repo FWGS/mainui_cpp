@@ -180,15 +180,17 @@ static CMenuWorldMap *g_pWorldMap = NULL;
 // the menu has only the 26 px default font and the 20 px small one: own fonts, made again when the scale changes
 HFont CMenuWorldMap::GetFont( int heightAt480 )
 {
-	if( fabs( m_flFontScale - m_flScale ) > 0.05f )
+	// the sizes are in the units of the menu (like UI_SMALL_CHAR_HEIGHT), scaled by uiStatic.scaleY
+	const float fs = uiStatic.scaleY;
+	if( fabs( m_flFontScale - fs ) > 0.01f )
 	{
 		for( int i = 0; i < 3; i++ )
 			if( m_hFonts[i] != -1 )
 				g_FontMgr->DeleteFont( m_hFonts[i] );
 		const int h[3] = { 12, 16, 20 };
 		for( int i = 0; i < 3; i++ )
-			m_hFonts[i] = CFontBuilder( WORLDMAP_FONT, (int)( h[i] * m_flScale + 0.5f ), WORLDMAP_WEIGHT ).Create();
-		m_flFontScale = m_flScale;
+			m_hFonts[i] = CFontBuilder( WORLDMAP_FONT, h[i] * fs, WORLDMAP_WEIGHT ).Create();
+		m_flFontScale = fs;
 	}
 	return heightAt480 <= 12 ? m_hFonts[0] : ( heightAt480 <= 16 ? m_hFonts[1] : m_hFonts[2] );
 }
@@ -239,7 +241,7 @@ void CMenuWorldMap::Text( const std::string &str, int x, int y, int w, int h, un
 	else if( charH == 15 ) fontH = 12;
 	HFont font = GetFont( fontH );
 	UI_DrawString( font, m_iOffX + (int)( x * m_flScale ), m_iOffY + (int)( y * m_flScale ),
-		(int)( w * m_flScale ), (int)( h * m_flScale ), str.c_str(), col, (int)( fontH * m_flScale ), justify, ETF_FORCECOL );
+		(int)( w * m_flScale ), (int)( h * m_flScale ), str.c_str(), col, (int)( fontH * uiStatic.scaleY ), justify, ETF_FORCECOL );
 }
 
 bool CMenuWorldMap::In( int mx, int my, int x, int y, int w, int h ) const
