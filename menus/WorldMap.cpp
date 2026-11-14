@@ -166,7 +166,7 @@ private:
 	float m_flScale;
 	int  m_iOffX, m_iOffY;
 
-	HFont m_hFonts[3];      // 12, 16, 20 px at 480p
+	HFont m_hFonts[3];      // 14, 16, 20 px at 480p
 	float m_flFontScale;
 	CImage m_Tiles1[3][2];
 	CImage m_Tiles2[3][2];
@@ -187,12 +187,12 @@ HFont CMenuWorldMap::GetFont( int heightAt480 )
 		for( int i = 0; i < 3; i++ )
 			if( m_hFonts[i] != -1 )
 				g_FontMgr->DeleteFont( m_hFonts[i] );
-		const int h[3] = { 12, 16, 20 };
+		const int h[3] = { 14, 16, 20 };
 		for( int i = 0; i < 3; i++ )
 			m_hFonts[i] = CFontBuilder( WORLDMAP_FONT, h[i] * fs, WORLDMAP_WEIGHT ).Create();
 		m_flFontScale = fs;
 	}
-	return heightAt480 <= 12 ? m_hFonts[0] : ( heightAt480 <= 16 ? m_hFonts[1] : m_hFonts[2] );
+	return heightAt480 <= 14 ? m_hFonts[0] : ( heightAt480 <= 16 ? m_hFonts[1] : m_hFonts[2] );
 }
 
 void CMenuWorldMap::LoadImages()
@@ -235,10 +235,10 @@ void CMenuWorldMap::Image( CImage &img, int x, int y, int w, int h, unsigned int
 void CMenuWorldMap::Text( const std::string &str, int x, int y, int w, int h, unsigned int col, int charH, uint justify )
 {
 	// the default font of the menu is 26 px: too big here. Headings take a 20 px font,
-	// the names on the map (15) a 12 px one, all the other texts a 16 px one
+	// the names on the map (15) a 14 px one, all the other texts a 16 px one
 	int fontH = 16;
 	if( charH >= 18 ) fontH = 20;
-	else if( charH == 15 ) fontH = 12;
+	else if( charH == 15 ) fontH = 14;
 	HFont font = GetFont( fontH );
 	UI_DrawString( font, m_iOffX + (int)( x * m_flScale ), m_iOffY + (int)( y * m_flScale ),
 		(int)( w * m_flScale ), (int)( h * m_flScale ), str.c_str(), col, (int)( fontH * uiStatic.scaleY ), justify, ETF_FORCECOL );
@@ -350,8 +350,8 @@ void CMenuWorldMap::Draw()
 		{
 			const WorldMapMission_t &m = g_Missions[i];
 			CImage &mark = m_Marker[ i == cur ? 0 : 1 ];
-			Image( mark, m.x, m.y + 2, 10, 10 );
-			Text( S( std::string( m.prefix ) + "_TITLE" ), m.x + 14, m.y, m.w, m.h,
+			Image( mark, m.x, m.y + 5, 6, 6 );
+			Text( S( std::string( m.prefix ) + "_TITLE" ), m.x + 10, m.y, m.w, m.h,
 				i == hover ? PackRGBA( 255, 255, 0, 255 ) : white, 15, QM_LEFT );
 		}
 
