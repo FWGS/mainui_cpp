@@ -22,8 +22,6 @@ the Free Software Foundation; either version 3 of the License, or
 #define WORLDMAP_FONT   "Trebuchet MS"
 #define WORLDMAP_WEIGHT 500
 
-// all missions are open while the progress is not saved (testing). false = only the ones with "open" flag
-static const bool g_bAllOpen = true;
 
 struct WorldMapMission_t
 {
