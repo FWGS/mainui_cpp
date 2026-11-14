@@ -58,9 +58,11 @@ static const WorldMapMission_t g_Missions[] =
 };
 static const int g_iMissionCount = sizeof( g_Missions ) / sizeof( g_Missions[0] );
 
-// czeror_english.txt: UTF-16, "KEY" "value" pairs, values can have several lines
+// czeror_<language>.txt: UTF-16, "KEY" "value" pairs, values can have several lines.
+// Like the strings of the menu: the english file always, the file of ui_language over it.
 static std::map<std::string, std::string> g_Strings;
 static bool g_bStringsLoaded = false;
+static std::string g_szStringsLanguage;
 
 static void AppendUtf8( std::string &out, unsigned int c )
 {
@@ -69,14 +71,13 @@ static void AppendUtf8( std::string &out, unsigned int c )
 	else { out += (char)( 0xE0 | ( c >> 12 )); out += (char)( 0x80 | (( c >> 6 ) & 0x3F )); out += (char)( 0x80 | ( c & 0x3F )); }
 }
 
-static void LoadStrings()
+static void LoadStringsFile( const char *language )
 {
-	if( g_bStringsLoaded )
-		return;
-	g_bStringsLoaded = true;
+	char path[128];
+	snprintf( path, sizeof( path ), "resource/czeror_%s.txt", language );
 
 	int len = 0;
-	byte *data = EngFuncs::COM_LoadFile( "resource/czeror_english.txt", &len );
+	byte *data = EngFuncs::COM_LoadFile( path, &len );
 	if( !data )
 		return;
 
@@ -127,6 +128,25 @@ static void LoadStrings()
 		}
 		i++;
 	}
+}
+
+static void LoadStrings()
+{
+	const char *language = EngFuncs::GetCvarString( "ui_language" );
+	if( !language || !language[0] )
+		language = "english";
+
+	// loaded already and the language is the same
+	if( g_bStringsLoaded && g_szStringsLanguage == language )
+		return;
+
+	g_bStringsLoaded = true;
+	g_szStringsLanguage = language;
+	g_Strings.clear();
+
+	LoadStringsFile( "english" );
+	if( strcmp( language, "english" ))
+		LoadStringsFile( language );
 }
 
 static const char *S( const std::string &key )
