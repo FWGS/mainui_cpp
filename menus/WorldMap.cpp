@@ -9,7 +9,6 @@ the Free Software Foundation; either version 3 of the License, or
 (at your option) any later version.
 */
 
-#include <map>
 #include <string>
 #include "BaseMenu.h"
 #include "BaseWindow.h"
@@ -57,104 +56,6 @@ static const WorldMapMission_t g_Missions[] =
 	{ "SANDSTORM", "cz_sandstorm", "cz_sandstorm", 370, 158, 160, 15 },
 };
 static const int g_iMissionCount = sizeof( g_Missions ) / sizeof( g_Missions[0] );
-
-// czeror_<language>.txt: UTF-16, "KEY" "value" pairs, values can have several lines.
-// Like the strings of the menu: the english file always, the file of ui_language over it.
-static std::map<std::string, std::string> g_Strings;
-static bool g_bStringsLoaded = false;
-static std::string g_szStringsLanguage;
-
-static void AppendUtf8( std::string &out, unsigned int c )
-{
-	if( c < 0x80 ) out += (char)c;
-	else if( c < 0x800 ) { out += (char)( 0xC0 | ( c >> 6 )); out += (char)( 0x80 | ( c & 0x3F )); }
-	else { out += (char)( 0xE0 | ( c >> 12 )); out += (char)( 0x80 | (( c >> 6 ) & 0x3F )); out += (char)( 0x80 | ( c & 0x3F )); }
-}
-
-static void LoadStringsFile( const char *language )
-{
-	char path[128];
-	snprintf( path, sizeof( path ), "resource/czeror_%s.txt", language );
-
-	int len = 0;
-	byte *data = EngFuncs::COM_LoadFile( path, &len );
-	if( !data )
-		return;
-
-	std::string text;
-	if( len >= 2 && data[0] == 0xFF && data[1] == 0xFE ) // UTF-16 LE
-	{
-		for( int i = 2; i + 1 < len; i += 2 )
-			AppendUtf8( text, data[i] | ( data[i + 1] << 8 ));
-	}
-	else
-		text.assign( (const char *)data, len );
-	EngFuncs::COM_FreeFile( data );
-
-	size_t i = 0, n = text.size();
-	std::string tok[2];
-	int have = 0;
-	while( i < n )
-	{
-		char c = text[i];
-		if( c == '/' && i + 1 < n && text[i + 1] == '/' )
-		{
-			while( i < n && text[i] != '\n' ) i++;
-			continue;
-		}
-		if( c == '"' )
-		{
-			std::string s;
-			i++;
-			while( i < n && text[i] != '"' )
-			{
-				if( text[i] == '\\' && i + 1 < n )
-				{
-					i++;
-					s += ( text[i] == 'n' ) ? '\n' : text[i];
-				}
-				else if( text[i] != '\r' )
-					s += text[i];
-				i++;
-			}
-			i++;
-			tok[have++] = s;
-			if( have == 2 )
-			{
-				g_Strings[tok[0]] = tok[1];
-				have = 0;
-			}
-			continue;
-		}
-		i++;
-	}
-}
-
-static void LoadStrings()
-{
-	const char *language = EngFuncs::GetCvarString( "ui_language" );
-	if( !language || !language[0] )
-		language = "english";
-
-	// loaded already and the language is the same
-	if( g_bStringsLoaded && g_szStringsLanguage == language )
-		return;
-
-	g_bStringsLoaded = true;
-	g_szStringsLanguage = language;
-	g_Strings.clear();
-
-	LoadStringsFile( "english" );
-	if( strcmp( language, "english" ))
-		LoadStringsFile( language );
-}
-
-static const char *S( const std::string &key )
-{
-	LoadStrings();
-	std::map<std::string, std::string>::const_iterator it = g_Strings.find( key );
-	return it != g_Strings.end() ? it->second.c_str() : key.c_str();
-}
 
 class CMenuWorldMap : public CMenuBaseWindow
 {
@@ -283,7 +184,7 @@ int CMenuWorldMap::MissionAt( int mx, int my ) const
 // the mission of the map that is loaded now, the first one otherwise
 int CMenuWorldMap::CurrentMission() const
 {
-	const char *map = EngFuncs::GetCvarString( "host_mapname" );
+	const char *map = EngFuncs::GetCvarString( "hostmap" );
 	if( map && map[0] )
 	{
 		for( int i = 0; i < g_iMissionCount; i++ )
@@ -342,9 +243,9 @@ void CMenuWorldMap::DrawMissionInfo( int idx )
 		m_MissionImgLoaded[idx] = true;
 	}
 	Image( m_MissionImg[idx], 20, 374, 87, 87, true );
-	Text( S( "CZERO_Mission" ), 139, 361, 90, 39, PackRGBA( 215, 215, 215, 255 ), 22, QM_LEFT );
-	Text( S( p + "_TITLE" ), 225, 361, 400, 39, green, 22, QM_LEFT );
-	Text( S( p + "_BRIEF" ), 140, 392, 300, 70, gray, 14, QM_TOPLEFT );
+	Text( L( "CZERO_Mission" ), 139, 361, 90, 39, PackRGBA( 215, 215, 215, 255 ), 22, QM_LEFT );
+	Text( L(( p + "_TITLE" ).c_str( )), 225, 361, 400, 39, green, 22, QM_LEFT );
+	Text( L(( p + "_BRIEF" ).c_str( )), 140, 392, 300, 70, gray, 14, QM_TOPLEFT );
 }
 
 void CMenuWorldMap::Draw()
@@ -373,7 +274,7 @@ void CMenuWorldMap::Draw()
 			const WorldMapMission_t &m = g_Missions[i];
 			CImage &mark = m_Marker[ i == cur ? 0 : 1 ];
 			Image( mark, m.x, m.y + 5, 6, 6 );
-			Text( S( std::string( m.prefix ) + "_TITLE" ), m.x + 10, m.y, m.w, m.h,
+			Text( L(( std::string( m.prefix ) + "_TITLE" ).c_str( )), m.x + 10, m.y, m.w, m.h,
 				i == hover ? PackRGBA( 255, 255, 0, 255 ) : white, 15, QM_LEFT );
 		}
 
@@ -384,7 +285,7 @@ void CMenuWorldMap::Draw()
 		const bool onResume = inGame && In( mx, my, 504, 437, 80, 26 );
 		UI_DrawRectangle( m_iOffX + (int)( 504 * m_flScale ), m_iOffY + (int)( 437 * m_flScale ),
 			(int)( 80 * m_flScale ), (int)( 26 * m_flScale ), inGame ? white : PackRGBA( 110, 110, 110, 255 ));
-		Text( S( "CZERO_Resume" ), 504, 437, 80, 26, onResume ? PackRGBA( 255, 255, 0, 255 ) : ( inGame ? white : PackRGBA( 110, 110, 110, 255 )), 14, QM_CENTER );
+		Text( L( "CZERO_Resume" ), 504, 437, 80, 26, onResume ? PackRGBA( 255, 255, 0, 255 ) : ( inGame ? white : PackRGBA( 110, 110, 110, 255 )), 14, QM_CENTER );
 	}
 	else
 	{
@@ -397,19 +298,19 @@ void CMenuWorldMap::Draw()
 		const unsigned int label = PackRGBA( 215, 215, 215, 255 );
 		const unsigned int value = PackRGBA( 190, 190, 190, 255 );
 
-		Text( S( "CZERO_Mission" ), 20, 60, 90, 20, label, 20, QM_LEFT );
-		Text( S( p + "_TITLE" ), 110, 60, 250, 20, PackRGBA( 40, 210, 60, 255 ), 20, QM_LEFT );
+		Text( L( "CZERO_Mission" ), 20, 60, 90, 20, label, 20, QM_LEFT );
+		Text( L(( p + "_TITLE" ).c_str( )), 110, 60, 250, 20, PackRGBA( 40, 210, 60, 255 ), 20, QM_LEFT );
 
-		Text( S( "CZERO_Time" ), 10, 90, 110, 20, label, 14, QM_TOPRIGHT );
-		Text( S( p + "_TIME" ), 130, 90, 230, 20, value, 14, QM_TOPLEFT );
-		Text( S( "CZERO_Locale" ), 10, 110, 110, 40, label, 14, QM_TOPRIGHT );
-		Text( S( p + "_LOCATION" ), 130, 110, 230, 40, value, 14, QM_TOPLEFT );
-		Text( S( "CZERO_Organization" ), 10, 150, 110, 20, label, 14, QM_TOPRIGHT );
-		Text( S( p + "_ORGANIZATION" ), 130, 150, 230, 20, value, 14, QM_TOPLEFT );
-		Text( S( "CZERO_Overview" ), 10, 170, 110, 20, label, 14, QM_TOPRIGHT );
-		Text( S( p + "_OVERVIEW" ), 130, 170, 230, 150, value, 14, QM_TOPLEFT );
-		Text( S( "CZERO_Objective" ), 10, 320, 110, 20, label, 14, QM_TOPRIGHT );
-		Text( S( p + "_OBJECTIVE" ), 130, 320, 230, 100, value, 14, QM_TOPLEFT );
+		Text( L( "CZERO_Time" ), 10, 90, 110, 20, label, 14, QM_TOPRIGHT );
+		Text( L(( p + "_TIME" ).c_str( )), 130, 90, 230, 20, value, 14, QM_TOPLEFT );
+		Text( L( "CZERO_Locale" ), 10, 110, 110, 40, label, 14, QM_TOPRIGHT );
+		Text( L(( p + "_LOCATION" ).c_str( )), 130, 110, 230, 40, value, 14, QM_TOPLEFT );
+		Text( L( "CZERO_Organization" ), 10, 150, 110, 20, label, 14, QM_TOPRIGHT );
+		Text( L(( p + "_ORGANIZATION" ).c_str( )), 130, 150, 230, 20, value, 14, QM_TOPLEFT );
+		Text( L( "CZERO_Overview" ), 10, 170, 110, 20, label, 14, QM_TOPRIGHT );
+		Text( L(( p + "_OVERVIEW" ).c_str( )), 130, 170, 230, 150, value, 14, QM_TOPLEFT );
+		Text( L( "CZERO_Objective" ), 10, 320, 110, 20, label, 14, QM_TOPRIGHT );
+		Text( L(( p + "_OBJECTIVE" ).c_str( )), 130, 320, 230, 100, value, 14, QM_TOPLEFT );
 
 		if( !m_MissionImgLoaded[m_iSelected] )
 		{
@@ -432,7 +333,7 @@ void CMenuWorldMap::Draw()
 			if( sel )
 				UI_FillRect( m_iOffX + (int)( ( cx + 3 ) * m_flScale ), m_iOffY + (int)( ( cy + 3 ) * m_flScale ),
 					(int)( 4 * m_flScale ), (int)( 4 * m_flScale ), white );
-			Text( S( skillKeys[i] ), 430 + 24, skillY[i], 176, 30,
+			Text( L( skillKeys[i] ), 430 + 24, skillY[i], 176, 30,
 				sel ? white : ( hov ? PackRGBA( 255, 255, 0, 255 ) : PackRGBA( 170, 170, 170, 255 )), 14, QM_LEFT );
 		}
 
@@ -443,7 +344,7 @@ void CMenuWorldMap::Draw()
 			const bool hov = In( mx, my, btn[i].x, btn[i].y, btn[i].w, btn[i].h );
 			UI_DrawRectangle( m_iOffX + (int)( btn[i].x * m_flScale ), m_iOffY + (int)( btn[i].y * m_flScale ),
 				(int)( btn[i].w * m_flScale ), (int)( btn[i].h * m_flScale ), white );
-			Text( S( btn[i].key ), btn[i].x, btn[i].y, btn[i].w, btn[i].h, hov ? PackRGBA( 255, 255, 0, 255 ) : white, 13, QM_CENTER );
+			Text( L( btn[i].key ), btn[i].x, btn[i].y, btn[i].w, btn[i].h, hov ? PackRGBA( 255, 255, 0, 255 ) : white, 13, QM_CENTER );
 		}
 	}
 }
@@ -455,7 +356,7 @@ bool CMenuWorldMap::KeyDown( int key )
 		if( m_bSelect )
 			m_bSelect = false;
 		else
-			UI_CloseMenu();
+			Hide();
 		return true;
 	}
 

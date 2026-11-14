@@ -49,12 +49,10 @@ private:
 	void _Init() override;
 
 	static void StartGameCb( CMenuBaseItem *pSelf, void *pExtra );
-	static void TrainingCb( CMenuBaseItem *pSelf, void *pExtra );
 	static void ShowDialogCb( CMenuBaseItem *pSelf, void *pExtra  );
 
 	CMenuYesNoMessageBox  msgBox;
 
-	CEventCallback trainCallback;
 	CEventCallback easyCallback;
 	CEventCallback normCallback;
 	CEventCallback hardCallback;
@@ -93,23 +91,6 @@ void CMenuNewGame::StartGameCb( CMenuBaseItem *pSelf, void *pExtra )
 	ui->StartGame( (uintptr_t)pExtra );
 }
 
-void CMenuNewGame::TrainingCb( CMenuBaseItem *pSelf, void *pExtra )
-{
-	if( EngFuncs::GetCvarFloat( "host_serverstate" ) && EngFuncs::GetCvarFloat( "maxplayers" ) > 1 )
-		EngFuncs::HostEndGame( "end of the game" );
-
-	EngFuncs::CvarSetValue( "skill", 1.0f );
-	EngFuncs::CvarSetValue( "deathmatch", 0.0f );
-	EngFuncs::CvarSetValue( "teamplay", 0.0f );
-	EngFuncs::CvarSetValue( "pausable", 1.0f );
-	EngFuncs::CvarSetValue( "maxplayers", 1.0f );
-	EngFuncs::CvarSetValue( "coop", 0.0f );
-	EngFuncs::PlayBackgroundTrack( NULL, NULL );
-
-	// the training map of the game info (trainmap in liblist.gam)
-	EngFuncs::ClientCmdF( false, "map %s\n", gMenu.m_gameinfo.trainmap );
-}
-
 void CMenuNewGame::ShowDialogCb( CMenuBaseItem *pSelf, void *pExtra )
 {
 	CMenuNewGame *ui = (CMenuNewGame*)pSelf->Parent();
@@ -137,13 +118,6 @@ void CMenuNewGame::_Init( void )
 
 	hardCallback = StartGameCb;
 	hardCallback.pExtra = (void *)3;
-
-	if( UI_IsCZDS() )
-	{
-		// CZ:DS: the training mission first, as in the original New Game window
-		trainCallback = TrainingCb;
-		AddButton( L( "GameUI_TrainingRoom" ), L( "StringsList_190" ), PC_HAZARD_COURSE, trainCallback, QMF_NOTIFY );
-	}
 
 	CMenuPicButton *easy = AddButton( L( "GameUI_Easy" ), L( "StringsList_200" ), PC_EASY, easyCallback, QMF_NOTIFY );
 	CMenuPicButton *norm = AddButton( L( "GameUI_Medium" ), L( "StringsList_201" ), PC_MEDIUM, normCallback, QMF_NOTIFY );

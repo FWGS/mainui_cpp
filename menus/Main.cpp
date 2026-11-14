@@ -53,7 +53,6 @@ private:
 	void Think() override;
 
 	void VidInit(bool connected);
-	void VidInitCZDS( bool connected );
 
 	void DisconnectCb();
 	void DisconnectDialogCb();
@@ -70,7 +69,6 @@ private:
 	CMenuPicButton	hazardCourse;
 	CMenuPicButton	configuration;
 	CMenuPicButton	saveRestore;
-	CMenuPicButton	saveGame;  // CZ:DS
 	CMenuPicButton	worldMap;  // CZ:DS
 	CMenuPicButton	multiPlayer;
 	CMenuPicButton	customGame;
@@ -221,15 +219,12 @@ void CMenuMain::_Init( void )
 
 	saveRestore.iFlags |= QMF_NOTIFY;
 
-	// CZ:DS: Save Game and World Map are separate buttons (GameMenu.res of the game)
-	saveGame.SetNameAndStatus( L( "GameUI_SaveGame" ), L( "StringsList_192" ) );
-	saveGame.SetPicture( PC_SAVE_GAME );
-	saveGame.iFlags |= QMF_NOTIFY;
-	saveGame.onReleased = UI_SaveGame_Menu;
-
-	worldMap.SetNameAndStatus( L( "CZERO_WorldMap" ), L( "Choose a mission" ) );
-	worldMap.iFlags |= QMF_NOTIFY;
-	worldMap.onReleased = UI_WorldMap_Menu;
+	if( UI_IsCZDS( ))
+	{
+		worldMap.SetNameAndStatus( L( "CZERO_WorldMap" ), L( "Choose a mission" ) );
+		worldMap.iFlags |= QMF_NOTIFY;
+		worldMap.onReleased = UI_WorldMap_Menu;
+	}
 
 	customGame.SetNameAndStatus( L( "GameUI_ChangeGame" ), L( "StringsList_530" ) );
 	customGame.SetPicture( PC_CUSTOM_GAME );
@@ -300,6 +295,9 @@ void CMenuMain::_Init( void )
 	AddItem( resumeGame );
 	AddItem( newGame );
 
+	if( UI_IsCZDS( ))
+		AddItem( worldMap );
+
 	if ( bTrainMap )
 		AddItem( hazardCourse );
 
@@ -314,8 +312,6 @@ void CMenuMain::_Init( void )
 	AddItem( quit );
 	AddItem( minimizeBtn );
 	AddItem( quitButton );
-	AddItem( saveGame );
-	AddItem( worldMap );
 }
 
 /*
@@ -323,74 +319,8 @@ void CMenuMain::_Init( void )
 UI_Main_Init
 =================
 */
-// CZ:DS: Resume Game, New Game, World Map, Load Game, Save Game, Disconnect, Options, Quit
-void CMenuMain::VidInitCZDS( bool connected )
-{
-	int hoffset = ( 70 / 640.0 ) * 1024.0;
-	int previews_voffset = ( 404 / 480.0 ) * 768.0;
-	int ygap = (( 404 - 373 ) / 480.0 ) * 768.0;
-	bool single = gpGlobals->maxClients < 2;
-
-	minimizeBtn.SetRect( uiStatic.width - 72, 13, 32, 32 );
-	quitButton.SetRect( uiStatic.width - 36, 13, 32, 32 );
-
-	// the buttons are placed from the bottom to the top
-	quit.SetCoord( hoffset, previews_voffset + ygap );
-	int yoffset = previews_voffset;
-
-	configuration.SetCoord( hoffset, yoffset );
-	yoffset -= ygap;
-
-	if( connected && single )
-	{
-		saveGame.SetCoord( hoffset, yoffset );
-		yoffset -= ygap;
-	}
-
-	saveRestore.SetCoord( hoffset, yoffset );
-	yoffset -= ygap;
-
-	worldMap.SetCoord( hoffset, yoffset );
-	yoffset -= ygap;
-
-	newGame.SetCoord( hoffset, yoffset );
-	yoffset -= ygap;
-
-	if( connected )
-	{
-		resumeGame.SetCoord( hoffset, yoffset );
-		yoffset -= ygap;
-
-		disconnect.SetCoord( hoffset, yoffset );
-		yoffset -= ygap;
-	}
-
-	console.SetCoord( hoffset, yoffset );
-
-	resumeGame.SetVisibility( connected );
-	disconnect.SetVisibility( connected );
-	newGame.SetVisibility( true );
-	worldMap.SetVisibility( true );
-	saveGame.SetVisibility( connected && single );
-
-	hazardCourse.SetVisibility( false );
-	multiPlayer.SetVisibility( false );
-	customGame.SetVisibility( false );
-	previews.SetVisibility( false );
-
-	saveRestore.SetNameAndStatus( L( "GameUI_LoadGame" ), L( "StringsList_191" ) );
-	saveRestore.SetPicture( PC_LOAD_GAME );
-	saveRestore.onReleased = UI_LoadGame_Menu;
-}
-
 void CMenuMain::VidInit( bool connected )
 {
-	if( UI_IsCZDS( ))
-	{
-		VidInitCZDS( connected );
-		return;
-	}
-
 	int hoffset = ( 70 / 640.0 ) * 1024.0;
 
 	// in original menu Previews is located at specific point
@@ -429,6 +359,12 @@ void CMenuMain::VidInit( bool connected )
 	if( bTrainMap )
 	{
 		hazardCourse.SetCoord( hoffset, yoffset );
+		yoffset -= ygap;
+	}
+
+	if( UI_IsCZDS( ))
+	{
+		worldMap.SetCoord( hoffset, yoffset );
 		yoffset -= ygap;
 	}
 
