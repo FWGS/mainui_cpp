@@ -236,6 +236,10 @@ void CMenuFramework::CMenuBannerBitmap::SetPicture(const char *pic)
 
 void CMenuFramework::CMenuBannerBitmap::Draw( Point pt, Size sz )
 {
+	// CZ:DS: the titles of the pages are not drawn
+	if( UI_IsCZDS() )
+		return;
+
 	if( image.IsValid() )
 	{
 		UI_DrawPic( pt, sz, uiColorWhite, image, QM_DRAWADDITIVE );
