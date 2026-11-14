@@ -171,7 +171,7 @@ private:
 	void LoadImages();
 	HFont GetFont( int heightAt480 );
 	void Layout();
-	void Image( CImage &img, int x, int y, int w, int h, unsigned int color = 0xFFFFFFFF );
+	void Image( CImage &img, int x, int y, int w, int h, bool alpha = false );
 	void Text( const std::string &str, int x, int y, int w, int h, unsigned int col, int charH, uint justify );
 	bool In( int mx, int my, int x, int y, int w, int h ) const;
 	int  CurrentMission() const;
@@ -246,10 +246,12 @@ void CMenuWorldMap::Layout()
 	m_iOffY = (int)( ( ScreenHeight - 480 * m_flScale ) * 0.5f );
 }
 
-void CMenuWorldMap::Image( CImage &img, int x, int y, int w, int h, unsigned int color )
+// alpha: the picture has an alpha channel (the mission pictures have transparent rounded corners)
+void CMenuWorldMap::Image( CImage &img, int x, int y, int w, int h, bool alpha )
 {
 	UI_DrawPic( m_iOffX + (int)( x * m_flScale ), m_iOffY + (int)( y * m_flScale ),
-		(int)( w * m_flScale + 0.5f ), (int)( h * m_flScale + 0.5f ), color, img );
+		(int)( w * m_flScale + 0.5f ), (int)( h * m_flScale + 0.5f ), 0xFFFFFFFF, img,
+		alpha ? QM_DRAWTRANS : QM_DRAWNORMAL );
 }
 
 void CMenuWorldMap::Text( const std::string &str, int x, int y, int w, int h, unsigned int col, int charH, uint justify )
@@ -339,7 +341,7 @@ void CMenuWorldMap::DrawMissionInfo( int idx )
 		m_MissionImg[idx].Load( buf );
 		m_MissionImgLoaded[idx] = true;
 	}
-	Image( m_MissionImg[idx], 20, 374, 87, 87 );
+	Image( m_MissionImg[idx], 20, 374, 87, 87, true );
 	Text( S( "CZERO_Mission" ), 139, 361, 90, 39, PackRGBA( 215, 215, 215, 255 ), 22, QM_LEFT );
 	Text( S( p + "_TITLE" ), 225, 361, 400, 39, green, 22, QM_LEFT );
 	Text( S( p + "_BRIEF" ), 140, 392, 300, 70, gray, 14, QM_TOPLEFT );
@@ -416,7 +418,7 @@ void CMenuWorldMap::Draw()
 			m_MissionImg[m_iSelected].Load( buf );
 			m_MissionImgLoaded[m_iSelected] = true;
 		}
-		Image( m_MissionImg[m_iSelected], 381, 60, 243, 243 );
+		Image( m_MissionImg[m_iSelected], 381, 60, 243, 243, true );
 
 		const char *skillKeys[3] = { "CZERO_EasySkill", "CZERO_MediumSkill", "CZERO_HardSkill" };
 		const int skillY[3] = { 314, 341, 370 };
