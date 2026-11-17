@@ -1400,11 +1400,22 @@ void CMenuServerBrowser::_VidInit()
 	}
 	else
 	{
-		gameList.SetCoord( 360, 230 + tabSwitch.size.h + uiStatic.outlineWidth );
+		// filters end 20 units above the bottom, same padding as on the right
+		int y = 768 - 20 - filterPing.size.h - UI_OUTLINE_WIDTH - gameList.size.h;
+		gameList.SetCoord( 360, y );
+		tabSwitch.SetCoord( 360, y - uiStatic.outlineWidth - tabSwitch.size.h );
 	}
 
 	int x = gameList.pos.x;
 	int y = gameList.pos.y + gameList.size.h + UI_OUTLINE_WIDTH;
+
+	// map filter takes the space left, so the filters row ends with the table
+	int tableWidth = uiStatic.width - 20 - x;
+	int fixedWidth = filterPing.size.w + filterEmpty.size.w + filterFull.size.w + filterProtocol.size.w + 40;
+	filterMap.size.w = Q_max( 100, tableWidth - fixedWidth );
+	if( m_bLanOnly ) // protocol filter is hidden in LAN mode
+		filterMap.size.w += filterProtocol.size.w + 10;
+
 	filterPing.SetCoord( x, y );
 	x += filterPing.size.w + 10;
 	filterEmpty.SetCoord( x, y );
