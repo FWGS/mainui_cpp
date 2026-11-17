@@ -804,6 +804,8 @@ void CMenuServerBrowser::FavoriteServer()
 			}
 		}
 	}
+
+	SaveLists();
 }
 
 void CMenuServerBrowser::MaybeEnableFavoriteButton( void )
@@ -1099,8 +1101,9 @@ void CMenuServerBrowser::AddServer( void )
 		}
 	}
 
-	favlist_entry_t entry( addressField.GetBuffer(), proto, false );
+	favlist_entry_t entry( addressField.GetBuffer(), proto, true );
 	favoritesList.AddToTail( entry );
+	SaveLists();
 
 	int previousTab = tabSwitch.GetState();
 	if( previousTab != 2 )
@@ -1111,13 +1114,13 @@ void CMenuServerBrowser::AddServer( void )
 	CUtlString fakeInfoString;
 	entry.GenerateDummyInfoString( fakeInfoString );
 
-	server_t serv( adr, fakeInfoString, false, true );
+	server_t serv( adr, fakeInfoString, true, true );
 	serv.UpdateData();
 	serv.SetPing( MAX_PING );
 	m_InternetServers[2].AddToTail( serv );
 	if( tabSwitch.GetState() == 2 )
 	{
-		gameListModel.AddServerToList( adr, fakeInfoString, false );
+		gameListModel.AddServerToList( adr, fakeInfoString, true );
 	}
 
 	entry.QueryServer();
