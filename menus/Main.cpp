@@ -69,6 +69,7 @@ private:
 	CMenuPicButton	hazardCourse;
 	CMenuPicButton	configuration;
 	CMenuPicButton	saveRestore;
+	CMenuPicButton	worldMap;  // CZ:DS
 	CMenuPicButton	multiPlayer;
 	CMenuPicButton	customGame;
 	CMenuPicButton	previews;
@@ -218,6 +219,13 @@ void CMenuMain::_Init( void )
 
 	saveRestore.iFlags |= QMF_NOTIFY;
 
+	if( UI_IsCZDS( ))
+	{
+		worldMap.SetNameAndStatus( L( "CZERO_WorldMap" ), L( "Choose a mission" ) );
+		worldMap.iFlags |= QMF_NOTIFY;
+		worldMap.onReleased = UI_WorldMap_Menu;
+	}
+
 	customGame.SetNameAndStatus( L( "GameUI_ChangeGame" ), L( "StringsList_530" ) );
 	customGame.SetPicture( PC_CUSTOM_GAME );
 	customGame.iFlags |= QMF_NOTIFY;
@@ -287,6 +295,9 @@ void CMenuMain::_Init( void )
 	AddItem( resumeGame );
 	AddItem( newGame );
 
+	if( UI_IsCZDS( ))
+		AddItem( worldMap );
+
 	if ( bTrainMap )
 		AddItem( hazardCourse );
 
@@ -348,6 +359,12 @@ void CMenuMain::VidInit( bool connected )
 	if( bTrainMap )
 	{
 		hazardCourse.SetCoord( hoffset, yoffset );
+		yoffset -= ygap;
+	}
+
+	if( UI_IsCZDS( ))
+	{
+		worldMap.SetCoord( hoffset, yoffset );
 		yoffset -= ygap;
 	}
 
