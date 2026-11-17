@@ -143,6 +143,18 @@ struct server_t
 #undef GENERATE_COMPAR_FN
 };
 
+// address without port resolves to port 0, but engine queries the default server port
+static bool UI_StringToAdr( const char *s, netadr_t *adr )
+{
+	if( !EngFuncs::textfuncs.pNetAPI->StringToAdr( (char *)s, adr ))
+		return false;
+
+	if( adr->port == 0 )
+		adr->port = BigShort( 27015 );
+
+	return true;
+}
+
 struct favlist_entry_t
 {
 	favlist_entry_t( const char *sadr, const char *prot, bool favorited = true )
@@ -150,6 +162,24 @@ struct favlist_entry_t
 		Q_strncpy( this->sadr, sadr, sizeof( this->sadr ));
 		Q_strncpy( this->prot, prot, sizeof( this->prot ));
 		this->favorited = favorited;
+		this->resolved = false;
+	}
+
+	// sadr may be a hostname, so compare by resolved address, not by string
+	bool MatchesAdr( const netadr_t &a ) const
+	{
+		if( !strcmp( sadr, EngFuncs::NET_AdrToString( a )))
+			return true;
+
+		if( !resolved )
+		{
+			// blocking DNS lookup, cached only on success
+			if( !UI_StringToAdr( sadr, &adr ))
+				return false;
+			resolved = true;
+		}
+
+		return !EngFuncs::NET_CompareAdr( &adr, &a );
 	}
 
 	void GenerateDummyInfoString( CUtlString &info ) const
@@ -180,6 +210,10 @@ struct favlist_entry_t
 	char sadr[128];
 	char prot[16];
 	bool favorited;
+
+private:
+	mutable netadr_t adr;
+	mutable bool resolved;
 };
 
 struct filterMap_t
@@ -797,7 +831,7 @@ void CMenuServerBrowser::FavoriteServer()
 	{
 		FOR_EACH_VEC( favoritesList, i )
 		{
-			if( !strcmp( favoritesList[i].sadr, sadr ))
+			if( favoritesList[i].MatchesAdr( serv.adr ))
 			{
 				favoritesList.FastRemove( i );
 				break;
@@ -902,7 +936,7 @@ void CMenuServerBrowser::QueryServerList( const CUtlVector<favlist_entry_t> &lis
 	{
 		netadr_t adr;
 
-		if( !EngFuncs::textfuncs.pNetAPI->StringToAdr( (char *)list[i].sadr, &adr ))
+		if( !UI_StringToAdr( list[i].sadr, &adr ))
 			continue;
 
 		bool found = false;
@@ -1067,7 +1101,7 @@ void CMenuServerBrowser::AddServer( void )
 {
 	netadr_t adr;
 
-	if( !EngFuncs::textfuncs.pNetAPI->StringToAdr( (char *)addressField.GetBuffer(), &adr ))
+	if( !UI_StringToAdr( addressField.GetBuffer(), &adr ))
 	{
 		UI_ShowMessageBox( L( "Invalid address" ));
 		return;
@@ -1535,12 +1569,11 @@ void CMenuServerBrowser::AddServerToList( netadr_t adr, const char *info )
 	if( !IsVisible() )
 		return;
 
-	const char *s = EngFuncs::NET_AdrToString( adr );
 	bool is_favorite = false;
 
 	FOR_EACH_VEC( favoritesList, i )
 	{
-		if( !strcmp( favoritesList[i].sadr, s ))
+		if( favoritesList[i].MatchesAdr( adr ))
 		{
 			is_favorite = favoritesList[i].favorited;
 			break;
@@ -1615,7 +1648,7 @@ void CMenuServerBrowser::AddServerToList( netadr_t adr, const char *info )
 		bool found = false;
 		FOR_EACH_VEC( favoritesList, j )
 		{
-			if( !strcmp( favoritesList[j].sadr, s ))
+			if( favoritesList[j].MatchesAdr( adr ))
 			{
 				found = true;
 				break;
@@ -1629,7 +1662,7 @@ void CMenuServerBrowser::AddServerToList( netadr_t adr, const char *info )
 		bool found = false;
 		FOR_EACH_VEC( historyList, j )
 		{
-			if( !strcmp( historyList[j].sadr, s ))
+			if( historyList[j].MatchesAdr( adr ))
 			{
 				found = true;
 				break;
