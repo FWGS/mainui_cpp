@@ -24,12 +24,16 @@ enum
 {
 	WORLDMAP_WIDTH = 640,
 	WORLDMAP_HEIGHT = 480,
-	WORLDMAP_TILES_X = 3,
-	WORLDMAP_TILES_Y = 2,
-	WORLDMAP_FONT_COUNT = 3,
-	WORLDMAP_SKILL_COUNT = 3,
 	WORLDMAP_STRING_SIZE = 128,
-	WORLDMAP_CAMPAIGN_COUNT = 13 // missions before the bonus ones
+	WORLDMAP_FIRST_BONUS_BIT = 16384 // the bits from this one are the bonus missions
+};
+
+enum
+{
+	MARKER_CURRENT,
+	MARKER_UNLOCKED,
+	MARKER_LOCKED,
+	MARKER_COUNT
 };
 
 enum
@@ -47,7 +51,15 @@ struct WorldMapRect_t
 static const WorldMapRect_t g_CancelButton = { 384, 410, 110, 22 };
 static const WorldMapRect_t g_OkButton = { 510, 410, 100, 22 };
 static const WorldMapRect_t g_ResumeButton = { 504, 437, 80, 26 };
-static const int g_iSkillY[WORLDMAP_SKILL_COUNT] = { 314, 341, 370 };
+static const int g_iSkillY[] = { 314, 341, 370 };
+static const char *g_SkillKeys[] = { "CZERO_EasySkill", "CZERO_MediumSkill", "CZERO_HardSkill" };
+static const int g_iFontHeights[] = { WORLDMAP_FONT_SMALL, WORLDMAP_FONT_MEDIUM, WORLDMAP_FONT_LARGE };
+
+// the world map is made of tiles
+static const int g_iTileX[] = { 0, 256, 512 };
+static const int g_iTileW[] = { 256, 256, 128 };
+static const int g_iTileY[] = { 0, 256 };
+static const int g_iTileH[] = { 256, 224 };
 
 // bit of the mission in cl_levellocks (LEVEL_* of the mod)
 static const int g_iMissionBits[] =
@@ -86,13 +98,13 @@ static const WorldMapMission_t g_Missions[] =
 	{ "PIPEDREAM", "cz_pipedream", "cz_pipedream1", 372, 141, 90, 15 },
 	{ "SANDSTORM", "cz_sandstorm", "cz_sandstorm", 370, 158, 160, 15 },
 };
-static const int g_iMissionCount = sizeof( g_Missions ) / sizeof( g_Missions[0] );
+static const int g_iMissionCount = V_ARRAYSIZE( g_Missions );
 
 class CMenuWorldMap : public CMenuBaseWindow
 {
 public:
 	CMenuWorldMap() : CMenuBaseWindow( "CMenuWorldMap" ), m_bSelect( false ), m_iSelected( -1 ), m_iSkill( 1 ),
-		m_bLoaded( false ), m_flFontScale( 0 ) { for( int i = 0; i < WORLDMAP_FONT_COUNT; i++ ) m_hFonts[i] = -1; }
+		m_bLoaded( false ), m_flFontScale( 0 ) { for( size_t i = 0; i < V_ARRAYSIZE( m_hFonts ); i++ ) m_hFonts[i] = -1; }
 
 	void Show() override;
 	void Draw() override;
@@ -120,11 +132,11 @@ private:
 	float m_flScale;
 	int  m_iOffX, m_iOffY;
 
-	HFont m_hFonts[WORLDMAP_FONT_COUNT];
+	HFont m_hFonts[V_ARRAYSIZE( g_iFontHeights )];
 	float m_flFontScale;
-	CImage m_Tiles1[WORLDMAP_TILES_X][WORLDMAP_TILES_Y];
-	CImage m_Tiles2[WORLDMAP_TILES_X][WORLDMAP_TILES_Y];
-	CImage m_Marker[3]; // current, unlocked, locked
+	CImage m_Tiles1[V_ARRAYSIZE( g_iTileX )][V_ARRAYSIZE( g_iTileY )];
+	CImage m_Tiles2[V_ARRAYSIZE( g_iTileX )][V_ARRAYSIZE( g_iTileY )];
+	CImage m_Marker[MARKER_COUNT];
 	CImage m_MissionImg[g_iMissionCount];
 	bool   m_MissionImgLoaded[g_iMissionCount];
 };
@@ -142,12 +154,11 @@ HFont CMenuWorldMap::GetFont( int heightAt480 )
 	const float fs = uiStatic.scaleY;
 	if( fabs( m_flFontScale - fs ) > 0.01f )
 	{
-		for( int i = 0; i < WORLDMAP_FONT_COUNT; i++ )
+		for( size_t i = 0; i < V_ARRAYSIZE( m_hFonts ); i++ )
 			if( m_hFonts[i] != -1 )
 				g_FontMgr->DeleteFont( m_hFonts[i] );
-		const int h[WORLDMAP_FONT_COUNT] = { WORLDMAP_FONT_SMALL, WORLDMAP_FONT_MEDIUM, WORLDMAP_FONT_LARGE };
-		for( int i = 0; i < WORLDMAP_FONT_COUNT; i++ )
-			m_hFonts[i] = CFontBuilder( WORLDMAP_FONT, h[i] * fs, WORLDMAP_WEIGHT ).Create();
+		for( size_t i = 0; i < V_ARRAYSIZE( m_hFonts ); i++ )
+			m_hFonts[i] = CFontBuilder( WORLDMAP_FONT, g_iFontHeights[i] * fs, WORLDMAP_WEIGHT ).Create();
 		m_flFontScale = fs;
 	}
 	return heightAt480 <= WORLDMAP_FONT_SMALL ? m_hFonts[0] : ( heightAt480 <= WORLDMAP_FONT_MEDIUM ? m_hFonts[1] : m_hFonts[2] );
@@ -159,18 +170,18 @@ void CMenuWorldMap::LoadImages()
 		return;
 	m_bLoaded = true;
 
-	for( int i = 0; i < WORLDMAP_TILES_X; i++ )
-		for( int j = 0; j < WORLDMAP_TILES_Y; j++ )
+	for( size_t i = 0; i < V_ARRAYSIZE( g_iTileX ); i++ )
+		for( size_t j = 0; j < V_ARRAYSIZE( g_iTileY ); j++ )
 		{
 			char path[WORLDMAP_STRING_SIZE];
-			V_snprintf( path, sizeof( path ), "gfx/vgui/worldmap_%d_%d.tga", i, j );
+			V_snprintf( path, sizeof( path ), "gfx/vgui/worldmap_%d_%d.tga", (int)i, (int)j );
 			m_Tiles1[i][j].Load( path );
-			V_snprintf( path, sizeof( path ), "gfx/vgui/worldmap2_%d_%d.tga", i, j );
+			V_snprintf( path, sizeof( path ), "gfx/vgui/worldmap2_%d_%d.tga", (int)i, (int)j );
 			m_Tiles2[i][j].Load( path );
 		}
-	m_Marker[0].Load( "gfx/vgui/missioncurrent.tga" );
-	m_Marker[1].Load( "gfx/vgui/missionunlocked.tga" );
-	m_Marker[2].Load( "gfx/vgui/missionlocked.tga" );
+	m_Marker[MARKER_CURRENT].Load( "gfx/vgui/missioncurrent.tga" );
+	m_Marker[MARKER_UNLOCKED].Load( "gfx/vgui/missionunlocked.tga" );
+	m_Marker[MARKER_LOCKED].Load( "gfx/vgui/missionlocked.tga" );
 	for( int i = 0; i < g_iMissionCount; i++ )
 		m_MissionImgLoaded[i] = false;
 }
@@ -223,9 +234,9 @@ bool CMenuWorldMap::IsOpen( int idx ) const
 int CMenuWorldMap::LatestOpen() const
 {
 	int best = -1;
-	for( int i = 0; i < WORLDMAP_CAMPAIGN_COUNT; i++ )
+	for( int i = 0; i < g_iMissionCount; i++ )
 	{
-		if( IsOpen( i ) && ( best < 0 || g_iMissionBits[i] > g_iMissionBits[best] ))
+		if( g_iMissionBits[i] < WORLDMAP_FIRST_BONUS_BIT && IsOpen( i ) && ( best < 0 || g_iMissionBits[i] > g_iMissionBits[best] ))
 			best = i;
 	}
 	return best;
@@ -304,15 +315,13 @@ void CMenuWorldMap::Draw()
 	UI_FillRect( 0, 0, ScreenWidth, ScreenHeight, PackRGBA( 0, 0, 0, 255 ));
 
 	const int mx = uiStatic.cursorX, my = uiStatic.cursorY;
-	const int xs[WORLDMAP_TILES_X] = { 0, 256, 512 }, ys[WORLDMAP_TILES_Y] = { 0, 256 };
-	const int ws[WORLDMAP_TILES_X] = { 256, 256, 128 }, hs[WORLDMAP_TILES_Y] = { 256, 224 };
 	const unsigned int white = PackRGBA( 255, 255, 255, 255 );
 
 	if( !m_bSelect )
 	{
-		for( int i = 0; i < WORLDMAP_TILES_X; i++ )
-			for( int j = 0; j < WORLDMAP_TILES_Y; j++ )
-				Image( m_Tiles1[i][j], xs[i], ys[j], ws[i], hs[j] );
+		for( size_t i = 0; i < V_ARRAYSIZE( g_iTileX ); i++ )
+			for( size_t j = 0; j < V_ARRAYSIZE( g_iTileY ); j++ )
+				Image( m_Tiles1[i][j], g_iTileX[i], g_iTileY[j], g_iTileW[i], g_iTileH[j] );
 
 		int cur = CurrentMission();
 		const int latest = LatestOpen();
@@ -322,7 +331,7 @@ void CMenuWorldMap::Draw()
 		{
 			const WorldMapMission_t &m = g_Missions[i];
 			const bool open = IsOpen( i );
-			CImage &mark = m_Marker[ !open ? 2 : ( i == latest ? 0 : 1 ) ];
+			CImage &mark = m_Marker[ !open ? MARKER_LOCKED : ( i == latest ? MARKER_CURRENT : MARKER_UNLOCKED ) ];
 			Image( mark, m.x, m.y + 5, 6, 6 );
 			char key[WORLDMAP_STRING_SIZE];
 			Text( L( MissionKey( key, m.prefix, "_TITLE" )), m.x + 10, m.y, m.w, m.h,
@@ -340,9 +349,9 @@ void CMenuWorldMap::Draw()
 	}
 	else
 	{
-		for( int i = 0; i < 3; i++ )
-			for( int j = 0; j < 2; j++ )
-				Image( m_Tiles2[i][j], xs[i], ys[j], ws[i], hs[j] );
+		for( size_t i = 0; i < V_ARRAYSIZE( g_iTileX ); i++ )
+			for( size_t j = 0; j < V_ARRAYSIZE( g_iTileY ); j++ )
+				Image( m_Tiles2[i][j], g_iTileX[i], g_iTileY[j], g_iTileW[i], g_iTileH[j] );
 
 		const WorldMapMission_t &m = g_Missions[m_iSelected];
 		const char *p = m.prefix;
@@ -373,8 +382,7 @@ void CMenuWorldMap::Draw()
 		}
 		Image( m_MissionImg[m_iSelected], 381, 60, 243, 243, true );
 
-		const char *skillKeys[WORLDMAP_SKILL_COUNT] = { "CZERO_EasySkill", "CZERO_MediumSkill", "CZERO_HardSkill" };
-		for( int i = 0; i < WORLDMAP_SKILL_COUNT; i++ )
+		for( int i = 0; i < (int)V_ARRAYSIZE( g_iSkillY ); i++ )
 		{
 			const bool sel = m_iSkill == i + 1;
 			const bool hov = In( mx, my, 430, g_iSkillY[i], 200, 30 );
@@ -384,13 +392,13 @@ void CMenuWorldMap::Draw()
 			if( sel )
 				UI_FillRect( m_iOffX + (int)( ( cx + 3 ) * m_flScale ), m_iOffY + (int)( ( cy + 3 ) * m_flScale ),
 					(int)( 4 * m_flScale ), (int)( 4 * m_flScale ), white );
-			Text( L( skillKeys[i] ), 430 + 24, g_iSkillY[i], 176, 30,
+			Text( L( g_SkillKeys[i] ), 430 + 24, g_iSkillY[i], 176, 30,
 				sel ? white : ( hov ? PackRGBA( 255, 255, 0, 255 ) : PackRGBA( 170, 170, 170, 255 )), 14, QM_LEFT );
 		}
 
 		const WorldMapRect_t *buttons[] = { &g_CancelButton, &g_OkButton };
 		const char *buttonKeys[] = { "CZERO_Cancel", "CZERO_Okay" };
-		for( int i = 0; i < 2; i++ )
+		for( size_t i = 0; i < V_ARRAYSIZE( buttons ); i++ )
 		{
 			const WorldMapRect_t &b = *buttons[i];
 			const bool hov = In( mx, my, b.x, b.y, b.w, b.h );
@@ -436,7 +444,7 @@ bool CMenuWorldMap::KeyDown( int key )
 	}
 	else
 	{
-		for( int i = 0; i < WORLDMAP_SKILL_COUNT; i++ )
+		for( int i = 0; i < (int)V_ARRAYSIZE( g_iSkillY ); i++ )
 			if( In( mx, my, 430, g_iSkillY[i], 200, 30 ))
 				m_iSkill = i + 1;
 
