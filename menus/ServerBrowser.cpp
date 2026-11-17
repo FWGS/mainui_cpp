@@ -1068,6 +1068,12 @@ void CMenuServerBrowser::OnTabSwitch()
 		// re-add entries via model to apply filters and update UI controls
 		gameListModel.AddServerToList( m_InternetServers[newTab][i].adr, m_InternetServers[newTab][i].info, m_InternetServers[newTab][i].favorite );
 	}
+
+	// favorites and history only query their own servers, not the master,
+	// so skip the refresh cooldown and update them right when opened
+	if( newTab == 2 || newTab == 3 )
+		refreshTime2 = 0;
+
 	RefreshList();
 }
 
