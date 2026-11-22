@@ -1267,6 +1267,7 @@ void CMenuServerBrowser::_Init( void )
 
 	serverProtocol.Setup( &protlistModel );
 	serverProtocol.SetCurrentValue( 0.0f );
+	serverProtocol.bWrapAround = true;
 	serverProtocol.eTextAlignment = QM_LEFT;
 	serverProtocol.SetRect( 64, 100, 512, 32 );\
 
