@@ -145,6 +145,22 @@ bool CMenuYesNoMessageBox::KeyDown( int key )
 	return BaseClass::KeyDown( key );
 }
 
+bool CMenuYesNoMessageBox::KeyUp( int key )
+{
+	if( BaseClass::KeyUp( key ))
+		return true;
+
+	// Enter in a text field or spin control confirms the dialog
+	if( UI::Key::IsEnter( key ) && ItemAtCursor() != &yes && ItemAtCursor() != &no )
+	{
+		if( bAutoHide ) Hide();
+		onPositive( this );
+		return true;
+	}
+
+	return false;
+}
+
 /*
 ==============
 CMenuYesNoMessageBox::SetMessage
