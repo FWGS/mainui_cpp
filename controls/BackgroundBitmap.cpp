@@ -197,7 +197,8 @@ void CMenuBackgroundBitmap::Draw()
 #endif
 
 	int xOffset = 0, yOffset = 0;
-	if( !ui_background_stretch->value )
+	// CZ:DS: the background stays anchored to the top-left corner (the game title is in that part)
+	if( !ui_background_stretch->value && !UI_IsCZDS( ))
 	{
 		// center wide background (for example if background is wider than our window)
 		if( s.w * xScale > ScreenWidth )
