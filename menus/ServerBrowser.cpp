@@ -1205,7 +1205,6 @@ void CMenuServerBrowser::_Init( void )
 	gameList.bFramedHintText = true;
 	gameList.bAllowSorting = true;
 	gameList.onChanged = VoidCb( &CMenuServerBrowser::OnChangeSelectedServer );
-	gameList.SetSize( -20, 465 );
 
 	tabSwitch.SetRect( 360, 230, -20, 32 );
 	tabSwitch.AddSwitch( L( "Direct" ));
@@ -1397,25 +1396,25 @@ void CMenuServerBrowser::_VidInit()
 
 	if( m_bLanOnly )
 	{
-		gameList.SetCoord( 360, 230 );
+		gameList.SetRect( 360, 230, -20, 465 );
 	}
 	else
 	{
+		int top = 230 + tabSwitch.size.h + UI_OUTLINE_WIDTH;
+
 		// filters end 20 units above the bottom, same padding as on the right
-		int y = 768 - 20 - filterPing.size.h - UI_OUTLINE_WIDTH - gameList.size.h;
-		gameList.SetCoord( 360, y );
-		tabSwitch.SetCoord( 360, y - uiStatic.outlineWidth - tabSwitch.size.h );
+		gameList.SetRect( 360, top, -20, 768 - 20 - filterPing.size.h - UI_OUTLINE_WIDTH - top );
 	}
 
 	int x = gameList.pos.x;
 	int y = gameList.pos.y + gameList.size.h + UI_OUTLINE_WIDTH;
 
-	// map filter takes the space left, so the filters row ends with the table
+	// map filter shrinks when the filters row doesn't fit under the table
 	int tableWidth = uiStatic.width - 20 - x;
-	int fixedWidth = filterPing.size.w + filterEmpty.size.w + filterFull.size.w + filterProtocol.size.w + 40;
-	filterMap.size.w = Q_max( 100, tableWidth - fixedWidth );
-	if( m_bLanOnly ) // protocol filter is hidden in LAN mode
-		filterMap.size.w += filterProtocol.size.w + 10;
+	int fixedWidth = filterPing.size.w + filterEmpty.size.w + filterFull.size.w + 30;
+	if( !m_bLanOnly ) // protocol filter is hidden in LAN mode
+		fixedWidth += filterProtocol.size.w + 10;
+	filterMap.size.w = bound( 100, tableWidth - fixedWidth, 200 );
 
 	filterPing.SetCoord( x, y );
 	x += filterPing.size.w + 10;
