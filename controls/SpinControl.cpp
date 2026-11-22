@@ -230,6 +230,12 @@ const char *CMenuSpinControl::MoveLeft()
 			m_flCurValue = m_flMinValue;
 		sound = uiStatic.sounds[SND_MOVE];
 	}
+	else if( m_pModel && m_flMaxValue > m_flMinValue )
+	{
+		// list of choices wraps around like a carousel
+		m_flCurValue = m_flMaxValue;
+		sound = uiStatic.sounds[SND_MOVE];
+	}
 	else sound = uiStatic.sounds[SND_BUZZ];
 
 	return sound;
@@ -244,6 +250,11 @@ const char *CMenuSpinControl::MoveRight()
 		m_flCurValue += m_flRange;
 		if( m_flCurValue > m_flMaxValue )
 			m_flCurValue = m_flMaxValue;
+		sound = uiStatic.sounds[SND_MOVE];
+	}
+	else if( m_pModel && m_flMaxValue > m_flMinValue )
+	{
+		m_flCurValue = m_flMinValue;
 		sound = uiStatic.sounds[SND_MOVE];
 	}
 	else sound = uiStatic.sounds[SND_BUZZ];
