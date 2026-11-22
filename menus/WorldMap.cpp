@@ -39,11 +39,11 @@ static constexpr int CHAR_SMALL  = 14;
 static constexpr int CHAR_MEDIUM = 16;
 static constexpr int CHAR_LARGE  = 20;
 
-static constexpr unsigned int COLOR_HIGHLIGHT = PackRGBA( 255, 255, 0, 255 );
-static constexpr unsigned int COLOR_LABEL = PackRGBA( 215, 215, 215, 255 );
-static constexpr unsigned int COLOR_TITLE = PackRGBA( 40, 210, 60, 255 );
-static constexpr unsigned int COLOR_TEXT = PackRGBA( 190, 190, 190, 255 );
-static constexpr unsigned int COLOR_SKILL = PackRGBA( 170, 170, 170, 255 );
+static constexpr unsigned int s_ColorHighlight = PackRGBA( 255, 255, 0, 255 );
+static constexpr unsigned int s_ColorLabel = PackRGBA( 215, 215, 215, 255 );
+static constexpr unsigned int s_ColorTitle = PackRGBA( 40, 210, 60, 255 );
+static constexpr unsigned int s_ColorText = PackRGBA( 190, 190, 190, 255 );
+static constexpr unsigned int s_ColorSkill = PackRGBA( 170, 170, 170, 255 );
 
 enum
 {
@@ -135,7 +135,7 @@ static void InitButton( CMenuAction &button, const char *text, int x, int y, int
 	button.szName = text;
 	button.SetRect( x, y, w, h );
 	InitText( button, CHAR_MEDIUM, uiColorWhite, QM_CENTER );
-	button.colorFocus = COLOR_HIGHLIGHT;
+	button.colorFocus = s_ColorHighlight;
 	button.eFocusAnimation = QM_HIGHLIGHTIFFOCUS;
 	button.bDrawStroke = true;
 	button.colorStroke = uiColorWhite;
@@ -314,10 +314,10 @@ void CMenuWorldMapSelect::_Init()
 	LoadTiles( "worldmap2" );
 
 	m_MissionLabel.szName = L_GAME( "CZERO_Mission" );
-	InitLabel( m_MissionLabel, 32, 96, 144, 32, CHAR_LARGE, COLOR_LABEL, QM_LEFT );
+	InitLabel( m_MissionLabel, 32, 96, 144, 32, CHAR_LARGE, s_ColorLabel, QM_LEFT );
 	AddItem( m_MissionLabel );
 
-	InitLabel( m_MissionTitle, 176, 96, 400, 32, CHAR_LARGE, COLOR_TITLE, QM_LEFT );
+	InitLabel( m_MissionTitle, 176, 96, 400, 32, CHAR_LARGE, s_ColorTitle, QM_LEFT );
 	AddItem( m_MissionTitle );
 
 	int y = 144;
@@ -327,10 +327,10 @@ void CMenuWorldMapSelect::_Init()
 		const WorldMapInfoRow_t &row = s_InfoRows[i];
 
 		m_InfoLabels[i].szName = L_GAME( row.label );
-		InitLabel( m_InfoLabels[i], 16, y, 176, row.h, CHAR_MEDIUM, COLOR_LABEL, QM_TOPRIGHT );
+		InitLabel( m_InfoLabels[i], 16, y, 176, row.h, CHAR_MEDIUM, s_ColorLabel, QM_TOPRIGHT );
 		AddItem( m_InfoLabels[i] );
 
-		InitLabel( m_InfoValues[i], 208, y, 368, row.h, CHAR_MEDIUM, COLOR_TEXT, QM_TOPLEFT );
+		InitLabel( m_InfoValues[i], 208, y, 368, row.h, CHAR_MEDIUM, s_ColorText, QM_TOPLEFT );
 		AddItem( m_InfoValues[i] );
 
 		y += row.h;
@@ -348,8 +348,8 @@ void CMenuWorldMapSelect::_Init()
 		item.skill = i + 1;
 		item.szName = L_GAME( s_SkillKeys[i] );
 		item.SetRect( 688, 502 + i * 45, 320, SKILL_HEIGHT );
-		InitText( item, CHAR_MEDIUM, COLOR_SKILL, QM_LEFT );
-		item.colorFocus = COLOR_HIGHLIGHT;
+		InitText( item, CHAR_MEDIUM, s_ColorSkill, QM_LEFT );
+		item.colorFocus = s_ColorHighlight;
 		SET_EVENT_MULTI( item.onReleased,
 		{
 			CMenuWorldMapSkill *self = (CMenuWorldMapSkill *)pSelf;
@@ -550,7 +550,7 @@ void CMenuWorldMap::_Init()
 		SetLocalized( item, item.titleKey, sizeof( item.titleKey ), m.title, "_TITLE" );
 		item.SetRect( m.x, m.y, MISSION_TEXT_OFFSET + m.w, MISSION_HEIGHT );
 		InitText( item, CHAR_SMALL, uiColorWhite, QM_LEFT );
-		item.colorFocus = COLOR_HIGHLIGHT;
+		item.colorFocus = s_ColorHighlight;
 		SET_EVENT_MULTI( item.onReleased,
 		{
 			CMenuWorldMapMission *self = (CMenuWorldMapMission *)pSelf;
@@ -565,13 +565,13 @@ void CMenuWorldMap::_Init()
 	AddItem( m_InfoPicture );
 
 	m_InfoLabel.szName = L_GAME( "CZERO_Mission" );
-	InitLabel( m_InfoLabel, 222, 577, 144, 62, CHAR_LARGE, COLOR_LABEL, QM_LEFT );
+	InitLabel( m_InfoLabel, 222, 577, 144, 62, CHAR_LARGE, s_ColorLabel, QM_LEFT );
 	AddItem( m_InfoLabel );
 
-	InitLabel( m_InfoTitle, 360, 577, 640, 62, CHAR_LARGE, COLOR_TITLE, QM_LEFT );
+	InitLabel( m_InfoTitle, 360, 577, 640, 62, CHAR_LARGE, s_ColorTitle, QM_LEFT );
 	AddItem( m_InfoTitle );
 
-	InitLabel( m_InfoBrief, 224, 627, 480, 112, CHAR_MEDIUM, COLOR_TEXT, QM_TOPLEFT );
+	InitLabel( m_InfoBrief, 224, 627, 480, 112, CHAR_MEDIUM, s_ColorText, QM_TOPLEFT );
 	AddItem( m_InfoBrief );
 
 	InitButton( m_Resume, L_GAME( "CZERO_Resume" ), 806, 699, 128, 41 );
