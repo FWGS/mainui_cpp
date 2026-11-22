@@ -79,6 +79,9 @@ void CMenuNewGame::StartGame( uintptr_t skill )
 
 	EngFuncs::PlayBackgroundTrack( NULL, NULL );
 
+	if( UI_IsCZDS() )
+		EngFuncs::CvarSetValue( "cl_newgame", 1.0f ); // the server closes the missions again
+
 	if( startDemoChapter.bChecked )
 		EngFuncs::ClientCmdF( false, "newgame \"%s\"\n", gMenu.m_gameinfo.demomap );
 	else EngFuncs::ClientCmd( false, "newgame\n" );
