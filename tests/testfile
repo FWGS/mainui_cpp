@@ -4,3 +4,6 @@ L( "test2" )
 L("test" "test")
 L( "multiline"
 "multiline" ) // don't added, yet
+N_( "test3" )
+XL( "nope" ) // not L()
+L_GAME( "game" )

@@ -126,6 +126,8 @@ typedef struct
 	bool needMapListUpdate;
 	bool nextFrameActive;
 	bool renderPicbuttonText;
+	bool hideBanners;
+	bool backgroundTopLeft;
 
 	int lowmemory;
 
@@ -221,6 +223,7 @@ int UI_CreditsActive( void );
 void UI_DrawFinalCredits( void );
 
 void UI_CloseMenu( void );
+void UI_PrepareSingleplayerGame( int skill );
 
 // SCR support
 void UI_LoadScriptConfig( void );

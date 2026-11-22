@@ -598,6 +598,28 @@ void UI_CloseMenu( void )
 		EngFuncs::KEY_SetDest( KEY_GAME );
 }
 
+/*
+=================
+UI_PrepareSingleplayerGame
+
+The caller then starts the map with its own command.
+=================
+*/
+void UI_PrepareSingleplayerGame( int skill )
+{
+	if( EngFuncs::GetCvarFloat( "host_serverstate" ) && EngFuncs::GetCvarFloat( "maxplayers" ) > 1 )
+		EngFuncs::HostEndGame( "end of the game" );
+
+	EngFuncs::CvarSetValue( "skill", skill );
+	EngFuncs::CvarSetValue( "deathmatch", 0.0f );
+	EngFuncs::CvarSetValue( "teamplay", 0.0f );
+	EngFuncs::CvarSetValue( "pausable", 1.0f ); // singleplayer is always allowing pause
+	EngFuncs::CvarSetValue( "maxplayers", 1.0f );
+	EngFuncs::CvarSetValue( "coop", 0.0f );
+
+	EngFuncs::PlayBackgroundTrack( NULL, NULL );
+}
+
 // =====================================================================
 
 
@@ -1204,7 +1226,12 @@ void UI_Init( void )
 
 	gMenu.m_gameinfo = *gi;
 
-	uiStatic.renderPicbuttonText = ( gMenu.m_gameinfo.flags & GFL_RENDER_PICBUTTON_TEXT ) || UI_IsCZDS();
+	// CZ:DS has no WON menu graphics, don't let the ones from valve show through
+	// and its background has the title in the top left corner, keep it in view when cropped
+	const bool czds = UI_IsCZDS();
+	uiStatic.renderPicbuttonText = ( gMenu.m_gameinfo.flags & GFL_RENDER_PICBUTTON_TEXT ) || czds;
+	uiStatic.hideBanners = czds;
+	uiStatic.backgroundTopLeft = czds;
 
 	// trying to load colors.lst
 	UI_ApplyCustomColors ();

@@ -37,7 +37,7 @@ public:
 
 	static void LoadBackground();
 	static bool ShouldDrawLogoMovie() { return s_bEnableLogoMovie; }
-private:
+
 	struct bimage_t
 	{
 		HIMAGE hImage;
@@ -45,6 +45,9 @@ private:
 		Size size;
 	};
 
+	static void DrawBackgroundPiece( const bimage_t &image, Point p, int xOffset, int yOffset, float xScale, float yScale );
+
+private:
 	enum bstate_e
 	{
 		DRAW_COLOR,
@@ -52,7 +55,6 @@ private:
 		DRAW_STEAM,
 	};
 
-	void DrawBackgroundPiece( const bimage_t &image, Point p, int xOffset, int yOffset, float xScale, float yScale );
 	void DrawSteamBackgroundLayout( Point p, int xOffset, int yOffset, float xScale, float yScale );
 	void DrawColor();
 	void DrawInGameBackground();

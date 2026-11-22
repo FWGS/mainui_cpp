@@ -78,16 +78,24 @@ void CMenuBackgroundBitmap::DrawColor()
 	UI_FillRect( m_scPos, m_scSize, colorBase );
 }
 
+/*
+=================
+CMenuBackgroundBitmap::DrawBackgroundPiece
+
+Fades with the window it's drawn in. UI_UpdateMenu draws the menu background with the alpha factor disabled.
+Pieces that touch share their scaled edge, so they don't overlap: overlapped pixels get blended twice while fading.
+=================
+*/
 void CMenuBackgroundBitmap::DrawBackgroundPiece( const bimage_t &image, Point p, int xOffset, int yOffset, float xScale, float yScale )
 {
-	EngFuncs::PIC_Set( image.hImage, 255, 255, 255, 255 );
+	CImage pic( image.hImage );
 
 	int dx = (int)ceil( image.coord.x * xScale );
 	int dy = (int)ceil( image.coord.y * yScale );
-	int dw = (int)ceil( image.size.w * xScale );
-	int dt = (int)ceil( image.size.h * yScale );
+	int dw = (int)ceil(( image.coord.x + image.size.w ) * xScale ) - dx;
+	int dt = (int)ceil(( image.coord.y + image.size.h ) * yScale ) - dy;
 
-	EngFuncs::PIC_Draw( p.x + dx + xOffset, p.y + dy + yOffset, dw, dt );
+	UI_DrawPic( p.x + dx + xOffset, p.y + dy + yOffset, dw, dt, uiColorWhite, pic );
 }
 
 void CMenuBackgroundBitmap::DrawSteamBackgroundLayout( Point p, int xOffset, int yOffset, float xScale, float yScale )
@@ -197,7 +205,7 @@ void CMenuBackgroundBitmap::Draw()
 #endif
 
 	int xOffset = 0, yOffset = 0;
-	if( !ui_background_stretch->value )
+	if( !ui_background_stretch->value && !uiStatic.backgroundTopLeft )
 	{
 		// center wide background (for example if background is wider than our window)
 		if( s.w * xScale > ScreenWidth )

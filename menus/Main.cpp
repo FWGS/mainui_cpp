@@ -155,17 +155,7 @@ UI_Main_HazardCourse
 */
 void CMenuMain::HazardCourseCb()
 {
-	if( EngFuncs::GetCvarFloat( "host_serverstate" ) && EngFuncs::GetCvarFloat( "maxplayers" ) > 1 )
-		EngFuncs::HostEndGame( "end of the game" );
-
-	EngFuncs::CvarSetValue( "skill", 1.0f );
-	EngFuncs::CvarSetValue( "deathmatch", 0.0f );
-	EngFuncs::CvarSetValue( "teamplay", 0.0f );
-	EngFuncs::CvarSetValue( "pausable", 1.0f ); // singleplayer is always allowing pause
-	EngFuncs::CvarSetValue( "coop", 0.0f );
-	EngFuncs::CvarSetValue( "maxplayers", 1.0f ); // singleplayer
-
-	EngFuncs::PlayBackgroundTrack( NULL, NULL );
+	UI_PrepareSingleplayerGame( 1 );
 
 	EngFuncs::ClientCmd( false, "hazardcourse\n" );
 }
@@ -226,7 +216,7 @@ void CMenuMain::_Init( void )
 
 	if( UI_IsCZDS( ))
 	{
-		worldMap.SetNameAndStatus( L( "CZERO_WorldMap" ), L( "Choose a mission" ) );
+		worldMap.SetNameAndStatus( L_GAME( "CZERO_WorldMap" ), L( "Choose a mission" ) );
 		worldMap.iFlags |= QMF_NOTIFY;
 		worldMap.onReleased = UI_WorldMap_Menu;
 	}
@@ -301,11 +291,11 @@ void CMenuMain::_Init( void )
 	AddItem( disconnect );
 	AddItem( resumeGame );
 
-	if( UI_IsCZDS( ))
-		AddItem( worldMap );
-
 	if ( bShowNewGame )
 		AddItem( newGame );
+
+	if( UI_IsCZDS( ))
+		AddItem( worldMap );
 
 	if ( bShowHazardCourse )
 		AddItem( hazardCourse );

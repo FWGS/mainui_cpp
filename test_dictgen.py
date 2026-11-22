@@ -18,7 +18,7 @@ import filecmp
 import os
 
 VALID_UNPARSED_TOKENS = ['L ("test1")', 'L( "test2" )', 'L("test" "test")']
-INVALID_UNPARSED_TOKENS = ['L( test )', 'L( "multiline"\n"multiline )']
+INVALID_UNPARSED_TOKENS = ['L( test )', 'L( "multiline"\n"multiline )', 'L( "nope" )']
 VALID_TOKENS = ["test1", "test2", "testtest"]
 
 class DictGenTest(unittest.TestCase):
@@ -30,6 +30,12 @@ class DictGenTest(unittest.TestCase):
 
 		for i in INVALID_UNPARSED_TOKENS:
 			self.assertFalse(i in tokens)
+
+	def test_parsing_markers(self):
+		tokens = dictgen.process_file(os.path.join('tests', 'testfile'))
+		self.assertTrue('N_( "test3" )' in tokens)
+		self.assertEqual(dictgen.process_trans(['N_( "test3" )']), ['test3'])
+		self.assertFalse('game' in dictgen.process_trans(tokens))
 
 	def test_processing_translables(self):
 		tokens = dictgen.process_trans(VALID_UNPARSED_TOKENS)

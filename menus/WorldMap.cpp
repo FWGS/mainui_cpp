@@ -1,32 +1,49 @@
 /*
-WorldMap.cpp - Condition Zero world map and mission select (CZ:DS)
-Own drawing in the menu library: the original window is VGUI2 and its controls are not available.
-Layout numbers are from the original resource/UI/WorldMap.res and WorldMapMissionSelect.res.
+WorldMap.cpp - Condition Zero: Deleted Scenes world map and mission select
+Copyright (C) 2026 SergioPoverony
 
-This program is free software; you can redistribute it and/or modify
+This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 3 of the License, or
+the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 */
 
+#include "extdll_menu.h"
 #include "BaseMenu.h"
 #include "BaseWindow.h"
-#include "Image.h"
-#include "keydefs.h"
+#include "Action.h"
+#include "Bitmap.h"
+#include "BackgroundBitmap.h"
 #include "Utils.h"
-#include "FontManager.h"
-#include <math.h>
 
-#define WORLDMAP_FONT   "Trebuchet MS"
-#define WORLDMAP_WEIGHT 500
+// the map picture is cut into gfx/vgui/worldmap_<x>_<y>.tga tiles, placed by their sizes
+static constexpr int TILES_X = 3;
+static constexpr int TILES_Y = 2;
 
-enum
-{
-	WORLDMAP_WIDTH = 640,
-	WORLDMAP_HEIGHT = 480,
-	WORLDMAP_STRING_SIZE = 128,
-	WORLDMAP_FIRST_BONUS_BIT = 16384 // the bits from this one are the bonus missions
-};
+// the layout follows resource/UI/WorldMap.res and WorldMapMissionSelect.res of the game, scaled up from 640x480
+static constexpr int MISSION_HEIGHT = 24;
+static constexpr int MISSION_MARKER_SIZE = 10;
+static constexpr int MISSION_TEXT_OFFSET = 16;
+
+static constexpr int SKILL_HEIGHT = 48;
+
+// localization keys of the missions, like SECRETWAR_ORGANIZATION
+static constexpr int KEY_SIZE = 32;
+
+static constexpr int CHAR_SMALL  = 14;
+static constexpr int CHAR_MEDIUM = 16;
+static constexpr int CHAR_LARGE  = 20;
+
+static constexpr unsigned int COLOR_HIGHLIGHT = PackRGBA( 255, 255, 0, 255 );
+static constexpr unsigned int COLOR_LABEL = PackRGBA( 215, 215, 215, 255 );
+static constexpr unsigned int COLOR_TITLE = PackRGBA( 40, 210, 60, 255 );
+static constexpr unsigned int COLOR_TEXT = PackRGBA( 190, 190, 190, 255 );
+static constexpr unsigned int COLOR_SKILL = PackRGBA( 170, 170, 170, 255 );
 
 enum
 {
@@ -36,428 +53,573 @@ enum
 	MARKER_COUNT
 };
 
-enum
+// the order of the mission bits in cl_levellocks, starting from bit 1, see LEVEL_* in the czeror game library
+static constexpr struct WorldMapMission_t
 {
-	WORLDMAP_FONT_SMALL = 14,
-	WORLDMAP_FONT_MEDIUM = 16,
-	WORLDMAP_FONT_LARGE = 20
-};
-
-struct WorldMapRect_t
-{
-	int x, y, w, h;
-};
-
-static const WorldMapRect_t g_CancelButton = { 384, 410, 110, 22 };
-static const WorldMapRect_t g_OkButton = { 510, 410, 100, 22 };
-static const WorldMapRect_t g_ResumeButton = { 504, 437, 80, 26 };
-static const int g_iSkillY[] = { 314, 341, 370 };
-static const char *g_SkillKeys[] = { "CZERO_EasySkill", "CZERO_MediumSkill", "CZERO_HardSkill" };
-static const int g_iFontHeights[] = { WORLDMAP_FONT_SMALL, WORLDMAP_FONT_MEDIUM, WORLDMAP_FONT_LARGE };
-
-// the world map is made of tiles
-static const int g_iTileX[] = { 0, 256, 512 };
-static const int g_iTileW[] = { 256, 256, 128 };
-static const int g_iTileY[] = { 0, 256 };
-static const int g_iTileH[] = { 256, 224 };
-
-// bit of the mission in cl_levellocks (LEVEL_* of the mod)
-static const int g_iMissionBits[] =
-{
-	2, 8, 4, 16, 32, 64, 128, 256, 512, 2048, 1024, 4096, 8192,   // the order of g_Missions
-	16384, 32768, 65536, 131072, 262144, 524288                    // the bonus missions
-};
-
-struct WorldMapMission_t
-{
-	const char *prefix;  // #<prefix>_TITLE
-	const char *info;    // #<info>_BRIEF, _LOCATION, _TIME, ... (differs from prefix only for Silo)
-	const char *image;   // gfx/vgui/<image>_large.tga
+	const char *title; // #<title>_TITLE
+	const char *info;  // #<info>_BRIEF, _TIME, ..., differs from title only for Silo
+	const char *image; // gfx/vgui/<image>_large.tga
 	const char *map;
-	int x, y, w, h;
-};
-
-static const WorldMapMission_t g_Missions[] =
+	int x, y, w; // label on the map
+} s_Missions[] =
 {
-	{ "TRAINING", "TRAINING", "cz_train", "cz_train01", 90, 115, 180, 15 },
-	{ "LOSTCAUSE", "LOSTCAUSE", "cz_lostcause", "cz_lostcause", 479, 197, 155, 15 },
-	{ "RECOIL", "RECOIL", "cz_recoil", "cz_recoil-intro", 332, 207, 150, 15 },
-	{ "SILO", "SECRETWAR", "cz_silo", "cz_silo01", 453, 74, 180, 15 },
-	{ "BRECON", "BRECON", "cz_brecon", "cz_brecon01", 330, 90, 200, 15 },
-	{ "DRUGLAB", "DRUGLAB", "cz_druglab", "cz_druglab1", 139, 211, 170, 15 },
-	{ "MOTORCADE", "MOTORCADE", "cz_motor", "cz_motor1", 287, 129, 200, 15 },
-	{ "THINICE", "THINICE", "cz_thinice", "cz_thinice01", 238, 89, 90, 15 },
-	{ "DOWNED", "DOWNED", "cz_downed", "cz_downed1", 149, 257, 200, 15 },
-	{ "TURNCRANK", "TURNCRANK", "cz_turncrank", "cz_turncrank", 74, 132, 190, 15 },
-	{ "HANKAGAI", "HANKAGAI", "cz_hankagai", "cz_hankagai1", 540, 115, 95, 15 },
-	{ "ALAMO", "ALAMO", "cz_alamo", "cz_alamo", 317, 144, 55, 15 },
-	{ "HIGHRISE", "HIGHRISE", "cz_highrise", "cz_hr01", 274, 111, 200, 15 },
-	{ "TRUTH", "TRUTH", "cz_truth", "cz_truth1", 535, 130, 100, 15 },
-	{ "RUN", "RUN", "cz_run", "cz_run1", 535, 99, 90, 15 },
-	{ "MIAMI", "MIAMI", "cz_miami", "cz_miami1", 139, 154, 170, 15 },
-	{ "FASTLINE", "FASTLINE", "cz_fastline", "cz_fastline1", 537, 148, 95, 15 },
-	{ "PIPEDREAM", "PIPEDREAM", "cz_pipedream", "cz_pipedream1", 372, 141, 90, 15 },
-	{ "SANDSTORM", "SANDSTORM", "cz_sandstorm", "cz_sandstorm", 370, 158, 160, 15 },
+	{ "TRAINING",  "TRAINING",  "cz_train",     "cz_train01",      144, 184, 288 },
+	{ "RECOIL",    "RECOIL",    "cz_recoil",    "cz_recoil-intro", 531, 331, 240 },
+	{ "LOSTCAUSE", "LOSTCAUSE", "cz_lostcause", "cz_lostcause",    766, 315, 248 },
+	{ "SILO",      "SECRETWAR", "cz_silo",      "cz_silo01",       724, 118, 288 },
+	{ "BRECON",    "BRECON",    "cz_brecon",    "cz_brecon01",     528, 144, 320 },
+	{ "DRUGLAB",   "DRUGLAB",   "cz_druglab",   "cz_druglab1",     222, 337, 272 },
+	{ "MOTORCADE", "MOTORCADE", "cz_motor",     "cz_motor1",       459, 206, 320 },
+	{ "THINICE",   "THINICE",   "cz_thinice",   "cz_thinice01",    380, 142, 144 },
+	{ "DOWNED",    "DOWNED",    "cz_downed",    "cz_downed1",      238, 411, 320 },
+	{ "HANKAGAI",  "HANKAGAI",  "cz_hankagai",  "cz_hankagai1",    864, 184, 152 },
+	{ "TURNCRANK", "TURNCRANK", "cz_turncrank", "cz_turncrank",    118, 211, 304 },
+	{ "ALAMO",     "ALAMO",     "cz_alamo",     "cz_alamo",        507, 230, 88  },
+	{ "HIGHRISE",  "HIGHRISE",  "cz_highrise",  "cz_hr01",         438, 177, 320 },
+	// bonus missions
+	{ "TRUTH",     "TRUTH",     "cz_truth",     "cz_truth1",       856, 208, 160 },
+	{ "RUN",       "RUN",       "cz_run",       "cz_run1",         856, 158, 144 },
+	{ "MIAMI",     "MIAMI",     "cz_miami",     "cz_miami1",       222, 246, 272 },
+	{ "FASTLINE",  "FASTLINE",  "cz_fastline",  "cz_fastline1",    859, 236, 152 },
+	{ "PIPEDREAM", "PIPEDREAM", "cz_pipedream", "cz_pipedream1",   595, 225, 144 },
+	{ "SANDSTORM", "SANDSTORM", "cz_sandstorm", "cz_sandstorm",    592, 252, 256 },
 };
-static const int g_iMissionCount = V_ARRAYSIZE( g_Missions );
 
-class CMenuWorldMap : public CMenuBaseWindow
+static constexpr int MISSION_COUNT = V_ARRAYSIZE( s_Missions );
+static constexpr int CAMPAIGN_MISSION_COUNT = MISSION_COUNT - 6; // 6 bonus missions
+
+static int MissionBit( int mission )
+{
+	return 1 << ( mission + 1 );
+}
+
+// the rows go one under another
+static constexpr struct WorldMapInfoRow_t
+{
+	const char *label;
+	const char *suffix;
+	int h;
+} s_InfoRows[] =
+{
+	{ "CZERO_Time",         "_TIME",         32  },
+	{ "CZERO_Locale",       "_LOCATION",     64  },
+	{ "CZERO_Organization", "_ORGANIZATION", 32  },
+	{ "CZERO_Overview",     "_OVERVIEW",     240 },
+	{ "CZERO_Objective",    "_OBJECTIVE",    160 },
+};
+
+static constexpr int INFO_ROW_COUNT = V_ARRAYSIZE( s_InfoRows );
+
+static const char *s_SkillKeys[] = { "CZERO_EasySkill", "CZERO_MediumSkill", "CZERO_HardSkill" };
+
+static constexpr int SKILL_COUNT = V_ARRAYSIZE( s_SkillKeys );
+
+static void InitText( CMenuBaseItem &item, int charSize, unsigned int color, unsigned int align )
+{
+	// fonts are scaled to the character height when drawn
+	item.SetCharSize( QM_SMALLFONT );
+	item.charSize = charSize;
+	item.colorBase = color;
+	item.eTextAlignment = align;
+}
+
+static void InitLabel( CMenuAction &label, int x, int y, int w, int h, int charSize, unsigned int color, unsigned int align )
+{
+	label.iFlags |= QMF_INACTIVE;
+	label.SetRect( x, y, w, h );
+	InitText( label, charSize, color, align );
+}
+
+static void InitButton( CMenuAction &button, const char *text, int x, int y, int w, int h )
+{
+	button.szName = text;
+	button.SetRect( x, y, w, h );
+	InitText( button, CHAR_MEDIUM, uiColorWhite, QM_CENTER );
+	button.colorFocus = COLOR_HIGHLIGHT;
+	button.eFocusAnimation = QM_HIGHLIGHTIFFOCUS;
+	button.bDrawStroke = true;
+	button.colorStroke = uiColorWhite;
+}
+
+static void SetLocalized( CMenuBaseItem &item, char *key, size_t size, const char *prefix, const char *suffix )
+{
+	snprintf( key, size, "%s%s", prefix, suffix );
+	item.szName = L_GAME( key );
+}
+
+static void SetMissionPicture( CMenuBitmap &bitmap, const WorldMapMission_t &mission )
+{
+	char path[64];
+
+	snprintf( path, sizeof( path ), "gfx/vgui/%s_large.tga", mission.image );
+	bitmap.SetPicture( path );
+}
+
+/*
+=================
+CMenuWorldMapPage
+
+Full screen, with the layout of the game in the middle
+=================
+*/
+class CMenuWorldMapPage : public CMenuBaseWindow
 {
 public:
-	CMenuWorldMap() : CMenuBaseWindow( "CMenuWorldMap" ), m_bSelect( false ), m_iSelected( -1 ), m_iSkill( 1 ),
-		m_bLoaded( false ), m_flFontScale( 0 ) { for( size_t i = 0; i < V_ARRAYSIZE( m_hFonts ); i++ ) m_hFonts[i] = -1; }
+	typedef CMenuBaseWindow BaseClass;
 
-	void Show() override;
+	CMenuWorldMapPage( const char *name ) : BaseClass( name ) { }
+
 	void Draw() override;
-	bool KeyDown( int key ) override;
-	bool IsRoot() const override { return false; }
+
+protected:
+	void _VidInit() override;
+	void LoadTiles( const char *name );
 
 private:
-	void LoadImages();
-	HFont GetFont( int heightAt480 );
-	void Layout();
-	void Image( CImage &img, int x, int y, int w, int h, bool alpha = false );
-	void Text( const char *str, int x, int y, int w, int h, unsigned int col, int charH, uint justify );
-	bool In( int mx, int my, int x, int y, int w, int h ) const;
-	int  CurrentMission() const;
-	bool IsOpen( int idx ) const;
-	int  LatestOpen() const;
-	int  MissionAt( int mx, int my ) const;
-	void DrawMissionInfo( int idx );
-	void StartMission();
-
-	bool m_bSelect;
-	int  m_iSelected;
-	int  m_iSkill;
-	bool m_bLoaded;
-	float m_flScale;
-	int  m_iOffX, m_iOffY;
-
-	HFont m_hFonts[V_ARRAYSIZE( g_iFontHeights )];
-	float m_flFontScale;
-	CImage m_Tiles1[V_ARRAYSIZE( g_iTileX )][V_ARRAYSIZE( g_iTileY )];
-	CImage m_Tiles2[V_ARRAYSIZE( g_iTileX )][V_ARRAYSIZE( g_iTileY )];
-	CImage m_Marker[MARKER_COUNT];
-	CImage m_MissionImg[g_iMissionCount];
-	bool   m_MissionImgLoaded[g_iMissionCount];
+	CMenuBackgroundBitmap::bimage_t m_Tiles[TILES_X][TILES_Y];
+	Size m_MapSize;
 };
 
-static CMenuWorldMap *g_pWorldMap = NULL;
-
-static const char *MissionKey( char *key, const char *prefix, const char *suffix )
+void CMenuWorldMapPage::_VidInit()
 {
-	V_snprintf( key, WORLDMAP_STRING_SIZE, "%s%s", prefix, suffix );
-	return key;
+	SetRect( uiStatic.xOffset + ( uiStatic.width - 1024 ) / 2, uiStatic.yOffset, 1024, 768 );
 }
 
-HFont CMenuWorldMap::GetFont( int heightAt480 )
+void CMenuWorldMapPage::LoadTiles( const char *name )
 {
-	const float fs = uiStatic.scaleY;
-	if( fabs( m_flFontScale - fs ) > 0.01f )
+	int x = 0, y = 0;
+
+	for( int i = 0; i < TILES_X; i++ )
 	{
-		for( size_t i = 0; i < V_ARRAYSIZE( m_hFonts ); i++ )
-			if( m_hFonts[i] != -1 )
-				g_FontMgr->DeleteFont( m_hFonts[i] );
-		for( size_t i = 0; i < V_ARRAYSIZE( m_hFonts ); i++ )
-			m_hFonts[i] = CFontBuilder( WORLDMAP_FONT, g_iFontHeights[i] * fs, WORLDMAP_WEIGHT ).Create();
-		m_flFontScale = fs;
+		y = 0;
+
+		for( int j = 0; j < TILES_Y; j++ )
+		{
+			CMenuBackgroundBitmap::bimage_t &tile = m_Tiles[i][j];
+			char path[64];
+
+			snprintf( path, sizeof( path ), "gfx/vgui/%s_%d_%d.tga", name, i, j );
+			tile.hImage = EngFuncs::PIC_Load( path );
+			tile.coord = Point( x, y );
+			tile.size = Size( EngFuncs::PIC_Width( tile.hImage ), EngFuncs::PIC_Height( tile.hImage ));
+
+			y += tile.size.h;
+		}
+
+		x += m_Tiles[i][0].size.w;
 	}
-	return heightAt480 <= WORLDMAP_FONT_SMALL ? m_hFonts[0] : ( heightAt480 <= WORLDMAP_FONT_MEDIUM ? m_hFonts[1] : m_hFonts[2] );
+
+	m_MapSize = Size( x, y );
 }
 
-void CMenuWorldMap::LoadImages()
+void CMenuWorldMapPage::Draw()
 {
-	if( m_bLoaded )
+	const int right = m_scPos.x + m_scSize.w;
+	const int bottom = m_scPos.y + m_scSize.h;
+
+	// black only around the map, every pixel drawn twice by a fading window gets darker
+	UI_FillRect( 0, 0, ScreenWidth, m_scPos.y, uiColorBlack );
+	UI_FillRect( 0, bottom, ScreenWidth, ScreenHeight - bottom, uiColorBlack );
+	UI_FillRect( 0, m_scPos.y, m_scPos.x, m_scSize.h, uiColorBlack );
+	UI_FillRect( right, m_scPos.y, ScreenWidth - right, m_scSize.h, uiColorBlack );
+
+	if( m_MapSize.w > 0 && m_MapSize.h > 0 )
+	{
+		const float xScale = (float)m_scSize.w / m_MapSize.w;
+		const float yScale = (float)m_scSize.h / m_MapSize.h;
+
+		for( int i = 0; i < TILES_X; i++ )
+		{
+			for( int j = 0; j < TILES_Y; j++ )
+				CMenuBackgroundBitmap::DrawBackgroundPiece( m_Tiles[i][j], m_scPos, 0, 0, xScale, yScale );
+		}
+	}
+	else
+	{
+		UI_FillRect( m_scPos, m_scSize, uiColorBlack );
+	}
+
+	BaseClass::Draw();
+}
+
+/*
+=================
+CMenuWorldMapSelect
+=================
+*/
+class CMenuWorldMapSkill : public CMenuAction
+{
+public:
+	void Draw() override;
+
+	int skill;
+};
+
+class CMenuWorldMapSelect : public CMenuWorldMapPage
+{
+public:
+	typedef CMenuWorldMapPage BaseClass;
+
+	CMenuWorldMapSelect() : BaseClass( "CMenuWorldMapSelect" ), m_iSkill( 1 ), m_iMission( 0 ) { }
+
+	void Open( int mission );
+
+	int m_iSkill;
+
+protected:
+	void _Init() override;
+
+private:
+	void StartMission();
+
+	int m_iMission;
+
+	CMenuAction m_MissionLabel;
+	CMenuAction m_MissionTitle;
+	CMenuAction m_InfoLabels[INFO_ROW_COUNT];
+	CMenuAction m_InfoValues[INFO_ROW_COUNT];
+	char m_szTitleKey[KEY_SIZE];
+	char m_szInfoKeys[INFO_ROW_COUNT][KEY_SIZE];
+	CMenuBitmap m_Picture;
+	CMenuWorldMapSkill m_Skills[SKILL_COUNT];
+	CMenuAction m_Cancel;
+	CMenuAction m_Ok;
+};
+
+void CMenuWorldMapSkill::Draw()
+{
+	// the box is centered in a square on the left, text goes after it
+	const int h = m_scSize.h;
+	const int box = h / 3;
+	const int boxX = m_scPos.x + ( h - box ) / 2;
+	const int boxY = m_scPos.y + ( h - box ) / 2;
+	const bool selected = GetParent( CMenuWorldMapSelect )->m_iSkill == skill;
+	unsigned int color = colorBase;
+
+	if( selected )
+		color = uiColorWhite;
+	else if( this == m_pParent->ItemAtCursor( ))
+		color = colorFocus;
+
+	UI_DrawRectangle( boxX, boxY, box, box, uiColorWhite );
+
+	if( selected )
+		UI_FillRect( boxX + box / 4, boxY + box / 4, box / 2, box / 2, uiColorWhite );
+
+	UI_DrawString( font, m_scPos.x + h, m_scPos.y, m_scSize.w - h, h, szName, color, m_scChSize, QM_LEFT, ETF_FORCECOL );
+}
+
+void CMenuWorldMapSelect::_Init()
+{
+	LoadTiles( "worldmap2" );
+
+	m_MissionLabel.szName = L_GAME( "CZERO_Mission" );
+	InitLabel( m_MissionLabel, 32, 96, 144, 32, CHAR_LARGE, COLOR_LABEL, QM_LEFT );
+	AddItem( m_MissionLabel );
+
+	InitLabel( m_MissionTitle, 176, 96, 400, 32, CHAR_LARGE, COLOR_TITLE, QM_LEFT );
+	AddItem( m_MissionTitle );
+
+	int y = 144;
+
+	for( int i = 0; i < INFO_ROW_COUNT; i++ )
+	{
+		const WorldMapInfoRow_t &row = s_InfoRows[i];
+
+		m_InfoLabels[i].szName = L_GAME( row.label );
+		InitLabel( m_InfoLabels[i], 16, y, 176, row.h, CHAR_MEDIUM, COLOR_LABEL, QM_TOPRIGHT );
+		AddItem( m_InfoLabels[i] );
+
+		InitLabel( m_InfoValues[i], 208, y, 368, row.h, CHAR_MEDIUM, COLOR_TEXT, QM_TOPLEFT );
+		AddItem( m_InfoValues[i] );
+
+		y += row.h;
+	}
+
+	m_Picture.iFlags |= QMF_INACTIVE;
+	m_Picture.SetRenderMode( QM_DRAWTRANS );
+	m_Picture.SetRect( 609, 96, 388, 388 );
+	AddItem( m_Picture );
+
+	for( int i = 0; i < SKILL_COUNT; i++ )
+	{
+		CMenuWorldMapSkill &item = m_Skills[i];
+
+		item.skill = i + 1;
+		item.szName = L_GAME( s_SkillKeys[i] );
+		item.SetRect( 688, 502 + i * 45, 320, SKILL_HEIGHT );
+		InitText( item, CHAR_MEDIUM, COLOR_SKILL, QM_LEFT );
+		item.colorFocus = COLOR_HIGHLIGHT;
+		SET_EVENT_MULTI( item.onReleased,
+		{
+			CMenuWorldMapSkill *self = (CMenuWorldMapSkill *)pSelf;
+			self->GetParent( CMenuWorldMapSelect )->m_iSkill = self->skill;
+		});
+		AddItem( item );
+	}
+
+	InitButton( m_Cancel, L_GAME( "CZERO_Cancel" ), 614, 656, 176, 35 );
+	m_Cancel.onReleased = VoidCb( &CMenuWorldMapSelect::Hide );
+	AddItem( m_Cancel );
+
+	InitButton( m_Ok, L_GAME( "CZERO_Okay" ), 816, 656, 160, 35 );
+	m_Ok.onReleased = VoidCb( &CMenuWorldMapSelect::StartMission );
+	AddItem( m_Ok );
+}
+
+void CMenuWorldMapSelect::Open( int mission )
+{
+	const WorldMapMission_t &m = s_Missions[mission];
+	const int skill = EngFuncs::GetCvarFloat( "skill" );
+
+	m_iMission = mission;
+	m_iSkill = bound( 1, skill, SKILL_COUNT );
+
+	SetLocalized( m_MissionTitle, m_szTitleKey, sizeof( m_szTitleKey ), m.title, "_TITLE" );
+
+	for( int i = 0; i < INFO_ROW_COUNT; i++ )
+		SetLocalized( m_InfoValues[i], m_szInfoKeys[i], sizeof( m_szInfoKeys[i] ), m.info, s_InfoRows[i].suffix );
+
+	SetMissionPicture( m_Picture, m );
+
+	Show();
+	SetCursorToItem( m_Ok );
+}
+
+void CMenuWorldMapSelect::StartMission()
+{
+	const char *map = s_Missions[m_iMission].map;
+
+	// a running game goes on with the picked mission, as in the original client
+	if( CL_IsActive() && EngFuncs::GetCvarFloat( "host_serverstate" ) && EngFuncs::GetCvarFloat( "maxplayers" ) <= 1 )
+	{
+		EngFuncs::CvarSetValue( "skill", m_iSkill );
+		EngFuncs::ClientCmdF( false, "changelevel %s\n", map );
 		return;
-	m_bLoaded = true;
-
-	for( size_t i = 0; i < V_ARRAYSIZE( g_iTileX ); i++ )
-		for( size_t j = 0; j < V_ARRAYSIZE( g_iTileY ); j++ )
-		{
-			char path[WORLDMAP_STRING_SIZE];
-			V_snprintf( path, sizeof( path ), "gfx/vgui/worldmap_%d_%d.tga", (int)i, (int)j );
-			m_Tiles1[i][j].Load( path );
-			V_snprintf( path, sizeof( path ), "gfx/vgui/worldmap2_%d_%d.tga", (int)i, (int)j );
-			m_Tiles2[i][j].Load( path );
-		}
-	m_Marker[MARKER_CURRENT].Load( "gfx/vgui/missioncurrent.tga" );
-	m_Marker[MARKER_UNLOCKED].Load( "gfx/vgui/missionunlocked.tga" );
-	m_Marker[MARKER_LOCKED].Load( "gfx/vgui/missionlocked.tga" );
-	for( int i = 0; i < g_iMissionCount; i++ )
-		m_MissionImgLoaded[i] = false;
-}
-
-void CMenuWorldMap::Layout()
-{
-	float sx = ScreenWidth / (float)WORLDMAP_WIDTH, sy = ScreenHeight / (float)WORLDMAP_HEIGHT;
-	m_flScale = sx < sy ? sx : sy;
-	m_iOffX = (int)( ( ScreenWidth - WORLDMAP_WIDTH * m_flScale ) * 0.5f );
-	m_iOffY = (int)( ( ScreenHeight - WORLDMAP_HEIGHT * m_flScale ) * 0.5f );
-}
-
-void CMenuWorldMap::Image( CImage &img, int x, int y, int w, int h, bool alpha )
-{
-	UI_DrawPic( m_iOffX + (int)( x * m_flScale ), m_iOffY + (int)( y * m_flScale ),
-		(int)( w * m_flScale + 0.5f ), (int)( h * m_flScale + 0.5f ), 0xFFFFFFFF, img,
-		alpha ? QM_DRAWTRANS : QM_DRAWNORMAL );
-}
-
-void CMenuWorldMap::Text( const char *str, int x, int y, int w, int h, unsigned int col, int charH, uint justify )
-{
-	int fontH = WORLDMAP_FONT_MEDIUM;
-	if( charH >= 18 ) fontH = WORLDMAP_FONT_LARGE;
-	else if( charH == 15 ) fontH = WORLDMAP_FONT_SMALL;
-	HFont font = GetFont( fontH );
-	UI_DrawString( font, m_iOffX + (int)( x * m_flScale ), m_iOffY + (int)( y * m_flScale ),
-		(int)( w * m_flScale ), (int)( h * m_flScale ), str, col, (int)( fontH * uiStatic.scaleY ), justify, ETF_FORCECOL );
-}
-
-bool CMenuWorldMap::In( int mx, int my, int x, int y, int w, int h ) const
-{
-	int px = m_iOffX + (int)( x * m_flScale ), py = m_iOffY + (int)( y * m_flScale );
-	return mx >= px && my >= py && mx < px + (int)( w * m_flScale ) && my < py + (int)( h * m_flScale );
-}
-
-int CMenuWorldMap::MissionAt( int mx, int my ) const
-{
-	for( int i = 0; i < g_iMissionCount; i++ )
-		if( In( mx, my, g_Missions[i].x, g_Missions[i].y, g_Missions[i].w, g_Missions[i].h ))
-			return i;
-	return -1;
-}
-
-bool CMenuWorldMap::IsOpen( int idx ) const
-{
-	return ( (int)EngFuncs::GetCvarFloat( "cl_levellocks" ) & g_iMissionBits[idx] ) != 0;
-}
-
-// the highest bit among the open campaign missions is the next one to play
-int CMenuWorldMap::LatestOpen() const
-{
-	int best = -1;
-	for( int i = 0; i < g_iMissionCount; i++ )
-	{
-		if( g_iMissionBits[i] < WORLDMAP_FIRST_BONUS_BIT && IsOpen( i ) && ( best < 0 || g_iMissionBits[i] > g_iMissionBits[best] ))
-			best = i;
 	}
-	return best;
+
+	UI_PrepareSingleplayerGame( m_iSkill );
+	EngFuncs::ClientCmdF( false, "map %s\n", map );
 }
 
-int CMenuWorldMap::CurrentMission() const
+/*
+=================
+CMenuWorldMap
+=================
+*/
+class CMenuWorldMapMission : public CMenuAction
 {
-	const char *map = EngFuncs::GetCvarString( "hostmap" );
-	if( map && map[0] )
+public:
+	typedef CMenuAction BaseClass;
+
+	bool KeyUp( int key ) override;
+	void Draw() override;
+
+	int mission;
+	char titleKey[KEY_SIZE];
+};
+
+class CMenuWorldMap : public CMenuWorldMapPage
+{
+public:
+	typedef CMenuWorldMapPage BaseClass;
+
+	CMenuWorldMap() : BaseClass( "CMenuWorldMap" ), m_iLocks( 0 ), m_iCurrent( -1 ), m_iInfoMission( -1 ) { }
+
+	void Show() override;
+	void Think() override;
+
+	bool IsUnlocked( int mission ) const;
+	CImage &Marker( int mission );
+	void OpenMission( int mission );
+
+protected:
+	void _Init() override;
+
+private:
+	void UpdateLocks();
+	void ShowMissionInfo( int mission );
+
+	int m_iLocks;
+	int m_iCurrent;
+	int m_iInfoMission;
+
+	CImage m_Markers[MARKER_COUNT];
+	CMenuWorldMapMission m_Missions[MISSION_COUNT];
+	CMenuBitmap m_InfoPicture;
+	CMenuAction m_InfoLabel;
+	CMenuAction m_InfoTitle;
+	CMenuAction m_InfoBrief;
+	char m_szInfoTitleKey[KEY_SIZE];
+	char m_szInfoBriefKey[KEY_SIZE];
+	CMenuAction m_Resume;
+
+	CMenuWorldMapSelect m_Select;
+};
+
+bool CMenuWorldMapMission::KeyUp( int key )
+{
+	if( GetParent( CMenuWorldMap )->IsUnlocked( mission ))
+		return BaseClass::KeyUp( key );
+
+	if( UI::Key::IsEnter( key ) || ( UI::Key::IsLeftMouse( key ) && FBitSet( iFlags, QMF_HASMOUSEFOCUS )))
 	{
-		for( int i = 0; i < g_iMissionCount; i++ )
+		PlayLocalSound( uiStatic.sounds[SND_BUZZ] );
+		return true;
+	}
+
+	return false;
+}
+
+void CMenuWorldMapMission::Draw()
+{
+	const int h = m_scSize.h;
+	const int marker = h * MISSION_MARKER_SIZE / MISSION_HEIGHT;
+	const int text = h * MISSION_TEXT_OFFSET / MISSION_HEIGHT;
+	const unsigned int color = this == m_pParent->ItemAtCursor() ? colorFocus : colorBase;
+
+	UI_DrawPic( m_scPos.x, m_scPos.y + ( h - marker ) / 2, marker, marker, uiColorWhite, GetParent( CMenuWorldMap )->Marker( mission ));
+	UI_DrawString( font, m_scPos.x + text, m_scPos.y, m_scSize.w - text, h, szName, color, m_scChSize, QM_LEFT, ETF_FORCECOL );
+}
+
+bool CMenuWorldMap::IsUnlocked( int mission ) const
+{
+	return ( m_iLocks & MissionBit( mission )) != 0;
+}
+
+CImage &CMenuWorldMap::Marker( int mission )
+{
+	if( !IsUnlocked( mission ))
+		return m_Markers[MARKER_LOCKED];
+
+	return m_Markers[mission == m_iCurrent ? MARKER_CURRENT : MARKER_UNLOCKED];
+}
+
+void CMenuWorldMap::OpenMission( int mission )
+{
+	m_Select.Open( mission );
+}
+
+void CMenuWorldMap::UpdateLocks()
+{
+	m_iLocks = EngFuncs::GetCvarFloat( "cl_levellocks" );
+	m_iCurrent = -1;
+
+	// the czeror game library sets the bit after the last mission when the ending is reached
+	if( m_iLocks & MissionBit( MISSION_COUNT ))
+		return;
+
+	// the newest unlocked campaign mission is the current one, as in the original client
+	for( int i = CAMPAIGN_MISSION_COUNT - 1; i >= 0; i-- )
+	{
+		if( IsUnlocked( i ))
 		{
-			size_t l = strlen( g_Missions[i].image );
-			if( !strncmp( map, g_Missions[i].image, l ))
-				return i;
+			m_iCurrent = i;
+			break;
 		}
 	}
-	return 0;
+}
+
+void CMenuWorldMap::ShowMissionInfo( int mission )
+{
+	if( m_iInfoMission == mission )
+		return;
+
+	const WorldMapMission_t &m = s_Missions[mission];
+
+	m_iInfoMission = mission;
+	SetMissionPicture( m_InfoPicture, m );
+	SetLocalized( m_InfoTitle, m_szInfoTitleKey, sizeof( m_szInfoTitleKey ), m.title, "_TITLE" );
+	SetLocalized( m_InfoBrief, m_szInfoBriefKey, sizeof( m_szInfoBriefKey ), m.info, "_BRIEF" );
+}
+
+void CMenuWorldMap::_Init()
+{
+	LoadTiles( "worldmap" );
+
+	m_Markers[MARKER_CURRENT].Load( "gfx/vgui/missioncurrent.tga" );
+	m_Markers[MARKER_UNLOCKED].Load( "gfx/vgui/missionunlocked.tga" );
+	m_Markers[MARKER_LOCKED].Load( "gfx/vgui/missionlocked.tga" );
+
+	for( int i = 0; i < MISSION_COUNT; i++ )
+	{
+		const WorldMapMission_t &m = s_Missions[i];
+		CMenuWorldMapMission &item = m_Missions[i];
+
+		item.mission = i;
+		SetLocalized( item, item.titleKey, sizeof( item.titleKey ), m.title, "_TITLE" );
+		item.SetRect( m.x, m.y, MISSION_TEXT_OFFSET + m.w, MISSION_HEIGHT );
+		InitText( item, CHAR_SMALL, uiColorWhite, QM_LEFT );
+		item.colorFocus = COLOR_HIGHLIGHT;
+		SET_EVENT_MULTI( item.onReleased,
+		{
+			CMenuWorldMapMission *self = (CMenuWorldMapMission *)pSelf;
+			self->GetParent( CMenuWorldMap )->OpenMission( self->mission );
+		});
+		AddItem( item );
+	}
+
+	m_InfoPicture.iFlags |= QMF_INACTIVE;
+	m_InfoPicture.SetRenderMode( QM_DRAWTRANS );
+	m_InfoPicture.SetRect( 32, 598, 139, 139 );
+	AddItem( m_InfoPicture );
+
+	m_InfoLabel.szName = L_GAME( "CZERO_Mission" );
+	InitLabel( m_InfoLabel, 222, 577, 144, 62, CHAR_LARGE, COLOR_LABEL, QM_LEFT );
+	AddItem( m_InfoLabel );
+
+	InitLabel( m_InfoTitle, 360, 577, 640, 62, CHAR_LARGE, COLOR_TITLE, QM_LEFT );
+	AddItem( m_InfoTitle );
+
+	InitLabel( m_InfoBrief, 224, 627, 480, 112, CHAR_MEDIUM, COLOR_TEXT, QM_TOPLEFT );
+	AddItem( m_InfoBrief );
+
+	InitButton( m_Resume, L_GAME( "CZERO_Resume" ), 806, 699, 128, 41 );
+	m_Resume.onReleased = UI_CloseMenu;
+	AddItem( m_Resume );
 }
 
 void CMenuWorldMap::Show()
 {
-	Layout();
-	m_bSelect = false;
-	m_iSelected = -1;
-	m_iSkill = (int)EngFuncs::GetCvarFloat( "skill" );
-	if( m_iSkill < 1 || m_iSkill > 3 ) m_iSkill = 1;
-	if( !uiStatic.menu.IsActive() )
-		UI_SetActiveMenu( true );
-	CMenuBaseWindow::Show();
-}
-
-void CMenuWorldMap::StartMission()
-{
-	if( m_iSelected < 0 )
+	// menu_worldmap command is registered for every game
+	if( !UI_IsCZDS( ))
 		return;
 
-	if( EngFuncs::GetCvarFloat( "host_serverstate" ) && EngFuncs::GetCvarFloat( "maxplayers" ) > 1 )
-		EngFuncs::HostEndGame( "end of the game" );
+	// the czeror client opens the map from the game, with the worldmap command and the MapInfo message
+	if( !uiStatic.menu.IsActive( ))
+		UI_SetActiveMenu( true );
 
-	EngFuncs::CvarSetValue( "skill", (float)m_iSkill );
-	EngFuncs::CvarSetValue( "deathmatch", 0.0f );
-	EngFuncs::CvarSetValue( "teamplay", 0.0f );
-	EngFuncs::CvarSetValue( "pausable", 1.0f );
-	EngFuncs::CvarSetValue( "maxplayers", 1.0f );
-	EngFuncs::CvarSetValue( "coop", 0.0f );
-	EngFuncs::PlayBackgroundTrack( NULL, NULL );
-	EngFuncs::ClientCmdF( false, "map %s\n", g_Missions[m_iSelected].map );
+	const bool inGame = CL_IsActive();
+
+	m_Resume.SetGrayed( !inGame );
+	m_Resume.colorStroke = inGame ? uiColorWhite : uiColorDkGrey;
+
+	BaseClass::Show();
+
+	UpdateLocks();
+
+	const int mission = m_iCurrent >= 0 ? m_iCurrent : 0;
+
+	SetCursorToItem( m_Missions[mission] );
+	ShowMissionInfo( mission );
 }
 
-void CMenuWorldMap::DrawMissionInfo( int idx )
+void CMenuWorldMap::Think()
 {
-	const unsigned int green = PackRGBA( 40, 210, 60, 255 );
-	const unsigned int gray = PackRGBA( 190, 190, 190, 255 );
-	const char *p = g_Missions[idx].prefix;
-	const char *pi = g_Missions[idx].info;
-	char key[WORLDMAP_STRING_SIZE];
+	CMenuBaseItem *focused = ItemAtCursor();
 
-	if( !m_MissionImgLoaded[idx] )
+	UpdateLocks();
+
+	for( int i = 0; i < MISSION_COUNT; i++ )
 	{
-		char path[WORLDMAP_STRING_SIZE];
-		V_snprintf( path, sizeof( path ), "gfx/vgui/%s_large.tga", g_Missions[idx].image );
-		m_MissionImg[idx].Load( path );
-		m_MissionImgLoaded[idx] = true;
+		if( focused == &m_Missions[i] )
+		{
+			ShowMissionInfo( i );
+			break;
+		}
 	}
-	Image( m_MissionImg[idx], 20, 374, 87, 87, true );
-	Text( L( "CZERO_Mission" ), 139, 361, 90, 39, PackRGBA( 215, 215, 215, 255 ), 22, QM_LEFT );
-	Text( L( MissionKey( key, p, "_TITLE" )), 225, 361, 400, 39, green, 22, QM_LEFT );
-	Text( L( MissionKey( key, pi, "_BRIEF" )), 140, 392, 300, 70, gray, 14, QM_TOPLEFT );
+
+	BaseClass::Think();
 }
 
-void CMenuWorldMap::Draw()
-{
-	LoadImages();
-	Layout();
-
-	UI_FillRect( 0, 0, ScreenWidth, ScreenHeight, PackRGBA( 0, 0, 0, 255 ));
-
-	const int mx = uiStatic.cursorX, my = uiStatic.cursorY;
-	const unsigned int white = PackRGBA( 255, 255, 255, 255 );
-
-	if( !m_bSelect )
-	{
-		for( size_t i = 0; i < V_ARRAYSIZE( g_iTileX ); i++ )
-			for( size_t j = 0; j < V_ARRAYSIZE( g_iTileY ); j++ )
-				Image( m_Tiles1[i][j], g_iTileX[i], g_iTileY[j], g_iTileW[i], g_iTileH[j] );
-
-		int cur = CurrentMission();
-		const int latest = LatestOpen();
-		int hover = MissionAt( mx, my );
-
-		for( int i = 0; i < g_iMissionCount; i++ )
-		{
-			const WorldMapMission_t &m = g_Missions[i];
-			const bool open = IsOpen( i );
-			CImage &mark = m_Marker[ !open ? MARKER_LOCKED : ( i == latest ? MARKER_CURRENT : MARKER_UNLOCKED ) ];
-			Image( mark, m.x, m.y + 5, 6, 6 );
-			char key[WORLDMAP_STRING_SIZE];
-			Text( L( MissionKey( key, m.prefix, "_TITLE" )), m.x + 10, m.y, m.w, m.h,
-				i == hover ? PackRGBA( 255, 255, 0, 255 ) : white, 15, QM_LEFT );
-		}
-
-		DrawMissionInfo( hover >= 0 ? hover : cur );
-
-		// Resume: only when a game is running
-		const bool inGame = EngFuncs::ClientInGame() != 0;
-		const bool onResume = inGame && In( mx, my, g_ResumeButton.x, g_ResumeButton.y, g_ResumeButton.w, g_ResumeButton.h );
-		UI_DrawRectangle( m_iOffX + (int)( 504 * m_flScale ), m_iOffY + (int)( 437 * m_flScale ),
-			(int)( 80 * m_flScale ), (int)( 26 * m_flScale ), inGame ? white : PackRGBA( 110, 110, 110, 255 ));
-		Text( L( "CZERO_Resume" ), 504, 437, 80, 26, onResume ? PackRGBA( 255, 255, 0, 255 ) : ( inGame ? white : PackRGBA( 110, 110, 110, 255 )), 14, QM_CENTER );
-	}
-	else
-	{
-		for( size_t i = 0; i < V_ARRAYSIZE( g_iTileX ); i++ )
-			for( size_t j = 0; j < V_ARRAYSIZE( g_iTileY ); j++ )
-				Image( m_Tiles2[i][j], g_iTileX[i], g_iTileY[j], g_iTileW[i], g_iTileH[j] );
-
-		const WorldMapMission_t &m = g_Missions[m_iSelected];
-		const char *p = m.prefix;
-		const char *pi = m.info;
-		char key[WORLDMAP_STRING_SIZE];
-		const unsigned int label = PackRGBA( 215, 215, 215, 255 );
-		const unsigned int value = PackRGBA( 190, 190, 190, 255 );
-
-		Text( L( "CZERO_Mission" ), 20, 60, 90, 20, label, 20, QM_LEFT );
-		Text( L( MissionKey( key, p, "_TITLE" )), 110, 60, 250, 20, PackRGBA( 40, 210, 60, 255 ), 20, QM_LEFT );
-
-		Text( L( "CZERO_Time" ), 10, 90, 110, 20, label, 14, QM_TOPRIGHT );
-		Text( L( MissionKey( key, pi, "_TIME" )), 130, 90, 230, 20, value, 14, QM_TOPLEFT );
-		Text( L( "CZERO_Locale" ), 10, 110, 110, 40, label, 14, QM_TOPRIGHT );
-		Text( L( MissionKey( key, pi, "_LOCATION" )), 130, 110, 230, 40, value, 14, QM_TOPLEFT );
-		Text( L( "CZERO_Organization" ), 10, 150, 110, 20, label, 14, QM_TOPRIGHT );
-		Text( L( MissionKey( key, pi, "_ORGANIZATION" )), 130, 150, 230, 20, value, 14, QM_TOPLEFT );
-		Text( L( "CZERO_Overview" ), 10, 170, 110, 20, label, 14, QM_TOPRIGHT );
-		Text( L( MissionKey( key, pi, "_OVERVIEW" )), 130, 170, 230, 150, value, 14, QM_TOPLEFT );
-		Text( L( "CZERO_Objective" ), 10, 320, 110, 20, label, 14, QM_TOPRIGHT );
-		Text( L( MissionKey( key, pi, "_OBJECTIVE" )), 130, 320, 230, 100, value, 14, QM_TOPLEFT );
-
-		if( !m_MissionImgLoaded[m_iSelected] )
-		{
-			char path[WORLDMAP_STRING_SIZE];
-			V_snprintf( path, sizeof( path ), "gfx/vgui/%s_large.tga", m.image );
-			m_MissionImg[m_iSelected].Load( path );
-			m_MissionImgLoaded[m_iSelected] = true;
-		}
-		Image( m_MissionImg[m_iSelected], 381, 60, 243, 243, true );
-
-		for( int i = 0; i < (int)V_ARRAYSIZE( g_iSkillY ); i++ )
-		{
-			const bool sel = m_iSkill == i + 1;
-			const bool hov = In( mx, my, 430, g_iSkillY[i], 200, 30 );
-			const int cx = 430 + 6, cy = g_iSkillY[i] + 6;
-			UI_DrawRectangle( m_iOffX + (int)( cx * m_flScale ), m_iOffY + (int)( cy * m_flScale ),
-				(int)( 10 * m_flScale ), (int)( 10 * m_flScale ), white );
-			if( sel )
-				UI_FillRect( m_iOffX + (int)( ( cx + 3 ) * m_flScale ), m_iOffY + (int)( ( cy + 3 ) * m_flScale ),
-					(int)( 4 * m_flScale ), (int)( 4 * m_flScale ), white );
-			Text( L( g_SkillKeys[i] ), 430 + 24, g_iSkillY[i], 176, 30,
-				sel ? white : ( hov ? PackRGBA( 255, 255, 0, 255 ) : PackRGBA( 170, 170, 170, 255 )), 14, QM_LEFT );
-		}
-
-		const WorldMapRect_t *buttons[] = { &g_CancelButton, &g_OkButton };
-		const char *buttonKeys[] = { "CZERO_Cancel", "CZERO_Okay" };
-		for( size_t i = 0; i < V_ARRAYSIZE( buttons ); i++ )
-		{
-			const WorldMapRect_t &b = *buttons[i];
-			const bool hov = In( mx, my, b.x, b.y, b.w, b.h );
-			UI_DrawRectangle( m_iOffX + (int)( b.x * m_flScale ), m_iOffY + (int)( b.y * m_flScale ),
-				(int)( b.w * m_flScale ), (int)( b.h * m_flScale ), white );
-			Text( L( buttonKeys[i] ), b.x, b.y, b.w, b.h, hov ? PackRGBA( 255, 255, 0, 255 ) : white, 13, QM_CENTER );
-		}
-	}
-}
-
-bool CMenuWorldMap::KeyDown( int key )
-{
-	if( UI::Key::IsEscape( key ))
-	{
-		if( m_bSelect )
-			m_bSelect = false;
-		else
-			Hide();
-		return true;
-	}
-
-	if( UI::Key::IsConsole( key ))
-	{
-		EngFuncs::KEY_SetDest( KEY_CONSOLE );
-		return true;
-	}
-
-	if( key != K_MOUSE1 )
-		return true;
-
-	const int mx = uiStatic.cursorX, my = uiStatic.cursorY;
-
-	if( !m_bSelect )
-	{
-		int hit = MissionAt( mx, my );
-		if( hit >= 0 && IsOpen( hit ))
-		{
-			m_iSelected = hit;
-			m_bSelect = true;
-		}
-		else if( EngFuncs::ClientInGame() && In( mx, my, 504, 437, 80, 26 ))
-			UI_CloseMenu();
-	}
-	else
-	{
-		for( int i = 0; i < (int)V_ARRAYSIZE( g_iSkillY ); i++ )
-			if( In( mx, my, 430, g_iSkillY[i], 200, 30 ))
-				m_iSkill = i + 1;
-
-		if( In( mx, my, g_CancelButton.x, g_CancelButton.y, g_CancelButton.w, g_CancelButton.h ))
-			m_bSelect = false;
-		else if( In( mx, my, g_OkButton.x, g_OkButton.y, g_OkButton.w, g_OkButton.h ))
-			StartMission();
-	}
-	return true;
-}
-
-// console: menu_worldmap
 ADD_MENU( menu_worldmap, CMenuWorldMap, UI_WorldMap_Menu );

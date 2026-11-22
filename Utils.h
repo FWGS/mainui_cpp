@@ -78,7 +78,7 @@ extern "C" EXPORT void AddTouchButtonToList( const char *name, const char *textu
 #define Green( x )	( ((x) & 0xFF00 ) >> 8 )
 #define Blue( x )	( ((x) & 0xFF ) >> 0 )
 
-inline unsigned int PackRGBA( const unsigned int r, const unsigned int g, const unsigned int b, const unsigned int a )
+inline constexpr unsigned int PackRGBA( const unsigned int r, const unsigned int g, const unsigned int b, const unsigned int a )
 {
 	return ((a)<<24|(r)<<16|(g)<<8|(b));
 }
@@ -149,6 +149,13 @@ const char *L( const char *szStr ) __attribute__(( format_arg( 1 ))); // L means
 #else
 const char *L( const char *szStr ); // L means Localize!
 #endif
+
+// like gettext's N_(), marks a key for dictgen.py where L() can't be called yet, e.g. in constant tables
+#define N_( x ) x
+
+// L() for keys that only come from the game's own translation files, dictgen.py skips them
+#define L_GAME( x ) L( x )
+
 void UI_FreeCustomStrings( void );
 
 inline size_t Q_strncpy( char *dst, const char *src, size_t size )
