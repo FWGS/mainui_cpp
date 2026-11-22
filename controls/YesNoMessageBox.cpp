@@ -145,6 +145,25 @@ bool CMenuYesNoMessageBox::KeyDown( int key )
 	return BaseClass::KeyDown( key );
 }
 
+bool CMenuYesNoMessageBox::KeyUp( int key )
+{
+	if( BaseClass::KeyUp( key ))
+		return true;
+
+	// Enter in a text field or spin control confirms the dialog
+	// gamepad A button on a text field opens the system keyboard, see CMenuField::KeyDown
+	CMenuBaseItem *item = ItemAtCursor();
+	if( item && item != &yes && item != &no && UI::Key::IsEnter( key ) && key != K_A_BUTTON )
+	{
+		if( bAutoHide )
+			Hide();
+		onPositive( this );
+		return true;
+	}
+
+	return false;
+}
+
 /*
 ==============
 CMenuYesNoMessageBox::SetMessage

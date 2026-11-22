@@ -574,8 +574,6 @@ void CMenuGameListModel::Update( void )
 
 	if( servers.Count() )
 	{
-		parent->joinGame->SetGrayed( false );
-		parent->MaybeEnableFavoriteButton();
 		parent->OnChangeSelectedServer();
 		if( m_iSortingColumn != -1 )
 			Sort( m_iSortingColumn, m_bAscend );
@@ -584,6 +582,9 @@ void CMenuGameListModel::Update( void )
 
 void CMenuGameListModel::OnActivateEntry( int line )
 {
+	if( !servers.IsValidIndex( line ))
+		return;
+
 	CMenuServerBrowser::Connect( servers[line] );
 }
 
@@ -834,6 +835,8 @@ void CMenuServerBrowser::ClearList()
 	filterMap.AddItem( L( "any map" ), "" );
 
 	gameListModel.Flush();
+	// old selection points to a different server or past the end of the new list
+	gameList.SetCurrentIndex( 0 );
 	joinGame->SetGrayed( true );
 	viewGameInfo->SetGrayed( true );
 	favorite->SetGrayed( true );
@@ -928,9 +931,6 @@ void CMenuServerBrowser::QueryServerList( const CUtlVector<favlist_entry_t> &lis
 			if( curTab == tabSwitch.GetState() && gameListModel.GetRows() == 0 )
 			{
 				gameListModel.AddServerToList( adr, fakeInfoString, list[i].favorited );
-				joinGame->SetGrayed( false );
-				viewGameInfo->SetGrayed( false );
-				MaybeEnableFavoriteButton();
 				OnChangeSelectedServer();
 			}
 		}
@@ -1038,9 +1038,19 @@ void CMenuServerBrowser::OnTabSwitch()
 void CMenuServerBrowser::OnChangeSelectedServer( void )
 {
 	int i = gameList.GetCurrentIndex();
+	bool selected = gameListModel.servers.IsValidIndex( i );
 
-	if( !gameListModel.servers.IsValidIndex( i ))
+	// selection can be lost when the list is refreshed
+	joinGame->SetGrayed( !selected );
+	viewGameInfo->SetGrayed( !selected );
+
+	if( !selected )
+	{
+		favorite->SetGrayed( true );
 		return;
+	}
+
+	MaybeEnableFavoriteButton();
 
 	bool fav = gameListModel.servers[i].favorite;
 	ToggleFavoriteButton( !fav );
@@ -1195,7 +1205,6 @@ void CMenuServerBrowser::_Init( void )
 	gameList.bFramedHintText = true;
 	gameList.bAllowSorting = true;
 	gameList.onChanged = VoidCb( &CMenuServerBrowser::OnChangeSelectedServer );
-	gameList.SetSize( -20, 465 );
 
 	tabSwitch.SetRect( 360, 230, -20, 32 );
 	tabSwitch.AddSwitch( L( "Direct" ));
@@ -1257,6 +1266,7 @@ void CMenuServerBrowser::_Init( void )
 
 	serverProtocol.Setup( &protlistModel );
 	serverProtocol.SetCurrentValue( 0.0f );
+	serverProtocol.bWrapAround = true;
 	serverProtocol.eTextAlignment = QM_LEFT;
 	serverProtocol.SetRect( 64, 100, 512, 32 );\
 
@@ -1386,15 +1396,26 @@ void CMenuServerBrowser::_VidInit()
 
 	if( m_bLanOnly )
 	{
-		gameList.SetCoord( 360, 230 );
+		gameList.SetRect( 360, 230, -20, 465 );
 	}
 	else
 	{
-		gameList.SetCoord( 360, 230 + tabSwitch.size.h + uiStatic.outlineWidth );
+		int top = 230 + tabSwitch.size.h + UI_OUTLINE_WIDTH;
+
+		// filters end 20 units above the bottom, same padding as on the right
+		gameList.SetRect( 360, top, -20, 768 - 20 - filterPing.size.h - UI_OUTLINE_WIDTH - top );
 	}
 
 	int x = gameList.pos.x;
 	int y = gameList.pos.y + gameList.size.h + UI_OUTLINE_WIDTH;
+
+	// map filter shrinks when the filters row doesn't fit under the table
+	int tableWidth = uiStatic.width - 20 - x;
+	int fixedWidth = filterPing.size.w + filterEmpty.size.w + filterFull.size.w + 30;
+	if( !m_bLanOnly ) // protocol filter is hidden in LAN mode
+		fixedWidth += filterProtocol.size.w + 10;
+	filterMap.size.w = bound( 100, tableWidth - fixedWidth, 200 );
+
 	filterPing.SetCoord( x, y );
 	x += filterPing.size.w + 10;
 	filterEmpty.SetCoord( x, y );
@@ -1462,6 +1483,7 @@ void CMenuServerBrowser::Show()
 	// clear out server table
 	staticWaitingPassword = false;
 	gameListModel.Flush();
+	gameList.SetCurrentIndex( 0 );
 	gameList.SetSortingColumn( COLUMN_PING );
 	joinGame->SetGrayed( true );
 	viewGameInfo->SetGrayed( true );
@@ -1564,9 +1586,6 @@ void CMenuServerBrowser::AddServerToList( netadr_t adr, const char *info )
 
 		// Always update visible model for LAN
 		gameListModel.AddServerToList( adr, info, false );
-		joinGame->SetGrayed( false );
-		viewGameInfo->SetGrayed( false );
-		MaybeEnableFavoriteButton();
 		OnChangeSelectedServer();
 		return;
 	}
@@ -1659,10 +1678,6 @@ void CMenuServerBrowser::AddServerToList( netadr_t adr, const char *info )
 	if( targetTab == curTabVisible )
 	{
 		gameListModel.AddServerToList( adr, info, is_favorite );
-
-		joinGame->SetGrayed( false );
-		viewGameInfo->SetGrayed( false );
-		MaybeEnableFavoriteButton();
 		OnChangeSelectedServer();
 	}
 }

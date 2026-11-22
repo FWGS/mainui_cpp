@@ -26,9 +26,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "CheckBox.h"
 #include "SpinControl.h"
 #include "StringArrayModel.h"
+#include "BaseModel.h"
+#include "utlvector.h"
+#include "utlstring.h"
+#include "Table.h"
+#include "YesNoMessageBox.h"
 #include "Action.h"
 
 #define ART_BANNER			"gfx/shell/head_gamepad"
+#define ART_BANNER_FAVORITE "gfx/shell/favorite"
 
 enum engineAxis_t
 {
@@ -60,8 +66,11 @@ public:
 private:
 	void _Init() override;
 	void _VidInit() override;
+	void GetAxisBinding();
 	void GetConfig();
 	void SaveAndPopMenu() override;
+	void UpdatePresets();
+	void ApplyPreset();
 
 	CMenuSlider side, forward, pitch, yaw;
 	CMenuCheckBox invSide, invFwd, invPitch, invYaw;
@@ -71,36 +80,50 @@ private:
 	CMenuAction axisBind_label;
 
 	CMenuCheckBox enableOsk;
+
+	class CPresetsListModel : public CMenuBaseModel, public CUtlVector<CUtlString>
+	{
+	public:
+		void Update() override {}
+		int GetColumns() const override { return 2; }
+		int GetRows() const override { return Count(); }
+
+		const char *GetCellText( int line, int column ) override
+		{
+			if( column == 0 )
+				return Element( line ).String();
+
+			return line == iActive ? ART_BANNER_FAVORITE : NULL;
+		}
+
+		ECellType GetCellType( int line, int column ) override
+		{
+			return column == 0 ? CELL_TEXT : CELL_IMAGE_ADDITIVE;
+		}
+
+		unsigned int GetAlignmentForColumn( int column ) const override
+		{
+			return column == 0 ? QM_LEFT : QM_CENTER;
+		}
+
+		int iActive = -1;
+	} presetsModel;
+	CMenuTable presets;
+	CMenuPicButton applyPreset;
+	CMenuYesNoMessageBox msgBox;
 };
 
 /*
 =================
-CMenuGamePad::GetConfig
+CMenuGamePad::GetAxisBinding
+
 =================
 */
-void CMenuGamePad::GetConfig( void )
+void CMenuGamePad::GetAxisBinding( void )
 {
-	float _side, _forward, _pitch, _yaw;
 	char binding[7] = { 0 };
 
-	enableOsk.LinkCvar( "osk_enable" );
-
 	Q_strncpy( binding, EngFuncs::GetCvarString( "joy_axis_binding"), sizeof( binding ));
-
-	_side = EngFuncs::GetCvarFloat( "joy_side" );
-	_forward = EngFuncs::GetCvarFloat( "joy_forward" );
-	_pitch = EngFuncs::GetCvarFloat( "joy_pitch" );
-	_yaw = EngFuncs::GetCvarFloat( "joy_yaw" );
-
-	side.SetCurrentValue( fabs( _side ) );
-	forward.SetCurrentValue( fabs( _forward ));
-	pitch.SetCurrentValue( fabs( _pitch ));
-	yaw.SetCurrentValue( fabs( _yaw ));
-
-	invSide.bChecked = _side < 0.0f;
-	invFwd.bChecked = _forward < 0.0f;
-	invPitch.bChecked = _pitch < 0.0f;
-	invYaw.bChecked = _yaw < 0.0f;
 
 	// I made a monster...
 	for( unsigned int i = 0; i < sizeof( binding ) - 1; i++ )
@@ -136,6 +159,37 @@ void CMenuGamePad::GetConfig( void )
 			axisBind[i].SetCurrentValue( JOY_AXIS_NULL );
 		}
 	}
+}
+
+/*
+=================
+CMenuGamePad::GetConfig
+
+=================
+*/
+void CMenuGamePad::GetConfig( void )
+{
+	float _side, _forward, _pitch, _yaw;
+
+	enableOsk.LinkCvar( "osk_enable" );
+
+	_side = EngFuncs::GetCvarFloat( "joy_side" );
+	_forward = EngFuncs::GetCvarFloat( "joy_forward" );
+	_pitch = EngFuncs::GetCvarFloat( "joy_pitch" );
+	_yaw = EngFuncs::GetCvarFloat( "joy_yaw" );
+
+	side.SetCurrentValue( fabs( _side ) );
+	forward.SetCurrentValue( fabs( _forward ));
+	pitch.SetCurrentValue( fabs( _pitch ));
+	yaw.SetCurrentValue( fabs( _yaw ));
+
+	invSide.bChecked = _side < 0.0f;
+	invFwd.bChecked = _forward < 0.0f;
+	invPitch.bChecked = _pitch < 0.0f;
+	invYaw.bChecked = _yaw < 0.0f;
+
+	GetAxisBinding();
+	UpdatePresets();
 }
 
 /*
@@ -191,6 +245,62 @@ void CMenuGamePad::SaveAndPopMenu()
 
 /*
 =================
+CMenuGamePad::UpdatePresets
+
+=================
+*/
+void CMenuGamePad::UpdatePresets()
+{
+	const char *preset = EngFuncs::GetCvarString( "joy_preset" );
+	char **filenames;
+	int numFiles;
+
+	presetsModel.RemoveAll();
+	presetsModel.iActive = -1;
+
+	// presets are shipped in engine's extras.pk3, so don't limit search to game directory
+	filenames = EngFuncs::GetFilesList( "gamepad_presets/*.cfg", &numFiles, false );
+
+	for( int i = 0; filenames && i < numFiles; i++ )
+	{
+		char name[128];
+
+		COM_FileBase( filenames[i], name, sizeof( name ));
+		presetsModel.AddToTail( name );
+
+		if( !strcmp( name, preset ))
+			presetsModel.iActive = presetsModel.Count() - 1;
+	}
+
+	presets.SetCurrentIndex( presetsModel.iActive >= 0 ? presetsModel.iActive : 0 );
+	applyPreset.SetGrayed( presetsModel.Count() == 0 );
+}
+
+/*
+=================
+CMenuGamePad::ApplyPreset
+
+=================
+*/
+void CMenuGamePad::ApplyPreset()
+{
+	int i = presets.GetCurrentIndex();
+	char name[256];
+
+	if( !presetsModel.IsValidIndex( i ))
+		return;
+
+	Com_EscapeCommand( name, presetsModel[i].Get(), sizeof( name ));
+	EngFuncs::ClientCmdF( true, "joy_loadpreset \"%s\"\n", name );
+	EngFuncs::ClientCmd( false, "host_writeconfig\n" );
+
+	// preset changes axis binding, reload it or Done writes old one back
+	GetAxisBinding();
+	UpdatePresets();
+}
+
+/*
+=================
 CMenuGamePad::Init
 =================
 */
@@ -231,6 +341,18 @@ void CMenuGamePad::_Init( void )
 	yaw.SetNameAndStatus( L( "Look Y" ), L( "Vertical look sensitivity" ) );
 	invYaw.SetNameAndStatus( L( "Invert" ), L( "Invert yaw axis" ) );
 
+	presets.SetModel( &presetsModel );
+	presets.SetupColumn( 0, L( "Presets" ), 1.0f );
+	presets.SetupColumn( 1, NULL, 32.0f, true );
+
+	applyPreset.SetNameAndStatus( L( "Activate" ), L( "Apply selected preset" ) );
+	applyPreset.SetPicture( PC_ACTIVATE );
+	applyPreset.onReleased = msgBox.MakeOpenEvent();
+
+	msgBox.SetMessage( L( "Replace gamepad bindings with the selected preset?" ) );
+	msgBox.onPositive = VoidCb( &CMenuGamePad::ApplyPreset );
+	msgBox.Link( this );
+
 	AddItem( banner );
 	AddButton( L( "Controls" ), nullptr, PC_CONTROLS, UI_Controls_Menu );
 	AddButton( L( "Gyroscope" ), nullptr, PC_GYRO, UI_GamePadGyro_Menu, QMF_NOTIFY, 'g' );
@@ -247,6 +369,8 @@ void CMenuGamePad::_Init( void )
 	AddItem( yaw );
 	AddItem( invYaw );
 	AddItem( axisBind_label );
+	AddItem( presets );
+	AddItem( applyPreset );
 }
 
 void CMenuGamePad::_VidInit()
@@ -260,8 +384,6 @@ void CMenuGamePad::_VidInit()
 		axisBind[i].SetRect( 360, y, 256, invSide.size.h );
 		axisBind[i].SetCharSize( QM_SMALLFONT );
 	}
-
-	enableOsk.SetCoord( 360, y );
 
 	int sliderAlign = invSide.size.h - side.size.h;
 
@@ -280,6 +402,13 @@ void CMenuGamePad::_VidInit()
 	yaw.SetCoord( 630, 430 + sliderAlign );
 	yaw.SetCharSize( QM_SMALLFONT );
 	invYaw.SetCoord( 850, 430 );
+
+	enableOsk.SetCoord( 630, 480 );
+
+	presets.SetRect( 630, 530, 330, 140 );
+
+	applyPreset.SetCoord( 630, 680 );
+	applyPreset.size.w = 120;
 
 	GetConfig();
 }

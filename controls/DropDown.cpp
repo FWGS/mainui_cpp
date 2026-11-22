@@ -32,6 +32,8 @@ CMenuDropDown::CMenuDropDown() : BaseClass()
 	bDropUp = false;
 
 	m_iState = 0;
+	m_isOpen = false;
+	m_bKeyboardHighlight = false;
 	m_szNames.Purge();
 }
 
@@ -40,6 +42,7 @@ void CMenuDropDown::VidInit()
 	iBackgroundColor.SetDefault( uiColorBlack );
 	iFgTextColor.SetDefault( uiInputFgColor );
 	iBgTextColor.SetDefault( uiPromptTextColor );
+	iBorderFocusedColor.SetDefault( uiInputTextColor );
 
 	BaseClass::VidInit();
 
@@ -81,6 +84,10 @@ int CMenuDropDown::IsNewStateByMouseClick()
 
 bool CMenuDropDown::KeyDown( int key )
 {
+	// open list takes arrows for itself, they change the value on key up
+	if( m_isOpen && !FBitSet( iFlags, QMF_MOUSEONLY ) && ( UI::Key::IsDownArrow( key ) || UI::Key::IsUpArrow( key )))
+		return true;
+
 	return false;
 }
 
@@ -94,6 +101,7 @@ bool CMenuDropDown::KeyUp( int key )
 		if( m_isOpen )
 			state = IsNewStateByMouseClick( );
 
+		m_bKeyboardHighlight = false;
 		MenuToggle( );
 		ret = true;
 	}
@@ -103,12 +111,16 @@ bool CMenuDropDown::KeyUp( int key )
 
 	if( !FBitSet( iFlags, QMF_MOUSEONLY ) )
 	{
-		if( UI::Key::IsDownArrow( key ) )
-			state += 1;
-		else if( UI::Key::IsUpArrow( key ) )
-			state -= 1;
+		// arrows move focus between items, so closed list keeps its value,
+		// otherwise just passing through it with keyboard or gamepad changes it
+		if( m_isOpen && ( UI::Key::IsDownArrow( key ) || UI::Key::IsUpArrow( key )))
+		{
+			state += UI::Key::IsDownArrow( key ) ? 1 : -1;
+			m_bKeyboardHighlight = true;
+		}
 		else if( UI::Key::IsEnter( key ) )
 		{
+			m_bKeyboardHighlight = true;
 			MenuToggle( );
 			return true;
 		}
@@ -130,6 +142,13 @@ bool CMenuDropDown::KeyUp( int key )
 	}
 
 	return ret;
+}
+
+bool CMenuDropDown::MouseMove( int x, int y )
+{
+	// the mouse is used again, highlight follows it
+	m_bKeyboardHighlight = false;
+	return true;
 }
 
 void CMenuDropDown::SetMenuOpen( bool isOpen )
@@ -160,12 +179,19 @@ void CMenuDropDown::Draw()
 	if( iFlags & QMF_DROPSHADOW )
 		textflags |= ETF_SHADOW;
 
+	// show which item has focus, same color as focused table stroke
+	if( IsCurrentSelected( ))
+		borderColor = iBorderFocusedColor;
+
 	if( m_isOpen )
 	{
 		Point pt( m_scPos.x, m_scPos.y );
 
 		if( !bDropUp )
 			pt.y += m_scItemSize.h;
+
+		// without mouse over the list, or when it's used with keyboard or gamepad, highlight the item chosen with arrows
+		bool mouseOver = !m_bKeyboardHighlight && UI_CursorInRect( pt.x, pt.y, m_scItemSize.w, m_scSize.h - m_scItemSize.h );
 
 		// all other items
 		UI_FillRect( pt.x, pt.y, m_scItemSize.w, m_scSize.h - m_scItemSize.h, 0xff000000 );
@@ -174,7 +200,9 @@ void CMenuDropDown::Draw()
 			uint textColor = iBgTextColor;
 			uint tempflags = textflags;
 
-			if( UI_CursorInRect( pt, m_scItemSize ) && !(iFlags & (QMF_GRAYED|QMF_INACTIVE)))
+			bool highlight = mouseOver ? UI_CursorInRect( pt, m_scItemSize ) : i == m_iState;
+
+			if( highlight && !(iFlags & (QMF_GRAYED|QMF_INACTIVE)))
 			{
 				UI_FillRect( pt, m_scItemSize, colorFocus );
 				tempflags |= ETF_FORCECOL;

@@ -142,6 +142,15 @@ bool CMenuField::KeyDown( int key )
 {
 	bool handled = false;
 
+	// gamepad has no keys to type, ask the engine for the system keyboard with the text of this field
+	if( key == K_A_BUTTON )
+	{
+		EngFuncs::SetTextInputRect( m_scPos.x, m_scPos.y, m_scSize.w, m_scSize.h );
+		EngFuncs::SetTextInputBuffer( szBuffer );
+		UI_EnableTextInput( true );
+		return true;
+	}
+
 	// clipboard paste
 	if( UI::Key::IsInsert( key ) && EngFuncs::KEY_IsDown( K_SHIFT ))
 	{
@@ -284,6 +293,9 @@ void CMenuField::Char( int key )
 	{
 		// ctrl-c clears the field
 		Clear( );
+		SetCvarString( szBuffer );
+		_Event( QM_CHANGED );
+		return;
 	}
 
 	len = strlen( szBuffer );

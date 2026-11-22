@@ -143,6 +143,7 @@ void CMenuTouchOptions::SaveAndPopMenu( void )
 	moveY.WriteCvar();
 	enable.WriteCvar();
 	nomouse.WriteCvar();
+	safearea.WriteCvar();
 	acceleration.WriteCvar();
 	power.WriteCvar();
 	multiplier.WriteCvar();
@@ -161,6 +162,7 @@ void CMenuTouchOptions::GetConfig( void )
 	moveY.UpdateEditable();
 	enable.UpdateEditable();
 	nomouse.UpdateEditable();
+	safearea.UpdateEditable();
 	acceleration.UpdateEditable();
 	power.UpdateEditable();
 	multiplier.UpdateEditable();

@@ -41,6 +41,7 @@ public:
 
 	bool KeyDown( int key ) override;
 	bool KeyUp( int key ) override;
+	bool MouseMove( int x, int y ) override;
 	void VidInit() override;
 	void Draw() override;
 
@@ -86,6 +87,7 @@ public:
 	CColor iBackgroundColor;
 	CColor iFgTextColor;
 	CColor iBgTextColor;
+	CColor iBorderFocusedColor;
 
 	bool bDropUp;
 
@@ -106,6 +108,7 @@ protected:
 
 	int m_iState;
 	bool m_isOpen;
+	bool m_bKeyboardHighlight; // open list highlights the current value, not the item under the mouse cursor
 
 private:
 	int IsNewStateByMouseClick();

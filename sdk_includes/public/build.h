@@ -77,6 +77,7 @@ Then you can use another oneliner to query all variables:
 #undef XASH_OSX
 #undef XASH_POSIX
 #undef XASH_PPC
+#undef XASH_PS4
 #undef XASH_PSP
 #undef XASH_PSVITA
 #undef XASH_RISCV
@@ -105,7 +106,11 @@ Then you can use another oneliner to query all variables:
 	#define XASH_PSP 1
 #else // POSIX compatible
 	#define XASH_POSIX 1
-	#if defined __linux__
+	// OpenOrbis toolchain targets FreeBSD, but libc++ headers undefine __FreeBSD__
+	// so PS4 must be checked first to get same result in C and C++
+	#if defined __ORBIS__
+		#define XASH_PS4 1
+	#elif defined __linux__
 		#if defined __ANDROID__
 			#define XASH_ANDROID 1
 			#if defined __TERMUX__
