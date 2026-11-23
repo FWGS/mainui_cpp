@@ -69,6 +69,7 @@ private:
 	CMenuPicButton	hazardCourse;
 	CMenuPicButton	configuration;
 	CMenuPicButton	saveRestore;
+	CMenuPicButton	worldMap;  // CZ:DS
 	CMenuPicButton	multiPlayer;
 	CMenuPicButton	customGame;
 	CMenuPicButton	readme;
@@ -155,17 +156,7 @@ UI_Main_HazardCourse
 */
 void CMenuMain::HazardCourseCb()
 {
-	if( EngFuncs::GetCvarFloat( "host_serverstate" ) && EngFuncs::GetCvarFloat( "maxplayers" ) > 1 )
-		EngFuncs::HostEndGame( "end of the game" );
-
-	EngFuncs::CvarSetValue( "skill", 1.0f );
-	EngFuncs::CvarSetValue( "deathmatch", 0.0f );
-	EngFuncs::CvarSetValue( "teamplay", 0.0f );
-	EngFuncs::CvarSetValue( "pausable", 1.0f ); // singleplayer is always allowing pause
-	EngFuncs::CvarSetValue( "coop", 0.0f );
-	EngFuncs::CvarSetValue( "maxplayers", 1.0f ); // singleplayer
-
-	EngFuncs::PlayBackgroundTrack( NULL, NULL );
+	UI_PrepareSingleplayerGame( 1 );
 
 	EngFuncs::ClientCmd( false, "hazardcourse\n" );
 }
@@ -223,6 +214,13 @@ void CMenuMain::_Init( void )
 	configuration.onReleased = UI_Options_Menu;
 
 	saveRestore.iFlags |= QMF_NOTIFY;
+
+	if( UI_IsCZDS( ))
+	{
+		worldMap.SetNameAndStatus( L_GAME( "CZERO_WorldMap" ), L( "Choose a mission" ) );
+		worldMap.iFlags |= QMF_NOTIFY;
+		worldMap.onReleased = UI_WorldMap_Menu;
+	}
 
 	customGame.SetNameAndStatus( L( "GameUI_ChangeGame" ), L( "StringsList_530" ) );
 	customGame.SetPicture( PC_CUSTOM_GAME );
@@ -302,6 +300,9 @@ void CMenuMain::_Init( void )
 	if ( bShowNewGame )
 		AddItem( newGame );
 
+	if( UI_IsCZDS( ))
+		AddItem( worldMap );
+
 	if ( bShowHazardCourse )
 		AddItem( hazardCourse );
 
@@ -373,6 +374,12 @@ void CMenuMain::VidInit( bool connected )
 	if( bShowHazardCourse )
 	{
 		hazardCourse.SetCoord( hoffset, yoffset );
+		yoffset -= ygap;
+	}
+
+	if( UI_IsCZDS( ))
+	{
+		worldMap.SetCoord( hoffset, yoffset );
 		yoffset -= ygap;
 	}
 

@@ -594,16 +594,16 @@ void CMenuTouchButtons::_VidInit()
 	blue.SetCoord( sliders_x, 270 );
 	alpha.SetCoord( sliders_x, 330 );
 
-	additive.SetCoord( 650, 465 );
+	additive.SetCoord( 650, 430 );
 
-	mp.SetCoord( 400, 420 );
-	sp.SetCoord( 160 - 72 + 400, 420 );
-	lock.SetCoord( 256 - 72 + 400, 420 );
-	hide.SetCoord( 384 - 72 + 400, 420 );
+	mp.SetCoord( 400, 390 );
+	sp.SetCoord( 160 - 72 + 400, 390 );
+	lock.SetCoord( 256 - 72 + 400, 390 );
+	hide.SetCoord( 384 - 72 + 400, 390 );
 
-	precision.SetCoord( 400, 465 );
-	stick.SetCoord( 400, 510 );
-	latch.SetCoord( 650, 510 );
+	precision.SetCoord( 400, 430 );
+	stick.SetCoord( 400, 470 );
+	latch.SetCoord( 650, 470 );
 	buttonList.SetRect( 72, 135, 300, 395 );
 
 	save.SetRect( 384 - 42 + 320, 550, 170, 50 );

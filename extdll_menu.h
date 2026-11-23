@@ -53,7 +53,7 @@ GNU General Public License for more details.
 #ifdef MY_COMPILER_SUCKS
 // C++11 keywords
 #define final
-#define constexpr
+#define constexpr const // so never write constexpr const, and add inline to constexpr functions
 #define override
 #define nullptr NULL
 #endif

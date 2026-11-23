@@ -174,7 +174,8 @@ bool CMenuTable::MouseMove( int x, int y )
 		}
 	}
 
-	iTopItem = bound( 0, iTopItem, m_pModel->GetRows() - iNumRows );
+	// list shorter than the view must not get a negative top item
+	iTopItem = bound( 0, iTopItem, Q_max( 0, m_pModel->GetRows() - iNumRows ));
 
 	return true;
 }
@@ -615,7 +616,8 @@ void CMenuTable::Draw()
 
 	// HACKHACK: normalize iTopItem
 	// remove when there will be per-pixel scrolling
-	iTopItem = bound( 0, iTopItem, m_pModel->GetRows() - 1 );
+	// empty list must not get a negative top item, scrollbar would jump
+	iTopItem = bound( 0, iTopItem, Q_max( 0, m_pModel->GetRows() - 1 ));
 
 	if( UI_CursorInRect( boxPos, boxSize ) )
 	{

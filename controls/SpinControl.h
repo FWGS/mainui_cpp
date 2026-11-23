@@ -46,6 +46,8 @@ public:
 
 	void ForceDisplayString( const char *display );
 
+	bool bWrapAround;
+
 private:
 	const char *MoveLeft();
 	const char *MoveRight();

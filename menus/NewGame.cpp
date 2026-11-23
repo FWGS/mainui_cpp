@@ -67,17 +67,11 @@ CMenuNewGame::StartGame
 */
 void CMenuNewGame::StartGame( uintptr_t skill )
 {
-	if( EngFuncs::GetCvarFloat( "host_serverstate" ) && EngFuncs::GetCvarFloat( "maxplayers" ) > 1 )
-		EngFuncs::HostEndGame( "end of the game" );
+	UI_PrepareSingleplayerGame( skill );
 
-	EngFuncs::CvarSetValue( "skill", skill );
-	EngFuncs::CvarSetValue( "deathmatch", 0.0f );
-	EngFuncs::CvarSetValue( "teamplay", 0.0f );
-	EngFuncs::CvarSetValue( "pausable", 1.0f ); // singleplayer is always allowing pause
-	EngFuncs::CvarSetValue( "maxplayers", 1.0f );
-	EngFuncs::CvarSetValue( "coop", 0.0f );
-
-	EngFuncs::PlayBackgroundTrack( NULL, NULL );
+	// CZ:DS server resets cl_levellocks to the starting missions on spawn
+	if( UI_IsCZDS() )
+		EngFuncs::CvarSetValue( "cl_newgame", 1.0f );
 
 	if( startDemoChapter.bChecked )
 		EngFuncs::ClientCmdF( false, "newgame \"%s\"\n", gMenu.m_gameinfo.demomap );

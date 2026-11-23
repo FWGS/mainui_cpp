@@ -228,7 +228,7 @@ CMenuFramework::CMenuBannerBitmap::CMenuBannerBitmap()
 
 void CMenuFramework::CMenuBannerBitmap::SetPicture(const char *pic)
 {
-	if( uiStatic.lowmemory )
+	if( uiStatic.lowmemory || uiStatic.hideBanners )
 		return;
 
 	image.Load( pic );
@@ -236,6 +236,9 @@ void CMenuFramework::CMenuBannerBitmap::SetPicture(const char *pic)
 
 void CMenuFramework::CMenuBannerBitmap::Draw( Point pt, Size sz )
 {
+	if( uiStatic.hideBanners )
+		return;
+
 	if( image.IsValid() )
 	{
 		UI_DrawPic( pt, sz, uiColorWhite, image, QM_DRAWADDITIVE );
