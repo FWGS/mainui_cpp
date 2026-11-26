@@ -104,6 +104,15 @@ void CFontManager::VidInit( void )
 			.Create();
 		prevScale = scale;
 	}
+
+	// rebuild hud font every VidInit since hud_truetype_size may change
+	if( uiStatic.hHudFont )
+		g_FontMgr->DeleteFont( uiStatic.hHudFont );
+	float hudSize = EngFuncs::GetCvarFloat( "hud_truetype_size" );
+	if( hudSize <= 0.0f )
+		hudSize = 16.0f;
+	uiStatic.hHudFont = CFontBuilder( DEFAULT_MENUFONT, hudSize * scale, DEFAULT_WEIGHT )
+		.Create();
 }
 
 void CFontManager::DeleteAllFonts()
